@@ -1,0 +1,64 @@
+/* Styles for ConfirmationPage component - Harmonized */
+
+/* Assuming root variables are globally available */
+
+.containerSuccess {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 20px;
+  background-color: var(--light-background, #f7f7f7);
+  font-family: var(--font-family, 'Roboto', sans-serif);
+  color:#0c0c0c
+}
+
+.cardSuccess {
+  background-color: var(--background-color, #ffffff);
+  padding: 40px 50px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.icon-container {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 25px auto;
+  background-color: var(--primary-color, #00c6a9);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkmark {
+  color: var(--white, #242222);
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.cardSuccess h1 {
+  color: var(--text-color, #0c0c0c);
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+}
+
+.cardSuccess p {
+  color: #0c0c0c; /* Changed to black */
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+.countdown {
+  font-size: 0.9rem;
+  color: var(--light-text-color, #555555);
+}
+
+.countdown b {
+  color: var(--primary-color, #00c6a9);
+  font-weight: bold;
+}

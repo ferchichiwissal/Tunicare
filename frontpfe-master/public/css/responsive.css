@@ -1,0 +1,77 @@
+@media (max-width: 1300px) {
+  .treatment_section .side_img {
+    opacity: 0.2;
+  }
+}
+@media (max-width: 1120px) {}
+
+
+@media (max-width: 992px) {
+  .hero_area {
+      
+    height: 100vh; /* Plein écran */
+    width: 100%;
+  }
+
+  .slider_section {
+    padding: 0; /* Suppression du padding pour maximiser l'espace */
+    height: 100vh;
+    width: 100%;
+  }
+
+  .quote_btn-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .quote_btn-container a {
+    margin-right: 0;
+    margin-top: 10px;
+  }
+
+  .client_section .carousel_btn-box {
+    display: flex;
+    justify-content: center;
+    margin-top: 45px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about_section .detail-box {
+    margin-top: 45px;
+  }
+
+  .team_section .team_carousel {
+    padding: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .header_section .header_top .contact_nav a span {
+    display: none;
+  }
+
+  .header_section .header_top .contact_nav a i {
+    font-size: 28px;
+    margin: 0;
+  }
+
+  .treatment_section .side_img {
+    display: none;
+  }
+}
+
+@media (max-width: 376px) {
+  .slider_section .detail_box h1 {
+    font-size: 2.5rem;
+  }
+}
+
+
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 100%; /* Suppression de la limitation */
+    width: 100vw;
+  }
+}

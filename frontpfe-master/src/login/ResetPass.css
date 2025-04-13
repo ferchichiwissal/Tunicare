@@ -1,0 +1,104 @@
+/* Styles for ResetPass component - Harmonized */
+
+/* Assuming root variables are globally available */
+
+.auth-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh; /* Adjust as needed */
+  padding: 20px;
+  background-color: var(--light-background, #f7f7f7); /* Light background */
+  font-family: var(--font-family, 'Roboto', sans-serif);
+}
+
+.auth-inner {
+  padding: 30px 40px;
+  max-width: 450px;
+  width: 100%;
+  background-color: var(--background-color, #ffffff);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.auth-inner h3 {
+  color: var(--text-color, #0c0c0c);
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: bold;
+}
+
+.auth-inner form div {
+  margin-bottom: 20px;
+}
+
+.auth-inner label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: var(--text-color, #0c0c0c);
+}
+
+.auth-inner .form-control { /* Target .form-control within .auth-inner */
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.auth-inner .form-control:focus {
+  border-color: var(--primary-color, #00c6a9);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 198, 169, 0.2);
+}
+
+.auth-inner .btn.btn-primary { /* Target .btn.btn-primary within .auth-inner */
+  display: block; /* Make button full width */
+  width: 100%;
+  padding: 12px 30px;
+  background-color: var(--primary-color, #00c6a9);
+  color: var(--white, #ffffff);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.auth-inner .btn.btn-primary:hover {
+  background-color: #00937d;
+  transform: translateY(-1px);
+}
+
+.auth-inner .btn.btn-primary:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Message styling */
+.auth-inner p[style*="color: red"],
+.auth-inner p[style*="color: green"] {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.auth-inner p[style*="color: red"] { /* Error */
+  color: var(--error-color, #e60f0f) !important;
+  background-color: rgba(230, 15, 15, 0.1);
+  border: 1px solid var(--error-color, #e60f0f);
+}
+
+.auth-inner p[style*="color: green"] { /* Success */
+  color: green !important;
+  background-color: rgba(40, 167, 69, 0.1);
+  border: 1px solid green;
+}

@@ -1,0 +1,91 @@
+/* Styles for Logout component/dialog - Harmonized */
+
+/* Assuming root variables are globally available */
+
+/* Overlay for the dialog */
+.logout-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's on top */
+  font-family: var(--font-family, 'Roboto', sans-serif);
+}
+
+/* Dialog box */
+.logout-dialog-content {
+  background-color: var(--background-color, #ffffff);
+  padding: 30px 40px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.logout-dialog-content h2 {
+  color: var(--text-color, #0c0c0c);
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+}
+
+.logout-dialog-content p {
+  color: var(--light-text-color, #555555);
+  margin-bottom: 30px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Button container */
+.logout-dialog-actions {
+  display: flex;
+  justify-content: space-around; /* Space out buttons */
+  gap: 15px;
+}
+
+/* General button style within dialog */
+.logout-dialog-button {
+  flex: 1; /* Allow buttons to grow */
+  padding: 10px 20px;
+  border-radius: 5px; /* Consistent radius */
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+  border: none;
+  text-transform: uppercase;
+}
+
+.logout-dialog-button:hover {
+    transform: translateY(-1px);
+}
+
+/* Cancel button styling */
+.logout-dialog-button.cancel {
+  background-color: #28a745; /* Green background */
+  color: var(--white, #ffffff); /* White text */
+  border: 1px solid #28a745;
+}
+
+.logout-dialog-button.cancel:hover {
+  background-color: #218838; /* Darker green on hover */
+  border-color: #1e7e34;
+}
+
+/* Confirm button styling */
+.logout-dialog-button.confirm {
+  background-color: var(--error-color, #dc3545); /* Red background */
+  color: var(--white, #ffffff);
+  border: 1px solid var(--error-color, #dc3545);
+}
+
+.logout-dialog-button.confirm:hover {
+  background-color: #c82333; /* Darker red on hover */
+  border-color: #bd2130;
+}

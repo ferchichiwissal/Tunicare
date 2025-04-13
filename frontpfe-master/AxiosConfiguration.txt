@@ -1,0 +1,30 @@
+axiosInstance is a custom configuration of the Axios HTTP client used to centralize the setup of API requests and handle certain behaviors such as token management and error handling.
+
+Here’s a breakdown of its key features:
+
+Custom Axios Instance:
+
+An Axios instance is created using axios.create() with a specific configuration, such as the base URL for the API (baseURL).
+This instance is used across your application to make HTTP requests.
+Request Interceptor:
+
+The request interceptor allows you to modify every request before it’s sent.
+In this case, the interceptor adds an Authorization header with a Bearer token (either from localStorage or sessionStorage) if the token exists. This is useful for authenticated API requests.
+Response Interceptor:
+
+The response interceptor handles the server’s response globally.
+If the response status is 401 Unauthorized, the interceptor attempts to refresh the access token by sending the stored refreshToken to the server’s refresh endpoint.
+If the token refresh is successful, it updates the stored access token and retries the original request.
+If token refresh fails (e.g., refresh token is invalid or expired), it removes the stored tokens and redirects the user to the login page.
+Error Handling:
+
+Errors such as invalid tokens or network issues are caught by the response interceptor, preventing repetitive error-handling logic throughout your components.
+Reuse Across Components:
+
+By storing the Axios instance in a separate file (e.g., utils/axiosInstance.js), you ensure that the configuration and interceptors are applied globally across your app.
+Components only need to import and use this instance to make API calls, simplifying code maintenance.
+Benefits:
+Centralized Configuration: You manage all Axios settings, including interceptors, in one place.
+Token Management: Automatic handling of authorization tokens and refreshing expired tokens.
+Error Handling: Global error handling for common issues like unauthorized requests.
+Cleaner Code: Avoid repetitive configuration in every component by using the instance throughout the app.

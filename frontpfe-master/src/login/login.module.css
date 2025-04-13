@@ -1,0 +1,155 @@
+/* Styles for Login component - Harmonized CSS Module */
+
+/* Assuming root variables are globally available */
+
+/* Remove global styles and font import */
+/* @import url(...); */
+/* * { ... } */
+/* body { ... } */
+/* h1, h2, ... { ... } */
+/* body, html, .App, #root, .authwrapper { ... } */ /* .authwrapper is defined below */
+/* .navbarlight { ... } */ /* Assuming navbar styles are handled globally */
+
+.authwrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Center the inner form */
+  min-height: 100vh; /* Take full viewport height */
+  padding: 20px;
+  background-color: var(--light-background, #f7f7f7); /* Harmonized background */
+  font-family: var(--font-family, 'Roboto', sans-serif); /* Harmonized font */
+  width: 100%; /* Ensure it takes width */
+}
+
+/* Style for the inner form container */
+.authinner {
+  width: 100%; /* Take full width within constraints */
+  max-width: 450px; /* Limit max width */
+  margin: auto;
+  background: var(--background-color, #ffffff); /* Harmonized background */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Consistent shadow */
+  padding: 40px 55px 45px 55px; /* Keep existing padding */
+  border-radius: 8px; /* Consistent radius */
+  transition: all 0.3s;
+}
+
+.authwrapper h3 {
+  text-align: center;
+  margin: 0 0 25px 0; /* Adjusted margin */
+  line-height: 1.2; /* Adjusted line-height */
+  padding-bottom: 15px; /* Adjusted padding */
+  color: var(--text-color, #0c0c0c); /* Harmonized text color */
+  font-weight: bold; /* Ensure heading is bold */
+  font-size: 1.5rem; /* Consistent heading size */
+}
+
+/* Input field styling */
+.formcontrol {
+  width: 100%;
+  padding: 12px 15px; /* Consistent padding */
+  border-radius: 5px; /* Consistent radius */
+  border: 1px solid #ccc; /* Harmonized border */
+  font-size: 1rem; /* Consistent font size */
+  margin-bottom: 15px; /* Consistent margin */
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.formcontrol:focus {
+  border-color: var(--primary-color, #00c6a9); /* Harmonized focus color */
+  box-shadow: 0 0 0 2px rgba(0, 198, 169, 0.2); /* Consistent focus shadow */
+  outline: none;
+}
+
+/* Label styling */
+.authinner label { /* Target labels inside .authinner */
+  font-weight: bold; /* Make labels bold */
+  color: var(--text-color, #0c0c0c); /* Harmonized text color */
+  margin-bottom: 8px; /* Space below label */
+  display: block; /* Ensure label is on its own line */
+  font-size: 0.9rem; /* Slightly smaller label */
+}
+
+/* Checkbox styling */
+.customControlLabel { /* Keep existing class name */
+  font-weight: normal; /* Normal weight for checkbox label */
+  color: var(--light-text-color, #555555); /* Lighter text */
+  display: inline-block; /* Align with checkbox */
+  margin-left: 5px;
+  font-size: 0.9rem;
+}
+
+.authinner input[type="checkbox"] { /* Target checkbox */
+  -webkit-appearance: checkbox;
+  -moz-appearance: checkbox;
+       appearance: checkbox;
+  display: inline-block;
+  width: auto;
+  margin-right: 5px; /* Space between checkbox and label */
+  vertical-align: middle; /* Align checkbox */
+}
+
+/* Forgot password link styling */
+.forgotpassword {
+  text-align: right;
+  margin-top: 10px; /* Add some space above */
+  margin-bottom: 15px; /* Space below */
+}
+
+.forgotpassword button {
+  background: none;
+  border: none;
+  color: var(--primary-color, #00c6a9); /* Harmonized link color */
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem; /* Consistent small font size */
+  text-decoration: underline;
+}
+
+.forgotpassword button:hover {
+  color: #00937d; /* Darker shade on hover */
+}
+
+/* Button styling */
+.btn { /* General button class used in Login.js */
+  background-color: var(--primary-color, #00c6a9); /* Harmonized color */
+  color: var(--white, #ffffff);
+  font-size: 1rem; /* Consistent font size */
+  font-weight: bold;
+  padding: 12px 20px; /* Consistent padding */
+  border: none;
+  border-radius: 5px; /* Consistent radius */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s;
+  width: 100%; /* Make button full width */
+  text-transform: uppercase;
+  margin-top: 10px; /* Space above button */
+}
+
+.btn:hover {
+  background-color: #00937d; /* Darker shade */
+  transform: translateY(-1px); /* Subtle lift */
+}
+
+.btn:disabled { /* Style for disabled button */
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Margin utility (if used) */
+.mb3 {
+  margin-bottom: 1rem; /* Use rem for consistency */
+}
+
+/* Error message styling */
+.errorMessage { /* Assuming an error message div might use this class */
+    color: var(--error-color, #e60f0f);
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-top: 15px;
+    padding: 10px;
+    background-color: rgba(230, 15, 15, 0.1);
+    border: 1px solid var(--error-color, #e60f0f);
+    border-radius: 5px;
+    text-align: center;
+}

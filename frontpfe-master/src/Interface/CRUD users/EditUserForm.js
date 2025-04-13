@@ -1,0 +1,340 @@
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import { getToken, clearUserData, isTokenExpired } from "../../utils/auth"; // Import auth utils
+import './EditUserForm.css'; // Import the CSS file
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
+const EditUserForm = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "", // Keep email, might be display-only or backend handles changes
+    address: "",
+    birthDate: "",
+    tel: "",
+    // Excluded non-editable fields: role, isActive, password
+  });
+
+  const [initialData, setInitialData] = useState({}); // Store initial data for comparison
+  const [errors, setErrors] = useState({}); // Use object for field-specific and submit errors
+  const [loading, setLoading] = useState(true); // Start loading true for initial fetch
+  const [isSubmitting, setIsSubmitting] = useState(false); // For update submission
+
+  // --- Logout Function ---
+  const performLogout = useCallback(() => {
+    clearUserData();
+    alert("Session expired or logged out. Redirecting to login.");
+    navigate("/sign-in");
+  }, [navigate]);
+
+  // --- Token Expiry & Inactivity Checks ---
+   useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+      performLogout();
+      return;
+    }
+    let expiryTimer;
+    try {
+      const decodedToken = jwtDecode(token);
+      const expiryTime = decodedToken.exp * 1000;
+      const currentTime = Date.now();
+      const timeToExpire = expiryTime - currentTime;
+      if (timeToExpire > 0) {
+        expiryTimer = setTimeout(performLogout, timeToExpire);
+      } else {
+        performLogout();
+        return;
+      }
+    } catch (error) {
+      console.error("Erreur lors du décodage du token :", error);
+      performLogout();
+      return;
+    }
+    let inactivityTimer;
+    const resetInactivityTimer = () => {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+    };
+    const events = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+    events.forEach((event) => window.addEventListener(event, resetInactivityTimer));
+    resetInactivityTimer();
+
+    return () => {
+      clearTimeout(expiryTimer);
+      clearTimeout(inactivityTimer);
+      events.forEach((event) => window.removeEventListener(event, resetInactivityTimer));
+    };
+  }, [performLogout]);
+
+  // --- Fetch User Data ---
+  useEffect(() => {
+    if (!id) {
+        setErrors({ fetch: "User ID is missing." }); // Use setErrors
+        setLoading(false);
+        return;
+    };
+
+    const fetchUserData = async () => {
+      setLoading(true);
+      setErrors({}); // Clear previous errors
+      try {
+        const token = getToken();
+        if (!token) throw new Error("Authentication token not found.");
+
+        const response = await axios.get(`http://localhost:6952/Users/allid/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const userData = {
+          firstName: response.data.firstName || "",
+          lastName: response.data.lastName || "",
+          email: response.data.email || "", // Include email
+          address: response.data.address || "",
+          birthDate: response.data.birthDate ? response.data.birthDate.split("T")[0] : "",
+          tel: response.data.tel || "",
+        };
+        setFormData(userData);
+        setInitialData(userData); // Store initial data
+
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            setErrors({ fetch: "Permission denied or session expired." }); // Use setErrors
+            performLogout(); // Logout on auth error
+        } else if (error.response && error.response.status === 404) {
+             setErrors({ fetch: `User with ID ${id} not found.` }); // Use setErrors
+        } else {
+            setErrors({ fetch: "Failed to fetch user data. Please try again." }); // Use setErrors
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [id, performLogout]); // Add performLogout dependency
+
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+     // Clear specific field error on change
+     if (errors[name]) {
+        setErrors(prevErrors => ({ ...prevErrors, [name]: undefined }));
+    }
+    // Clear general submit error on any change
+    if (errors.submit) {
+        setErrors(prevErrors => ({ ...prevErrors, submit: undefined }));
+    }
+  }, [errors]); // Depend on errors to clear them
+
+  // --- Form Validation ---
+   const validateForm = () => {
+    const newErrors = {};
+    if (!formData.firstName) newErrors.firstName = "First name is required";
+    if (!formData.lastName) newErrors.lastName = "Last name is required";
+    // Basic email format check (assuming email is not editable, but good practice)
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = "Invalid email format";
+    }
+     if (!formData.birthDate) newErrors.birthDate = "Birth date is required";
+     // Phone validation: only if filled, must be digits
+    if (formData.tel && !/^\d+$/.test(formData.tel)) {
+        newErrors.tel = "Phone number must contain only digits";
+    }
+    setErrors(newErrors); // Use setErrors
+    return Object.keys(newErrors).length === 0;
+  };
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return; // Validate before submitting
+
+    const token = getToken();
+    if (!token) {
+        setErrors({ submit: "Authentication required. Please log in again." }); // Use setErrors
+        performLogout();
+        return;
+    }
+
+    // Prepare only changed fields to send
+    const fieldsToUpdate = {};
+    Object.keys(formData).forEach((key) => {
+      // Include field if it has changed from initial state
+      if (formData[key] !== initialData[key]) {
+        // Special handling for potentially empty optional fields that were initially null/empty
+        if ( (key === 'tel' || key === 'address') && formData[key] === '' && (initialData[key] === null || initialData[key] === '')) {
+           // Don't send empty string if it was already null/empty
+        } else {
+           fieldsToUpdate[key] = formData[key];
+        }
+      }
+    });
+
+     // If no fields changed, inform the user and don't submit
+    if (Object.keys(fieldsToUpdate).length === 0) {
+        alert("No changes detected.");
+        return;
+    }
+
+    // Exclude email if it shouldn't be updatable
+    // delete fieldsToUpdate.email;
+
+    setIsSubmitting(true);
+    setErrors({}); // Clear previous submit errors
+
+    try {
+      await axios.put(`http://localhost:6952/Users/update/${id}`, fieldsToUpdate, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, // Ensure correct content type
+      });
+      alert("User updated successfully!");
+      navigate("/dashboard"); // Or navigate back to user list/profile
+    } catch (error) {
+      console.error("Error updating user:", error);
+       if (error.response) {
+            if (error.response.status === 401 || error.response.status === 403) {
+                setErrors({ submit: "Permission denied or session expired." }); // Use setErrors
+                performLogout();
+            } else if (error.response.status === 404) {
+                setErrors({ submit: `User with ID ${id} not found.` }); // Use setErrors
+            } else {
+                 setErrors({ submit: error.response.data?.message || "Failed to update the user. Please try again." }); // Use setErrors
+            }
+       } else {
+            setErrors({ submit: "Network error or server unavailable. Please try again." }); // Use setErrors
+       }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading && !Object.keys(initialData).length) { // Show loading only on initial fetch
+    return <div className="text-center p-4">Loading user data...</div>;
+  }
+
+  if (errors.fetch) {
+    return <div className="alert alert-danger m-4">{errors.fetch}</div>;
+  }
+
+  return (
+    <div className="edit-user-container container mt-4"> {/* Added Bootstrap container class */}
+      <h2>Edit User Profile (ID: {id})</h2>
+      {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
+
+      <form onSubmit={handleSubmit} noValidate>
+        {/* Row 1: First Name, Last Name */}
+        <div className="row g-3 mb-3">
+          <div className="col-md-6">
+            <label htmlFor="edit-firstName" className="form-label required">First Name</label>
+            <input
+              type="text"
+              id="edit-firstName"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              placeholder="Enter first name"
+              className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
+              required
+            />
+            <div className="invalid-feedback">{errors.firstName}</div>
+          </div>
+          <div className="col-md-6">
+            <label htmlFor="edit-lastName" className="form-label required">Last Name</label>
+            <input
+              type="text"
+              id="edit-lastName"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              placeholder="Enter last name"
+              className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
+              required
+            />
+            <div className="invalid-feedback">{errors.lastName}</div>
+          </div>
+        </div>
+
+        {/* Row 2: Email (Display Only), Birth Date */}
+         <div className="row g-3 mb-3">
+            <div className="col-md-6">
+                <label htmlFor="edit-email" className="form-label">Email</label>
+                <input
+                    type="email"
+                    id="edit-email"
+                    name="email"
+                    value={formData.email}
+                    className="form-control"
+                    readOnly // Make email read-only
+                    disabled // Visually indicate it's not editable
+                />
+                 {/* No validation feedback needed for read-only field */}
+            </div>
+            <div className="col-md-6">
+                <label htmlFor="edit-birthDate" className="form-label required">Birth Date</label>
+                <input
+                    type="date"
+                    id="edit-birthDate"
+                    name="birthDate"
+                    value={formData.birthDate}
+                    onChange={handleInputChange}
+                    className={`form-control ${errors.birthDate ? 'is-invalid' : ''}`}
+                    required
+                />
+                <div className="invalid-feedback">{errors.birthDate}</div>
+            </div>
+        </div>
+
+        {/* Row 3: Telephone, Address */}
+        <div className="row g-3 mb-3">
+          <div className="col-md-6">
+            <label htmlFor="edit-tel" className="form-label">Telephone</label>
+            <input
+              type="text"
+              id="edit-tel"
+              name="tel"
+              value={formData.tel}
+              onChange={handleInputChange}
+              placeholder="Enter phone number (optional)"
+              className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
+            />
+             <div className="invalid-feedback">{errors.tel}</div>
+          </div>
+          <div className="col-md-6">
+            <label htmlFor="edit-address" className="form-label">Address</label>
+            <input
+              type="text"
+              id="edit-address"
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              placeholder="Enter address (optional)"
+              className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+            />
+             {/* No feedback needed for optional field */}
+          </div>
+        </div>
+
+        {/* Row 4: Submit Button */}
+        <div className="row g-3">
+            <div className="col-12 text-center">
+                <button type="submit" className="btn btn-primary btn-lg" disabled={isSubmitting}>
+                {isSubmitting ? "Updating..." : "Update User"}
+                </button>
+            </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default EditUserForm;
