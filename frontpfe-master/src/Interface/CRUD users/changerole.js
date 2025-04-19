@@ -1,6 +1,6 @@
  import React, { useEffect, useState,useCallback } from "react";
  import { useNavigate } from "react-router-dom";
-
+ import { useTranslation } from "react-i18next"; // Import useTranslation
 import axios from "axios";
 import { getToken, getRoles, clearUserData, isTokenExpired, getUserData } from "../../utils/auth"; // Import getUserData
 import './changerole.css'; // Import the CSS file
@@ -9,6 +9,7 @@ const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const UserManagement = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(); // Get translation function
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [userRoles, setUserRoles] = useState([]);
@@ -20,7 +21,7 @@ const UserManagement = () => {
   // --- Logout Function (using useCallback) ---
   const performLogout = useCallback(() => {
     clearUserData();
-    alert("Session expired or logged out. Redirecting to login.");
+    alert(t('changeRole.alerts.sessionExpired'));
     navigate("/sign-in");
   }, [navigate]);
   // Removed extra closing brace here
@@ -95,7 +96,7 @@ const UserManagement = () => {
       console.log("Fetching cabinet patients for DOCTOR/ASSISTANT");
     } else {
       console.error("Unsupported role for viewing patients:", roles);
-      setError("You do not have permission to view patient data.");
+      setError(t('changeRole.errors.fetch.permissionDeniedView'));
       setLoading(false);
       setUsers([]);
       return;
@@ -117,10 +118,10 @@ const UserManagement = () => {
       .catch((err) => {
         console.error(`Error loading patients from ${apiUrl}:`, err);
         if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-          setError("Access Denied or Session Expired.");
+          setError(t('changeRole.errors.fetch.auth'));
           performLogout();
         } else {
-          setError("Failed to load patient data. Please try again later.");
+          setError(t('changeRole.errors.fetch.generic'));
         }
         setLoading(false);
       });
@@ -157,17 +158,17 @@ const UserManagement = () => {
 
     // Basic permission check (should be redundant if UI is correct, but safe)
     if (!userRoles.includes("ROLE_ADMIN") && !userRoles.includes("ROLE_DOCTOR") && !userRoles.includes("ROLE_ASSISTANT")) {
-        alert("You do not have permission to perform this action.");
+        alert(t('changeRole.alerts.transferFailed.permissionDeniedAction'));
         return;
     }
      // Doctor/Assistant can only transfer to their own cabinet
      if ((userRoles.includes("ROLE_DOCTOR") || userRoles.includes("ROLE_ASSISTANT")) && targetCabinetId !== currentUserCabinetId) {
-        alert("You can only transfer patients within your own cabinet.");
+        alert(t('changeRole.alerts.transferFailed.wrongCabinet'));
         return;
      }
 
 
-    const confirmationMessage = `Are you sure you want to transfer patient ${userToChange.firstName} ${userToChange.lastName} (ID: ${patientUserId}) to the ${targetRoleString} role in cabinet ID ${targetCabinetId}?`;
+    const confirmationMessage = t('changeRole.confirmations.transfer', { firstName: userToChange.firstName, lastName: userToChange.lastName, userId: patientUserId, role: targetRoleString, cabinetId: targetCabinetId });
 
     if (window.confirm(confirmationMessage)) {
         setLoading(true);
@@ -186,7 +187,7 @@ const UserManagement = () => {
             },
         })
         .then((response) => {
-            alert(`Patient successfully transferred to ${targetRoleString}. New User ID: ${response.data?.newUser?.id}`);
+            alert(t('changeRole.alerts.transferSuccess', { role: targetRoleString, newUserId: response.data?.newUser?.id }));
             console.log("Transfer response:", response.data);
             // Refresh list by removing the transferred patient
             setUsers(prevUsers => prevUsers.filter(user => user.id !== patientUserId));
@@ -194,22 +195,22 @@ const UserManagement = () => {
         })
         .catch((error) => {
             console.error(`Error transferring patient to ${targetRoleString}:`, error);
-            const defaultMessage = `Failed to transfer patient to ${targetRoleString}. Please try again later.`;
+            const defaultMessage = t('changeRole.errors.transfer.generic', { role: targetRoleString });
             let alertMessage = defaultMessage;
             if (error.response) {
                 const status = error.response.status;
                 const message = error.response.data?.message || defaultMessage;
                 if (status === 401 || status === 403) {
-                    alertMessage = `Permission Denied or Session Expired: ${message}`;
+                    alertMessage = t('changeRole.errors.transfer.authWithMessage', { message });
                     performLogout();
                 } else if (status === 404) {
-                    alertMessage = `Not Found: ${message}`;
+                    alertMessage = t('changeRole.errors.transfer.notFoundWithMessage', { message });
                 } else if (status === 400) {
-                    alertMessage = `Bad Request: ${message}`;
+                    alertMessage = t('changeRole.errors.transfer.badRequestWithMessage', { message });
                 } else if (status === 409) { // Conflict (e.g., Doctor already exists)
-                    alertMessage = `Conflict: ${message}`;
+                    alertMessage = t('changeRole.errors.transfer.conflictWithMessage', { message });
                 } else {
-                    alertMessage = `Error (${status}): ${message}`;
+                    alertMessage = t('changeRole.errors.transfer.otherErrorWithMessage', { status, message });
                 }
             }
             alert(alertMessage);
@@ -244,11 +245,11 @@ const UserManagement = () => {
   });
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{t('changeRole.loading')}</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div>{t('changeRole.errorPrefix')}: {error}</div>;
   }
 
   // Determine if current user is Admin or Doctor/Assistant
@@ -257,10 +258,10 @@ const UserManagement = () => {
 
   return (
     <div className="changerole-container"> {/* Added container class */}
-      <h1>User Role Management</h1>
+      <h1>{t('changeRole.title')}</h1>
       <input
         type="text"
-        placeholder="Rechercher par nom et prénom"
+        placeholder={t('changeRole.searchPlaceholder')}
         value={searchTerm}
          onChange={(e) => setSearchTerm(e.target.value)}
          className="form-control mb-4" // Use Bootstrap class
@@ -271,42 +272,41 @@ const UserManagement = () => {
         <thead>
           <tr>
          
-            <th>Nom</th>
-            <th>Email</th>
-            <th>Rôle</th>
-            <th>Transfert</th>
+            <th>{t('changeRole.tableHeaders.name')}</th>
+            <th>{t('changeRole.tableHeaders.email')}</th>
+            <th>{t('changeRole.tableHeaders.role')}</th>
+            <th>{t('changeRole.tableHeaders.transfer')}</th>
           </tr>
         </thead>
         <tbody>
           {filteredUsers.length === 0 ? (
             <tr>
-              <td colSpan="5">Aucun utilisateur trouvé</td>
+              <td colSpan="5">{t('changeRole.noUsersFound')}</td>
             </tr>
           ) : (
             filteredUsers.map((user) => (
               <tr key={user.id}>
                 
                 <td>{user.firstName} {user.lastName}</td>
-                <td>{user.email? user.email: "ce patient n'a pas d'email"}</td>
+                <td>{user.email? user.email: t('changeRole.noEmail')}</td>
                 <td>{user.role}</td> {/* Should always be PATIENT */}
                 <td>
                   {isAdmin && user.registrations && (
                     <>
                       {user.registrations.length === 0 && (
-                        <span>No cabinet registrations</span>
+                        <span>{t('changeRole.noRegistrations')}</span>
                       )}
+                      {/* Admin View: Single Registration */}
                       {user.registrations.length === 1 && (
-                        <select
-                          id={`role-select-${user.id}`}
-                          defaultValue=""
-                          onChange={(e) => handleTransferPatient(user.id, e.target.value, user.registrations[0].cabinetId)}
+                        <button
+                          onClick={() => handleTransferPatient(user.id, 'DOCTOR', user.registrations[0].cabinetId)}
+                          className="btn btn-sm btn-primary" // Use standard Bootstrap button style or theme class
                           disabled={loading}
                         >
-                          <option value="" disabled>-- Select Role --</option>
-                          <option value="DOCTOR">DOCTOR</option>
-                          <option value="ASSISTANT">ASSISTANT</option>
-                        </select>
+                          {t('changeRole.buttons.changeToDoctor')} {/* New Translation Key */}
+                        </button>
                       )}
+                      {/* Admin View: Multiple Registrations */}
                       {user.registrations.length > 1 && (
                         <>
                           <select
@@ -316,36 +316,46 @@ const UserManagement = () => {
                             disabled={loading}
                             style={{ marginRight: '10px' }}
                           >
-                            <option value="" disabled>-- Select Cabinet --</option>
+                            <option value="" disabled>{t('changeRole.cabinetOptions.select')}</option>
                             {user.registrations.map(reg => (
                               <option key={reg.cabinetId} value={reg.cabinetId}>
-                                {reg.cabinetName || `Cabinet ID: ${reg.cabinetId}`} {/* Display name or ID */}
+                                {reg.cabinetName || t('changeRole.cabinetOptions.cabinetId', { id: reg.cabinetId })}
                               </option>
                             ))}
                           </select>
-                          <select
-                            id={`role-select-${user.id}`}
-                            defaultValue=""
-                            onChange={(e) => handleTransferPatient(user.id, e.target.value, selectedTargetCabinets[user.id])}
+                          {/* Button replaces the role dropdown */}
+                          <button
+                            onClick={() => handleTransferPatient(user.id, 'DOCTOR', selectedTargetCabinets[user.id])}
+                            className="btn btn-sm btn-primary" // Use standard Bootstrap button style or theme class
                             disabled={loading || !selectedTargetCabinets[user.id]} // Disable if no cabinet selected
-                            title={!selectedTargetCabinets[user.id] ? "Select a target cabinet first" : ""}
+                            title={!selectedTargetCabinets[user.id] ? t('changeRole.tooltips.selectCabinetFirst') : ""}
                           >
-                            <option value="" disabled>-- Select Role --</option>
-                            <option value="DOCTOR">DOCTOR</option>
-                            <option value="ASSISTANT">ASSISTANT</option>
-                          </select>
+                            {t('changeRole.buttons.changeToDoctor')} {/* New Translation Key */}
+                          </button>
                         </>
                       )}
                     </>
                   )}
-                  {isDoctorOrAssistant && (
+                  {/* Doctor View */}
+                  {userRoles.includes("ROLE_DOCTOR") && (
                     <button
-                      onClick={() => handleTransferPatient(user.id, 'ASSISTANT', currentUserCabinetId)}
-                      className="btn btn-theme-green" // Use custom theme green class
-                      disabled={loading || !currentUserCabinetId} // Disable if doctor/assistant has no cabinet ID
-                      title={!currentUserCabinetId ? "Your cabinet information is missing" : ""}
+                      onClick={() => handleTransferPatient(user.id, 'ASSISTANT', currentUserCabinetId)} // Target role ASSISTANT
+                      className="btn btn-sm btn-primary"
+                      disabled={loading || !currentUserCabinetId}
+                      title={!currentUserCabinetId ? t('changeRole.tooltips.missingCabinetInfo') : ""}
                     >
-                      Changer en Assistant
+                      {t('changeRole.buttons.changeToAssistant')} {/* New text key */}
+                    </button>
+                  )}
+                  {/* Assistant View - Now same as Doctor View */}
+                  {userRoles.includes("ROLE_ASSISTANT") && (
+                    <button
+                      onClick={() => handleTransferPatient(user.id, 'ASSISTANT', currentUserCabinetId)} // Target role ASSISTANT
+                      className="btn btn-sm btn-primary"
+                      disabled={loading || !currentUserCabinetId}
+                      title={!currentUserCabinetId ? t('changeRole.tooltips.missingCabinetInfo') : ""}
+                    >
+                      {t('changeRole.buttons.changeToAssistant')} {/* Use same text key as Doctor */}
                     </button>
                   )}
                 </td>

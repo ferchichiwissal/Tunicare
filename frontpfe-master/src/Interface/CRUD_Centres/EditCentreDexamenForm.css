@@ -1,0 +1,117 @@
+/* Styles for EditCabinetForm component - Harmonized */
+
+/* Assuming root variables are globally available */
+
+/* Apply styles to the container div if it uses a class,
+   otherwise, these styles might need to target the div via JS or be applied globally.
+   Assuming a container class like 'edit-cabinet-container' might be added later.
+   For now, these styles might not apply directly without changes to the JS. */
+
+.edit-cabinet-container { /* Placeholder class name */
+  padding: 30px;
+  max-width: 600px; /* Match inline style max-width */
+  margin: 40px auto;
+  background-color: var(--background-color, #ffffff);
+  border: 1px solid #ccc; /* Match inline style border */
+  border-radius: 8px; /* Match inline style border-radius */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+  font-family: var(--font-family, 'Roboto', sans-serif);
+}
+
+.edit-cabinet-container h2 {
+  color: var(--text-color, #0c0c0c);
+  text-align: center;
+  margin-bottom: 25px;
+  border-bottom: 2px solid var(--primary-color, #00c6a9);
+  padding-bottom: 10px;
+  display: inline-block;
+}
+
+.edit-cabinet-container form div { /* Targeting divs inside form */
+  margin-bottom: 15px; /* Match inline style */
+}
+
+.edit-cabinet-container label {
+  display: block;
+  margin-bottom: 5px; /* Match inline style */
+  font-weight: bold; /* Match inline style */
+  color: var(--text-color, #0c0c0c);
+}
+
+/* Style for required labels */
+.edit-cabinet-container label.required::after {
+  content: '*';
+  color: var(--error-color, #e60f0f);
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.edit-cabinet-container input[type="text"] {
+  width: 100%; /* Match inline style */
+  padding: 10px 12px; /* Adjusted padding */
+  border: 1px solid #ccc; /* Match inline style */
+  border-radius: 4px; /* Match inline style */
+  box-sizing: border-box; /* Match inline style */
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.edit-cabinet-container input[type="text"]:focus {
+  border-color: var(--primary-color, #00c6a9);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 198, 169, 0.2);
+}
+
+.edit-cabinet-container button {
+  padding: 10px 15px; /* Match inline style */
+  color: var(--white, #ffffff);
+  border: none;
+  border-radius: 4px; /* Match inline style */
+  cursor: pointer;
+  margin-right: 10px; /* Match inline style */
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.edit-cabinet-container button[type="submit"] {
+  background-color: var(--primary-color, #00c6a9); /* Harmonized color */
+}
+.edit-cabinet-container button[type="submit"]:hover {
+  background-color: #00937d; /* Darker shade */
+  transform: translateY(-1px);
+}
+
+.edit-cabinet-container button[type="button"] { /* Assuming cancel button */
+  background-color: var(--secondary-color, #6c757d); /* Harmonized color */
+}
+.edit-cabinet-container button[type="button"]:hover {
+  background-color: #5a6268; /* Darker shade */
+}
+
+.edit-cabinet-container button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Error message styling */
+.edit-cabinet-container .error-message { /* Assuming a class might be added */
+  color: var(--error-color, #e60f0f);
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 15px; /* More space */
+  padding: 10px;
+  background-color: rgba(230, 15, 15, 0.1);
+  border: 1px solid var(--error-color, #e60f0f);
+  border-radius: 5px;
+  text-align: center;
+}
+
+/* Loading message styling */
+.edit-cabinet-container .loading-message { /* Assuming a class might be added */
+  font-style: italic;
+  color: var(--light-text-color, #555555);
+  text-align: center;
+  padding: 20px;
+}

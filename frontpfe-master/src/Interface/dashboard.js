@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 import { Line, Bar } from 'react-chartjs-2';
 import { jwtDecode } from "jwt-decode";
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
@@ -15,6 +16,7 @@ const Dashboard = ({ onLogout }) => {
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // State for sidebar visibility
   const navigate = useNavigate();
+  const { t } = useTranslation(); // Get translation function
 
   // Perform logout and redirect
   const performLogout = () => {
@@ -66,7 +68,7 @@ const Dashboard = ({ onLogout }) => {
       inactivityTimer = setTimeout(() => {
         setSessionExpired(true);
         onLogout();
-        alert("Your session has expired due to inactivity. Redirecting to login...");
+        alert(t('sessionExpiredAlert')); // Use translation key for alert
         navigate("/sign-in");
       }, INACTIVITY_TIMEOUT);
     };
@@ -106,7 +108,7 @@ const Dashboard = ({ onLogout }) => {
   if (sessionExpired) return null;
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{t('loading')}</div>; // Translate loading text
   }
 
   // Data for the first chart: Payments Over Time
@@ -114,7 +116,7 @@ const Dashboard = ({ onLogout }) => {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
     datasets: [
       {
-        label: 'Payments Over Time',
+        label: t('dashboard.charts.payments.label'),
         data: [800, 980, 1200, 1580, 1850, 2000],
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
@@ -129,7 +131,7 @@ const Dashboard = ({ onLogout }) => {
     plugins: {
       title: {
         display: true,
-        text: 'Monthly Payments Overview',
+        text: t('dashboard.charts.payments.title'),
       },
       legend: {
         position: 'top',
@@ -139,13 +141,13 @@ const Dashboard = ({ onLogout }) => {
       x: {
         title: {
           display: true,
-          text: 'Month',
+          text: t('dashboard.charts.monthAxisLabel'),
         },
       },
       y: {
         title: {
           display: true,
-          text: 'Payments (dt)',
+          text: t('dashboard.charts.payments.yAxisLabel'),
         },
         beginAtZero: true,
       },
@@ -157,7 +159,7 @@ const Dashboard = ({ onLogout }) => {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
     datasets: [
       {
-        label: 'Phone Calls Made',
+        label: t('dashboard.charts.phoneCalls.label'),
         data: [200, 400, 510, 620, 730, 800],
         backgroundColor: 'rgba(255, 99, 132, 0.2)',
         borderColor: 'rgba(255, 99, 132, 1)',
@@ -172,7 +174,7 @@ const Dashboard = ({ onLogout }) => {
     plugins: {
       title: {
         display: true,
-        text: 'Phone Calls Made per Month',
+        text: t('dashboard.charts.phoneCalls.title'),
       },
       legend: {
         position: 'top',
@@ -182,13 +184,13 @@ const Dashboard = ({ onLogout }) => {
       x: {
         title: {
           display: true,
-          text: 'Month',
+          text: t('dashboard.charts.monthAxisLabel'), // Reuse month label
         },
       },
       y: {
         title: {
           display: true,
-          text: 'Phone Calls',
+          text: t('dashboard.charts.phoneCalls.yAxisLabel'),
         },
         beginAtZero: true,
       },
@@ -205,32 +207,35 @@ const Dashboard = ({ onLogout }) => {
   if (user.role === "ADMIN") {
     navigationLinks = (
       <>
-        <a href="#">Dashboard</a>
-       {/* <a href="/add">Add an Account</a>*/}
-        {/* <a href="/Tovalidate">Confirmation</a>*/}
-        <a href="/users">doctors Management</a>
-         {/*<a href="/bloque">Desactivate Accounts</a>*/}
-        <a href="/UserManagement">Change Role</a>
-        <a href="/add-cabinet">Ajouter Cabinet</a>
-        <a href="/manage-cabinets">Gérer Cabinets & QR Codes</a> {/* Link for Admin */}
-        <a href={`/edit-user/${id}`}>Edit My Account</a>
-        <a href="/change-password">Change Password</a>
-        <a href="/Logout">Logout</a>
+        <a href="#">{t('nav.dashboard')}</a>
+       {/* <a href="/add">{t('nav.addAccount')}</a>*/}
+        {/* <a href="/Tovalidate">{t('nav.confirmation')}</a>*/}
+        <a href="/users">{t('nav.doctorsManagement')}</a>
+         {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a>*/}
+        <a href="/UserManagement">{t('nav.changeRole')}</a>
+        <a href="/add-cabinet">{t('nav.addCabinet')}</a>
+        <a href="/manage-cabinets">{t('nav.manageCabinets')}</a> {/* Link for Admin Cabinets */}
+        <a href="/add-centre">{t('nav.addExamCentre')}</a> {/* Link for Admin Centres */}
+        <a href="/manage-centres">{t('nav.manageExamCentres')}</a> {/* Link for Admin Centres */}
+        <a href="/activation">{t('nav.activationManagement')}</a> {/* Added Activation Link */}
+        <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
+        <a href="/change-password">{t('nav.changePassword')}</a>
+        <a href="/Logout">{t('nav.logout')}</a>
       </>
     );
   } else if (user.role === "DOCTOR") {
     navigationLinks = (
       <>
-        <a href="#">Dashboard</a>
+        <a href="#">{t('nav.dashboard')}</a>
         {/* Assistants/Doctors might not need 'Add an Account' directly, adjust if needed */}
-         <a href="/add">Add an Account</a>
-        <a href="/Tovalidate">Confirmation</a>
-        <a href="/users">User Management</a> {/* Consider filtering users by their cabinet */}
-        {/*<a href="/bloque">Desactivate Accounts</a> {/* Consider filtering users by their cabinet */}
-        <a href="/UserManagement">Change Role</a> {/* Consider filtering users by their cabinet */}
-        <a href={`/edit-user/${id}`}>Edit My Account</a>
-        <a href="/change-password">Change Password</a>
-        <a href="/Logout">Logout</a>
+         <a href="/add">{t('nav.addAccount')}</a>
+        <a href="/Tovalidate">{t('nav.confirmation')}</a>
+        <a href="/users">{t('nav.userManagement')}</a> {/* Consider filtering users by their cabinet */}
+        {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a> {/* Consider filtering users by their cabinet */}
+        <a href="/UserManagement">{t('nav.changeRole')}</a> {/* Consider filtering users by their cabinet */}
+        <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
+        <a href="/change-password">{t('nav.changePassword')}</a>
+        <a href="/Logout">{t('nav.logout')}</a>
       </>
     );
   } 
@@ -238,16 +243,16 @@ const Dashboard = ({ onLogout }) => {
   else if (user.role === "ASSISTANT" ) {
     navigationLinks = (
       <>
-        <a href="#">Dashboard</a>
+        <a href="#">{t('nav.dashboard')}</a>
         {/* Assistants/Doctors might not need 'Add an Account' directly, adjust if needed */}
-         <a href="/add">Add an Account As Assistant  </a>
-        <a href="/Tovalidate">Confirmation</a>
-        <a href="/users">User Management</a> {/* Consider filtering users by their cabinet */}
-        {/*<a href="/bloque">Desactivate Accounts</a> {/* Consider filtering users by their cabinet */}
-        <a href="/UserManagement">Change Role</a> {/* Consider filtering users by their cabinet */}
-        <a href={`/edit-user/${id}`}>Edit My Account</a>
-        <a href="/change-password">Change Password</a>
-        <a href="/Logout">Logout</a>
+         <a href="/add">{t('nav.addAccountAssistant')}</a>
+        <a href="/Tovalidate">{t('nav.confirmation')}</a>
+        <a href="/users">{t('nav.userManagement')}</a> {/* Consider filtering users by their cabinet */}
+        {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a> {/* Consider filtering users by their cabinet */}
+        <a href="/UserManagement">{t('nav.changeRole')}</a> {/* Consider filtering users by their cabinet */}
+        <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
+        <a href="/change-password">{t('nav.changePassword')}</a>
+        <a href="/Logout">{t('nav.logout')}</a>
       </>
     );
   } 
@@ -259,13 +264,36 @@ const Dashboard = ({ onLogout }) => {
   else if (user.role === "PATIENT") {
     navigationLinks = (
       <>
-        <a href="#">Dashboard</a>
-        <a href={`/edit-user/${id}`}>Edit My Account</a>
-        <a href="/change-password">Change Password</a>
-        <a href="/Logout">Logout</a>
+        <a href="#">{t('nav.dashboard')}</a>
+        <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
+        <a href="/change-password">{t('nav.changePassword')}</a>
+        <a href="/Logout">{t('nav.logout')}</a>
        </>
     );
   }
+
+
+
+
+
+
+ 
+  else if (user.role === "DOCTOR_CENTRE_EXAMEN") {
+    navigationLinks = (
+      <>
+        <a href="#">{t('nav.dashboard')}</a>
+        <a href={`/edit-doctor-centre/${id}`}>{t('nav.editMyAccount')}</a> {/* Reverted to correct route path */}
+        <a href="/change-password">{t('nav.changePassword')}</a>
+        <a href="/Logout">{t('nav.logout')}</a>
+       </>
+    );
+  }
+
+
+
+
+
+
 
   return (
     <div className="app">
@@ -300,83 +328,83 @@ const Dashboard = ({ onLogout }) => {
           </nav>
           <footer className="footer">
             <h1>Zimys<small>©</small></h1>
-            <div>Zimys © All Rights Reserved 2025</div>
+            <div>{t('footer.copyright', { year: 2025 })}</div>
           </footer>
         </div>
   
         <div className="app-body-main-content">
           <section className="service-section">
-            <h2>{user.first_name} {user.last_name} Dashboard</h2>
+            <h2>{t('dashboard.title', { firstName: user.first_name, lastName: user.last_name })}</h2>
             <div className="tiles">
               <article className="tile">
                 <div className="tile-header">
                   <i className="ph-lightning-light"></i>
                   <h3>
-                    <span>Performance Objectives</span>
-                    <span>Revenue Target Achievement:</span>
+                    <span>{t('dashboard.tiles.performance.title')}</span>
+                    <span>{t('dashboard.tiles.performance.subtitle')}</span>
                   </h3>
                 </div>
-                <a href="#">View Details</a>
+                <a href="#">{t('dashboard.tiles.viewDetails')}</a>
               </article>
   
               <article className="tile">
                 <div className="tile-header">
                   <i className="ph-fire-simple-light"></i>
                   <h3>
-                    <span>Monthly Sales</span>
-                    <span>Target Reached: 75%</span>
+                    <span>{t('dashboard.tiles.sales.title')}</span>
+                    <span>{t('dashboard.tiles.sales.subtitle', { percentage: 75 })}</span>
                   </h3>
                 </div>
-                <a href="#">View Details</a>
+                <a href="#">{t('dashboard.tiles.viewDetails')}</a>
               </article>
   
               <article className="tile">
                 <div className="tile-header">
                   <i className="ph-file-light"></i>
                   <h3>
-                    <span>Team Performance</span>
-                    <span>Team A: 85% of the target</span>
+                    <span>{t('dashboard.tiles.teamPerformance.title')}</span>
+                    <span>{t('dashboard.tiles.teamPerformance.subtitle', { team: 'A', percentage: 85 })}</span>
                   </h3>
                 </div>
-                <a href="#">View Details</a>
+                <a href="#">{t('dashboard.tiles.viewDetails')}</a>
               </article>
             </div>
           </section>
   
           <section className="service-section">
-            <h2>Performance Dashboard</h2>
+            <h2>{t('dashboard.performanceSectionTitle')}</h2>
             <div className="tiles">
               <article className="tile">
                 <div className="tile-header">
                   <i className="ph-folder-light"></i>
                   <h3>
-                    <span>Project Tracking</span>
-                    <span>Ongoing Projects: 5</span>
+                    <span>{t('dashboard.tiles.projectTracking.title')}</span>
+                    <span>{t('dashboard.tiles.projectTracking.subtitle', { count: 5 })}</span>
                   </h3>
                 </div>
-                <a href="#">View Details</a>
+                <a href="#">{t('dashboard.tiles.viewDetails')}</a>
               </article>
   
               <article className="tile">
                 <div className="tile-header">
                   <i className="ph-users-light"></i>
                   <h3>
-                    <span>Team Objectives</span>
-                    <span>Completion Rate: 80%</span>
+                    <span>{t('dashboard.tiles.teamObjectives.title')}</span>
+                    <span>{t('dashboard.tiles.teamObjectives.subtitle', { percentage: 80 })}</span>
                   </h3>
                 </div>
-                <a href="#">Analyze Progress</a>
+                <a href="#">{t('dashboard.tiles.analyzeProgress')}</a>
               </article>
   
               <article className="tile">
                 <div className="tile-header">
                   <i className="ph-bell-light"></i>
                   <h3>
-                    <span>Notifications</span>
-                    <span>Upcoming Meetings: 2</span>
+                    <span>{t('dashboard.tiles.notifications.title')}</span>
+                    <span>{t('dashboard.tiles.notifications.subtitle', { count: 2 })}</span>
                   </h3>
                 </div>
-                <a href="#">View Notifications</a>
+                <a href="#">{t('dashboard.tiles.viewNotifications')}</a>
               </article>
             </div>
           </section>
@@ -385,14 +413,14 @@ const Dashboard = ({ onLogout }) => {
           {user.role === 'EMPLOYEE' && (
             <>
               <section className="charts-section">
-                <h3>{user.first_name} {user.last_name} Performance</h3>
+                <h3>{t('dashboard.charts.performanceTitle', { firstName: user.first_name, lastName: user.last_name })}</h3>
                 <div className="chart-container">
-                  <h4>Payments Over Time</h4>
+                  <h4>{t('dashboard.charts.payments.label')}</h4> {/* Reuse label */}
                   <Bar data={paymentData} options={paymentOptions} />
                 </div>
   
                 <div className="chart-container">
-                  <h4>Phone Calls Made per Month</h4>
+                  <h4>{t('dashboard.charts.phoneCalls.title')}</h4> {/* Reuse title */}
                   <Bar data={phoneCallsData} options={phoneCallsOptions} />
                 </div>
               </section>
@@ -402,7 +430,7 @@ const Dashboard = ({ onLogout }) => {
           <button
             className="sidebar-toggle-button-main"
             onClick={toggleSidebar}
-            title={isSidebarOpen ? "Hide Sidebar" : "Show Sidebar"}
+            title={isSidebarOpen ? t('dashboard.tooltips.hideSidebar') : t('dashboard.tooltips.showSidebar')}
           >
             <i className={isSidebarOpen ? "ph-arrow-circle-right" : "ph-arrow-circle-left"}></i>
           </button>
@@ -424,36 +452,42 @@ const Dashboard = ({ onLogout }) => {
             <h3>{user.firstName} {user.lastName}</h3>
   
             <div className="user-info-item">
-              <p><strong>email:</strong> <span>{user.email}</span></p>
+              <p><strong>{t('dashboard.sidebar.emailLabel')}:</strong> <span>{user.email}</span></p>
             </div>
           </div>
   
           <div className="sidebar-content">
             <div className="user-info-item">
-              <p><strong>Birth Date:</strong> <span>{user.birthDate ? user.birthDate : "Not provided"}</span></p>
+              <p><strong>{t('dashboard.sidebar.birthDateLabel')}:</strong> <span>{user.birthDate ? user.birthDate : t('dashboard.sidebar.notProvided')}</span></p>
             </div>
             
             <div className="user-info-item">
-              <p><strong>Role:</strong> <span>{user.role}</span></p>
+              <p><strong>{t('dashboard.sidebar.roleLabel')}:</strong> <span>{user.role}</span></p> {/* Role might need translation itself if it's displayed */}
             </div>
             
            
             
             <div className="user-info-item">
-              <p><strong>Gender:</strong> <span>{user.gender}</span></p>
+              <p><strong>{t('dashboard.sidebar.genderLabel')}:</strong> <span>{user.gender}</span></p> {/* Gender might need translation */}
             </div>
             
             <div className="user-info-item">
-              <p><strong>Address:</strong> <span>{user.address}</span></p>
+              <p><strong>{t('dashboard.sidebar.addressLabel')}:</strong> <span>{user.address}</span></p>
             </div>
             
             <div className="user-info-item">
-              <p><strong>Phone:</strong> <span>{user.tel}</span></p>
+              <p><strong>{t('dashboard.sidebar.phoneLabel')}:</strong> <span>{user.tel}</span></p>
             </div>
           <div className="user-info-item">
-              <p><strong>Age:</strong> <span>{user.age ? user.age : "N/A"}</span></p> {/* Added check for null age */}
+              <p><strong>{t('dashboard.sidebar.ageLabel')}:</strong> <span>{user.age ? user.age : t('dashboard.sidebar.notAvailable')}</span></p> {/* Added check for null age */}
           </div>
 
+          {/* Display specialty only for DOCTOR_CENTRE_EXAMEN */}
+          {user.role === "DOCTOR_CENTRE_EXAMEN" && (
+            <div className="user-info-item">
+              <p><strong>{t('dashboard.sidebar.specialtyLabel', 'Specialty')}:</strong> <span>{user.speciality ? user.speciality : t('dashboard.sidebar.notProvided')}</span></p> {/* Corrected field name */}
+            </div>
+          )}
              
           </div>
         </div>

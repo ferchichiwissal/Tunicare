@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 // Optional: Add CSS for styling
 import './CabinetList.css'; // Import the CSS file
 
 const CabinetList = () => {
+    const { t } = useTranslation(); // Initialize translation function
     const [cabinets, setCabinets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedCabinetQr, setSelectedCabinetQr] = useState(null); // To store QR code data URL
     const [selectedCabinetDetails, setSelectedCabinetDetails] = useState(null); // To store details for printing
-    // Removed state for inline editing: editingCabinetId, editFormData
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -19,7 +20,7 @@ const CabinetList = () => {
             setError('');
             const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
             if (!token) {
-                setError("Authentification requise.");
+                setError(t('manageCabinets.authRequired'));
                 setLoading(false);
                 // navigate('/sign-in'); // Optional redirect
                 return;
@@ -35,17 +36,17 @@ const CabinetList = () => {
                 } else {
                     console.warn("Received non-array data for cabinets:", response.data);
                     setCabinets([]); // Set to empty array to prevent .map error
-                    setError('Format de données inattendu reçu du serveur.');
+                    setError(t('manageCabinets.unexpectedData'));
                 }
             } catch (err) {
                 console.error("Error fetching cabinets:", err);
                 setCabinets([]); // Ensure cabinets is an empty array on error
                  if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-                     setError("Permission refusée. Seuls les administrateurs peuvent voir cette page.");
+                     setError(t('manageCabinets.permissionDenied'));
                  } else {
                     // Attempt to get a more specific error message if available
                     const errorMsg = err.response?.data?.message || err.message || 'Erreur lors de la récupération des cabinets.';
-                    setError(errorMsg);
+                    setError(t('manageCabinets.fetchError') + `: ${errorMsg}`); // Add prefix
                  }
             } finally {
                 setLoading(false);
@@ -61,7 +62,7 @@ const CabinetList = () => {
         setSelectedCabinetDetails(null); // Clear previous details
          const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
          if (!token) {
-             setError("Authentification requise.");
+             setError(t('manageCabinets.authRequired'));
              return;
          }
 
@@ -85,12 +86,12 @@ const CabinetList = () => {
         } catch (err) {
              console.error("Error fetching QR code:", err);
               if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-                  setError("Permission refusée pour générer ce QR code.");
+                  setError(t('manageCabinets.qrPermissionDenied'));
               } else if (err.response && err.response.status === 404) {
-                   setError("Cabinet non trouvé pour générer le QR code.");
+                   setError(t('manageCabinets.qrNotFound'));
               }
               else {
-                 setError('Erreur lors de la génération du QR code.');
+                 setError(t('manageCabinets.qrError'));
               }
         }
     };
@@ -101,7 +102,7 @@ const CabinetList = () => {
 
         const printWindow = window.open('', '_blank', 'height=600,width=800');
         if (printWindow) {
-            printWindow.document.write('<html><head><title>Imprimer QR Code</title>');
+            printWindow.document.write(`<html><head><title>${t('manageCabinets.buttons.print')} QR Code</title>`); // Translate title
             // Basic styling for print
             printWindow.document.write('<style>');
             printWindow.document.write(`
@@ -113,10 +114,11 @@ const CabinetList = () => {
             printWindow.document.write('</style></head><body>');
 
             // Content to print
-            printWindow.document.write(`<h3>Cabinet: ${selectedCabinetDetails.name}</h3>`);
-            printWindow.document.write(`<p><strong>Adresse:</strong> ${selectedCabinetDetails.address}</p>`);
-            printWindow.document.write(`<p><strong>Téléphone:</strong> ${selectedCabinetDetails.tel || 'N/A'}</p>`);
-            printWindow.document.write('<p><strong>QR Code Inscription:</strong></p>');
+            // Translate print content
+            printWindow.document.write(`<h3>${t('manageCabinets.tableHeaders.name')}: ${selectedCabinetDetails.name}</h3>`);
+            printWindow.document.write(`<p><strong>${t('manageCabinets.tableHeaders.address')}:</strong> ${selectedCabinetDetails.address}</p>`);
+            printWindow.document.write(`<p><strong>${t('manageCabinets.tableHeaders.phone')}:</strong> ${selectedCabinetDetails.tel || t('manageCabinets.notAvailable')}</p>`);
+            printWindow.document.write(`<p><strong>${t('manageCabinets.tableHeaders.qrCode')} ${t('signUp')}:</strong></p>`); // Combine keys
             printWindow.document.write(`<img src="${selectedCabinetQr}" alt="QR Code Inscription ${selectedCabinetDetails.name}" />`);
 
             printWindow.document.write('</body></html>');
@@ -130,7 +132,7 @@ const CabinetList = () => {
             }, 250); // Adjust timeout if needed
 
         } else {
-            alert("Impossible d'ouvrir la fenêtre d'impression. Vérifiez les paramètres de votre navigateur (bloqueur de pop-up).");
+            alert(t('manageCabinets.printPopupError'));
         }
     };
 
@@ -141,14 +143,14 @@ const CabinetList = () => {
 
     // --- Delete Function ---
     const handleDelete = async (cabinetId) => {
-        if (!window.confirm(`Êtes-vous sûr de vouloir supprimer le cabinet ID ${cabinetId} et tous ses utilisateurs associés ? Cette action est irréversible.`)) {
+        if (!window.confirm(t('manageCabinets.deleteConfirm', { id: cabinetId }))) {
             return; // Stop if user cancels
         }
 
         setError(''); // Clear previous errors
         const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
         if (!token) {
-            setError("Authentification requise pour supprimer.");
+            setError(t('manageCabinets.deleteAuthRequired'));
             // Optionally redirect to login
             return;
         }
@@ -159,44 +161,44 @@ const CabinetList = () => {
             });
 
             if (response.status === 204) { // 204 No Content is typical for successful DELETE
-                alert("Cabinet et utilisateurs associés supprimés avec succès.");
+                alert(t('manageCabinets.deleteSuccess'));
                 // Remove the cabinet from the local state to update the UI
                 setCabinets(prevCabinets => prevCabinets.filter(cabinet => cabinet.idSite !== cabinetId));
             } else {
                  // Should not happen with 204, but handle defensively
-                setError(`Réponse inattendue du serveur: ${response.status}`);
+                setError(t('manageCabinets.unexpectedResponse', { status: response.status }));
             }
 
         } catch (err) {
             console.error("Error deleting cabinet:", err);
             if (err.response) {
                  if (err.response.status === 401 || err.response.status === 403) {
-                     setError("Permission refusée pour supprimer ce cabinet.");
+                     setError(t('manageCabinets.deletePermissionDenied'));
                      // Optionally redirect or logout
                  } else if (err.response.status === 404) {
-                     setError("Cabinet non trouvé pour la suppression.");
+                     setError(t('manageCabinets.deleteNotFound'));
                  } else {
-                    setError(`Erreur lors de la suppression: ${err.response.data?.message || err.response.statusText || 'Erreur inconnue'}`);
+                    setError(t('manageCabinets.deleteError', { message: err.response.data?.message || err.response.statusText || 'Erreur inconnue' }));
                  }
             } else {
-                 setError('Erreur réseau ou serveur inaccessible lors de la suppression.');
+                 setError(t('manageCabinets.deleteNetworkError'));
             }
              // Display error in an alert as well for immediate feedback
-             alert(`Erreur lors de la suppression: ${error || 'Veuillez vérifier la console pour plus de détails.'}`);
+             alert(error); // Alert the already translated error message from setError
         }
     };
 
 
     if (loading) {
-        return <div>Chargement des cabinets...</div>;
+        return <div>{t('manageCabinets.loading')}</div>;
     }
 
     return (
         <div className="cabinet-list-container"> {/* Add container class */}
-            <h2>Liste des Cabinets</h2>
+            <h2>{t('manageCabinets.title')}</h2>
             {error && <p className="error-message">{error}</p>}
 
-            {cabinets.length === 0 && !error && <p>Aucun cabinet trouvé.</p>}
+            {cabinets.length === 0 && !error && <p>{t('manageCabinets.noCabinets')}</p>}
 
             {cabinets.length > 0 && (
               <div className="table-responsive"> {/* Add Bootstrap responsive wrapper */}
@@ -204,11 +206,11 @@ const CabinetList = () => {
                     <thead>
                         <tr>
                             
-                            <th>Nom</th>
-                            <th>Adresse</th>
-                            <th>Téléphone</th>
-                            <th>Actions</th>
-                            <th>QR Code</th> {/* Separate column for QR code button */}
+                            <th>{t('manageCabinets.tableHeaders.name')}</th>
+                            <th>{t('manageCabinets.tableHeaders.address')}</th>
+                            <th>{t('manageCabinets.tableHeaders.phone')}</th>
+                            <th>{t('manageCabinets.tableHeaders.actions')}</th>
+                            <th>{t('manageCabinets.tableHeaders.qrCode')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -218,14 +220,14 @@ const CabinetList = () => {
                                 {/* Display Mode Cells */}
                                 <td>{cabinet.name}</td>
                                 <td>{cabinet.address}</td>
-                                <td>{cabinet.tel || 'N/A'}</td>
+                                <td>{cabinet.tel || t('manageCabinets.notAvailable')}</td>
                                 <td> {/* Removed inline style */}
                                     {/* Use Bootstrap button classes */}
-                                    <button onClick={() => handleEdit(cabinet.idSite)} className="btn btn-sm btn-outline-primary me-1">Modifier</button> {/* Added me-1 for margin */}
-                                    <button onClick={() => handleDelete(cabinet.idSite)} className="btn btn-sm btn-danger">Supprimer</button>
+                                    <button onClick={() => handleEdit(cabinet.idSite)} className="btn btn-sm btn-outline-primary me-1">{t('manageCabinets.buttons.edit')}</button>
+                                    <button onClick={() => handleDelete(cabinet.idSite)} className="btn btn-sm btn-danger">{t('manageCabinets.buttons.delete')}</button>
                                 </td>
                                 <td>
-                                    <button onClick={() => handleShowQrCode(cabinet)} className="btn btn-sm btn-info">Afficher QR</button> {/* Use btn-info for QR */}
+                                    <button onClick={() => handleShowQrCode(cabinet)} className="btn btn-sm btn-info">{t('manageCabinets.buttons.showQr')}</button>
                                 </td>
                             </tr>
                         ))}
@@ -236,13 +238,13 @@ const CabinetList = () => {
 
             {selectedCabinetQr && (
                 <div className="qr-code-display mt-4 p-3 border rounded bg-light"> {/* Added Bootstrap classes */}
-                    <h3 className="mb-3">QR Code pour l'inscription :</h3>
+                    <h3 className="mb-3">{t('manageCabinets.qrModal.title')}</h3>
                     <img src={selectedCabinetQr} alt="QR Code Inscription Cabinet" className="img-fluid mb-3" style={{maxWidth: '200px', border: '1px solid #ccc'}} /> {/* Added Bootstrap class */}
                     <div> {/* Wrapper for buttons */}
-                        <button onClick={() => { setSelectedCabinetQr(null); setSelectedCabinetDetails(null); }} className="btn btn-secondary me-2">Fermer</button>
-                        <button onClick={handlePrint} className="btn btn-success">Imprimer</button> {/* Use btn-success for print */}
+                        <button onClick={() => { setSelectedCabinetQr(null); setSelectedCabinetDetails(null); }} className="btn btn-secondary me-2">{t('manageCabinets.buttons.close')}</button>
+                        <button onClick={handlePrint} className="btn btn-success">{t('manageCabinets.buttons.print')}</button>
                     </div>
-                    <p className="mt-2"><small>Scannez ce code pour vous inscrire dans ce cabinet.</small></p>
+                    <p className="mt-2"><small>{t('manageCabinets.qrModal.scanMessage')}</small></p>
                 </div>
             )}
         </div>

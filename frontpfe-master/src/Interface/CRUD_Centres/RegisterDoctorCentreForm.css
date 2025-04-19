@@ -1,0 +1,247 @@
+/* Styles for RegistrationForm component - Harmonized */
+
+/* Assuming root variables are globally available */
+
+.wholeSection { /* Use a more specific class if needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--light-background, #f7f7f7); /* Harmonized background */
+  padding: 20px;
+  font-family: var(--font-family, 'Roboto', sans-serif); /* Harmonized font */
+}
+
+.registration-form-container { /* Use this class in the JS component */
+  width: 100%;
+  max-width: 900px;
+  background: var(--background-color, #ffffff); /* Harmonized background */
+  border-radius: 8px; /* Consistent radius */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Consistent shadow */
+  padding: 40px; /* More padding */
+}
+
+/* General error message at the top */
+.error-message {
+  color: var(--error-color, #e60f0f);
+  background-color: rgba(230, 15, 15, 0.1);
+  padding: 12px 15px;
+  border-radius: 5px;
+  margin-bottom: 25px;
+  text-align: center;
+  border: 1px solid var(--error-color, #e60f0f);
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px; /* Increased gap */
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.form-row {
+  display: grid; /* Use grid for better alignment */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive columns */
+  gap: 20px 30px; /* Row gap, Column gap */
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Consistent gap */
+}
+
+.form-field label { /* Add label styling */
+  display: block;
+  font-weight: bold;
+  color: var(--text-color, #0c0c0c);
+}
+
+.form-field label.required::after { /* Required indicator */
+  content: '*';
+  color: var(--error-color, #e60f0f);
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.input,
+.input-file, /* Style file input similarly */
+.verification-input { /* Style verification input */
+  padding: 12px 15px;
+  border: 1px solid #ccc; /* Harmonized border */
+  border-radius: 5px; /* Consistent radius */
+  font-size: 1rem; /* Consistent font size */
+  transition: border-color 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Add styles for select to match input */
+select.form-select {
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+  /* Ensure background and color match if needed, or inherit */
+  background-color: var(--background-color, #ffffff); /* Match input background */
+  color: var(--text-color, #0c0c0c); /* Match input text color */
+  /* Adjust height if necessary, often padding handles this */
+  height: auto; /* Or match input height if fixed */
+}
+
+select.form-select:focus { /* Add focus style for select */
+  border-color: var(--primary-color, #00c6a9); /* Harmonized focus */
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 198, 169, 0.2);
+}
+
+.input.error { /* Input specific error state */
+  border-color: var(--error-color, #e60f0f);
+}
+
+.error-text { /* Field specific error text */
+  color: var(--error-color, #e60f0f);
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+
+.file-upload-label {
+  /* Keep existing styles or adjust as needed */
+  color: var(--light-text-color, #555);
+  font-size: 0.9rem;
+}
+
+.password-strength-indicator {
+  font-size: 0.85rem;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.password-strength-indicator.strong {
+  color: green; /* Keep success color */
+}
+
+.password-strength-indicator.weak {
+  color: var(--error-color, #e60f0f); /* Harmonized error color */
+}
+
+.submit-button,
+.verify-button { /* Style both buttons similarly */
+  padding: 12px 30px;
+  background-color: var(--primary-color, #00c6a9); /* Harmonized color */
+  color: var(--white, #ffffff);
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+  text-transform: uppercase;
+  align-self: center; /* Center button if in flex column */
+  margin-top: 10px; /* Add some space */
+}
+
+.submit-button:hover,
+.verify-button:hover {
+  background-color: #00937d; /* Darker shade */
+  transform: translateY(-1px);
+}
+
+.submit-button.submitting,
+.verify-button:disabled { /* Style disabled state */
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Verification Styles */
+.verification-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee; /* Separator */
+}
+
+.verification-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center; /* Center input */
+}
+
+.verification-input {
+  max-width: 300px; /* Limit width */
+}
+
+.verification-error {
+  color: var(--error-color, #e60f0f);
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.resend-link {
+  background: none;
+  border: none;
+  color: var(--primary-color, #00c6a9); /* Harmonized link color */
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+.resend-link:hover {
+  color: #00937d; /* Darker shade */
+}
+
+/* ReCAPTCHA Styles */
+.g-recaptcha {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0; /* Consistent margin */
+}
+
+/* Responsive Styles - Keep existing breaks but adjust values if needed */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr; /* Stack columns */
+    gap: 20px; /* Only row gap needed */
+  }
+
+  .registration-form-container {
+    padding: 30px;
+  }
+
+  .input, .verification-input, .submit-button, .verify-button {
+    padding: 12px 15px; /* Keep consistent padding */
+    font-size: 1rem; /* Keep consistent font size */
+  }
+}
+
+@media (max-width: 480px) {
+  .wholeSection {
+    padding: 15px;
+  }
+
+  .registration-form-container {
+    padding: 20px;
+  }
+
+  .form, .form-section {
+    gap: 20px;
+  }
+
+  .error-message, .error-text {
+    font-size: 0.8rem;
+  }
+}

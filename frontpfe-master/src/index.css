@@ -11,3 +11,466 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* --- Theme Styles --- */
+
+/* Light Mode uses default browser/existing CSS styles */
+
+/* Dark Mode Variables - Light Text on Dark Background */
+body.dark-mode {
+  --bg-color: #1f1f1f;          /* Dark Gray base background */
+  --text-color: #e0e0e0;        /* Light Gray text */
+  --primary-color: #4db6ac;     /* Teal accent color */
+  --secondary-color: #a0a0a0;    /* Medium gray for secondary text */
+  --card-bg: #2c2c2c;          /* Slightly lighter dark gray for cards/forms */
+  --input-bg: #3a3a3a;          /* Darker gray for inputs */
+  --input-border: #555555;      /* Medium gray border */
+  --link-color: var(--primary-color);
+  --header-bg: var(--card-bg);   /* Use card background for header */
+  --header-text: var(--text-color); /* Light header text */
+  --button-bg: var(--primary-color);
+  --button-text: #ffffff;        /* White text on teal buttons */
+  --button-border: var(--primary-color);
+  --button-hover-bg: #6cc6bb;    /* Lighter teal on hover */
+  --button-hover-border: #6cc6bb;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Apply Theme Variables Globally */
+body.dark-mode {
+  background-color: var(--bg-color);
+  color: var(--text-color); /* Apply base text color */
+}
+
+body.dark-mode a {
+  color: var(--link-color);
+}
+body.dark-mode a:hover {
+  filter: brightness(1.2);
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: var(--text-color); /* Default light text for headings */
+}
+
+/* --- Component Specific Styles --- */
+
+/* Header */
+body.dark-mode .header_section,
+body.dark-mode .header_top,
+body.dark-mode .header_bottom {
+  background-color: var(--header-bg) !important;
+  color: var(--header-text) !important;
+}
+body.dark-mode .header_section a,
+body.dark-mode .header_section span,
+body.dark-mode .header_section .nav-link {
+   color: var(--header-text) !important;
+}
+body.dark-mode .header_section .fa {
+   color: var(--link-color);
+}
+body.dark-mode .nav_search-btn .fa-search {
+    color: #ffffff !important; /* White search icon */
+}
+body.dark-mode .navbar-brand img {
+   /* filter: brightness(0.9) contrast(1.1); Optional: slightly adjust logo */
+}
+
+/* Buttons */
+body.dark-mode .btn {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--button-border);
+}
+body.dark-mode .btn:hover {
+  background-color: var(--button-hover-bg);
+  border-color: var(--button-hover-border);
+  color: var(--button-text);
+}
+body.dark-mode .btn-outline-secondary {
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    background-color: transparent;
+}
+body.dark-mode .btn-outline-secondary:hover {
+    color: var(--button-text);
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+/* Theme toggle button */
+body.dark-mode .btn-outline-secondary.ml-2 {
+    color: var(--text-color);
+    border-color: var(--input-border);
+}
+body.dark-mode .btn-outline-secondary.ml-2:hover {
+    background-color: var(--input-bg);
+}
+
+/* Forms (General) */
+body.dark-mode .form-control,
+body.dark-mode select.form-control {
+  background-color: var(--input-bg);
+  color: var(--text-color); /* Light text in inputs */
+  border: 1px solid var(--input-border);
+}
+body.dark-mode .form-control::placeholder {
+  color: var(--secondary-color); /* Medium gray for placeholder */
+  opacity: 0.7;
+}
+body.dark-mode .form-control:focus {
+  background-color: var(--input-bg);
+  color: var(--text-color); /* Light text on focus */
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(var(--primary-color), 0.35);
+}
+body.dark-mode label {
+  color: var(--text-color); /* Light label text */
+}
+
+/* Cards / Boxes */
+body.dark-mode .box {
+  background-color: var(--card-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-color); /* Light text in boxes */
+}
+body.dark-mode .box h4, body.dark-mode .box p {
+   color: var(--text-color); /* Light text */
+}
+
+/* Hero Area */
+body.dark-mode .hero_area {
+    background-color: var(--bg-color);
+}
+
+/* Highlight spans in headings */
+body.dark-mode .heading_container h2 span,
+body.dark-mode .detail-box h1 span {
+    color: var(--primary-color);
+}
+
+/* Tables */
+body.dark-mode table {
+    background-color: transparent;
+    color: var(--text-color); /* Light text in tables */
+    border-collapse: collapse;
+    width: 100%;
+}
+body.dark-mode th, body.dark-mode td {
+    border: 1px solid var(--input-border);
+    padding: 0.75rem;
+    text-align: left;
+    background-color: var(--card-bg); /* Use card background for cells */
+    color: var(--text-color) !important; /* Force light text in cells */
+}
+body.dark-mode thead th {
+    background-color: #303030; /* Darker header background */
+    font-weight: bold;
+    color: var(--text-color) !important; /* Force light text in header */
+}
+
+/* Dashboard Tile Specific Styles */
+body.dark-mode .tile {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--input-border);
+}
+/* Force light text on all elements inside tiles */
+body.dark-mode .tile * {
+    color: var(--text-color) !important;
+}
+/* Ensure links inside tiles use link color */
+body.dark-mode .tile a {
+    color: var(--link-color) !important;
+}
+
+/* --- Login Page Specific Overrides --- */
+body.dark-mode div[class*="login_authwrapper"] {
+    background-color: var(--bg-color) !important;
+}
+body.dark-mode div[class*="login_authinner"] {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+}
+/* Force light text on all elements inside login form */
+body.dark-mode div[class*="login_authinner"] * {
+    color: var(--text-color) !important;
+}
+body.dark-mode div[class*="login_authinner"] input[class*="login_formcontrol"],
+body.dark-mode div[class*="login_authinner"] select[class*="login_formcontrol"] {
+    background-color: var(--input-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--input-border) !important;
+}
+body.dark-mode div[class*="login_authinner"] button[class*="login_btn"] {
+     background-color: var(--button-bg) !important;
+     color: var(--button-text) !important;
+     border-color: var(--button-border) !important;
+}
+body.dark-mode div[class*="login_authinner"] button[class*="login_btn"]:hover {
+     background-color: var(--button-hover-bg) !important;
+     border-color: var(--button-hover-border) !important;
+}
+/* Ensure links inside login form use link color */
+body.dark-mode div[class*="login_authinner"] a {
+     color: var(--link-color) !important;
+}
+
+/* --- Container Styles for Specific Pages (Dashboard, Forms, Lists, Confirmation, Reset) --- */
+/* Apply card background to specific page/form containers */
+body.dark-mode .app-body-main-content, /* Dashboard */
+body.dark-mode .changerole-container,  /* User Management */
+body.dark-mode .cabinet-list-container, /* Manage Cabinets */
+body.dark-mode .add-cabinet-container,  /* Add Cabinet Form */
+body.dark-mode .edit-user-container,   /* Edit User Form */
+body.dark-mode .change-password-container, /* Change Password Form */
+body.dark-mode .registration-form-container, /* Registration Form */
+body.dark-mode .cardSuccess, /* Confirmation Page Card */
+body.dark-mode .reset-password-container .card, /* Reset Password Page Card */
+body.dark-mode .auth-inner, /* Reset Password Request Form Inner */
+body.dark-mode .add-form-container /* Add Form */ {
+    background-color: var(--card-bg) !important;
+    padding: 1.5rem; /* Consistent padding */
+    border-radius: 8px;
+    /* border: 1px solid var(--input-border); Optional: Add border if needed */
+    margin-top: 1rem; /* Adjust margin as needed */
+    margin-bottom: 1rem;
+    color: var(--text-color) !important; /* Default light text */
+}
+/* Specific background for Confirmation page wrapper */
+body.dark-mode .containerSuccess {
+     background-color: var(--bg-color) !important; /* Use base dark bg */
+     display: flex; /* Ensure centering works */
+     justify-content: center;
+     align-items: center;
+     min-height: 100vh;
+}
+/* Specific background for Reset Password page wrapper */
+body.dark-mode .reset-password-container {
+     background-color: var(--bg-color) !important; /* Use base dark bg */
+     padding-top: 3rem; /* Add padding like other forms */
+     padding-bottom: 3rem;
+     min-height: 100vh;
+}
+/* Specific background for Reset Password Request page wrapper */
+body.dark-mode .auth-wrapper { /* Assuming ResetPass uses this wrapper */
+     background-color: var(--bg-color) !important; /* Use base dark bg */
+     display: flex; /* Ensure centering works */
+     justify-content: center;
+     align-items: center;
+     min-height: 100vh;
+}
+
+/* Force light text on ALL descendants within these specific containers */
+body.dark-mode .app-body-main-content *,
+body.dark-mode .changerole-container *,
+body.dark-mode .cabinet-list-container *,
+body.dark-mode .add-cabinet-container *,
+body.dark-mode .edit-user-container *,
+body.dark-mode .change-password-container *,
+body.dark-mode .registration-form-container *,
+body.dark-mode .cardSuccess *, /* Confirmation Page Card */
+body.dark-mode .reset-password-container .card *, /* Reset Password Page Card */
+body.dark-mode .auth-inner *, /* Reset Password Request Form Inner */
+body.dark-mode .add-form-container * /* Add Form */ {
+     color: var(--text-color) !important;
+}
+
+/* Ensure buttons inside these containers use correct theme colors */
+body.dark-mode .app-body-main-content .btn,
+body.dark-mode .changerole-container .btn,
+body.dark-mode .cabinet-list-container .btn,
+body.dark-mode .add-cabinet-container .btn,
+body.dark-mode .edit-user-container .btn,
+body.dark-mode .change-password-container .btn,
+body.dark-mode .registration-form-container .btn,
+body.dark-mode .reset-password-container .btn, /* Reset Password Page Card */
+body.dark-mode .auth-inner .btn, /* Reset Password Request Form Inner */
+body.dark-mode .add-form-container .btn /* Add Form */ {
+    color: var(--button-text) !important;
+    background-color: var(--button-bg) !important;
+    border-color: var(--button-border) !important;
+}
+body.dark-mode .app-body-main-content .btn:hover,
+body.dark-mode .changerole-container .btn:hover,
+body.dark-mode .cabinet-list-container .btn:hover,
+body.dark-mode .add-cabinet-container .btn:hover,
+body.dark-mode .edit-user-container .btn:hover,
+body.dark-mode .change-password-container .btn:hover,
+body.dark-mode .registration-form-container .btn:hover,
+body.dark-mode .reset-password-container .btn:hover, /* Reset Password Page Card */
+body.dark-mode .auth-inner .btn:hover, /* Reset Password Request Form Inner */
+body.dark-mode .add-form-container .btn:hover /* Add Form */ {
+     background-color: var(--button-hover-bg) !important;
+     border-color: var(--button-hover-border) !important;
+}
+
+/* Ensure inputs inside these containers use correct theme colors */
+body.dark-mode .app-body-main-content .form-control,
+body.dark-mode .changerole-container .form-control,
+body.dark-mode .cabinet-list-container .form-control,
+body.dark-mode .add-cabinet-container .form-control,
+body.dark-mode .edit-user-container .form-control,
+body.dark-mode .change-password-container .form-control,
+body.dark-mode .registration-form-container .form-control,
+body.dark-mode .registration-form-container .form-select,
+body.dark-mode .reset-password-container .form-control, /* Reset Password Page Card */
+body.dark-mode .auth-inner .form-control, /* Reset Password Request Form Inner */
+body.dark-mode .add-form-container .form-control, /* Add Form */
+body.dark-mode .add-form-container .form-select /* Add Form Select */ {
+    background-color: var(--input-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--input-border) !important;
+}
+
+/* Ensure read-only/disabled inputs inside these containers use correct theme colors */
+body.dark-mode .app-body-main-content .form-control:read-only,
+body.dark-mode .app-body-main-content .form-control:disabled,
+body.dark-mode .changerole-container .form-control:read-only,
+body.dark-mode .changerole-container .form-control:disabled,
+body.dark-mode .cabinet-list-container .form-control:read-only,
+body.dark-mode .cabinet-list-container .form-control:disabled,
+body.dark-mode .add-cabinet-container .form-control:read-only,
+body.dark-mode .add-cabinet-container .form-control:disabled,
+body.dark-mode .edit-user-container .form-control:read-only,
+body.dark-mode .edit-user-container .form-control:disabled,
+body.dark-mode .change-password-container .form-control:read-only,
+body.dark-mode .change-password-container .form-control:disabled,
+body.dark-mode .registration-form-container .form-control:read-only,
+body.dark-mode .registration-form-container .form-control:disabled,
+body.dark-mode .registration-form-container .form-select:disabled,
+body.dark-mode .reset-password-container .form-control:read-only, /* Reset Password Page Card */
+body.dark-mode .reset-password-container .form-control:disabled,
+body.dark-mode .auth-inner .form-control:read-only, /* Reset Password Request Form Inner */
+body.dark-mode .auth-inner .form-control:disabled,
+body.dark-mode .add-form-container .form-control:read-only, /* Add Form */
+body.dark-mode .add-form-container .form-control:disabled,
+body.dark-mode .add-form-container .form-select:disabled {
+    background-color: #404040 !important; /* Consistent disabled background */
+    opacity: 0.7;
+}
+
+/* Ensure links inside these form containers use link color */
+body.dark-mode .app-body-main-content a,
+body.dark-mode .changerole-container a,
+body.dark-mode .cabinet-list-container a,
+body.dark-mode .add-cabinet-container a,
+body.dark-mode .edit-user-container a,
+body.dark-mode .change-password-container a,
+body.dark-mode .registration-form-container a,
+body.dark-mode .reset-password-container a, /* Reset Password Page Card */
+body.dark-mode .auth-inner a, /* Reset Password Request Form Inner */
+body.dark-mode .add-form-container a /* Add Form */ {
+    color: var(--link-color) !important;
+}
+
+/* Style the QR code display box */
+body.dark-mode .qr-code-display {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--input-border) !important;
+}
+body.dark-mode .qr-code-display * { /* Force light text inside QR display */
+     color: var(--text-color) !important;
+}
+body.dark-mode .qr-code-display img {
+    border-color: var(--input-border) !important; /* Adjust image border */
+    background-color: white; /* Keep QR code background white for scanning */
+    padding: 5px; /* Add padding around QR code */
+}
+
+/* Style alert messages globally */
+body.dark-mode .alert-danger {
+    background-color: #7f1d1d;
+    color: #f87171; /* Brighter red text */
+    border-color: #b91c1c;
+}
+body.dark-mode .alert-success {
+     background-color: #065f46;
+     color: #a7f3d0;
+     border-color: #064e3b;
+}
+body.dark-mode .message { /* Style general .message class if used */
+    color: var(--primary-color);
+}
+
+/* --- Dashboard Sidebar Specific Styles --- */
+/* Apply dark card background to both sidebars */
+body.dark-mode .app-body-navigation,
+body.dark-mode .sidebar {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important; /* Default light text */
+    padding: 1rem; /* Add some padding */
+    border-right: 1px solid var(--input-border); /* Example border for left nav */
+}
+body.dark-mode .sidebar { /* Specific border for right sidebar */
+     border-left: 1px solid var(--input-border);
+     border-right: none; /* Remove right border if added above */
+}
+
+/* Force light text on ALL descendants within the sidebars */
+body.dark-mode .app-body-navigation *,
+body.dark-mode .sidebar * {
+     color: var(--text-color) !important;
+}
+
+/* Ensure links in navigation sidebar are styled correctly */
+body.dark-mode .app-body-navigation .navigation a {
+    color: var(--text-color) !important; /* Force light text for nav links */
+    display: block; /* Make links block for better spacing */
+    padding: 0.5rem 0; /* Add padding */
+    text-decoration: none;
+    border-radius: 4px; /* Add slight rounding */
+    margin-bottom: 0.25rem; /* Space between links */
+}
+body.dark-mode .app-body-navigation .navigation a:hover {
+    color: var(--link-color) !important; /* Use link color on hover */
+    background-color: rgba(255, 255, 255, 0.05); /* Subtle hover background */
+}
+
+/* Style the footer inside the navigation sidebar */
+body.dark-mode .app-body-navigation .footer {
+    background-color: #121212 !important; /* Black background */
+    border-top: 1px solid var(--input-border);
+    padding: 1rem; /* Add padding */
+    margin-top: 1rem;
+    border-radius: 4px; /* Optional rounding */
+}
+body.dark-mode .app-body-navigation .footer * {
+     color: #ffffff !important; /* White text */
+     font-size: 0.8rem;
+}
+
+/* Style user info items in the right sidebar */
+body.dark-mode .sidebar .user-info-item p {
+    margin-bottom: 0.5rem;
+}
+body.dark-mode .sidebar .user-info-item strong {
+     margin-right: 0.5em; /* Space after label */
+     opacity: 0.8; /* Slightly dim the label */
+}
+body.dark-mode .sidebar .user-info-item span {
+     /* Ensure span text is clearly visible */
+     color: var(--text-color) !important;
+}
+/* Ensure links in the right sidebar are styled correctly */
+body.dark-mode .sidebar a {
+    color: var(--link-color) !important;
+}
+
+/* --- Logout Dialog Specific Styles --- */
+body.dark-mode .logout-dialog .logout-dialog-title,
+body.dark-mode .logout-dialog .logout-dialog-content {
+    color: #1f1f1f !important; /* Black text */
+}
+/* Optional: Style buttons if needed */
+/* body.dark-mode .logout-dialog .logout-dialog-button.cancel { ... } */
+/* body.dark-mode .logout-dialog .logout-dialog-button.confirm { ... } */
+
+/* Ensure form validation feedback is red in dark mode */
+body.dark-mode .invalid-feedback {
+    color: #dc3545 !important; /* Standard Bootstrap danger color, forced */
+}

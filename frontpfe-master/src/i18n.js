@@ -13,13 +13,18 @@ i18n
   .init({
     lng: savedLanguage, // Utiliser la langue sauvegardée
     fallbackLng: "en",
-    debug: false,
+    // preload: ['en', 'fr'], // Remove preload for now
+    debug: true, // Re-enable debug logging
     interpolation: {
       escapeValue: false,
     },
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
+      // load: 'languageOnly', // Revert to default load strategy
     },
+    react: {
+      useSuspense: true // Explicitly enable Suspense integration
+    }
   });
 
 export default i18n;

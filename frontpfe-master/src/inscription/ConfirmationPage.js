@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
 import "./ConfirmationPage.css"; // Import the dedicated CSS file
 
 function ConfirmationPage() {
+  const { t } = useTranslation(); // Initialize translation function
     const [countdown, setCountdown] = useState(5);
     const navigate = useNavigate(); // Hook for navigation
 
@@ -25,12 +27,13 @@ function ConfirmationPage() {
                 <div className="icon-container">
                     <span className="checkmark">✓</span>
                 </div>
-                <h1>Inscription réussie</h1><p>
-                Félicitations ! Votre inscription a été complétée avec succès.<br></br>
-                Nous vous remercions pour votre confiance.
-            </p>
-                <br></br>
-                <p className="countdown">Redirection dans <b>0{countdown}s</b>...</p>
+                <h1>{t('confirmation.successTitle')}</h1>
+                <p>
+                  {t('confirmation.successMessage1')}<br />
+                  {t('confirmation.successMessage2')}
+                </p>
+                <br />
+                <p className="countdown">{t('confirmation.redirectMessage', { count: countdown })}</p>
             </div>
         </div>
     );

@@ -28,6 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<!-- Let Spring Boot parent manage lombok version -->
 	</properties>
 	<dependencies>
 		<dependency>
@@ -119,6 +120,13 @@
 			<artifactId>jackson-datatype-hibernate6</artifactId>
 			<!-- Version is managed by Spring Boot parent POM -->
 		</dependency>
+
+		<!-- Lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope> <!-- Explicitly set scope to provided -->
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -126,6 +134,24 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<!-- Add Maven Compiler Plugin configuration -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<!-- Version is often inherited from parent POM, but can be specified -->
+				<configuration>
+					<source>${java.version}</source> <!-- Use property -->
+					<target>${java.version}</target> <!-- Use property -->
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<!-- Version should be inherited from the dependency section -->
+						</path>
+						<!-- Add other annotation processors if needed -->
+					</annotationProcessorPaths>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

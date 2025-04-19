@@ -200,6 +200,31 @@ public class AuthController {
                              ));
                  }
             }
+        } else if (baseUser instanceof DoctorCentreDexamen) {
+            DoctorCentreDexamen doctorCentre = (DoctorCentreDexamen) baseUser;
+
+            // Check if active (isActive == 1 means true)
+            if (!doctorCentre.isActive()) {
+                log.warn("Login failed: DoctorCentreDexamen {} account is inactive.", email);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Your account is currently inactive. Please contact support."));
+            }
+
+            // Get the associated CentreDexamen and its ID
+            CentreDexamen centre = doctorCentre.getCentreDexamen();
+            if (centre == null || centre.getIdCentre() == null) { // Use the correct getter getIdCentre()
+                log.error("Login failed: DoctorCentreDexamen {} has no assigned centre or centre has no ID.", email);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Account not associated with a valid examination centre."));
+            }
+            cabinetIdForToken = centre.getIdCentre(); // Store centre ID here using the correct getter
+
+            // Optional: Check against requestedCabinetId if DoctorCentreDexamen can also select cabinets (unlikely based on request)
+            // if (finalRequestedCabinetId != null && !finalRequestedCabinetId.equals(cabinetIdForToken)) {
+            //     log.warn("Login failed: DoctorCentreDexamen {} requested centre {} but belongs to {}", email, finalRequestedCabinetId, cabinetIdForToken);
+            //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Access denied for the selected centre.")); // Or appropriate message
+            // }
+
+            log.info("DoctorCentreDexamen login successful for {} in centre {}", email, cabinetIdForToken);
+
         } else {
              log.error("Login failed: Unhandled user type for email {}", email);
              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Login failed due to unexpected user role."));
@@ -244,6 +269,11 @@ public class AuthController {
             userInfo.put("age", Period.between(baseUser.getBirthDate(), LocalDate.now()).getYears());
         } else {
             userInfo.put("age", null);
+        }
+
+        // Add speciality specifically for DoctorCentreDexamen
+        if (baseUser instanceof DoctorCentreDexamen) {
+            userInfo.put("speciality", ((DoctorCentreDexamen) baseUser).getSpeciality());
         }
         // --- End adding fields ---
 

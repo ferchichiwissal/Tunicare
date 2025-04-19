@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react"; // Added useCallback
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 import axios from "axios";
 import { getToken, getRoles, clearUserData, isTokenExpired, getUserData } from "../../utils/auth";
 import './AddForm.css'; // Import the CSS file
@@ -15,6 +16,7 @@ const checkPasswordStrength = (password) => {
 
 function AddForm() { // Renamed component for clarity
   const navigate = useNavigate();
+  const { t } = useTranslation(); // Get translation function
   const [formData, setFormData] = useState({
     first_name: "",
     lastName: "",
@@ -38,7 +40,7 @@ function AddForm() { // Renamed component for clarity
   // --- Logout Function ---
   const performLogout = useCallback(() => {
     clearUserData();
-    alert("Session expired or logged out. Redirecting to login.");
+    alert(t('addForm.alerts.sessionExpired'));
     navigate("/sign-in");
   }, [navigate]);
 
@@ -102,7 +104,7 @@ function AddForm() { // Renamed component for clarity
     } else if (isDoctorOrAssistant) {
       setUserRole("DOCTOR_OR_ASSISTANT");
     } else {
-      alert("You don't have permission to access this page.");
+      alert(t('addForm.alerts.permissionDeniedAccess'));
       performLogout();
     }
   }, [performLogout]); // Added performLogout dependency
@@ -113,9 +115,9 @@ function AddForm() { // Renamed component for clarity
 
     if (name === "password") {
       if (value && !checkPasswordStrength(value)) {
-        setPasswordStrength("Weak");
+        setPasswordStrength(t('addForm.passwordStrength.weak'));
       } else if (value && checkPasswordStrength(value)) {
-        setPasswordStrength("Strong");
+        setPasswordStrength(t('addForm.passwordStrength.strong'));
       } else {
         setPasswordStrength(""); // Clear strength if password empty
       }
@@ -129,25 +131,25 @@ function AddForm() { // Renamed component for clarity
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.first_name) newErrors.first_name = "First name is required";
-    if (!formData.lastName) newErrors.lastName = "Last name is required";
+    if (!formData.first_name) newErrors.first_name = t('addForm.errors.validation.firstNameRequired');
+    if (!formData.lastName) newErrors.lastName = t('addForm.errors.validation.lastNameRequired');
     if (formData.email && !/^[^\s@]+@(gmail\.com|yahoo\.com)$/.test(formData.email)) {
-        newErrors.email = "Email must be a valid @gmail.com or @yahoo.com address";
+        newErrors.email = t('addForm.errors.validation.emailInvalidDomain');
     }
-    if (!formData.birthDate) newErrors.birthDate = "Birth date is required";
+    if (!formData.birthDate) newErrors.birthDate = t('addForm.errors.validation.birthDateRequired');
     if (formData.tel && !/^\d+$/.test(formData.tel)) {
-        newErrors.tel = "Phone number must contain only digits";
+        newErrors.tel = t('addForm.errors.validation.phoneDigitsOnly');
     }
-    if (!formData.gendre) newErrors.gendre = "Gender is required";
+    if (!formData.gendre) newErrors.gendre = t('addForm.errors.validation.genderRequired');
     // Password validation only if password is not empty
     if (formData.password && !checkPasswordStrength(formData.password)) {
-      newErrors.password = "Password must contain at least 8 characters, including uppercase, lowercase, a number, and a special character (@, #, $, %, ^, &, +, =, or !)";
+      newErrors.password = t('addForm.errors.validation.passwordStrength');
     }
     if (formData.password && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword = t('addForm.errors.validation.passwordsMismatch');
     }
     if (!formData.password && formData.confirmPassword) {
-        newErrors.confirmPassword = "Confirm password should be empty if password is empty";
+        newErrors.confirmPassword = t('addForm.errors.validation.confirmPasswordNotEmpty');
     }
 
     setErrors(newErrors);
@@ -160,7 +162,7 @@ function AddForm() { // Renamed component for clarity
 
     const token = getToken();
     if (!token) {
-      alert("Session invalid. Please log in again.");
+      alert(t('addForm.alerts.sessionInvalid'));
       performLogout();
       return;
     }
@@ -170,7 +172,7 @@ function AddForm() { // Renamed component for clarity
       setIsCheckingExistence(true);
       setErrors({});
       if (!loggedInUserCabinetId) {
-          setErrors({ general: "Could not determine your cabinet affiliation. Please log in again." });
+          setErrors({ general: t('addForm.errors.existenceCheck.noCabinet') });
           setIsCheckingExistence(false);
           performLogout();
           return;
@@ -186,13 +188,13 @@ function AddForm() { // Renamed component for clarity
           headers: { "Authorization": `Bearer ${token}` }
         });
         if (checkResponse.data === true) {
-          setErrors({ general: "A user with this email, first name, and last name already exists in this cabinet." });
+          setErrors({ general: t('addForm.errors.existenceCheck.userExists') });
           setIsCheckingExistence(false);
           return;
         }
       } catch (error) {
         if (error.response && error.response.status !== 404) {
-          setErrors({ general: "Could not verify user existence. Please try again." });
+          setErrors({ general: t('addForm.errors.existenceCheck.generic') });
           console.error("Existence check error:", error);
           setIsCheckingExistence(false);
           return;
@@ -210,7 +212,7 @@ function AddForm() { // Renamed component for clarity
     } else if (userRole === "DOCTOR_OR_ASSISTANT") {
       apiUrl = "http://localhost:6952/Users/add";
     } else {
-      alert("Invalid user role. Cannot proceed.");
+      alert(t('addForm.alerts.invalidRole'));
       setIsSubmitting(false);
       return;
     }
@@ -234,8 +236,8 @@ function AddForm() { // Renamed component for clarity
       });
 
       const successMessage = userRole === "ADMIN"
-        ? "User added successfully with admin privileges!"
-        : "Patient added successfully!";
+        ? t('addForm.alerts.adminAddSuccess')
+        : t('addForm.alerts.patientAddSuccess');
       alert(successMessage);
 
       setFormData({
@@ -251,15 +253,15 @@ function AddForm() { // Renamed component for clarity
       console.error("Error adding user:", error);
       if (error.response) {
         if (error.response.status === 401 || error.response.status === 403) {
-          alert("Permission denied or session expired.");
+          alert(t('addForm.alerts.permissionDeniedSubmit'));
           performLogout();
         } else {
           const backendMessage = error.response.data?.message ||
-                               "An error occurred. Please check the data and try again.";
+                               t('addForm.errors.submit.generic');
           setErrors({ general: backendMessage });
         }
       } else {
-        setErrors({ general: "Network error or server unavailable. Please try again later." });
+        setErrors({ general: t('addForm.errors.submit.networkError') });
       }
     } finally {
       setIsSubmitting(false);
@@ -268,9 +270,9 @@ function AddForm() { // Renamed component for clarity
 
   return (
     // Use registration-form class for consistency if styles are shared, or create AddForm specific styles
-    <div className="registration-form">
+    <div className="add-form-container"> {/* Changed class name */}
       <h2 className="form-title">
-        {userRole === "ADMIN" ? "Add New User" : "Add New Patient"}
+        {userRole === "ADMIN" ? t('addForm.title.admin') : t('addForm.title.patient')}
       </h2>
       {errors.general && <div className="alert alert-danger">{errors.general}</div>}
 
@@ -278,31 +280,29 @@ function AddForm() { // Renamed component for clarity
           {/* Row 1: First Name, Last Name */}
           <div className="row g-3 mb-3">
             <div className="col-md-6">
-              <label htmlFor="add-first-name" className="form-label required">First Name</label>
+              <label htmlFor="add-first-name" className="form-label required">{t('addForm.labels.firstName')}</label>
               <input
                 type="text"
                 id="add-first-name"
                 name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                placeholder="Enter first name"
-                className={`form-control ${errors.first_name ? 'is-invalid' : ''}`}
-                required
-              />
+                 value={formData.first_name}
+                 onChange={handleChange}
+                 className={`form-control ${errors.first_name ? 'is-invalid' : ''}`}
+                 required
+               />
               <div className="invalid-feedback">{errors.first_name}</div>
             </div>
             <div className="col-md-6">
-              <label htmlFor="add-last-name" className="form-label required">Last Name</label>
+              <label htmlFor="add-last-name" className="form-label required">{t('addForm.labels.lastName')}</label>
               <input
                 type="text"
                 id="add-last-name"
                 name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                placeholder="Enter last name"
-                className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
-                required
-              />
+                 value={formData.lastName}
+                 onChange={handleChange}
+                 className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
+                 required
+               />
               <div className="invalid-feedback">{errors.lastName}</div>
             </div>
           </div>
@@ -310,20 +310,19 @@ function AddForm() { // Renamed component for clarity
           {/* Row 2: Email, Birth Date */}
           <div className="row g-3 mb-3">
             <div className="col-md-6">
-              <label htmlFor="add-email" className="form-label">Email</label>
+              <label htmlFor="add-email" className="form-label">{t('addForm.labels.email')}</label>
               <input
                 type="email"
                 id="add-email"
                 name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter email (optional)"
-                className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-              />
+                 value={formData.email}
+                 onChange={handleChange}
+                 className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+               />
               <div className="invalid-feedback">{errors.email}</div>
             </div>
             <div className="col-md-6">
-              <label htmlFor="add-birthDate" className="form-label required">Birth Date</label>
+              <label htmlFor="add-birthDate" className="form-label required">{t('addForm.labels.birthDate')}</label>
               <input
                 type="date"
                 id="add-birthDate"
@@ -340,36 +339,34 @@ function AddForm() { // Renamed component for clarity
           {/* Row 3: Telephone, Address */}
           <div className="row g-3 mb-3">
             <div className="col-md-6">
-              <label htmlFor="add-tel" className="form-label">Telephone</label>
+              <label htmlFor="add-tel" className="form-label">{t('addForm.labels.telephone')}</label>
               <input
                 type="text"
                 id="add-tel"
                 name="tel"
-                value={formData.tel}
-                onChange={handleChange}
-                placeholder="Enter phone number (optional)"
-                className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
-              />
+                 value={formData.tel}
+                 onChange={handleChange}
+                 className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
+               />
               <div className="invalid-feedback">{errors.tel}</div>
             </div>
             <div className="col-md-6">
-              <label htmlFor="add-address" className="form-label">Address</label>
+              <label htmlFor="add-address" className="form-label">{t('addForm.labels.address')}</label>
               <input
                 type="text"
                 id="add-address"
                 name="address"
-                value={formData.address}
-                onChange={handleChange}
-                placeholder="Enter address (optional)"
-                className={`form-control ${errors.address ? 'is-invalid' : ''}`}
-              />
+                 value={formData.address}
+                 onChange={handleChange}
+                 className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+               />
             </div>
           </div>
 
           {/* Row 4: Gender, Photo */}
           <div className="row g-3 mb-3">
             <div className="col-md-6">
-              <label htmlFor="add-gender" className="form-label required">Gender</label>
+              <label htmlFor="add-gender" className="form-label required">{t('addForm.labels.gender')}</label>
               <select
                 id="add-gender"
                 name="gendre"
@@ -378,15 +375,15 @@ function AddForm() { // Renamed component for clarity
                 className={`form-select ${errors.gendre ? 'is-invalid' : ''}`}
                 required
               >
-                <option value="">Select Gender...</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
+                <option value="">{t('addForm.genderOptions.select')}</option>
+                <option value="Male">{t('addForm.genderOptions.male')}</option>
+                <option value="Female">{t('addForm.genderOptions.female')}</option>
+                <option value="Other">{t('addForm.genderOptions.other')}</option>
               </select>
               <div className="invalid-feedback">{errors.gendre}</div>
             </div>
             <div className="col-md-6">
-              <label htmlFor="add-photo" className="form-label">Profile Photo (Optional)</label>
+              <label htmlFor="add-photo" className="form-label">{t('addForm.labels.photo')}</label>
               <input
                 type="file"
                 id="add-photo"
@@ -401,35 +398,33 @@ function AddForm() { // Renamed component for clarity
           {/* Row 5: Password, Confirm Password */}
           <div className="row g-3 mb-3">
             <div className="col-md-6">
-              <label htmlFor="add-password" className="form-label">Password</label>
+              <label htmlFor="add-password" className="form-label">{t('addForm.labels.password')}</label>
               <input
                 type="password"
                 id="add-password"
                 name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter password (optional)"
-                className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-              />
+                 value={formData.password}
+                 onChange={handleChange}
+                 className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+               />
               <div className="invalid-feedback">{errors.password}</div>
               {passwordStrength && (
                 <div className={`form-text password-strength ${passwordStrength.toLowerCase()}`}>
-                  Password Strength: {passwordStrength}
+                  {t('addForm.passwordStrength.label')}: {passwordStrength}
                 </div>
               )}
             </div>
             <div className="col-md-6">
-              <label htmlFor="add-confirmPassword" className="form-label">Confirm Password</label>
+              <label htmlFor="add-confirmPassword" className="form-label">{t('addForm.labels.confirmPassword')}</label>
               <input
                 type="password"
                 id="add-confirmPassword"
                 name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirm password (if entered)"
-                className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
-                // Required only if password has value
-                required={!!formData.password}
+                 value={formData.confirmPassword}
+                 onChange={handleChange}
+                 className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                 // Required only if password has value
+                 required={!!formData.password}
               />
               <div className="invalid-feedback">{errors.confirmPassword}</div>
             </div>
@@ -443,7 +438,7 @@ function AddForm() { // Renamed component for clarity
                   disabled={isCheckingExistence || isSubmitting}
                   className={`btn btn-primary btn-lg ${(isSubmitting || isCheckingExistence) ? "disabled" : ""}`}
                 >
-                  {isCheckingExistence ? "Checking..." : (isSubmitting ? "Processing..." : "Submit")}
+                  {isCheckingExistence ? t('addForm.buttons.checking') : (isSubmitting ? t('addForm.buttons.processing') : t('addForm.buttons.submit'))}
                 </button>
              </div>
           </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"; // Import useEffect
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 import styles from "./login.module.css";
 import apiClient from "../utils/apiClient";
 import { storeUserData } from "../utils/auth";
@@ -8,13 +9,14 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [loginMessage, setLoginMessage] = useState("");
+  const [loginMessage, setLoginMessage] = useState(null); // Store key/options instead of string
   const [loading, setLoading] = useState(false);
   const [needsCabinetSelection, setNeedsCabinetSelection] = useState(false);
   const [cabinetOptions, setCabinetOptions] = useState([]);
   const [selectedCabinetId, setSelectedCabinetId] = useState("");
 
   const navigate = useNavigate();
+  const { t } = useTranslation(); // Get the translation function
 
   // useEffect to check for remembered email on component mount
   useEffect(() => {
@@ -28,14 +30,14 @@ const Login = () => {
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
     setLoading(true);
-    setLoginMessage("");
+    setLoginMessage(null); // Clear message
 
     let payload;
     let isInitialAttempt = !needsCabinetSelection;
 
     if (needsCabinetSelection) {
         if (!selectedCabinetId) {
-            setLoginMessage("Please select a cabinet.");
+            setLoginMessage({ key: 'selectCabinetError' });
             setLoading(false);
             return;
         }
@@ -46,7 +48,7 @@ const Login = () => {
         };
     } else {
         if (!email || !password) {
-            setLoginMessage("Please insert your email and password");
+            setLoginMessage({ key: 'missingCredentialsError' });
             setLoading(false);
             return;
         }
@@ -59,7 +61,7 @@ const Login = () => {
 
       // If status is 200, login is successful for the returned context (user/cabinet)
       if (response.status === 200 && responseData.user) {
-        setLoginMessage("Login successful!");
+        setLoginMessage({ key: 'loginSuccess' });
         // Pass the rememberMe state to storeUserData for token storage duration
         storeUserData(responseData, rememberMe); 
 
@@ -76,7 +78,7 @@ const Login = () => {
       } else {
           // Handle cases where login succeeded (status 200) but user data is missing in response
           console.error("Login succeeded but user data missing in response:", responseData);
-          setLoginMessage("Login successful, but failed to load user details.");
+          setLoginMessage({ key: 'loginSuccessIncomplete' });
           setNeedsCabinetSelection(false);
           setCabinetOptions([]);
       }
@@ -84,22 +86,24 @@ const Login = () => {
     } catch (error) {
       if (error.response) {
         if (isInitialAttempt && error.response.status === 428 && error.response.data?.cabinets) {
-          setLoginMessage("Multiple accounts found. Please select your cabinet.");
+          setLoginMessage({ key: 'multipleAccountsError' });
           setNeedsCabinetSelection(true);
           setCabinetOptions(error.response.data.cabinets);
           setSelectedCabinetId("");
         } else if (error.response.status === 401) {
           // Utiliser le message spécifique du backend pour les erreurs 401
-          setLoginMessage(error.response.data?.message || "Invalid email or password."); 
+          // Use key for default, but keep backend message if available
+          setLoginMessage({ key: 'invalidCredentialsError' }); // Always use the key
           setNeedsCabinetSelection(false);
           setCabinetOptions([]);
         } else {
-          setLoginMessage(error.response.data?.message || "Login failed due to a server error.");
+          // Use key for default, but keep backend message if available
+          setLoginMessage({ key: 'serverError' }); // Always use the key
           setNeedsCabinetSelection(false);
           setCabinetOptions([]);
         }
       } else {
-        setLoginMessage("Login failed. Please check your connection or contact support.");
+        setLoginMessage({ key: 'connectionError' });
         setNeedsCabinetSelection(false);
         setCabinetOptions([]);
       }
@@ -113,28 +117,26 @@ const Login = () => {
       <div className={styles.authWrapper}>
         <div className={styles.authinner}>
           <form onSubmit={handleLogin}>
-            <h3>Sign In</h3>
+            <h3>{t('signInTitle')}</h3>
             <div className="mb-3">
-              <label>Email address</label>
+              <label>{t('emailLabel')}</label>
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                type="email"
-                className={styles.formcontrol}
-                placeholder="Enter email"
-              />
-            </div>
+                 type="email"
+                 className={styles.formcontrol}
+               />
+             </div>
 
             <div className={styles.mb3}>
-              <label>Password</label>
+              <label>{t('passwordLabel')}</label>
               <input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                type="password"
-                className={styles.formcontrol}
-                placeholder="Enter password"
-              />
-            </div>
+                 type="password"
+                 className={styles.formcontrol}
+               />
+             </div>
 
             <div className="mb-3 form-check">
               <input
@@ -145,23 +147,23 @@ const Login = () => {
                 onChange={(e) => setRememberMe(e.target.checked)}
               />
               <label className="form-check-label" htmlFor="rememberMeCheckbox">
-                Remember me
+                {t('rememberMeLabel')}
               </label>
             </div>
 
             {needsCabinetSelection && (
               <div className={styles.mb3}>
-                <label>Select Cabinet</label>
+                <label>{t('selectCabinetLabel')}</label>
                 <select
                   className={styles.formcontrol}
                   value={selectedCabinetId}
-                  onChange={(e) => setSelectedCabinetId(e.target.value)}
-                  required
-                >
-                  <option value="" disabled>-- Select a Cabinet --</option>
-                  {cabinetOptions.map((cabinet) => (
-                    <option key={cabinet.cabinetId} value={cabinet.cabinetId}>
-                      {cabinet.cabinetName || `Cabinet ${cabinet.cabinetId}`}
+                   onChange={(e) => setSelectedCabinetId(e.target.value)}
+                   required
+                 >
+                   <option value="" disabled>{t('selectCabinetLabel')}</option> {/* Changed placeholder key to label key */}
+                   {cabinetOptions.map((cabinet) => (
+                     <option key={cabinet.cabinetId} value={cabinet.cabinetId}>
+                      {cabinet.cabinetName || t('cabinetOption', { id: cabinet.cabinetId })}
                     </option>
                   ))}
                 </select>
@@ -170,14 +172,19 @@ const Login = () => {
 
             <div className="d-grid">
               <button type="submit" className={styles.btn} disabled={loading}>
-                {loading ? "Processing..." : (needsCabinetSelection ? "Login to Selected Cabinet" : "Submit")}
+                {loading ? t('processingButton') : (needsCabinetSelection ? t('loginToCabinetButton') : t('submitButton'))}
               </button>
             </div>
 
-            {loginMessage && <p className={styles.message}>{loginMessage}</p>}
+            {/* Render translated message, checking if it's a key object or a direct string from backend */}
+            {loginMessage && (
+              <p className={styles.message}>
+                {typeof loginMessage === 'object' && loginMessage.key ? t(loginMessage.key, loginMessage.options) : loginMessage}
+              </p>
+            )}
 
             <p className={styles.forgotpassword}>
-              Forgot <Link to="/resetpassword">password?</Link>
+              {t('forgotPasswordPrefix')} <Link to="/resetpassword">{t('forgotPasswordLink')}</Link>
             </p>
           </form>
         </div>

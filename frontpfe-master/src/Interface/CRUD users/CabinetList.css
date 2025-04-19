@@ -51,38 +51,53 @@
 }
 
 /* Styling for action buttons */
-.cabinet-list-container td button {
+/* General styles for buttons within the table */
+.cabinet-list-container td button,
+.cabinet-list-container td a.btn { /* Apply to links styled as buttons too */
   padding: 6px 12px; /* Smaller padding for table buttons */
   margin-right: 5px; /* Space between buttons */
-  background-color: #00c6a9; /* Aqua green for Edit/Show QR */
-  color: #ffffff;
+  color: #ffffff !important; /* Ensure white text */
   border: none;
+  background-color: var(--primary-color, #00c6a9) !important; /* Apply the primary green color to ALL buttons, overriding Bootstrap */
   border-radius: 4px; /* Slightly smaller radius */
   cursor: pointer;
   font-size: 0.85rem; /* Smaller font */
   font-weight: bold;
-  transition: background-color 0.3s, transform 0.1s;
+  transition: background-color 0.3s, transform 0.1s, border-color 0.3s, color 0.3s; /* Added transitions */
+  text-decoration: none; /* Remove underline from links */
+  display: inline-block; /* Ensure links behave like buttons */
+  vertical-align: middle; /* Align buttons and links */
 }
 
-.cabinet-list-container td button:hover {
-  background-color: #00937d; /* Darker aqua green on hover */
-  transform: translateY(-1px);
+/* Hover effect for all action buttons */
+.cabinet-list-container td button:hover,
+.cabinet-list-container td a.btn:hover {
+  background-color: #00937d !important; /* Darker green on hover for ALL buttons, overriding Bootstrap */
+  transform: translateY(-1px); /* Keep hover effect */
 }
 
+/* Disabled state */
 .cabinet-list-container td button:disabled {
-  background-color: #ccc;
+  background-color: #ccc !important; /* Keep disabled style, override Bootstrap */
   cursor: not-allowed;
+  opacity: 0.65; /* Standard Bootstrap disabled opacity */
 }
 
-/* Specific style for delete button */
-.cabinet-list-container td button[style*="background-color: #dc3545"] {
-  background-color: #dc3545 !important; /* Red for Delete */
-}
-.cabinet-list-container td button[style*="background-color: #dc3545"]:hover {
-  background-color: #c82333 !important; /* Darker red on hover */
-}
+/* REMOVE any specific overrides for .btn-outline-primary, .btn-danger, .btn-info within this context */
+
 
 /* QR Code Display Section */
+/* Ensure original table background styles are correct */
+.cabinet-list-container tbody tr:nth-child(even) {
+  background-color: var(--light-background, #f7f7f7); /* Light grey for even rows */
+}
+.cabinet-list-container tbody tr:nth-child(odd) {
+  background-color: var(--background-color, #ffffff); /* White for odd rows */
+}
+.cabinet-list-container tbody tr:hover {
+  background-color: #e9e9e9; /* Slightly darker grey on hover */
+}
+
 .qr-code-display {
   margin-top: 30px;
   padding: 20px;

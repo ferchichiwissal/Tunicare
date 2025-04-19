@@ -1,20 +1,24 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import ReCAPTCHA from "react-google-recaptcha";
 import './registration.css'; // Keep custom styles for now
-
+import ThemeContext from "../utils/ThemeContext"; // Import ThemeContext
+import LanguageSelector from "../component/LanguageSelector"; // Import LanguageSelector
 const checkPasswordStrength = (password) => {
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!])[\w@#$%^&+=!]{8,}$/;
   return passwordRegex.test(password);
 };
 
 function RegistrationForm() {
+  const { t } = useTranslation(); // Initialize translation function
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const cabinetIdParam = searchParams.get("cabinetId");
   const cabinetId = cabinetIdParam && !isNaN(cabinetIdParam) ? Number(cabinetIdParam) : null;
   const recaptchaRef = useRef(null);
+  const { theme, toggleTheme } = useContext(ThemeContext); // Get theme context
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -57,24 +61,25 @@ function RegistrationForm() {
   const validateForm = () => {
     const newErrors = {};
 
+    // TODO: Translate validation messages
     if (!cabinetId) {
-      newErrors.cabinet = "Invalid registration link. Please use a valid registration URL provided by your clinic.";
+      newErrors.cabinet = t('registration.invalidLinkMessage'); // Use key for invalid link
     }
-    if (!formData.first_name) newErrors.first_name = "First name is required";
-    if (!formData.last_name) newErrors.last_name = "Last name is required";
+    if (!formData.first_name) newErrors.first_name = t('validation.firstNameRequired'); // Example key
+    if (!formData.last_name) newErrors.last_name = t('validation.lastNameRequired'); // Example key
     if (!formData.email) {
-      newErrors.email = "Email is required";
+      newErrors.email = t('validation.emailRequired'); // Example key
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Email must be a valid email address";
+      newErrors.email = t('validation.emailInvalid'); // Example key
     }
-    if (!formData.birthDate) newErrors.birthDate = "Birth date is required";
+    if (!formData.birthDate) newErrors.birthDate = t('validation.birthDateRequired'); // Example key
     if (formData.tel && !/^\d+$/.test(formData.tel)) {
-        newErrors.tel = "Phone number must contain only digits";
+        newErrors.tel = t('validation.phoneDigitsOnly'); // Example key
     }
-    if (!formData.gendre) newErrors.gendre = "Gender is required";
-    if (!formData.password) newErrors.password = "Password is required";
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
-    if (!captchaVerified) newErrors.captcha = "Please complete the reCAPTCHA";
+    if (!formData.gendre) newErrors.gendre = t('validation.genderRequired'); // Example key
+    if (!formData.password) newErrors.password = t('validation.passwordRequired'); // Example key
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = t('validation.passwordsDoNotMatch'); // Example key
+    if (!captchaVerified) newErrors.captcha = t('validation.captchaRequired'); // Example key
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -182,9 +187,9 @@ function RegistrationForm() {
   if (errors.cabinet) {
     return (
       <div className="registration-error-container">
-        <h2>Registration Error</h2>
-        <p className="error-message">{errors.cabinet}</p>
-        <p>Please contact your clinic administrator for assistance.</p>
+        <h2>{t('registration.errorTitle')}</h2>
+        <p className="error-message">{errors.cabinet}</p> {/* Already using translated key */}
+        <p>{t('registration.contactAdminMessage')}</p>
       </div>
     );
   }
@@ -192,7 +197,27 @@ function RegistrationForm() {
   return (
     <div className="wholeSection">
       <div className="registration-form-container">
-        <h2>Patient Registration</h2> {/* Added Title */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h2>{t('registration.title')}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}> {/* Container for buttons */}
+            {/* Language Selector */}
+            <LanguageSelector />
+            {/* Theme Toggle Button */}
+            <button
+              type="button" // Prevent form submission
+              onClick={toggleTheme}
+              className="btn btn-outline-secondary" // Use Bootstrap classes for basic styling
+              style={{ padding: "5px 10px", borderRadius: "5px" }}
+              aria-label="Toggle theme"
+            >
+              {theme === 'light' ? (
+                <i className="fa fa-moon-o" aria-hidden="true"></i> // Moon icon for dark mode
+              ) : (
+                <i className="fa fa-sun-o" aria-hidden="true"></i> // Sun icon for light mode
+              )}
+            </button>
+          </div>
+        </div>
         {errors.general && (
           <div className="alert alert-danger">{errors.general}</div> // Use Bootstrap alert
         )}
@@ -202,53 +227,50 @@ function RegistrationForm() {
               {/* Row 1: First Name, Last Name */}
               <div className="row g-3 mb-3">
                 <div className="col-md-6">
-                  <label htmlFor="reg-first-name" className="form-label required">First Name</label>
+                  <label htmlFor="reg-first-name" className="form-label required">{t('registration.firstNameLabel')}</label>
                   <input
                     type="text"
                     id="reg-first-name"
                     name="first_name"
                     value={formData.first_name}
-                    onChange={handleChange}
-                    placeholder="Enter first name"
-                    className={`form-control ${errors.first_name ? 'is-invalid' : ''}`}
-                    required
-                  />
-                   <div className="invalid-feedback">{errors.first_name}</div>
+                     onChange={handleChange}
+                     className={`form-control ${errors.first_name ? 'is-invalid' : ''}`}
+                     required
+                   />
+                   <div className="invalid-feedback">{errors.first_name}</div> {/* TODO: Translate dynamic error */}
                 </div>
                 <div className="col-md-6">
-                  <label htmlFor="reg-last-name" className="form-label required">Last Name</label>
+                  <label htmlFor="reg-last-name" className="form-label required">{t('registration.lastNameLabel')}</label>
                   <input
                     type="text"
                     id="reg-last-name"
                     name="last_name"
                     value={formData.last_name}
-                    onChange={handleChange}
-                    placeholder="Enter last name"
-                    className={`form-control ${errors.last_name ? 'is-invalid' : ''}`}
-                    required
-                  />
-                   <div className="invalid-feedback">{errors.last_name}</div>
+                     onChange={handleChange}
+                     className={`form-control ${errors.last_name ? 'is-invalid' : ''}`}
+                     required
+                   />
+                   <div className="invalid-feedback">{errors.last_name}</div> {/* TODO: Translate dynamic error */}
                 </div>
               </div>
 
               {/* Row 2: Email, Birth Date */}
               <div className="row g-3 mb-3">
                 <div className="col-md-6">
-                  <label htmlFor="reg-email" className="form-label required">Email</label>
+                  <label htmlFor="reg-email" className="form-label required">{t('registration.emailLabel')}</label>
                   <input
                     type="email"
                     id="reg-email"
                     name="email"
                     value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter email address"
-                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                    required
-                  />
-                  <div className="invalid-feedback">{errors.email}</div>
+                     onChange={handleChange}
+                     className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                     required
+                   />
+                  <div className="invalid-feedback">{errors.email}</div> {/* TODO: Translate dynamic error */}
                 </div>
                 <div className="col-md-6">
-                  <label htmlFor="reg-birthDate" className="form-label required">Birth Date</label>
+                  <label htmlFor="reg-birthDate" className="form-label required">{t('registration.birthDateLabel')}</label>
                   <input
                     type="date"
                     id="reg-birthDate"
@@ -258,36 +280,34 @@ function RegistrationForm() {
                     className={`form-control ${errors.birthDate ? 'is-invalid' : ''}`}
                     required
                   />
-                  <div className="invalid-feedback">{errors.birthDate}</div>
+                  <div className="invalid-feedback">{errors.birthDate}</div> {/* TODO: Translate dynamic error */}
                 </div>
               </div>
 
               {/* Row 3: Telephone, Address */}
               <div className="row g-3 mb-3">
                 <div className="col-md-6">
-                  <label htmlFor="reg-tel" className="form-label">Telephone</label>
+                  <label htmlFor="reg-tel" className="form-label">{t('registration.telephoneLabel')}</label>
                   <input
                     type="text"
                     id="reg-tel"
                     name="tel"
                     value={formData.tel}
-                    onChange={handleChange}
-                    placeholder="Enter phone number (optional)"
-                    className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
-                  />
-                  <div className="invalid-feedback">{errors.tel}</div>
+                     onChange={handleChange}
+                     className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
+                   />
+                  <div className="invalid-feedback">{errors.tel}</div> {/* TODO: Translate dynamic error */}
                 </div>
                 <div className="col-md-6">
-                  <label htmlFor="reg-address" className="form-label">Address</label>
+                  <label htmlFor="reg-address" className="form-label">{t('registration.addressLabel')}</label>
                   <input
                     type="text"
                     id="reg-address"
                     name="address"
                     value={formData.address}
-                    onChange={handleChange}
-                    placeholder="Enter address (optional)"
-                    className={`form-control ${errors.address ? 'is-invalid' : ''}`}
-                  />
+                     onChange={handleChange}
+                     className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+                   />
                    {/* No feedback needed for optional field */}
                 </div>
               </div>
@@ -295,7 +315,7 @@ function RegistrationForm() {
               {/* Row 4: Photo and Gender (Combined & Moved) */}
               <div className="row g-3 mb-3">
                  <div className="col-md-6">
-                   <label htmlFor="reg-photo" className="form-label">Profile Photo (Optional)</label>
+                   <label htmlFor="reg-photo" className="form-label">{t('registration.photoLabel')}</label>
                    <input
                      type="file"
                      id="reg-photo"
@@ -306,7 +326,7 @@ function RegistrationForm() {
                    />
                  </div>
                  <div className="col-md-6">
-                  <label htmlFor="reg-gender" className="form-label required">Gender</label>
+                  <label htmlFor="reg-gender" className="form-label required">{t('registration.genderLabel')}</label>
                   <select
                     id="reg-gender"
                     name="gendre"
@@ -315,49 +335,49 @@ function RegistrationForm() {
                     className={`form-select ${errors.gendre ? 'is-invalid' : ''}`}
                     required
                   ><br></br>
-                    <option value="">Select Gender...</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
+                    <option value="">{t('registration.selectGender')}</option>
+                    <option value="Male">{t('registration.genderMale')}</option>
+                    <option value="Female">{t('registration.genderFemale')}</option>
+                    <option value="Other">{t('registration.genderOther')}</option>
                   </select>
-                  <div className="invalid-feedback">{errors.gendre}</div>
+                  <div className="invalid-feedback">{errors.gendre}</div> {/* TODO: Translate dynamic error */}
                 </div>
               </div>
 
               {/* Row 6: Password, Confirm Password */}
               <div className="row g-3 mb-3">
                 <div className="col-md-6">
-                  <label htmlFor="reg-password" className="form-label required">Password</label>
+                  <label htmlFor="reg-password" className="form-label required">{t('registration.passwordLabel')}</label>
                   <input
                     type="password"
                     id="reg-password"
                     name="password"
                     value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Enter password"
-                    className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                    required
-                  />
-                  <div className="invalid-feedback">{errors.password}</div>
+                     onChange={handleChange}
+                     className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                     required
+                   />
+                  <div className="invalid-feedback">{errors.password}</div> {/* TODO: Translate dynamic error */}
                   {passwordStrength && (
                     <div className={`form-text password-strength-indicator ${passwordStrength.toLowerCase()}`}>
-                      Password Strength: {passwordStrength}
+                      {t('registration.passwordStrengthLabel', {
+                        strength: t(passwordStrength === 'Strong' ? 'registration.passwordStrengthStrong' : 'registration.passwordStrengthWeak')
+                      })}
                     </div>
                   )}
                 </div>
                 <div className="col-md-6">
-                  <label htmlFor="reg-confirmPassword" className="form-label required">Confirm Password</label>
+                  <label htmlFor="reg-confirmPassword" className="form-label required">{t('registration.confirmPasswordLabel')}</label>
                   <input
                     type="password"
                     id="reg-confirmPassword"
                     name="confirmPassword"
                     value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="Confirm password"
-                    className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
-                    required
-                  />
-                  <div className="invalid-feedback">{errors.confirmPassword}</div>
+                     onChange={handleChange}
+                     className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                     required
+                   />
+                  <div className="invalid-feedback">{errors.confirmPassword}</div> {/* TODO: Translate dynamic error */}
                 </div>
               </div>
 
@@ -369,7 +389,7 @@ function RegistrationForm() {
                       sitekey="6Lcjq9kqAAAAACubtDN_aCeAZkDR7rgT7VZB82C_" // Replace with your actual site key
                       onChange={handleCaptcha}
                     />
-                    {errors.captcha && <div className="text-danger mt-1" style={{fontSize: '0.875em'}}>{errors.captcha}</div>}
+                    {errors.captcha && <div className="text-danger mt-1" style={{fontSize: '0.875em'}}>{errors.captcha}</div>} {/* TODO: Translate dynamic error */}
                  </div>
               </div>
 
@@ -381,38 +401,37 @@ function RegistrationForm() {
                       disabled={isCheckingExistence || isSubmitting || !captchaVerified}
                       className={`btn btn-primary btn-lg ${(isSubmitting || isCheckingExistence) ? "disabled" : ""}`}
                     >
-                      {isCheckingExistence ? "Checking..." : (isSubmitting ? "Processing..." : "Register")}
+                      {isCheckingExistence ? t('registration.checkingButton') : (isSubmitting ? t('registration.processingButton') : t('registration.registerButton'))}
                     </button>
                  </div>
               </div>
           </form>
         ) : (
           <div className="verification-container">
-            <h3>Email Verification</h3>
-            <p>We've sent a verification code to {formData.email}. Please check your inbox.</p>
+            <h3>{t('registration.emailVerificationTitle')}</h3>
+            <p>{t('registration.emailVerificationMessage', { email: formData.email })}</p>
             <div className="verification-input-group">
               <input
                 type="text"
                 value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
-                placeholder="Enter 6-digit code"
-                className="form-control verification-input" // Use form-control
-              />
+                 onChange={(e) => setVerificationCode(e.target.value)}
+                 className="form-control verification-input" // Use form-control
+               />
               <button
                 onClick={handleVerificationSubmit}
                 className="btn btn-success verify-button" // Use Bootstrap button
               >
-                Verify Account
+                {t('registration.verifyButton')}
               </button>
             </div>
             {errors.verification && (
               <div className="verification-error alert alert-danger mt-3"> {/* Use Bootstrap alert */}
-                {errors.verification}
+                {errors.verification} {/* TODO: Translate dynamic error */}
                 <button
                   className="btn btn-link resend-link" // Style as link
                   onClick={() => setIsVerifying(false)}
                 >
-                  Try again
+                  {t('registration.tryAgainButton')}
                 </button>
               </div>
             )}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react"; // Added useCallback
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 import axios from "axios";
 import { getToken, clearUserData, isTokenExpired, getUserData } from "../../utils/auth";
 import './Users Management.css'; // Import the CSS file
@@ -8,16 +9,18 @@ const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const UserTable = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(); // Get translation function
   const [users, setUsers] = useState([]);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentUserDetails, setCurrentUserDetails] = useState(null);
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
+  const [viewType, setViewType] = useState('doctors'); // 'doctors' or 'doctorCentres'
 
   // --- Logout Function ---
   const performLogout = useCallback(() => { // Wrap in useCallback
     clearUserData();
-    alert("Session expired or logged out. Redirecting to login.");
+    alert(t('userManagement.alerts.sessionExpired'));
     navigate("/sign-in");
   }, [navigate]); // Add navigate dependency
 
@@ -74,11 +77,12 @@ const UserTable = () => {
     console.log("Current User Details:", details);
   }, []); // Run once on mount
 
-  // --- Fetch Users Function (Refactored) ---
+  // --- Fetch Users Function (Refactored for View Type) ---
   const fetchUsers = useCallback(async () => {
     if (sessionExpired || !currentUserDetails) return; // Wait for user details
 
     setLoading(true); // Start loading
+    setUsers([]); // Clear previous users
     const token = getToken();
     const roles = currentUserDetails?.roles;
 
@@ -91,23 +95,34 @@ const UserTable = () => {
 
     let apiUrl = "";
     const isAdmin = roles.includes("ROLE_ADMIN");
-    const isDoctor = roles.includes("ROLE_DOCTOR");
-    const isAssistant = roles.includes("ROLE_ASSISTANT");
+    // Note: Only Admin can currently see the 'doctorCentres' view based on requirements
+    // Other roles (Doctor, Assistant) will only see their relevant 'doctors' view.
 
-    if (isAdmin) {
-      apiUrl = "http://localhost:6952/Users/doctors"; // Admin gets doctors
-    } else if (isDoctor) {
-      apiUrl = "http://localhost:6952/Users/cabinet/active-users"; // Doctor gets active users in cabinet
-    } else if (isAssistant) {
-      apiUrl = "http://localhost:6952/Users/cabinet/active-patients"; // Assistant gets active patients in cabinet
+    if (viewType === 'doctors') {
+        const isDoctor = roles.includes("ROLE_DOCTOR");
+        const isAssistant = roles.includes("ROLE_ASSISTANT");
+
+        if (isAdmin) {
+          apiUrl = "http://localhost:6952/Users/doctors"; // Admin gets all doctors
+        } else if (isDoctor) {
+          apiUrl = "http://localhost:6952/Users/cabinet/active-users"; // Doctor gets active users in their cabinet
+        } else if (isAssistant) {
+          apiUrl = "http://localhost:6952/Users/cabinet/active-patients"; // Assistant gets active patients in their cabinet
+        } else {
+          console.error("Unknown or unsupported user roles for 'doctors' view:", roles);
+          setLoading(false);
+          return;
+        }
+    } else if (viewType === 'doctorCentres' && isAdmin) {
+        apiUrl = "http://localhost:6952/api/doctor-centre-examen/all"; // Admin gets ALL doctor centres (active and inactive)
     } else {
-      console.error("Unknown or unsupported user roles:", roles);
-      setUsers([]);
-      setLoading(false);
-      return;
+        console.error(`Unsupported viewType '${viewType}' or insufficient permissions for roles: ${roles}`);
+        setLoading(false);
+        return;
     }
 
-    console.log(`Fetching users from ${apiUrl} for roles: ${roles}`);
+
+    console.log(`Fetching users from ${apiUrl} for view: ${viewType}, roles: ${roles}`);
 
     try {
       const response = await axios.get(apiUrl, {
@@ -125,63 +140,66 @@ const UserTable = () => {
         console.warn("[fetchUsers] Could not filter self from user list because current user ID is missing.");
       }
       // Add a simple 'isActive' field for display purposes based on backend data
-      // This is a placeholder - the actual status might be more complex (per cabinet)
+      // Map data, ensuring 'active' field is used for displayStatus
       const usersWithStatus = filteredData.map(u => ({
           ...u,
-          // Attempt to determine status: Doctor/Assistant have direct 'active' field.
-          // Patients' status depends on registration (not directly available here).
-          // Default to true if field exists, otherwise assume active for display?
-          // This needs refinement based on what the API actually returns for each role.
-          displayStatus: u.active !== undefined ? u.active : true // Placeholder logic
+          // Use the 'active' field directly if it exists, otherwise default (e.g., true for simplicity)
+          // DoctorCentreDexamen should have 'active' field from backend.
+          // Regular doctors/patients might need adjustment based on API response structure.
+          displayStatus: u.active !== undefined ? u.active : true
       }));
 
       setUsers(usersWithStatus);
+      console.log(`[fetchUsers] Processed users for view '${viewType}':`, usersWithStatus);
     } catch (error) {
-      console.error(`Error loading users from ${apiUrl}:`, error);
+      console.error(`Error loading users from ${apiUrl} for view '${viewType}':`, error);
       if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-        alert("Access Denied or Session Expired. Please log in again.");
+        alert(t('userManagement.alerts.fetchFailed.auth'));
         performLogout();
       } else {
-        alert("Failed to load user data. Please try again later.");
+        alert(t('userManagement.alerts.fetchFailed.generic'));
       }
       setUsers([]); // Clear users on error
     } finally {
       setLoading(false); // Stop loading
     }
-  }, [sessionExpired, currentUserDetails, performLogout]); // Dependencies for useCallback
+  }, [sessionExpired, currentUserDetails, performLogout, viewType]); // Dependencies for useCallback - ADDED viewType
 
-  // --- Initial Load Users ---
+  // --- Load Users on Mount and View Change ---
   useEffect(() => {
     if (currentUserDetails) { // Fetch only when details are available
         fetchUsers();
     }
-  }, [currentUserDetails, fetchUsers]); // Trigger fetch when details load or fetchUsers changes
+  // Trigger fetch when details load, fetchUsers changes, OR viewType changes
+  }, [currentUserDetails, fetchUsers, viewType]);
 
 
   // --- Delete User / Registration ---
-  const handleDelete = (userIdToDelete) => { // Renamed function
-    console.log("[handleDelete] Clicked. currentUserDetails:", JSON.stringify(currentUserDetails));
+  const handleDelete = (userToDelete) => { // Pass the whole user object
+    const userIdToDelete = userToDelete.id;
+    const userRoleToDelete = userToDelete.role; // Get role from the user object
+    console.log(`[handleDelete] Clicked. Target User ID: ${userIdToDelete}, Role: ${userRoleToDelete}, View: ${viewType}, Current User:`, JSON.stringify(currentUserDetails));
 
     // Check current user details are loaded
     if (!currentUserDetails) {
         console.error("[deleteUser] Check failed: currentUserDetails is null or undefined.");
-        alert("Current user details not available. Please wait or try logging in again.");
+        alert(t('userManagement.alerts.deleteFailed.noCurrentUser'));
         return;
     }
     if (!currentUserDetails.user) {
         console.error("[deleteUser] Check failed: currentUserDetails.user is missing.", currentUserDetails);
-        alert("User core information missing in details. Please wait or try logging in again.");
+        alert(t('userManagement.alerts.deleteFailed.missingUserInfo'));
         return;
     }
      // Check specifically for null or undefined, allowing 0 as a valid ID
      if (currentUserDetails.user.id == null) { // Use == null check
         console.error("[deleteUser] Check failed: currentUserDetails.user.id is null or undefined.", currentUserDetails);
-        alert("Current User ID missing in details. Please wait or try logging in again.");
+        alert(t('userManagement.alerts.deleteFailed.missingUserId'));
         return;
     }
     if (!currentUserDetails.roles) {
         console.error("[deleteUser] Check failed: currentUserDetails.roles is missing.", currentUserDetails);
-        alert("Current User roles missing in details. Please wait or try logging in again.");
+        alert(t('userManagement.alerts.deleteFailed.missingUserRoles'));
         return;
     }
 
@@ -194,134 +212,156 @@ const UserTable = () => {
     const isAdmin = roles.includes("ROLE_ADMIN");
     const isDoctorOrAssistant = roles.includes("ROLE_DOCTOR") || roles.includes("ROLE_ASSISTANT");
 
-    // **Enhanced Check:** Doctor/Assistant must have a cabinetId
-    if (isDoctorOrAssistant && !cabinetId) {
-        alert("Cannot perform action: Your cabinet information is missing.");
+    // **Enhanced Check:** Doctor/Assistant must have a cabinetId for certain actions
+    if (viewType === 'doctors' && isDoctorOrAssistant && !cabinetId) {
+        alert(t('userManagement.alerts.deleteFailed.missingCabinetInfo'));
         return;
     }
 
-    if (!token) { // Token check is likely redundant if currentUserDetails exists, but safe
-      alert("Session invalid. Please log in again.");
-      performLogout(); // Log out if token somehow missing despite details existing
+    if (!token) {
+      alert(t('userManagement.alerts.sessionInvalid'));
+      performLogout();
       return;
     }
 
     let deleteUrl = "";
     let confirmationMessage = "";
+    let successMessageKey = "";
 
-    if (isAdmin) {
-      deleteUrl = `http://localhost:6952/Users/delete/${userIdToDelete}`;
-      confirmationMessage = "Are you sure you want to permanently delete this user and all their registrations?";
-    } else if (isDoctorOrAssistant && cabinetId) {
-      deleteUrl = `http://localhost:6952/Users/cabinet/${cabinetId}/user/${userIdToDelete}`;
- 
-      confirmationMessage = `Are you sure you want to remove this user's registration from your cabinet (ID: ${cabinetId})?`;
+    if (viewType === 'doctors') {
+        if (isAdmin) {
+          deleteUrl = `http://localhost:6952/Users/delete/${userIdToDelete}`;
+          confirmationMessage = t('userManagement.confirmations.deleteAdmin', { userId: userIdToDelete });
+          successMessageKey = 'userManagement.alerts.deleteSuccess.admin';
+        } else if (isDoctorOrAssistant && cabinetId) {
+          // This deletes the registration from the cabinet
+          deleteUrl = `http://localhost:6952/Users/cabinet/${cabinetId}/user/${userIdToDelete}`;
+          confirmationMessage = t('userManagement.confirmations.deleteDoctorAssistant', { userId: userIdToDelete, cabinetId });
+          successMessageKey = 'userManagement.alerts.deleteSuccess.doctorAssistant';
+        } else {
+          alert(t('userManagement.alerts.deleteFailed.permissionOrMissingCabinet'));
+          return;
+        }
+    } else if (viewType === 'doctorCentres' && isAdmin) {
+        // Deleting a DoctorCentreDexamen directly
+        deleteUrl = `http://localhost:6952/api/doctor-centre-examen/${userIdToDelete}`;
+        confirmationMessage = t('userManagement.confirmations.deleteDoctorCentre', { userId: userIdToDelete }); // Add new translation key
+        successMessageKey = 'userManagement.alerts.deleteSuccess.doctorCentre'; // Add new translation key
     } else {
-      alert("You do not have permission to delete users or your cabinet ID is missing.");
-      return;
+        alert(t('userManagement.alerts.deleteFailed.invalidViewOrPermission')); // Generic error for invalid state
+        return;
     }
 
+
     if (window.confirm(confirmationMessage)) {
+      setLoading(true);
       axios
         .delete(deleteUrl, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then(() => {
-          alert(isAdmin ? "User deleted successfully." : "User registration removed from this cabinet successfully.");
+          alert(t(successMessageKey)); // Use dynamic success message key
           // Refresh the list or filter locally
           setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userIdToDelete));
-          // TODO: Consider fetching the list again for absolute accuracy, especially if deleting a registration might change the user's overall status (active/inactive)
+          // Consider fetching the list again if needed: fetchUsers();
         })
         .catch((error) => {
-          console.error("Error during delete operation:", error);
+          console.error(`Error during delete operation for view ${viewType}:`, error);
           if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            alert("Permission denied or session expired.");
+            alert(t('userManagement.alerts.deleteFailed.auth'));
             performLogout();
           } else if (error.response && error.response.status === 404) {
-             alert("User or registration not found.");
+             alert(t('userManagement.alerts.deleteFailed.notFound'));
           } else {
-            alert("Failed to perform the delete operation. Please try again later.");
+            alert(t('userManagement.alerts.deleteFailed.generic'));
           }
         });
     }
   };
 
-  // --- Toggle User Status ---
+  // --- Toggle User Status (Deactivate/Activate) ---
   const handleToggleStatus = (targetUser) => {
-    console.log("[handleToggleStatus] Clicked. Target User:", targetUser, "Current User Details:", JSON.stringify(currentUserDetails));
+    console.log(`[handleToggleStatus] Clicked. Target User:`, targetUser, `View: ${viewType}`, "Current User Details:", JSON.stringify(currentUserDetails));
 
     // Check current user details are loaded
     const token = getToken();
-    const actorRoles = currentUserDetails.roles;
-    const actorCabinetId = currentUserDetails.cabinetId;
+    const actorRoles = currentUserDetails?.roles;
+    const actorCabinetId = currentUserDetails?.cabinetId;
     const targetUserId = targetUser.id;
     const targetUserRole = targetUser.role; // Role of the user being toggled
+    const currentStatus = targetUser.displayStatus; // Get current status from the mapped user data
 
-    console.log(`[handleToggleStatus] Context: Target User ID=${targetUserId}, Target Role=${targetUserRole}, Actor Roles=${actorRoles}, Actor Cabinet ID=${actorCabinetId}`);
+    console.log(`[handleToggleStatus] Context: Target User ID=${targetUserId}, Target Role=${targetUserRole}, Current Status=${currentStatus}, Actor Roles=${actorRoles}, Actor Cabinet ID=${actorCabinetId}`);
 
     if (!token) {
-      alert("Session invalid. Please log in again.");
+      alert(t('userManagement.alerts.sessionInvalid')); // Reuse session invalid alert
       performLogout();
       return;
     }
 
     let toggleUrl = "";
-    let confirmationMessage = "";
+    let confirmationMessageKey = ""; // Key for translation
+    let successMessageKey = ""; // Key for translation
 
-    // Determine API endpoint and confirmation based on TARGET user's role
-    if (targetUserRole === 'PATIENT') {
-        // Patients are toggled via cabinet registration
-        if (!actorCabinetId) {
-            alert("Cannot toggle patient status: Your cabinet information is missing.");
-            return;
+    if (viewType === 'doctors') {
+        // Logic for toggling status of regular Doctors/Assistants/Patients
+        if (targetUserRole === 'PATIENT') {
+            if (!actorCabinetId) {
+                alert(t('userManagement.alerts.toggleFailed.missingCabinetInfo')); return;
+            }
+            if (actorRoles.includes("ROLE_ADMIN")) {
+                 alert(t('userManagement.alerts.toggleFailed.adminPatientLimitation')); return;
+            }
+            toggleUrl = `http://localhost:6952/Users/cabinet/${actorCabinetId}/user/${targetUserId}/toggle-status`;
+            confirmationMessageKey = currentStatus ? 'userManagement.confirmations.deactivatePatient' : 'userManagement.confirmations.activatePatient';
+            successMessageKey = 'userManagement.alerts.toggleSuccess'; // Generic success message
+        } else if (targetUserRole === 'DOCTOR' || targetUserRole === 'ASSISTANT') {
+            toggleUrl = `http://localhost:6952/Users/users/${targetUserId}/toggle-direct-status`;
+            confirmationMessageKey = currentStatus ? 'userManagement.confirmations.deactivateDoctorAssistant' : 'userManagement.confirmations.activateDoctorAssistant';
+            successMessageKey = 'userManagement.alerts.toggleSuccess'; // Generic success message
+        } else {
+            alert(t('userManagement.alerts.toggleFailed.invalidRole', { role: targetUserRole })); return;
         }
-        // Admin cannot use this specific button for patients yet (needs cabinet context)
-        if (actorRoles.includes("ROLE_ADMIN")) {
-             alert("Admin role cannot use this toggle button for patients without specifying a target cabinet (UI enhancement needed).");
-             return;
-        }
-        toggleUrl = `http://localhost:6952/Users/cabinet/${actorCabinetId}/user/${targetUserId}/toggle-status`;
-        confirmationMessage = `Are you sure you want to toggle the active status for patient ID ${targetUserId} in your cabinet (ID: ${actorCabinetId})?`;
-
-    } else if (targetUserRole === 'DOCTOR' || targetUserRole === 'ASSISTANT') {
-        // Doctors/Assistants are toggled directly
-        toggleUrl = `http://localhost:6952/Users/users/${targetUserId}/toggle-direct-status`;
-        confirmationMessage = `Are you sure you want to toggle the active status for ${targetUserRole.toLowerCase()} ID ${targetUserId}?`;
-        // Permission check for toggling Doctor/Assistant happens in the backend service
+    } else if (viewType === 'doctorCentres' && actorRoles.includes("ROLE_ADMIN")) {
+        // Logic for toggling status of DoctorCentreDexamen
+        toggleUrl = `http://localhost:6952/api/doctor-centre-examen/${targetUserId}/toggle-status`;
+        confirmationMessageKey = currentStatus ? 'userManagement.confirmations.deactivateDoctorCentre' : 'userManagement.confirmations.activateDoctorCentre'; // Add new keys
+        successMessageKey = 'userManagement.alerts.toggleSuccessDoctorCentre'; // Add new key
     } else {
-        alert(`Cannot toggle status for user role: ${targetUserRole}`);
-        return;
+        alert(t('userManagement.alerts.toggleFailed.invalidViewOrPermission')); return;
     }
 
-    if (window.confirm(confirmationMessage)) {
-      setLoading(true); // Indicate loading
+    const confirmationText = t(confirmationMessageKey, { userId: targetUserId, role: targetUserRole.toLowerCase(), cabinetId: actorCabinetId });
+
+    if (window.confirm(confirmationText)) {
+      setLoading(true);
       axios
-        .put(toggleUrl, null, { // PUT request with null body
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        .put(toggleUrl, null, { headers: { Authorization: `Bearer ${token}` } })
         .then((response) => {
-          const newStatus = response.data?.isActiveNow; // Get the new status from response
-          alert(`${targetUserRole} status successfully toggled. New status: ${newStatus ? 'Active' : 'Inactive'}.`);
-          console.log("Toggle status response:", response.data);
-          fetchUsers(); // Refetch the user list to reflect the change
+          // Use the specific success message key
+          const newStatus = viewType === 'doctorCentres' ? response.data?.newStatus : response.data?.isActiveNow;
+          const statusText = newStatus ? t('userManagement.status.active') : t('userManagement.status.inactive');
+          alert(t(successMessageKey, { role: targetUserRole, status: statusText, userId: targetUserId }));
+          console.log(`Toggle status response for view ${viewType}:`, response.data);
+          fetchUsers(); // Refetch the user list
         })
         .catch((error) => {
-          console.error(`Error toggling ${targetUserRole} status:`, error);
+          console.error(`Error toggling ${targetUserRole} status in view ${viewType}:`, error);
           if (error.response) {
             const status = error.response.status;
             const message = error.response.data?.message || "An error occurred.";
             if (status === 401 || status === 403) {
-              alert(`Permission Denied or Session Expired: ${message}`);
+              alert(t('userManagement.alerts.toggleFailed.authWithMessage', { message }));
               performLogout();
             } else if (status === 404) {
-              alert(`Not Found: ${message}`);
+              alert(t('userManagement.alerts.toggleFailed.notFoundWithMessage', { message }));
             } else if (status === 400) {
-              alert(`Bad Request: ${message}`);
+              alert(t('userManagement.alerts.toggleFailed.badRequestWithMessage', { message }));
             } else {
-              alert(`Failed to toggle status: ${message}`);
+              alert(t('userManagement.alerts.toggleFailed.genericWithMessage', { message }));
             }
           } else {
-            alert(`Failed to toggle the ${targetUserRole} status due to a network or unexpected error.`);
+            alert(t('userManagement.alerts.toggleFailed.networkError', { role: targetUserRole }));
           }
         })
         .finally(() => {
@@ -331,9 +371,18 @@ const UserTable = () => {
   };
 
 
-  // Redirect to Edit
-  const handleEditClick = (id) => {
-    navigate(`/edit-user/${id}`);
+  // Redirect to Edit based on viewType
+  const handleEditClick = (userToEdit) => {
+    const id = userToEdit.id;
+    if (viewType === 'doctors') {
+        // Navigate to the existing edit form for regular users
+        navigate(`/edit-user/${id}`);
+    } else if (viewType === 'doctorCentres') {
+        // Navigate to a new edit form for doctor centres (to be created)
+        navigate(`/edit-doctor-centre/${id}`); // Define this route later
+    } else {
+        console.error("Cannot edit: Unknown view type", viewType);
+    }
   };
 
   // Filter users based on search term
@@ -345,65 +394,114 @@ const UserTable = () => {
     return fullName.includes(searchTermLower);
   });
 
+  // Only show radio buttons if the user is Admin
+  const isAdmin = currentUserDetails?.roles?.includes("ROLE_ADMIN");
+
   return (
     <div>
-      <h2>User List</h2>
+      <h2>{t('userManagement.title')}</h2>
+
+      {/* Radio Buttons for Admins */}
+      {isAdmin && (
+        <div className="mb-3">
+          <div className="form-check form-check-inline">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="viewTypeRadio"
+              id="viewDoctors"
+              value="doctors"
+              checked={viewType === 'doctors'}
+              onChange={() => setViewType('doctors')}
+            />
+            <label className="form-check-label" htmlFor="viewDoctors">
+              {t('userManagement.viewOptions.doctors')} {/* Add translation */}
+            </label>
+          </div>
+          <div className="form-check form-check-inline">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="viewTypeRadio"
+              id="viewDoctorCentres"
+              value="doctorCentres"
+              checked={viewType === 'doctorCentres'}
+              onChange={() => setViewType('doctorCentres')}
+            />
+            <label className="form-check-label" htmlFor="viewDoctorCentres">
+              {t('userManagement.viewOptions.doctorCentres')} {/* Add translation */}
+            </label>
+          </div>
+        </div>
+      )}
+
       <input
         type="text"
-        placeholder="Search by first name and last name (e.g., John Doe)"
+        placeholder={t('userManagement.searchPlaceholder')}
         value={searchTerm}
          onChange={(e) => setSearchTerm(e.target.value)}
          className="form-control mb-4" // Use Bootstrap class
        />
-       {loading && <p>Loading users...</p>} {/* Loading indicator */}
+       {loading && <p>{t('userManagement.loading')}</p>} {/* Loading indicator */}
        {/* Add Bootstrap responsive table wrapper */}
        <div className="table-responsive">
          <table className="table table-striped table-hover custom-table"> {/* Add Bootstrap table classes */}
         <thead>
           <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th> {/* Add Status column */}
-            <th>Actions</th>
+            <th>{t('userManagement.tableHeaders.firstName')}</th>
+            <th>{t('userManagement.tableHeaders.lastName')}</th>
+            <th>{t('userManagement.tableHeaders.email')}</th>
+            <th>{t('userManagement.tableHeaders.role')}</th>
+            <th>{t('userManagement.tableHeaders.status')}</th>
+            {/* Conditionally show Speciality for Doctor Centres */}
+            {viewType === 'doctorCentres' && <th>{t('userManagement.tableHeaders.speciality')}</th>}
+            <th>{t('userManagement.tableHeaders.actions')}</th>
           </tr>
         </thead>
         <tbody>
-          {!loading && filteredUsers.length === 0 ? ( // Check loading state
+          {!loading && filteredUsers.length === 0 ? (
             <tr>
-              <td colSpan="6">No users found</td> {/* Adjusted colSpan */}
+              {/* Adjust colspan based on visible columns */}
+              <td colSpan={viewType === 'doctorCentres' ? 7 : 6}>{t('userManagement.noUsersFound')}</td>
             </tr>
           ) : (
-            filteredUsers.map((user) => (
+            filteredUsers.map((user) => {
+              // Log speciality specifically for doctorCentres view for debugging
+              if (viewType === 'doctorCentres') {
+                console.log(`Rendering Doctor Centre ID: ${user.id}, Speciality:`, user.speciality);
+              }
+              return (
               <tr key={user.id}>
                 <td>{user.firstName}</td>
                 <td>{user.lastName}</td>
-                <td>{user.email ? user.email : "ce patient n'a pas d'email"}</td>
+                <td>{user.email ? user.email : t('userManagement.noEmail')}</td>
                 <td>{user.role}</td>
-                {/* Display status - Placeholder, needs refinement based on actual data */}
-                <td>{user.displayStatus ? <span className="badge bg-success">Active</span> : <span className="badge bg-secondary">Inactive</span>}</td> {/* Use Bootstrap badges */}
+                <td>{user.displayStatus ? <span className="badge bg-success">{t('userManagement.status.active')}</span> : <span className="badge bg-secondary">{t('userManagement.status.inactive')}</span>}</td>
+                {/* Conditionally render Speciality */}
+                {viewType === 'doctorCentres' && <td>{user.speciality ? user.speciality : 'N/A'}</td>}
                 <td>
-                  {/* Use Bootstrap button classes */}
-                  <button onClick={() => handleEditClick(user.id)} className="btn btn-sm btn-primary me-1" disabled={loading}>Edit</button>
+                  <button onClick={() => handleEditClick(user)} className="btn btn-sm btn-primary me-1" disabled={loading}>{t('userManagement.buttons.edit')} ✏️</button>
                   <button
-                    onClick={() => handleDelete(user.id)} // Use handleDelete
-                    className="btn btn-sm btn-danger me-1" // Use Bootstrap classes
-                    disabled={loading} // Disable during loading
+                    onClick={() => handleDelete(user)} // Pass whole user object
+                    className="btn btn-sm btn-danger me-1"
+                    disabled={loading}
                   >
-                    Delete
+                    {t('userManagement.buttons.delete')} 🗑️
                   </button>
                    <button
-                    onClick={() => handleToggleStatus(user)} // Pass the whole user object
-                    className="btn btn-sm btn-warning" // Use btn-warning for toggle
-                    disabled={loading} // Disable during loading
+                    onClick={() => handleToggleStatus(user)}
+                    className="btn btn-sm btn-warning"
+                    disabled={loading}
                   >
-                    {user.displayStatus ? 'Deactivate' : 'Activate'} {/* Change button text based on status */}
+                    {/* Use 'Deactivate'/'Activate' based on status */}
+                    {user.displayStatus ? t('userManagement.buttons.deactivate') : t('userManagement.buttons.activate')} 🔻
                   </button>
                 </td>
               </tr>
-            ))
-          )}
+              );
+            })
+          )
+  }
          </tbody>
        </table>
        </div> {/* Close table-responsive wrapper */}

@@ -5,5 +5,6 @@ public enum Role {
 	ADMIN,
 	DOCTOR,
 	ASSISTANT,
-	PATIENT
+	PATIENT,
+	DOCTOR_CENTRE_EXAMEN 
 }

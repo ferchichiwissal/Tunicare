@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 import { getToken, clearUserData, isTokenExpired } from '../../utils/auth';
 import './AddCabinetForm.css'; // Import the CSS file
 
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const AddCabinetForm = () => {
+    const { t } = useTranslation(); // Initialize translation function
     const [cabinetData, setCabinetData] = useState({
         name: '',
         address: '',
@@ -14,15 +16,14 @@ const AddCabinetForm = () => {
         tel: '',
         taxNumber: ''
     });
-    // const [error, setError] = useState(''); // Keep general error for now if needed, or remove
-    const [errors, setErrors] = useState({}); // Use object for field-specific errors
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     // --- Logout Function ---
     const performLogout = useCallback(() => {
         clearUserData();
-        alert("Session expired or logged out. Redirecting to login.");
+        alert(t('addCabinet.alerts.authRequired')); // Use a generic auth required message
         navigate("/sign-in");
     }, [navigate]);
 
@@ -85,14 +86,14 @@ const AddCabinetForm = () => {
      // --- Form Validation ---
     const validateForm = () => {
         const newErrors = {};
-        if (!cabinetData.name) newErrors.name = "Cabinet name is required.";
-        if (!cabinetData.address) newErrors.address = "Cabinet address is required.";
+        if (!cabinetData.name) newErrors.name = t('addCabinet.validation.nameRequired');
+        if (!cabinetData.address) newErrors.address = t('addCabinet.validation.addressRequired');
         // Optional: Add validation for tel/fax/taxNumber format if needed
         if (cabinetData.tel && !/^\+?\d[\d\s-]*$/.test(cabinetData.tel)) {
-             newErrors.tel = "Invalid phone number format.";
+             newErrors.tel = t('addCabinet.validation.invalidPhone');
         }
          if (cabinetData.fax && !/^\+?\d[\d\s-]*$/.test(cabinetData.fax)) {
-             newErrors.fax = "Invalid fax number format.";
+             newErrors.fax = t('addCabinet.validation.invalidFax');
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -110,7 +111,7 @@ const AddCabinetForm = () => {
         setLoading(true);
         const token = getToken();
         if (!token) {
-            setErrors({ submit: "Authentication required." }); // Use setErrors with submit key
+            setErrors({ submit: t('addCabinet.alerts.authRequired') });
             setLoading(false);
             performLogout();
             return;
@@ -125,7 +126,7 @@ const AddCabinetForm = () => {
             });
 
             if (response.status === 201) {
-                alert("Cabinet added successfully!");
+                alert(t('addCabinet.alerts.success'));
                 setCabinetData({ name: '', address: '', fax: '', tel: '', taxNumber: '' }); // Reset form
                 setErrors({}); // Clear errors on success
             } else {
@@ -134,21 +135,21 @@ const AddCabinetForm = () => {
             }
         } catch (err) {
             console.error("Error adding cabinet:", err);
-            let errorMsg = "An error occurred while adding the cabinet.";
+            let errorMsg = t('addCabinet.alerts.genericError');
             if (err.response) {
                 if (err.response.status === 409) {
-                    errorMsg = err.response.data?.message || "A cabinet with this name/address might already exist.";
+                    errorMsg = err.response.data?.message || t('addCabinet.alerts.conflict');
                     setErrors({ submit: errorMsg }); // Set specific submit error
                 } else if (err.response.status === 401 || err.response.status === 403) {
-                    errorMsg = "Permission denied. Only administrators can add cabinets.";
+                    errorMsg = t('addCabinet.alerts.permissionDenied');
                     setErrors({ submit: errorMsg });
                     performLogout(); // Log out on auth errors
                 } else {
-                    errorMsg = `Server error (${err.response.status}): ${err.response.data?.message || err.response.statusText}`;
+                    errorMsg = `${t('addCabinet.alerts.serverError')} (${err.response.status}): ${err.response.data?.message || err.response.statusText}`;
                      setErrors({ submit: errorMsg });
                 }
             } else if (err.request) {
-                errorMsg = 'No response from server. Check your connection.';
+                errorMsg = t('addCabinet.alerts.noResponse');
                  setErrors({ submit: errorMsg });
             } else {
                  setErrors({ submit: errorMsg }); // Generic error
@@ -163,37 +164,35 @@ const AddCabinetForm = () => {
     return (
         // Use Bootstrap container and classes
         <div className="add-cabinet-container container mt-4">
-            <h2>Add New Cabinet</h2>
+            <h2>{t('addCabinet.title')}</h2>
             {errors.submit && <div className="alert alert-danger">{errors.submit}</div>} {/* Display submit error */}
             <form onSubmit={handleSubmit} noValidate>
                 {/* Row 1: Name, Address */}
                 <div className="row g-3 mb-3">
                     <div className="col-md-6">
-                        <label htmlFor="cabinet-name" className="form-label required">Cabinet Name</label>
+                        <label htmlFor="cabinet-name" className="form-label required">{t('addCabinet.labels.name')}</label>
                         <input
                             type="text"
                             id="cabinet-name"
-                            name="name"
-                            value={cabinetData.name}
-                            onChange={handleChange}
-                            placeholder="Enter cabinet name"
-                            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                            required
-                        />
+                             name="name"
+                             value={cabinetData.name}
+                             onChange={handleChange}
+                             className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                             required
+                         />
                          <div className="invalid-feedback">{errors.name}</div>
                     </div>
                     <div className="col-md-6">
-                        <label htmlFor="cabinet-address" className="form-label required">Address</label>
+                        <label htmlFor="cabinet-address" className="form-label required">{t('addCabinet.labels.address')}</label>
                         <input
                             type="text"
                             id="cabinet-address"
-                            name="address"
-                            value={cabinetData.address}
-                            onChange={handleChange}
-                            placeholder="Enter cabinet address"
-                            className={`form-control ${errors.address ? 'is-invalid' : ''}`}
-                            required
-                        />
+                             name="address"
+                             value={cabinetData.address}
+                             onChange={handleChange}
+                             className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+                             required
+                         />
                          <div className="invalid-feedback">{errors.address}</div>
                     </div>
                 </div>
@@ -201,29 +200,27 @@ const AddCabinetForm = () => {
                  {/* Row 2: Telephone, Fax */}
                 <div className="row g-3 mb-3">
                     <div className="col-md-6">
-                        <label htmlFor="cabinet-tel" className="form-label">Telephone</label>
+                        <label htmlFor="cabinet-tel" className="form-label">{t('addCabinet.labels.telephone')}</label>
                         <input
                             type="text"
                             id="cabinet-tel"
-                            name="tel"
-                            value={cabinetData.tel}
-                            onChange={handleChange}
-                            placeholder="Enter phone number (optional)"
-                             className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
-                        />
+                             name="tel"
+                             value={cabinetData.tel}
+                             onChange={handleChange}
+                              className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
+                         />
                          <div className="invalid-feedback">{errors.tel}</div>
                     </div>
                      <div className="col-md-6">
-                        <label htmlFor="cabinet-fax" className="form-label">Fax</label>
+                        <label htmlFor="cabinet-fax" className="form-label">{t('addCabinet.labels.fax')}</label>
                         <input
                             type="text"
                             id="cabinet-fax"
-                            name="fax"
-                            value={cabinetData.fax}
-                            onChange={handleChange}
-                            placeholder="Enter fax number (optional)"
-                             className={`form-control ${errors.fax ? 'is-invalid' : ''}`}
-                        />
+                             name="fax"
+                             value={cabinetData.fax}
+                             onChange={handleChange}
+                              className={`form-control ${errors.fax ? 'is-invalid' : ''}`}
+                         />
                          <div className="invalid-feedback">{errors.fax}</div>
                     </div>
                 </div>
@@ -231,16 +228,15 @@ const AddCabinetForm = () => {
                  {/* Row 3: Tax Number */}
                  <div className="row g-3 mb-3">
                     <div className="col-md-6"> {/* Or col-12 if it should span full width */}
-                        <label htmlFor="cabinet-taxNumber" className="form-label">Tax Number</label>
+                        <label htmlFor="cabinet-taxNumber" className="form-label">{t('addCabinet.labels.taxNumber')}</label>
                         <input
                             type="text"
                             id="cabinet-taxNumber"
-                            name="taxNumber"
-                            value={cabinetData.taxNumber}
-                            onChange={handleChange}
-                            placeholder="Enter tax number (optional)"
-                            className={`form-control ${errors.taxNumber ? 'is-invalid' : ''}`}
-                        />
+                             name="taxNumber"
+                             value={cabinetData.taxNumber}
+                             onChange={handleChange}
+                             className={`form-control ${errors.taxNumber ? 'is-invalid' : ''}`}
+                         />
                          {/* No feedback needed for optional field unless format validation added */}
                     </div>
                  </div>
@@ -249,7 +245,7 @@ const AddCabinetForm = () => {
                  <div className="row g-3">
                     <div className="col-12 text-center">
                         <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
-                            {loading ? 'Adding...' : 'Add Cabinet'}
+                            {loading ? t('addCabinet.buttons.adding') : t('addCabinet.buttons.addCabinet')}
                         </button>
                     </div>
                  </div>

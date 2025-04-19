@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 import { getToken, clearUserData, isTokenExpired } from '../../utils/auth'; // Assuming auth utils are relevant
 import './EditCabinetForm.css'; // Import the CSS file
 
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const EditCabinetForm = () => {
+    const { t, i18n, ready } = useTranslation(); // Get i18n instance and ready flag
     const { id } = useParams(); // Get cabinet ID from URL parameter
     const navigate = useNavigate();
     const [cabinetData, setCabinetData] = useState({
@@ -24,7 +26,7 @@ const EditCabinetForm = () => {
      // --- Logout Function ---
     const performLogout = useCallback(() => {
         clearUserData();
-        alert("Session expired or logged out. Redirecting to login.");
+        alert(t('editCabinet.alerts.authRequiredFetch')); // Use a generic auth required message
         navigate("/sign-in");
     }, [navigate]);
 
@@ -75,7 +77,7 @@ const EditCabinetForm = () => {
             setErrors({}); // Clear previous errors
             const token = getToken();
             if (!token) {
-                setErrors({ fetch: "Authentication required." });
+                setErrors({ fetch: t('editCabinet.alerts.authRequiredFetch') });
                 setLoading(false);
                 performLogout();
                 return;
@@ -98,15 +100,15 @@ const EditCabinetForm = () => {
                 console.error("Error fetching cabinet:", err);
                  if (err.response) {
                     if (err.response.status === 404) {
-                        setErrors({ fetch: `Cabinet with ID ${id} not found.` });
+                        setErrors({ fetch: t('editCabinet.alerts.notFound', { id }) });
                     } else if (err.response.status === 401 || err.response.status === 403) {
-                        setErrors({ fetch: "Permission denied to view this cabinet." });
+                        setErrors({ fetch: t('editCabinet.alerts.permissionDeniedView') });
                         performLogout();
                     } else {
-                        setErrors({ fetch: `Error fetching cabinet: ${err.response.data?.message || err.response.statusText}` });
+                        setErrors({ fetch: t('editCabinet.alerts.fetchError', { message: err.response.data?.message || err.response.statusText }) });
                     }
                 } else {
-                    setErrors({ fetch: 'Network error or server unavailable.' });
+                    setErrors({ fetch: t('editCabinet.alerts.networkError') });
                 }
             } finally {
                 setLoading(false);
@@ -116,7 +118,7 @@ const EditCabinetForm = () => {
         if (id) {
             fetchCabinet();
         } else {
-            setErrors({ fetch: "Cabinet ID is missing." });
+            setErrors({ fetch: t('editCabinet.alerts.missingId') });
             setLoading(false);
         }
     }, [id, performLogout]); // Add performLogout dependency
@@ -140,13 +142,13 @@ const EditCabinetForm = () => {
      // --- Form Validation ---
     const validateForm = () => {
         const newErrors = {};
-        if (!cabinetData.name) newErrors.name = "Cabinet name is required.";
-        if (!cabinetData.address) newErrors.address = "Cabinet address is required.";
+        if (!cabinetData.name) newErrors.name = t('editCabinet.validation.nameRequired');
+        if (!cabinetData.address) newErrors.address = t('editCabinet.validation.addressRequired');
         if (cabinetData.tel && !/^\+?\d[\d\s-]*$/.test(cabinetData.tel)) {
-             newErrors.tel = "Invalid phone number format.";
+             newErrors.tel = t('editCabinet.validation.invalidPhone');
         }
          if (cabinetData.fax && !/^\+?\d[\d\s-]*$/.test(cabinetData.fax)) {
-             newErrors.fax = "Invalid fax number format.";
+             newErrors.fax = t('editCabinet.validation.invalidFax');
         }
         setErrors(newErrors); // Set errors based on current validation
         return Object.keys(newErrors).length === 0;
@@ -159,7 +161,7 @@ const EditCabinetForm = () => {
 
         const token = getToken();
         if (!token) {
-            setErrors({ submit: "Authentication required to modify." });
+            setErrors({ submit: t('editCabinet.alerts.authRequiredModify') });
             performLogout();
             return;
         }
@@ -178,7 +180,7 @@ const EditCabinetForm = () => {
         });
 
         if (Object.keys(updatePayload).length === 0) {
-            alert("No changes detected.");
+            alert(t('editCabinet.alerts.noChanges'));
             return;
         }
 
@@ -194,29 +196,29 @@ const EditCabinetForm = () => {
             });
 
             if (response.status === 200) {
-                alert("Cabinet updated successfully!");
+                alert(t('editCabinet.alerts.success'));
                 navigate('/manage-cabinets'); // Navigate back after successful update
             } else {
                 throw new Error(`Unexpected server response: ${response.status}`);
             }
         } catch (err) {
             console.error("Error updating cabinet:", err);
-            let errorMsg = "An error occurred while updating the cabinet.";
+            let errorMsg = t('editCabinet.alerts.updateError');
             if (err.response) {
                  if (err.response.status === 401 || err.response.status === 403) {
-                    errorMsg = "Permission denied to modify this cabinet.";
+                    errorMsg = t('editCabinet.alerts.permissionDeniedModify');
                     performLogout();
                 } else if (err.response.status === 404) {
-                    errorMsg = "Cabinet not found (maybe deleted?).";
+                    errorMsg = t('editCabinet.alerts.notFoundMaybeDeleted');
                 } else if (err.response.status === 409) {
-                    errorMsg = err.response.data?.message || "Conflict: Another cabinet with this name/address might exist.";
+                    errorMsg = err.response.data?.message || t('editCabinet.alerts.conflict');
                 } else if (err.response.status === 400) {
-                     errorMsg = `Validation Error: ${err.response.data || 'Invalid data.'}`;
+                     errorMsg = t('editCabinet.alerts.validationError', { message: err.response.data || 'Invalid data.' });
                 } else {
-                    errorMsg = `Server error (${err.response.status}): ${err.response.data?.message || err.response.statusText}`;
+                    errorMsg = `${t('editCabinet.alerts.serverError')} (${err.response.status}): ${err.response.data?.message || err.response.statusText}`;
                 }
             } else if (err.request) {
-                errorMsg = 'No response from server. Check connection.';
+                errorMsg = t('editCabinet.alerts.networkError');
             }
             setErrors({ submit: errorMsg }); // Set submit error
         } finally {
@@ -224,48 +226,53 @@ const EditCabinetForm = () => {
         }
     };
 
-    if (loading && !Object.keys(initialData).length) {
-        return <div className="text-center p-4">Loading cabinet information...</div>;
+    // Debug logs moved below
+
+    // Show loading message if translations aren't ready OR if fetching data
+    if (!ready || (loading && !Object.keys(initialData).length)) {
+        // Use a generic loading message if t function isn't ready yet
+        return <div className="text-center p-4">{ready ? t('editCabinet.loadingMessage') : 'Loading...'}</div>;
     }
 
     if (errors.fetch) {
          return <div className="alert alert-danger m-4">{errors.fetch}</div>;
     }
 
+    // Removed debug logs
+
     return (
         // Use Bootstrap container and classes
         <div className="edit-cabinet-container container mt-4">
-            <h2>Edit Cabinet (ID: {id})</h2>
+            {/* Removed debug log */}
+            <h2>{t('editCabinet.title', { id })}</h2>
             {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
             <form onSubmit={handleSubmit} noValidate>
                  {/* Row 1: Name, Address */}
                 <div className="row g-3 mb-3">
                     <div className="col-md-6">
-                        <label htmlFor="cabinet-name" className="form-label required">Cabinet Name</label>
+                        <label htmlFor="cabinet-name" className="form-label required">{t('editCabinet.labels.name')}</label>
                         <input
                             type="text"
                             id="cabinet-name"
-                            name="name"
-                            value={cabinetData.name}
-                            onChange={handleChange}
-                            placeholder="Enter cabinet name"
-                            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                            required
-                        />
+                             name="name"
+                             value={cabinetData.name}
+                             onChange={handleChange}
+                             className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                             required
+                         />
                          <div className="invalid-feedback">{errors.name}</div>
                     </div>
                     <div className="col-md-6">
-                        <label htmlFor="cabinet-address" className="form-label required">Address</label>
+                        <label htmlFor="cabinet-address" className="form-label required">{t('editCabinet.labels.address')}</label>
                         <input
                             type="text"
                             id="cabinet-address"
-                            name="address"
-                            value={cabinetData.address}
-                            onChange={handleChange}
-                            placeholder="Enter cabinet address"
-                            className={`form-control ${errors.address ? 'is-invalid' : ''}`}
-                            required
-                        />
+                             name="address"
+                             value={cabinetData.address}
+                             onChange={handleChange}
+                             className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+                             required
+                         />
                          <div className="invalid-feedback">{errors.address}</div>
                     </div>
                 </div>
@@ -273,29 +280,27 @@ const EditCabinetForm = () => {
                  {/* Row 2: Telephone, Fax */}
                 <div className="row g-3 mb-3">
                     <div className="col-md-6">
-                        <label htmlFor="cabinet-tel" className="form-label">Telephone</label>
+                        <label htmlFor="cabinet-tel" className="form-label">{t('editCabinet.labels.telephone')}</label>
                         <input
                             type="text"
                             id="cabinet-tel"
-                            name="tel"
-                            value={cabinetData.tel}
-                            onChange={handleChange}
-                            placeholder="Enter phone number (optional)"
-                            className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
-                        />
+                             name="tel"
+                             value={cabinetData.tel}
+                             onChange={handleChange}
+                             className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
+                         />
                          <div className="invalid-feedback">{errors.tel}</div>
                     </div>
                      <div className="col-md-6">
-                        <label htmlFor="cabinet-fax" className="form-label">Fax</label>
+                        <label htmlFor="cabinet-fax" className="form-label">{t('editCabinet.labels.fax')}</label>
                         <input
                             type="text"
                             id="cabinet-fax"
-                            name="fax"
-                            value={cabinetData.fax}
-                            onChange={handleChange}
-                            placeholder="Enter fax number (optional)"
-                            className={`form-control ${errors.fax ? 'is-invalid' : ''}`}
-                        />
+                             name="fax"
+                             value={cabinetData.fax}
+                             onChange={handleChange}
+                             className={`form-control ${errors.fax ? 'is-invalid' : ''}`}
+                         />
                          <div className="invalid-feedback">{errors.fax}</div>
                     </div>
                 </div>
@@ -303,16 +308,15 @@ const EditCabinetForm = () => {
                  {/* Row 3: Tax Number */}
                  <div className="row g-3 mb-3">
                     <div className="col-md-6">
-                        <label htmlFor="cabinet-taxNumber" className="form-label">Tax Number</label>
+                        <label htmlFor="cabinet-taxNumber" className="form-label">{t('editCabinet.labels.taxNumber')}</label>
                         <input
                             type="text"
                             id="cabinet-taxNumber"
-                            name="taxNumber"
-                            value={cabinetData.taxNumber}
-                            onChange={handleChange}
-                            placeholder="Enter tax number (optional)"
-                            className={`form-control ${errors.taxNumber ? 'is-invalid' : ''}`}
-                        />
+                             name="taxNumber"
+                             value={cabinetData.taxNumber}
+                             onChange={handleChange}
+                             className={`form-control ${errors.taxNumber ? 'is-invalid' : ''}`}
+                         />
                          {/* No feedback needed for optional field */}
                     </div>
                  </div>
@@ -321,10 +325,10 @@ const EditCabinetForm = () => {
                  <div className="row g-3">
                     <div className="col-12 d-flex justify-content-center gap-3"> {/* Center buttons with gap */}
                         <button type="submit" className="btn btn-primary btn-lg" disabled={isSubmitting}>
-                            {isSubmitting ? 'Saving...' : 'Save Changes'}
+                            {isSubmitting ? t('editCabinet.buttons.saving') : t('editCabinet.buttons.saveChanges')}
                         </button>
                         <button type="button" onClick={() => navigate('/manage-cabinets')} className="btn btn-secondary btn-lg" disabled={isSubmitting}>
-                            Cancel
+                            {t('editCabinet.buttons.cancel')}
                         </button>
                     </div>
                  </div>

@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react"; // Import useCallback
 import { Navigate } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
-import { useNavigate} from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
+import { clearUserData } from './auth'; // Import clearUserData
 
 
 const ProtectedLayout = ({ requiredRole, children  }) => {
@@ -11,12 +12,20 @@ const ProtectedLayout = ({ requiredRole, children  }) => {
   let isAuthenticated = false;
   let hasRequiredRole = false;
 
+  // --- Logout Function ---
+  const performLogout = useCallback(() => {
+      clearUserData();
+      // Removed t() function call as useTranslation is not used here
+      alert("Session expired or invalid. Redirecting to login.");
+      navigate("/sign-in");
+  }, [navigate]);
+
   useEffect(() => {
-    // Handle logout if token is invalid or expired
+    // Handle logout if token becomes invalid after initial check (less likely but for completeness)
     if (!isAuthenticated) {
-      onLogout();
+      performLogout(); // Call the correct logout function
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, performLogout]); // Add performLogout to dependencies
 
   if (token) {
     try {
@@ -52,28 +61,16 @@ const ProtectedLayout = ({ requiredRole, children  }) => {
     }
   }
 
-  const onLogout = () => {
-    // Clear tokens
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    sessionStorage.removeItem("accessToken");
-    sessionStorage.removeItem("refreshToken");
-
-    // Redirect to login
-    return <Navigate to="/sign-in" />;
-  };
+  // Removed unused and incorrectly implemented onLogout function
 
   // Redirect based on authentication and role
   if (!isAuthenticated) {
     return <Navigate to="/" />;
   }
   if (!hasRequiredRole) {
-    // Use a setTimeout to delay the navigation
-    alert("Unauthorized access");
-    setTimeout(() => {
-      navigate("/"); // Navigate to the desired page
-    }, 100); // Delay the navigation by 1 second (you can adjust the time)
-    return null; // Prevent rendering protected content
+    // Redirect directly if unauthorized
+    alert("Unauthorized access"); // Keep the alert for user feedback
+    return <Navigate to="/" />; // Use Navigate for direct redirect
   }
 
   return children; // Render the protected component if all checks pass

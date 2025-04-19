@@ -1,8 +1,8 @@
 {
   "welcome": "Welcome",
-  "call": "Call : +01 123455678990",
-  "email": "Email : demo@gmail.com",
-  "location": "Location",
+  "call": "Call : + 123455678990",
+  "email": "Email : info@tunicare.com",
+  "location": "123 Health St, MedCity",
   "login": "Login",
   "signUp": "Sign Up",
   "bookAppointment": "BOOK APPOINTMENT",
@@ -34,5 +34,846 @@
   "contactUs": "Contact Us",
   "hospitalDescription": "When looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to",
   "previous": "Previous",
-  "next": "Next"
+  "next": "Next",
+  "signInTitle": "Sign In",
+  "emailLabel": "Email address",
+  "emailPlaceholder": "Enter email",
+  "passwordLabel": "Password",
+  "passwordPlaceholder": "Enter password",
+  "rememberMeLabel": "Remember me",
+  "selectCabinetLabel": "Select Cabinet",
+  "selectCabinetPlaceholder": "-- Select a Cabinet --",
+  "cabinetOption": "Cabinet {{id}}",
+  "processingButton": "Processing...",
+  "loginToCabinetButton": "Login to Selected Cabinet",
+  "submitButton": "Submit",
+  "forgotPasswordPrefix": "Forgot",
+  "forgotPasswordLink": "password?",
+  "selectCabinetError": "Please select a cabinet.",
+  "missingCredentialsError": "Please insert your email and password",
+  "loginSuccess": "Login successful!",
+  "loginSuccessIncomplete": "Login successful, but failed to load user details.",
+  "multipleAccountsError": "Multiple accounts found. Please select your cabinet.",
+  "invalidCredentialsError": "Invalid email or password.",
+  "serverError": "Login failed due to a server error.",
+  "connectionError": "Login failed. Please check your connection or contact support.",
+  "sessionExpiredAlert": "Your session has expired due to inactivity. Redirecting to login...",
+  "loading": "Loading...",
+  "nav": {
+    "dashboard": "Dashboard",
+    "addAccount": "Add an Account",
+    "confirmation": "Confirmation",
+    "doctorsManagement": "Doctors Management",
+    "deactivateAccounts": "Deactivate Accounts",
+    "changeRole": "Change Role",
+    "addCabinet": "Add Cabinet",
+    "manageCabinets": "Manage Cabinets & QR Codes",
+    "manageExamCentres": "Manage Exam Centres",
+    "addExamCentre": "Add Exam Centre",
+    "editMyAccount": "Edit My Account",
+    "changePassword": "Change Password",
+    "logout": "Logout",
+    "userManagement": "User Management",
+    "addAccountAssistant": "Add an Account As Assistant",
+    "activationManagement": "Doctor Activation"
+  },
+  "dashboard": {
+    "title": "{{firstName}} {{lastName}} Dashboard",
+    "performanceSectionTitle": "Performance Dashboard",
+    "tiles": {
+      "performance": {
+        "title": "Performance Objectives",
+        "subtitle": "Revenue Target Achievement:"
+      },
+      "sales": {
+        "title": "Monthly Sales",
+        "subtitle": "Target Reached: {{percentage}}%"
+      },
+      "teamPerformance": {
+        "title": "Team Performance",
+        "subtitle": "Team {{team}}: {{percentage}}% of the target"
+      },
+      "projectTracking": {
+        "title": "Project Tracking",
+        "subtitle": "Ongoing Projects: {{count}}"
+      },
+      "teamObjectives": {
+        "title": "Team Objectives",
+        "subtitle": "Completion Rate: {{percentage}}%"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Upcoming Meetings: {{count}}"
+      },
+      "viewDetails": "View Details",
+      "analyzeProgress": "Analyze Progress",
+      "viewNotifications": "View Notifications"
+    },
+    "charts": {
+      "performanceTitle": "{{firstName}} {{lastName}} Performance",
+      "monthAxisLabel": "Month",
+      "payments": {
+        "label": "Payments Over Time",
+        "title": "Monthly Payments Overview",
+        "yAxisLabel": "Payments (dt)"
+      },
+      "phoneCalls": {
+        "label": "Phone Calls Made",
+        "title": "Phone Calls Made per Month",
+        "yAxisLabel": "Phone Calls"
+      }
+    },
+    "tooltips": {
+      "hideSidebar": "Hide Sidebar",
+      "showSidebar": "Show Sidebar"
+    },
+    "sidebar": {
+      "emailLabel": "Email",
+      "birthDateLabel": "Birth Date",
+      "roleLabel": "Role",
+      "genderLabel": "Gender",
+      "addressLabel": "Address",
+      "phoneLabel": "Phone",
+      "ageLabel": "Age",
+      "notProvided": "Not provided",
+      "notAvailable": "N/A"
+    }
+  },
+  "editUserForm": {
+    "title": "Edit User Profile (ID: {{id}})",
+    "loading": "Loading user data...",
+    "labels": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "birthDate": "Birth Date",
+      "telephone": "Telephone",
+      "address": "Address"
+    },
+    "placeholders": {
+      "firstName": "Enter first name",
+      "lastName": "Enter last name",
+      "telephone": "Enter phone number (optional)",
+      "address": "Enter address (optional)"
+    },
+    "buttons": {
+      "updating": "Updating...",
+      "updateUser": "Update User"
+    },
+    "alerts": {
+      "sessionExpired": "Session expired or logged out. Redirecting to login.",
+      "noChanges": "No changes detected.",
+      "updateSuccess": "User updated successfully!"
+    },
+    "errors": {
+      "fetch": {
+        "missingId": "User ID is missing.",
+        "noToken": "Authentication token not found.",
+        "permissionDenied": "Permission denied or session expired.",
+        "notFound": "User with ID {{id}} not found.",
+        "generic": "Failed to fetch user data. Please try again."
+      },
+      "validation": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "emailInvalid": "Invalid email format",
+        "birthDateRequired": "Birth date is required",
+        "phoneDigitsOnly": "Phone number must contain only digits"
+      },
+      "submit": {
+        "authRequired": "Authentication required. Please log in again.",
+        "permissionDenied": "Permission denied or session expired.",
+        "notFound": "User with ID {{id}} not found.",
+        "generic": "Failed to update the user. Please try again.",
+        "networkError": "Network error or server unavailable. Please try again."
+      }
+    }
+  },
+  "addForm": {
+    "title": {
+      "admin": "Add New User",
+      "patient": "Add New Patient"
+    },
+    "labels": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "birthDate": "Birth Date",
+      "telephone": "Telephone",
+      "address": "Address",
+      "gender": "Gender",
+      "photo": "Profile Photo (Optional)",
+      "password": "Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "placeholders": {
+      "firstName": "Enter first name",
+      "lastName": "Enter last name",
+      "email": "Enter email (optional)",
+      "telephone": "Enter phone number (optional)",
+      "address": "Enter address (optional)",
+      "password": "Enter password (optional)",
+      "confirmPassword": "Confirm password (if entered)"
+    },
+    "genderOptions": {
+      "select": "Select Gender...",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
+    "passwordStrength": {
+      "label": "Password Strength",
+      "weak": "Weak",
+      "strong": "Strong"
+    },
+    "buttons": {
+      "checking": "Checking...",
+      "processing": "Processing...",
+      "submit": "Submit"
+    },
+    "alerts": {
+      "sessionExpired": "Session expired or logged out. Redirecting to login.",
+      "permissionDeniedAccess": "You don't have permission to access this page.",
+      "sessionInvalid": "Session invalid. Please log in again.",
+      "invalidRole": "Invalid user role. Cannot proceed.",
+      "adminAddSuccess": "User added successfully with admin privileges!",
+      "patientAddSuccess": "Patient added successfully!",
+      "permissionDeniedSubmit": "Permission denied or session expired."
+    },
+    "errors": {
+      "validation": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "emailInvalidDomain": "Email must be a valid @gmail.com or @yahoo.com address",
+        "birthDateRequired": "Birth date is required",
+        "phoneDigitsOnly": "Phone number must contain only digits",
+        "genderRequired": "Gender is required",
+        "passwordStrength": "Password must contain at least 8 characters, including uppercase, lowercase, a number, and a special character (@, #, $, %, ^, &, +, =, or !)",
+        "passwordsMismatch": "Passwords do not match",
+        "confirmPasswordNotEmpty": "Confirm password should be empty if password is empty"
+      },
+      "existenceCheck": {
+        "noCabinet": "Could not determine your cabinet affiliation. Please log in again.",
+        "userExists": "A user with this email, first name, and last name already exists in this cabinet.",
+        "generic": "Could not verify user existence. Please try again."
+      },
+      "submit": {
+        "generic": "An error occurred. Please check the data and try again.",
+        "networkError": "Network error or server unavailable. Please try again later."
+      }
+    }
+  },
+  "userManagement": {
+    "title": "User List",
+    "searchPlaceholder": "Search by first name and last name (e.g., John Doe)",
+    "loading": "Loading users...",
+    "tableHeaders": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "speciality": "Speciality",
+      "actions": "Actions"
+    },
+    "viewOptions": {
+        "doctors": "Show Doctors",
+        "doctorCentres": "Show Exam Centre Doctors"
+    },
+    "noUsersFound": "No users found",
+    "noEmail": "This patient does not have an email",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "buttons": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    },
+    "alerts": {
+      "sessionExpired": "Session expired or logged out. Redirecting to login.",
+      "fetchFailed": {
+        "auth": "Access Denied or Session Expired. Please log in again.",
+        "generic": "Failed to load user data. Please try again later."
+      },
+      "deleteFailed": {
+        "noCurrentUser": "Current user details not available. Please wait or try logging in again.",
+        "missingUserInfo": "User core information missing in details. Please wait or try logging in again.",
+        "missingUserId": "Current User ID missing in details. Please wait or try logging in again.",
+        "missingUserRoles": "Current User roles missing in details. Please wait or try logging in again.",
+        "missingCabinetInfo": "Cannot perform action: Your cabinet information is missing.",
+        "permissionOrMissingCabinet": "You do not have permission to delete users or your cabinet ID is missing.",
+        "auth": "Permission denied or session expired.",
+        "notFound": "User or registration not found.",
+        "generic": "Failed to perform the delete operation. Please try again later.",
+        "invalidViewOrPermission": "Cannot delete: Invalid view type or insufficient permissions."
+      },
+      "deleteSuccess": {
+        "admin": "User deleted successfully.",
+        "doctorAssistant": "User registration removed from this cabinet successfully.",
+        "doctorCentre": "Exam Centre Doctor deleted successfully."
+      },
+      "sessionInvalid": "Session invalid. Please log in again.",
+      "toggleFailed": {
+        "missingCabinetInfo": "Cannot toggle patient status: Your cabinet information is missing.",
+        "adminPatientLimitation": "Admin role cannot use this toggle button for patients without specifying a target cabinet (UI enhancement needed).",
+        "invalidRole": "Cannot toggle status for user role: {{role}}",
+        "authWithMessage": "Permission Denied or Session Expired: {{message}}",
+        "notFoundWithMessage": "Not Found: {{message}}",
+        "badRequestWithMessage": "Bad Request: {{message}}",
+        "genericWithMessage": "Failed to toggle status: {{message}}",
+        "networkError": "Failed to toggle the {{role}} status due to a network or unexpected error.",
+        "invalidViewOrPermission": "Cannot toggle status: Invalid view type or insufficient permissions."
+      },
+      "toggleSuccess": "{{role}} status successfully toggled. New status: {{status}}.",
+      "toggleSuccessDoctorCentre": "Exam Centre Doctor (ID: {{userId}}) status successfully toggled. New status: {{status}}."
+    },
+    "confirmations": {
+      "deleteAdmin": "Are you sure you want to permanently delete user ID {{userId}} and all their registrations?",
+      "deleteDoctorAssistant": "Are you sure you want to remove user ID {{userId}}'s registration from your cabinet (ID: {{cabinetId}})?",
+      "deleteDoctorCentre": "Are you sure you want to permanently delete Exam Centre Doctor ID {{userId}}?",
+      "activatePatient": "Are you sure you want to activate patient ID {{userId}} in cabinet {{cabinetId}}?",
+      "deactivatePatient": "Are you sure you want to deactivate patient ID {{userId}} in cabinet {{cabinetId}}?",
+      "activateDoctorAssistant": "Are you sure you want to activate {{role}} ID {{userId}}?",
+      "deactivateDoctorAssistant": "Are you sure you want to deactivate {{role}} ID {{userId}}?",
+      "activateDoctorCentre": "Are you sure you want to activate Exam Centre Doctor ID {{userId}}?",
+      "deactivateDoctorCentre": "Are you sure you want to deactivate Exam Centre Doctor ID {{userId}}?"
+    }
+  },
+  "editDoctorCentreForm": {
+    "title": "Edit Exam Centre Doctor",
+    "loading": "Loading doctor data...",
+    "labels": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "birthDate": "Birth Date",
+      "tel": "Telephone",
+      "address": "Address",
+      "gender": "Gender",
+      "speciality": "Speciality"
+    },
+    "genderOptions": {
+      "select": "Select Gender...",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
+    "buttons": {
+      "updating": "Updating...",
+      "update": "Update Doctor",
+      "cancel": "Cancel"
+    },
+    "alerts": {
+      "sessionExpired": "Session expired. Please log in again.",
+      "updateSuccess": "Doctor details updated successfully!"
+    },
+    "errors": {
+      "fetchFailed": "Failed to fetch doctor data.",
+      "updateFailed": "Failed to update doctor details"
+    }
+  },
+  "tovalidate": {
+    "title": "Users Pending Validation",
+    "searchPlaceholder": "Search by first name and last name (e.g., John Doe)",
+    "loading": "Loading...",
+    "tableHeaders": {
+      "id": "ID",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "noUsersFound": "No users pending validation found",
+    "status": {
+      "active": "Active",
+      "inactivePending": "Inactive/Pending"
+    },
+    "buttons": {
+      "activate": "Activate",
+      "cancel": "Cancel"
+    },
+    "alerts": {
+      "sessionExpired": "Session expired or logged out. Redirecting to login.",
+      "fetchFailed": {
+        "auth": "Access Denied or Session Expired. Please log in again.",
+        "adminEndpointMissing": "Failed to load inactive users: Admin endpoint might not be available.",
+        "generic": "Failed to load inactive user data. Please try again later."
+      },
+      "deleteFailed": {
+        "noCurrentUser": "User details not fully loaded. Please wait or try logging in again.",
+        "sessionInvalid": "Session invalid. Please log in again.",
+        "missingCabinetInfo": "Cannot perform action: Your cabinet information is missing.",
+        "adminLimitation": "Admin cannot cancel registration directly from this screen without cabinet context (UI enhancement needed). Use the main User Management screen if applicable.",
+        "authWithMessage": "Permission Denied or Session Expired: {{message}}",
+        "notFoundWithMessage": "Not Found: {{message}}",
+        "genericWithMessage": "Failed to delete registration: {{message}}",
+        "networkError": "Failed to delete the registration due to a network or unexpected error."
+      },
+      "deleteSuccess": "User registration request cancelled (deleted).",
+      "activateFailed": {
+        "noCurrentUser": "User details not fully loaded. Please wait or try logging in again.",
+        "permission": "Only Doctors or Assistants associated with a cabinet can confirm registrations from this screen.",
+        "stillInactive": "Patient status toggled, but they are still inactive. Please check the details.",
+        "authWithMessage": "Permission Denied or Session Expired: {{message}}",
+        "notFoundWithMessage": "Not Found: {{message}}",
+        "badRequestWithMessage": "Bad Request: {{message}}",
+        "genericWithMessage": "Failed to activate patient: {{message}}",
+        "networkError": "Failed to activate the patient due to a network or unexpected error."
+      },
+      "activateSuccess": "Patient has been successfully activated.",
+      "toggleFailed": {
+        "noCurrentUser": "User details not fully loaded. Please wait or try logging in again.",
+        "sessionInvalid": "Session invalid. Please log in again.",
+        "missingCabinetInfo": "Cannot toggle patient status: Your cabinet information is missing.",
+        "adminLimitation": "Admin role cannot use this toggle button for patients without specifying a target cabinet (UI enhancement needed).",
+        "invalidRole": "Cannot toggle status for user role: {{role}}",
+        "authWithMessage": "Permission Denied or Session Expired: {{message}}",
+        "notFoundWithMessage": "Not Found: {{message}}",
+        "badRequestWithMessage": "Bad Request: {{message}}",
+        "genericWithMessage": "Failed to toggle status: {{message}}",
+        "networkError": "Failed to toggle the {{role}} status due to a network or unexpected error."
+      },
+      "toggleSuccess": "{{role}} status successfully toggled. New status: {{status}}."
+    },
+    "confirmations": {
+      "deleteRegistration": "Are you sure you want to delete user ID {{userId}}'s registration request from your cabinet (ID: {{cabinetId}})?",
+      "activatePatient": "Are you sure you want to activate patient ID {{patientId}} in your cabinet ({{cabinetId}})?",
+      "toggleDoctorAssistant": "Are you sure you want to toggle the active status for {{role}} ID {{userId}}? (This user might be removed from this list if activated)"
+    },
+    "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+    }
+  },
+  "activation": {
+    "title": "Doctor Activation Management",
+    "searchPlaceholder": "Search by name or email...",
+    "loading": "Loading...",
+    "unknownCentre": "N/A",
+    "tableHeaders": {
+      "id": "ID",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "speciality": "Speciality",
+      "centre": "Exam Centre",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "noDoctorsFound": "No inactive doctors found.",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "inactivePending": "Pending Activation"
+    },
+    "buttons": {
+      "activate": "Confirm",
+      "cancel": "Cancel",
+      "activateTooltip": "Activate this doctor",
+      "cancelTooltip": "Delete this doctor registration"
+    },
+    "alerts": {
+      "sessionExpired": "Session expired. Please log in again.",
+      "accessDenied": "Access Denied. Only Administrators can view this page.",
+      "sessionInvalid": "Session invalid. Please log in again.",
+      "fetchFailed": {
+        "auth": "Authentication failed or session expired. Please log in.",
+        "generic": "Failed to load inactive doctors. Please try again later."
+      },
+      "deleteFailed": {
+        "permission": "Permission denied. Only Admins can delete doctors.",
+        "generic": "Failed to delete doctor.",
+        "authWithMessage": "Authentication Error: {{message}}",
+        "notFoundWithMessage": "Not Found: {{message}}",
+        "genericWithMessage": "Error deleting doctor: {{message}}"
+      },
+      "deleteSuccess": "Doctor registration deleted successfully.",
+      "toggleFailed": {
+        "permission": "Permission denied. Only Admins can change status.",
+        "generic": "Failed to change doctor status.",
+        "authWithMessage": "Authentication Error: {{message}}",
+        "notFoundWithMessage": "Not Found: {{message}}",
+        "genericWithMessage": "Error changing status: {{message}}"
+      },
+      "toggleSuccess": "Doctor status updated successfully. New status: {{status}}."
+    },
+    "confirmations": {
+      "deleteDoctor": "Are you sure you want to permanently delete the registration for doctor ID {{doctorId}}?",
+      "activateDoctor": "Are you sure you want to activate doctor ID {{doctorId}}?"
+    }
+  },
+  "changeRole": {
+    "title": "User Role Management",
+    "searchPlaceholder": "Search by first name and last name",
+    "loading": "Loading...",
+    "errorPrefix": "Error",
+    "tableHeaders": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "transfer": "Transfer"
+    },
+    "noUsersFound": "No users found",
+    "noEmail": "This patient does not have an email",
+    "noRegistrations": "No cabinet registrations",
+    "roleOptions": {
+      "select": "-- Select Role --",
+      "doctor": "DOCTOR",
+      "assistant": "ASSISTANT"
+    },
+    "cabinetOptions": {
+      "select": "-- Select Cabinet --",
+      "cabinetId": "Cabinet ID: {{id}}"
+    },
+    "buttons": {
+      "changeToAssistant": "Change to Assistant"
+    },
+    "tooltips": {
+      "selectCabinetFirst": "Select a target cabinet first",
+      "missingCabinetInfo": "Your cabinet information is missing"
+    },
+    "alerts": {
+      "sessionExpired": "Session expired or logged out. Redirecting to login.",
+      "transferFailed": {
+        "permissionDeniedAction": "You do not have permission to perform this action.",
+        "wrongCabinet": "You can only transfer patients within your own cabinet."
+      },
+      "transferSuccess": "Patient successfully transferred to {{role}}. New User ID: {{newUserId}}"
+    },
+    "errors": {
+      "fetch": {
+        "permissionDeniedView": "You do not have permission to view patient data.",
+        "auth": "Access Denied or Session Expired.",
+        "generic": "Failed to load patient data. Please try again later."
+      },
+      "transfer": {
+        "generic": "Failed to transfer patient to {{role}}. Please try again later.",
+        "authWithMessage": "Permission Denied or Session Expired: {{message}}",
+        "notFoundWithMessage": "Not Found: {{message}}",
+        "badRequestWithMessage": "Bad Request: {{message}}",
+        "conflictWithMessage": "Conflict: {{message}}",
+        "otherErrorWithMessage": "Error ({{status}}): {{message}}"
+      }
+    },
+    "confirmations": {
+      "transfer": "Are you sure you want to transfer patient {{firstName}} {{lastName}} (ID: {{userId}}) to the {{role}} role in cabinet ID {{cabinetId}}?"
+    },
+    "buttons": {
+      "changeToDoctor": "Change to Doctor",
+      "changeToAssistant": "Change to Assistant"
+    }
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "labels": {
+      "oldPassword": "Old Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password"
+    },
+    "placeholders": {
+      "oldPassword": "Enter your current password",
+      "newPassword": "Enter new password (min. 8 characters)",
+      "confirmPassword": "Confirm new password"
+    },
+    "buttons": {
+      "changing": "Changing...",
+      "changePassword": "Change Password"
+    },
+    "alerts": {
+      "sessionExpired": "Session expired or logged out. Redirecting to login.",
+      "success": "Password changed successfully!"
+    },
+    "errors": {
+      "passwordsMismatch": "New passwords do not match.",
+      "passwordTooShort": "New password must be at least 8 characters long.",
+      "authRequired": "Authentication required. Please log in again.",
+      "generic": "Failed to change password."
+    }
+  },
+  "logout": {
+    "dialog": {
+      "title": "Confirm Logout",
+      "confirmationText": "Are you sure you want to logout?",
+      "cancelButton": "Cancel",
+      "logoutButton": "Logout"
+    }
+  },
+  "home": {
+    "slider": {
+      "title": "Your Modern Medical Practice Management Solution",
+      "subtitle": "TuniCare",
+      "description": "Streamline appointments, manage consultations, track exams, and generate medical reports effortlessly. Focus on patient care, let TuniCare handle the rest.",
+      "contactButton": "Learn More"
+    },
+    "bookAppointment": {
+        "title": "Book",
+        "titleHighlight": "Appointment",
+        "doctorPlaceholder": "Select Doctor",
+        "departmentPlaceholder": "Select Department",
+        "phonePlaceholder": "Enter Phone Number",
+        "symptomsPlaceholder": "Enter Symptoms"
+    },
+    "about": {
+      "title": "About",
+      "subtitle": "TuniCare",
+      "description": "TuniCare is a comprehensive platform designed to simplify the daily operations of medical practices. From scheduling appointments and managing patient records to handling consultations and generating detailed reports, our goal is to provide healthcare professionals with the tools they need to deliver efficient and effective care.",
+      "readMoreButton": "Read More"
+    },
+    "features": {
+      "title": "Application",
+      "subtitle": "Features",
+      "appointments": {
+        "title": "Appointment Scheduling",
+        "description": "Easily book, reschedule, and manage patient appointments with our intuitive calendar system."
+      },
+      "consultations": {
+        "title": "Consultation Management",
+        "description": "Record consultation details, diagnoses, prescriptions, and follow-up plans efficiently."
+      },
+      "exams": {
+        "title": "Exam Tracking",
+        "description": "Keep track of medical exams, results, and associated documents for each patient."
+      },
+      "reports": {
+        "title": "Medical Reports",
+        "description": "Generate comprehensive medical reports and summaries with ease."
+      },
+      "readMoreButton": "Read More"
+    },
+    "doctors": {
+        "title": "Our",
+        "titleHighlight": "Doctors",
+        "doctor1": { "name": "Dr. Hennry", "specialty": "Cardiology" },
+        "doctor2": { "name": "Dr. Jenni", "specialty": "Pediatrics" },
+        "doctor3": { "name": "Dr. Morco", "specialty": "Neurology" }
+    }
+  },
+  "testimonialTitle": "Patient Testimonial",
+  "testimonialTitleHighlight": "Testimonial",
+  "testimonial1Text": "TuniCare has revolutionized how we manage our practice. Scheduling is a breeze, and accessing patient records is faster than ever. Highly recommended!",
+  "testimonial1Author": "Satisfied Clinic Manager",
+  "testimonial1Location": "City Clinic",
+  "testimonial2Text": "The consultation management features are fantastic. It helps us keep track of everything efficiently and improves patient follow-up.",
+  "testimonial2Author": "Dr. Smith",
+  "testimonial2Location": "General Practice",
+  "testimonial3Text": "Generating reports used to take hours, now it's just a few clicks. A real time-saver for our administrative staff!",
+  "testimonial3Author": "Medical Assistant",
+  "testimonial3Location": "Specialty Center",
+  "contactTitle": "Get In Touch",
+  "contactTitleHighlight": "Touch",
+  "contactNamePlaceholder": "Enter your full name",
+  "contactEmailPlaceholder": "Enter your email",
+  "contactPhonePlaceholder": "Enter your phone number",
+  "contactMessagePlaceholder": "Enter your message",
+  "footer": {
+    "addressTitle": "Address",
+    "addressLine1": "123 Health St, MedCity",
+    "phone": "+01 1234567890",
+    "email": "info@tunicare.com",
+    "linksTitle": "Useful Links",
+    "homeLink": "Home",
+    "aboutLink": "About",
+    "servicesLink": "Features",
+    "whyUsLink": "Why Us",
+    "teamLink": "Team",
+    "postsTitle": "Latest Updates",
+    "post1Title": "New Feature: Teleconsultation",
+    "post1Author": "TuniCare Team",
+    "post1Date": "10 Apr 2025",
+    "post2Title": "Improved Reporting Module",
+    "post2Author": "TuniCare Team",
+    "post2Date": "05 Apr 2025",
+    "post3Title": "User Interface Enhancements",
+    "post3Author": "TuniCare Team",
+    "post3Date": "01 Apr 2025",
+    "newsTitle": "Newsletter",
+    "newsText": "Subscribe to our newsletter for the latest updates and features.",
+    "subscribePlaceholder": "Enter email",
+    "subscribeButton": "Subscribe",
+    "copyright": " © {{year}} All Rights Reserved By",
+    "copyrightLinkText": "TuniCare Platform"
+  },
+  "registration": {
+    "title": "Patient Registration",
+    "errorTitle": "Registration Error",
+    "invalidLinkMessage": "Invalid registration link. Please use a valid registration URL provided by your clinic.",
+    "contactAdminMessage": "Please contact your clinic administrator for assistance.",
+    "firstNameLabel": "First Name",
+    "firstNamePlaceholder": "Enter first name",
+    "lastNameLabel": "Last Name",
+    "lastNamePlaceholder": "Enter last name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter email address",
+    "birthDateLabel": "Birth Date",
+    "telephoneLabel": "Telephone",
+    "telephonePlaceholder": "Enter phone number (optional)",
+    "addressLabel": "Address",
+    "addressPlaceholder": "Enter address (optional)",
+    "photoLabel": "Profile Photo (Optional)",
+    "genderLabel": "Gender",
+    "selectGender": "Select Gender...",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderOther": "Other",
+    "specialityLabel": "Speciality",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter password",
+    "passwordStrengthLabel": "Password Strength: {{strength}}",
+    "passwordStrengthWeak": "Weak",
+    "passwordStrengthStrong": "Strong",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm password",
+    "checkingButton": "Checking...",
+    "processingButton": "Processing...",
+    "registerButton": "Register",
+    "emailVerificationTitle": "Email Verification",
+    "emailVerificationMessage": "We've sent a verification code to {{email}}. Please check your inbox.",
+    "verificationCodePlaceholder": "Enter 6-digit code",
+    "verifyButton": "Verify Account",
+    "tryAgainButton": "Try again"
+  },
+  "validation": {
+    "firstNameRequired": "First name is required",
+    "lastNameRequired": "Last name is required",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Email must be a valid email address",
+    "birthDateRequired": "Birth date is required",
+    "phoneDigitsOnly": "Phone number must contain only digits",
+    "genderRequired": "Gender is required",
+    "passwordRequired": "Password is required",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "captchaRequired": "Please complete the reCAPTCHA"
+  },
+  "confirmation": {
+    "successTitle": "Registration Successful",
+    "successMessage1": "Congratulations! Your registration has been completed successfully.",
+    "successMessage2": "Thank you for your trust.",
+    "redirectMessage": "Redirecting in {{count}}s..."
+  },
+  "addCabinet": {
+    "title": "Add New Cabinet",
+    "labels": {
+      "name": "Cabinet Name",
+      "address": "Address",
+      "telephone": "Telephone",
+      "fax": "Fax",
+      "taxNumber": "Tax Number"
+    },
+    "placeholders": {
+      "name": "Enter cabinet name",
+      "address": "Enter cabinet address",
+      "telephone": "Enter phone number (optional)",
+      "fax": "Enter fax number (optional)",
+      "taxNumber": "Enter tax number (optional)"
+    },
+    "buttons": {
+      "adding": "Adding...",
+      "addCabinet": "Add Cabinet"
+    },
+    "alerts": {
+      "success": "Cabinet added successfully!",
+      "authRequired": "Authentication required.",
+      "permissionDenied": "Permission denied. Only administrators can add cabinets.",
+      "conflict": "A cabinet with this name/address might already exist.",
+      "serverError": "Server error",
+      "noResponse": "No response from server. Check your connection.",
+      "genericError": "An error occurred while adding the cabinet."
+    },
+    "validation": {
+      "nameRequired": "Cabinet name is required.",
+      "addressRequired": "Cabinet address is required.",
+      "invalidPhone": "Invalid phone number format.",
+      "invalidFax": "Invalid fax number format."
+    }
+  },
+  "editCabinet": {
+    "title": "Edit Cabinet (ID: {{id}})",
+    "loadingMessage": "Loading cabinet information...",
+    "labels": {
+      "name": "Cabinet Name",
+      "address": "Address",
+      "telephone": "Telephone",
+      "fax": "Fax",
+      "taxNumber": "Tax Number"
+    },
+    "placeholders": {
+      "name": "Enter cabinet name",
+      "address": "Enter cabinet address",
+      "telephone": "Enter phone number (optional)",
+      "fax": "Enter fax number (optional)",
+      "taxNumber": "Enter tax number (optional)"
+    },
+    "buttons": {
+      "saving": "Saving...",
+      "saveChanges": "Save Changes",
+      "cancel": "Cancel"
+    },
+    "alerts": {
+      "success": "Cabinet updated successfully!",
+      "noChanges": "No changes detected.",
+      "authRequiredFetch": "Authentication required.",
+      "authRequiredModify": "Authentication required to modify.",
+      "permissionDeniedView": "Permission denied to view this cabinet.",
+      "permissionDeniedModify": "Permission denied to modify this cabinet.",
+      "notFound": "Cabinet with ID {{id}} not found.",
+      "notFoundMaybeDeleted": "Cabinet not found (maybe deleted?).",
+      "conflict": "Conflict: Another cabinet with this name/address might exist.",
+      "validationError": "Validation Error: {{message}}",
+      "serverError": "Server error",
+      "fetchError": "Error fetching cabinet: {{message}}",
+      "updateError": "An error occurred while updating the cabinet.",
+      "networkError": "Network error or server unavailable.",
+      "missingId": "Cabinet ID is missing."
+    },
+    "validation": {
+      "nameRequired": "Cabinet name is required.",
+      "addressRequired": "Cabinet address is required.",
+      "invalidPhone": "Invalid phone number format.",
+      "invalidFax": "Invalid fax number format."
+    }
+  },
+  "manageCabinets": {
+    "title": "Cabinet List",
+    "loading": "Loading cabinets...",
+    "noCabinets": "No cabinets found.",
+    "authRequired": "Authentication required.",
+    "permissionDenied": "Permission denied. Only administrators can view this page.",
+    "unexpectedData": "Unexpected data format received from server.",
+    "fetchError": "Error fetching cabinets.",
+    "qrError": "Error generating QR code.",
+    "qrPermissionDenied": "Permission denied to generate this QR code.",
+    "qrNotFound": "Cabinet not found for QR code generation.",
+    "printPopupError": "Could not open print window. Check your browser's popup blocker settings.",
+    "deleteConfirm": "Are you sure you want to delete cabinet ID {{id}} and all associated users? This action is irreversible.",
+    "deleteAuthRequired": "Authentication required to delete.",
+    "deletePermissionDenied": "Permission denied to delete this cabinet.",
+    "deleteNotFound": "Cabinet not found for deletion.",
+    "deleteError": "Error deleting cabinet: {{message}}",
+    "deleteNetworkError": "Network error or server unavailable during deletion.",
+    "deleteSuccess": "Cabinet and associated users deleted successfully.",
+    "unexpectedResponse": "Unexpected server response: {{status}}",
+    "tableHeaders": {
+      "name": "Name",
+      "address": "Address",
+      "phone": "Phone",
+      "actions": "Actions",
+      "qrCode": "QR Code"
+    },
+    "buttons": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "showQr": "Show QR",
+      "close": "Close",
+      "print": "Print"
+    },
+    "qrModal": {
+      "title": "QR Code for Registration:",
+      "scanMessage": "Scan this code to register in this cabinet."
+    },
+    "notAvailable": "N/A"
+  }
 }

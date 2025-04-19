@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 import { jwtDecode } from "jwt-decode";
 import { getToken, clearUserData, isTokenExpired } from "../../utils/auth"; // Import auth utils
 import './EditUserForm.css'; // Import the CSS file
@@ -10,6 +11,7 @@ const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 const EditUserForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation(); // Get translation function
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -29,7 +31,7 @@ const EditUserForm = () => {
   // --- Logout Function ---
   const performLogout = useCallback(() => {
     clearUserData();
-    alert("Session expired or logged out. Redirecting to login.");
+    alert(t('editUserForm.alerts.sessionExpired'));
     navigate("/sign-in");
   }, [navigate]);
 
@@ -76,7 +78,7 @@ const EditUserForm = () => {
   // --- Fetch User Data ---
   useEffect(() => {
     if (!id) {
-        setErrors({ fetch: "User ID is missing." }); // Use setErrors
+        setErrors({ fetch: t('editUserForm.errors.fetch.missingId') });
         setLoading(false);
         return;
     };
@@ -86,7 +88,7 @@ const EditUserForm = () => {
       setErrors({}); // Clear previous errors
       try {
         const token = getToken();
-        if (!token) throw new Error("Authentication token not found.");
+        if (!token) throw new Error(t('editUserForm.errors.fetch.noToken')); // Although this is internal, good practice
 
         const response = await axios.get(`http://localhost:6952/Users/allid/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -106,12 +108,12 @@ const EditUserForm = () => {
       } catch (error) {
         console.error("Error fetching user data:", error);
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            setErrors({ fetch: "Permission denied or session expired." }); // Use setErrors
+            setErrors({ fetch: t('editUserForm.errors.fetch.permissionDenied') });
             performLogout(); // Logout on auth error
         } else if (error.response && error.response.status === 404) {
-             setErrors({ fetch: `User with ID ${id} not found.` }); // Use setErrors
+             setErrors({ fetch: t('editUserForm.errors.fetch.notFound', { id }) });
         } else {
-            setErrors({ fetch: "Failed to fetch user data. Please try again." }); // Use setErrors
+            setErrors({ fetch: t('editUserForm.errors.fetch.generic') });
         }
       } finally {
         setLoading(false);
@@ -140,16 +142,16 @@ const EditUserForm = () => {
   // --- Form Validation ---
    const validateForm = () => {
     const newErrors = {};
-    if (!formData.firstName) newErrors.firstName = "First name is required";
-    if (!formData.lastName) newErrors.lastName = "Last name is required";
+    if (!formData.firstName) newErrors.firstName = t('editUserForm.errors.validation.firstNameRequired');
+    if (!formData.lastName) newErrors.lastName = t('editUserForm.errors.validation.lastNameRequired');
     // Basic email format check (assuming email is not editable, but good practice)
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        newErrors.email = "Invalid email format";
+        newErrors.email = t('editUserForm.errors.validation.emailInvalid');
     }
-     if (!formData.birthDate) newErrors.birthDate = "Birth date is required";
+     if (!formData.birthDate) newErrors.birthDate = t('editUserForm.errors.validation.birthDateRequired');
      // Phone validation: only if filled, must be digits
     if (formData.tel && !/^\d+$/.test(formData.tel)) {
-        newErrors.tel = "Phone number must contain only digits";
+        newErrors.tel = t('editUserForm.errors.validation.phoneDigitsOnly');
     }
     setErrors(newErrors); // Use setErrors
     return Object.keys(newErrors).length === 0;
@@ -162,7 +164,7 @@ const EditUserForm = () => {
 
     const token = getToken();
     if (!token) {
-        setErrors({ submit: "Authentication required. Please log in again." }); // Use setErrors
+        setErrors({ submit: t('editUserForm.errors.submit.authRequired') });
         performLogout();
         return;
     }
@@ -183,7 +185,7 @@ const EditUserForm = () => {
 
      // If no fields changed, inform the user and don't submit
     if (Object.keys(fieldsToUpdate).length === 0) {
-        alert("No changes detected.");
+        alert(t('editUserForm.alerts.noChanges'));
         return;
     }
 
@@ -197,21 +199,22 @@ const EditUserForm = () => {
       await axios.put(`http://localhost:6952/Users/update/${id}`, fieldsToUpdate, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, // Ensure correct content type
       });
-      alert("User updated successfully!");
+      alert(t('editUserForm.alerts.updateSuccess'));
       navigate("/dashboard"); // Or navigate back to user list/profile
     } catch (error) {
       console.error("Error updating user:", error);
        if (error.response) {
             if (error.response.status === 401 || error.response.status === 403) {
-                setErrors({ submit: "Permission denied or session expired." }); // Use setErrors
+                setErrors({ submit: t('editUserForm.errors.submit.permissionDenied') });
                 performLogout();
             } else if (error.response.status === 404) {
-                setErrors({ submit: `User with ID ${id} not found.` }); // Use setErrors
+                setErrors({ submit: t('editUserForm.errors.submit.notFound', { id }) });
             } else {
-                 setErrors({ submit: error.response.data?.message || "Failed to update the user. Please try again." }); // Use setErrors
+                 // Keep backend message if available, otherwise use generic key
+                 setErrors({ submit: error.response.data?.message || t('editUserForm.errors.submit.generic') });
             }
        } else {
-            setErrors({ submit: "Network error or server unavailable. Please try again." }); // Use setErrors
+            setErrors({ submit: t('editUserForm.errors.submit.networkError') });
        }
     } finally {
       setIsSubmitting(false);
@@ -219,7 +222,7 @@ const EditUserForm = () => {
   };
 
   if (loading && !Object.keys(initialData).length) { // Show loading only on initial fetch
-    return <div className="text-center p-4">Loading user data...</div>;
+    return <div className="text-center p-4">{t('editUserForm.loading')}</div>;
   }
 
   if (errors.fetch) {
@@ -228,38 +231,36 @@ const EditUserForm = () => {
 
   return (
     <div className="edit-user-container container mt-4"> {/* Added Bootstrap container class */}
-      <h2>Edit User Profile (ID: {id})</h2>
+      <h2>{t('editUserForm.title', { id })}</h2>
       {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
 
       <form onSubmit={handleSubmit} noValidate>
         {/* Row 1: First Name, Last Name */}
         <div className="row g-3 mb-3">
           <div className="col-md-6">
-            <label htmlFor="edit-firstName" className="form-label required">First Name</label>
+            <label htmlFor="edit-firstName" className="form-label required">{t('editUserForm.labels.firstName')}</label>
             <input
               type="text"
               id="edit-firstName"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              placeholder="Enter first name"
-              className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
-              required
-            />
+               name="firstName"
+               value={formData.firstName}
+               onChange={handleInputChange}
+               className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
+               required
+             />
             <div className="invalid-feedback">{errors.firstName}</div>
           </div>
           <div className="col-md-6">
-            <label htmlFor="edit-lastName" className="form-label required">Last Name</label>
+            <label htmlFor="edit-lastName" className="form-label required">{t('editUserForm.labels.lastName')}</label>
             <input
               type="text"
               id="edit-lastName"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              placeholder="Enter last name"
-              className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
-              required
-            />
+               name="lastName"
+               value={formData.lastName}
+               onChange={handleInputChange}
+               className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
+               required
+             />
             <div className="invalid-feedback">{errors.lastName}</div>
           </div>
         </div>
@@ -267,7 +268,7 @@ const EditUserForm = () => {
         {/* Row 2: Email (Display Only), Birth Date */}
          <div className="row g-3 mb-3">
             <div className="col-md-6">
-                <label htmlFor="edit-email" className="form-label">Email</label>
+                <label htmlFor="edit-email" className="form-label">{t('editUserForm.labels.email')}</label>
                 <input
                     type="email"
                     id="edit-email"
@@ -280,7 +281,7 @@ const EditUserForm = () => {
                  {/* No validation feedback needed for read-only field */}
             </div>
             <div className="col-md-6">
-                <label htmlFor="edit-birthDate" className="form-label required">Birth Date</label>
+                <label htmlFor="edit-birthDate" className="form-label required">{t('editUserForm.labels.birthDate')}</label>
                 <input
                     type="date"
                     id="edit-birthDate"
@@ -297,29 +298,27 @@ const EditUserForm = () => {
         {/* Row 3: Telephone, Address */}
         <div className="row g-3 mb-3">
           <div className="col-md-6">
-            <label htmlFor="edit-tel" className="form-label">Telephone</label>
+            <label htmlFor="edit-tel" className="form-label">{t('editUserForm.labels.telephone')}</label>
             <input
               type="text"
               id="edit-tel"
-              name="tel"
-              value={formData.tel}
-              onChange={handleInputChange}
-              placeholder="Enter phone number (optional)"
-              className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
-            />
+               name="tel"
+               value={formData.tel}
+               onChange={handleInputChange}
+               className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
+             />
              <div className="invalid-feedback">{errors.tel}</div>
           </div>
           <div className="col-md-6">
-            <label htmlFor="edit-address" className="form-label">Address</label>
+            <label htmlFor="edit-address" className="form-label">{t('editUserForm.labels.address')}</label>
             <input
               type="text"
               id="edit-address"
-              name="address"
-              value={formData.address}
-              onChange={handleInputChange}
-              placeholder="Enter address (optional)"
-              className={`form-control ${errors.address ? 'is-invalid' : ''}`}
-            />
+               name="address"
+               value={formData.address}
+               onChange={handleInputChange}
+               className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+             />
              {/* No feedback needed for optional field */}
           </div>
         </div>
@@ -328,7 +327,7 @@ const EditUserForm = () => {
         <div className="row g-3">
             <div className="col-12 text-center">
                 <button type="submit" className="btn btn-primary btn-lg" disabled={isSubmitting}>
-                {isSubmitting ? "Updating..." : "Update User"}
+                {isSubmitting ? t('editUserForm.buttons.updating') : t('editUserForm.buttons.updateUser')}
                 </button>
             </div>
         </div>

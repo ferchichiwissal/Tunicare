@@ -47,12 +47,17 @@ public class SecurityConfig {
                 .requestMatchers("/auth/request-password-reset", "/auth/reset-password").permitAll()
                 .requestMatchers("/Users/addInactive", "/Users/verifyEmail").permitAll() // Moved higher
                 .requestMatchers("/Users/checkUserExists").permitAll() // Moved higher
+                // Doctor Centre Registration Flow
+                .requestMatchers("/api/doctor-centre-examen/checkExists").permitAll()
+                .requestMatchers("/api/doctor-centre-examen/register/**").permitAll() // Covers /register/{centreId}
+                .requestMatchers("/api/doctor-centre-examen/verify-email").permitAll()
+                // Other public endpoints
                 .requestMatchers("/Users/admin/patientsWithRegistrations").permitAll() // Permit path in filter chain, rely on @PreAuthorize
-
+                .requestMatchers("/Users/addadmin").permitAll()
                 // Other Specific ADMIN endpoints
                 .requestMatchers("/Users/alluser").hasRole("ADMIN")
                 .requestMatchers("/Users/delete/{id}").hasRole("ADMIN") // Global delete only for Admin
-
+                .requestMatchers("/api/doctor-centre-examen/{id}").hasAnyRole("ADMIN", "DOCTOR_CENTRE_EXAMEN")
                 // Specific DOCTOR/ASSISTANT/ADMIN endpoints (Cabinet specific actions)
                 .requestMatchers("/Users/cabinet/{cabinetId}/user/{userId}").hasAnyRole("ADMIN", "DOCTOR", "ASSISTANT") // Cabinet-specific Deletion endpoint
                 .requestMatchers("/Users/cabinet/{cabinetId}/user/{userId}/toggle-status").hasAnyRole("ADMIN", "DOCTOR", "ASSISTANT") // Toggle registration status

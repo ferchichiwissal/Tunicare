@@ -95,11 +95,10 @@ const ResetPasswordPage = () => {
                         <div className="mb-3">
                             <label htmlFor="newPassword" className="form-label required">New Password</label>
                             <input
-                                type="password"
-                                id="newPassword"
-                                placeholder="Enter new password (min. 8 characters)"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
+                                 type="password"
+                                 id="newPassword"
+                                 value={newPassword}
+                                 onChange={(e) => setNewPassword(e.target.value)}
                                 className={`form-control ${error && (error.includes('Password') || error.includes('match')) ? 'is-invalid' : ''}`}
                                 required
                                 minLength="8"
@@ -109,11 +108,10 @@ const ResetPasswordPage = () => {
                         <div className="mb-3">
                             <label htmlFor="confirmPassword" className="form-label required">Confirm New Password</label>
                             <input
-                                type="password"
-                                id="confirmPassword"
-                                placeholder="Confirm new password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                 type="password"
+                                 id="confirmPassword"
+                                 value={confirmPassword}
+                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 className={`form-control ${error && error.includes('match') ? 'is-invalid' : ''}`}
                                 required
                                 minLength="8"

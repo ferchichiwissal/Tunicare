@@ -62,12 +62,11 @@ const ResetPass = () => {
                         <input
                             id="reset-email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            type="email"
-                            placeholder="Enter your account email"
-                            className={`form-control ${error ? 'is-invalid' : ''}`} // Use form-control
-                            required
-                        />
+                             onChange={(e) => setEmail(e.target.value)}
+                             type="email"
+                             className={`form-control ${error ? 'is-invalid' : ''}`} // Use form-control
+                             required
+                         />
                          {/* No specific field error display here, using general error above */}
                     </div>
 

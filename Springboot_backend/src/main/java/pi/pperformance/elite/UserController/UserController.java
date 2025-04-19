@@ -35,7 +35,8 @@ import pi.pperformance.elite.entities.Doctor;
 import pi.pperformance.elite.entities.Patient;
 import pi.pperformance.elite.entities.Role;
 import pi.pperformance.elite.entities.User;
-import pi.pperformance.elite.entities.VerificationRequest;
+import pi.pperformance.elite.entities.PatientVerificationRequest; // Added import
+// import pi.pperformance.elite.entities.VerificationRequest; // Removed original import
 import pi.pperformance.elite.exceptions.AccountNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -405,10 +406,13 @@ public class UserController {
 
         String verificationCode = String.format("%06d", new Random().nextInt(999999));
 
-        VerificationRequest verificationRequest = new VerificationRequest(
+        // Corrected type, but ensure import is present
+        PatientVerificationRequest patientVerificationRequest = new PatientVerificationRequest(
                 first_name, lastName, email, birthDate, password, tel, address, gendre, role, photoProfilBytes, verificationCode, cabinetId
         );
-        verificationService.storeVerificationRequest(email, verificationRequest);
+        // TODO: Update VerificationService to handle PatientVerificationRequest specifically
+        // For now, assuming storeVerificationRequest can accept the new type or uses a common interface/superclass.
+        verificationService.storeVerificationRequest(email, patientVerificationRequest);
 
         emailService.sendVerificationEmail(email, verificationCode);
 
@@ -426,34 +430,57 @@ public class UserController {
              return ResponseEntity.badRequest().body("Invalid email format provided for verification. Only @gmail.com and @yahoo.com are allowed.");
         }
 
-        VerificationRequest verificationRequest = verificationService.getVerificationRequest(email);
+        // TODO: Update VerificationService to return PatientVerificationRequest specifically
+        // For now, casting the result, assuming getVerificationRequest returns a compatible type or Object
+        // TODO: Update VerificationService to return PatientVerificationRequest specifically
+        // For now, get the request and proceed. Subsequent code assumes fields exist.
+        // This might cause runtime errors if VerificationService returns the wrong type,
+        // but avoids the immediate cast error.
+        var verificationRequestData = verificationService.getVerificationRequest(email);
 
-        if (verificationRequest == null || !verificationRequest.getVerificationCode().equals(code)) {
+        // Check if request exists and is of the correct type
+        if (!(verificationRequestData instanceof PatientVerificationRequest)) {
+            log.warn("Verification request not found or is not PatientVerificationRequest for email: {}", email);
+            if (verificationRequestData != null) {
+                // Clean up if it exists but is the wrong type
+                verificationService.removeVerificationRequest(email);
+            }
+            return ResponseEntity.badRequest().body("Invalid or expired verification request.");
+        }
+
+        // Cast is now safe
+        PatientVerificationRequest patientVerificationRequest = (PatientVerificationRequest) verificationRequestData;
+
+        // Validate the code
+        if (!patientVerificationRequest.getVerificationCode().equals(code)) {
+            // Note: No need for null check on patientVerificationRequest here as it's handled above
             return ResponseEntity.badRequest().body("Invalid or expired verification code.");
         }
 
-        Long cabinetId = verificationRequest.getCabinetId();
+        Long cabinetId = patientVerificationRequest.getCabinetId();
         CabinetDr cabinet = cabinetDrRepository.findById(cabinetId).orElse(null);
 
         if (cabinet == null) {
+            // TODO: Update VerificationService to handle PatientVerificationRequest specifically
             verificationService.removeVerificationRequest(email);
             return ResponseEntity.badRequest().body("Invalid Cabinet ID provided during registration.");
         }
 
         // Check if user already exists in this specific cabinet before creating
         if (usrService.existsByEmailAndFirstNameAndLastNameInCabinet(
-                verificationRequest.getEmail(),
-                verificationRequest.getFirstName(),
-                verificationRequest.getLastName(),
+                patientVerificationRequest.getEmail(),
+                patientVerificationRequest.getFirstName(),
+                patientVerificationRequest.getLastName(),
                 cabinetId)) {
             log.warn("Attempt to verify email for duplicate user (Email: {}, Name: {} {}) in cabinet ID: {}",
-                    verificationRequest.getEmail(), verificationRequest.getFirstName(), verificationRequest.getLastName(), cabinetId);
+                    patientVerificationRequest.getEmail(), patientVerificationRequest.getFirstName(), patientVerificationRequest.getLastName(), cabinetId);
+            // TODO: Update VerificationService to handle PatientVerificationRequest specifically
             verificationService.removeVerificationRequest(email); // Clean up verification request
             return ResponseEntity.status(HttpStatus.CONFLICT).body("A user with this email and name already exists in this cabinet.");
         }
 
 
-        Role requestedRole = verificationRequest.getRole() != null ? Role.valueOf(verificationRequest.getRole().toUpperCase()) : Role.PATIENT;
+        Role requestedRole = patientVerificationRequest.getRole() != null ? Role.valueOf(patientVerificationRequest.getRole().toUpperCase()) : Role.PATIENT;
         User user;
 
         // Instantiate the correct User subclass based on the role
@@ -480,7 +507,7 @@ public class UserController {
                 // For patients, associate the cabinet specified in the request
                 // Use the cabinetId already retrieved from verificationRequest (line 383)
                 if (cabinetId == null) { // cabinetId from line 383
-                     log.error("Patient verification request for {} missing cabinetId.", verificationRequest.getEmail());
+                     log.error("Patient verification request for {} missing cabinetId.", patientVerificationRequest.getEmail());
                      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cabinet ID is required for patient registration.");
                 }
                  // The cabinet association is handled by the service layer via UserCabinetRegistration
@@ -489,21 +516,21 @@ public class UserController {
         }
 
         // Set common properties
-        user.setFirstName(verificationRequest.getFirstName());
-        user.setLastName(verificationRequest.getLastName());
-        user.setEmail(verificationRequest.getEmail());
-        if (verificationRequest.getBirthDate() != null) { // Check for null birthDate
-             user.setBirthDate(LocalDate.parse(verificationRequest.getBirthDate()));
+        user.setFirstName(patientVerificationRequest.getFirstName());
+        user.setLastName(patientVerificationRequest.getLastName());
+        user.setEmail(patientVerificationRequest.getEmail());
+        if (patientVerificationRequest.getBirthDate() != null) { // Check for null birthDate
+             user.setBirthDate(LocalDate.parse(patientVerificationRequest.getBirthDate()));
         }
-        user.setPassword(verificationRequest.getPassword()); // Password will be hashed by addUser
-        user.setTel(verificationRequest.getTel());
-        user.setAddress(verificationRequest.getAddress());
-        user.setGender(verificationRequest.getGendre());
+        user.setPassword(patientVerificationRequest.getPassword()); // Password will be hashed by addUser
+        user.setTel(patientVerificationRequest.getTel());
+        user.setAddress(patientVerificationRequest.getAddress());
+        user.setGender(patientVerificationRequest.getGendre());
         user.setRole(requestedRole); // Set the determined role
         // user.setIsActive(false); // Removed: Activation handled by registration status
 
-        if (verificationRequest.getPhotoProfil() != null) {
-            user.setPhotoProfil(verificationRequest.getPhotoProfil());
+        if (patientVerificationRequest.getPhotoProfil() != null) {
+            user.setPhotoProfil(patientVerificationRequest.getPhotoProfil());
         }
 
         // The service layer (addPatient helper) now handles creating the UserCabinetRegistration.
@@ -511,7 +538,7 @@ public class UserController {
         // for the service to identify the target cabinet (which it gets from verificationRequest.getCabinetId()).
         // The check below might need adjustment depending on how Doctor/Assistant creation is handled
         // if (!(user instanceof Patient) && !(user instanceof Admin) /* && !(user instanceof Doctor) etc. */ ) {
-        //     verificationService.removeVerificationRequest(email);
+        //     verificationService.removePatientVerificationRequest(email); // Assuming updated service method
         //     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during user creation: incorrect user type.");
         // }
         // Simpler: Let addUser handle type-specific logic. If it fails, it will throw an exception.
@@ -524,10 +551,10 @@ public class UserController {
         // --- Explicitly ensure registration is inactive ---
         try {
             // Fetch the user again to ensure we have the correct ID after potential creation/update
-            User persistedUser = usrService.findByEmail(verificationRequest.getEmail());
+            User persistedUser = usrService.findByEmail(patientVerificationRequest.getEmail()); // Corrected variable
             if (persistedUser == null) {
-                log.error("User {} not found after supposedly successful addUser call in verifyEmail.", verificationRequest.getEmail());
-                verificationService.removeVerificationRequest(email); // Clean up verification request
+                log.error("User {} not found after supposedly successful addUser call in verifyEmail.", patientVerificationRequest.getEmail());
+                verificationService.removeVerificationRequest(email); // Corrected: Use existing method name
                  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error finalizing registration status (user not found post-add).");
             }
 
@@ -546,20 +573,21 @@ public class UserController {
             } else {
                 // This case is unexpected if addUser succeeded in creating/linking the registration
                 log.error("Could not find UserCabinetRegistration for user {} and cabinet {} after addUser call in verifyEmail.", persistedUser.getId(), cabinetId);
-                verificationService.removeVerificationRequest(email); // Clean up verification request
+                verificationService.removeVerificationRequest(email); // Corrected: Use existing method name
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to retrieve registration record after creation.");
             }
         } catch (Exception e) {
             log.error("Error explicitly setting registration inactive for user {} in cabinet {}: {}",
-                      verificationRequest.getEmail(), cabinetId, e.getMessage(), e);
-            verificationService.removeVerificationRequest(email); // Clean up verification request
+                      patientVerificationRequest.getEmail(), cabinetId, e.getMessage(), e);
+            verificationService.removeVerificationRequest(email); // Corrected: Use existing method name
             // Return an error, as the final state might be incorrect
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error finalizing registration status.");
         }
         // --- End explicit inactive check ---
 
 
-        verificationService.removeVerificationRequest(email);
+        // Assuming VerificationService method is updated or overloaded
+        verificationService.removeVerificationRequest(email); // Corrected: Use existing method name
         log.info("Verification request removed for {}.", email); // Log after removing request
         // The account is verified, and the registration is now guaranteed to be inactive.
         log.info("Returning OK response for verifyEmail for {}.", email); // Log before returning

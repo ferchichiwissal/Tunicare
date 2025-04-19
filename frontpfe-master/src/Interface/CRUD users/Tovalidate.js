@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react"; // Added useCallback
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 import axios from "axios";
 import { getToken, clearUserData, isTokenExpired, getUserData } from "../../utils/auth"; // Corrected import path, removed getRoles
 import './Tovalidate.css'; // Custom styles
@@ -8,6 +9,7 @@ const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const CompteValide = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(); // Get translation function
   const [users, setUsers] = useState([]);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,7 +19,7 @@ const CompteValide = () => {
   // --- Logout Function ---
   const performLogout = useCallback(() => { // Wrap in useCallback
     clearUserData();
-    alert("Session expired or logged out. Redirecting to login.");
+    alert(t('tovalidate.alerts.sessionExpired'));
     navigate("/sign-in");
   }, [navigate]); // Add navigate dependency
 
@@ -120,14 +122,14 @@ const CompteValide = () => {
     } catch (error) {
       console.error(`Error loading inactive users from ${apiUrl} (Tovalidate):`, error);
       if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-        alert("Access Denied or Session Expired. Please log in again.");
+        alert(t('tovalidate.alerts.fetchFailed.auth'));
         performLogout();
       } else {
         // Handle case where Admin endpoint might not exist yet
         if (isAdmin && error.response && error.response.status === 404) {
-             alert("Failed to load inactive users: Admin endpoint might not be available.");
+             alert(t('tovalidate.alerts.fetchFailed.adminEndpointMissing'));
         } else {
-            alert("Failed to load inactive user data. Please try again later.");
+            alert(t('tovalidate.alerts.fetchFailed.generic'));
         }
       }
       setUsers([]);
@@ -149,7 +151,7 @@ const CompteValide = () => {
     console.log("[deleteUserRegistration] Clicked. currentUserDetails:", JSON.stringify(currentUserDetails));
     if (!currentUserDetails || !currentUserDetails.user || !currentUserDetails.roles) {
         console.error("[deleteUserRegistration] Check failed: currentUserDetails incomplete.", currentUserDetails);
-        alert("User details not fully loaded. Please wait or try logging in again.");
+        alert(t('tovalidate.alerts.deleteFailed.noCurrentUser'));
         return;
     }
     const token = getToken();
@@ -158,7 +160,7 @@ const CompteValide = () => {
     console.log(`[deleteUserRegistration] Context: Target User ID=${userIdToDelete}, Actor Roles=${roles}, Actor Cabinet ID=${cabinetId}`); // Log context
 
     if (!token) {
-      alert("Session invalid. Please log in again.");
+      alert(t('tovalidate.alerts.sessionInvalid'));
       performLogout();
       return;
     }
@@ -168,7 +170,7 @@ const CompteValide = () => {
 
     // For Doctor/Assistant, cabinetId is required.
     if (isDoctorOrAssistant && !cabinetId) {
-        alert("Cannot perform action: Your cabinet information is missing.");
+        alert(t('tovalidate.alerts.deleteFailed.missingCabinetInfo'));
         return;
     }
 
@@ -176,13 +178,13 @@ const CompteValide = () => {
     // Option 1: Disable for Admin. Option 2: Try to find the user's cabinet (needs API change or more data).
     // Let's disable for Admin for now on this specific component.
     if (isAdmin) {
-        alert("Admin cannot cancel registration directly from this screen without cabinet context (UI enhancement needed). Use the main User Management screen if applicable.");
+        alert(t('tovalidate.alerts.deleteFailed.adminLimitation'));
         return;
     }
 
     // Construct the specific registration deletion URL
     const deleteUrl = `http://localhost:6952/Users/cabinet/${cabinetId}/user/${userIdToDelete}`;
-    const confirmationMessage = `Are you sure you want to delete this user's registration request from your cabinet (ID: ${cabinetId})?`;
+    const confirmationMessage = t('tovalidate.confirmations.deleteRegistration', { userId: userIdToDelete, cabinetId });
 
 
     if (window.confirm(confirmationMessage)) {
@@ -191,7 +193,7 @@ const CompteValide = () => {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then(() => {
-          alert("User registration request cancelled (deleted).");
+          alert(t('tovalidate.alerts.deleteSuccess'));
           setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userIdToDelete));
         })
         .catch((error) => {
@@ -200,15 +202,15 @@ const CompteValide = () => {
             const status = error.response.status;
             const message = error.response.data?.message || "An error occurred.";
              if (status === 401 || status === 403) {
-               alert(`Permission Denied or Session Expired: ${message}`);
+               alert(t('tovalidate.alerts.deleteFailed.authWithMessage', { message }));
                performLogout();
              } else if (status === 404) {
-                alert(`Not Found: ${message}`);
+                alert(t('tovalidate.alerts.deleteFailed.notFoundWithMessage', { message }));
              } else {
-               alert(`Failed to delete registration: ${message}`);
+               alert(t('tovalidate.alerts.deleteFailed.genericWithMessage', { message }));
              }
           } else {
-             alert("Failed to delete the registration due to a network or unexpected error.");
+             alert(t('tovalidate.alerts.deleteFailed.networkError'));
           }
         });
     }
@@ -219,7 +221,7 @@ const CompteValide = () => {
     console.log("[activatePatient] Clicked. currentUserDetails:", JSON.stringify(currentUserDetails));
     if (!currentUserDetails || !currentUserDetails.user || !currentUserDetails.roles) {
         console.error("[activatePatient] Check failed: currentUserDetails incomplete.", currentUserDetails);
-        alert("User details not fully loaded. Please wait or try logging in again.");
+        alert(t('tovalidate.alerts.activateFailed.noCurrentUser')); // Reuse similar key structure
         return;
     }
     const token = getToken();
@@ -228,7 +230,7 @@ const CompteValide = () => {
     console.log(`[activatePatient] Context: Target Patient ID=${patientId}, Actor Roles=${roles}, Actor Cabinet ID=${cabinetId}`); // Log context
 
     if (!token) {
-      alert("Session invalid. Please log in again.");
+      alert(t('tovalidate.alerts.sessionInvalid')); // Reuse session invalid alert
       performLogout();
       return;
     }
@@ -237,13 +239,13 @@ const CompteValide = () => {
     const isAuthorized = (roles.includes("ROLE_DOCTOR") || roles.includes("ROLE_ASSISTANT")) && cabinetId;
     if (!isAuthorized) {
       // Admin cannot use this button here as we don't know the target cabinet context
-      alert("Only Doctors or Assistants associated with a cabinet can confirm registrations from this screen.");
+      alert(t('tovalidate.alerts.activateFailed.permission'));
       return;
     }
 
     const targetCabinetId = cabinetId; // Use the logged-in Doctor/Assistant's cabinet ID
 
-    if (window.confirm(`Are you sure you want to activate patient ID ${patientId} in your cabinet (${targetCabinetId})?`)) {
+    if (window.confirm(t('tovalidate.confirmations.activatePatient', { patientId, cabinetId: targetCabinetId }))) {
       axios
              // toggleUrl = `http://localhost:6952/Users/cabinet/${actorCabinetId}/user/${targetUserId}/toggle-status`;
 
@@ -254,12 +256,12 @@ const CompteValide = () => {
         .then((response) => {
            const isActive = response.data?.isActiveNow;
            if (isActive) { // Check if the toggle resulted in activation
-             alert("Patient has been successfully activated.");
+             alert(t('tovalidate.alerts.activateSuccess'));
              // Remove the user from this list as they are now active
              setUsers((prevUsers) => prevUsers.filter((user) => user.id !== patientId));
            } else {
              // This shouldn't happen if we are activating an inactive user, but handle defensively
-             alert("Patient status toggled, but they are still inactive. Please check the details.");
+             alert(t('tovalidate.alerts.activateFailed.stillInactive'));
              console.warn("Toggle endpoint called, but user remained inactive:", response.data);
              // Optionally refetch the list here to show the current (still inactive) state
            }
@@ -270,17 +272,17 @@ const CompteValide = () => {
             const status = error.response.status;
             const message = error.response.data?.message || "An error occurred.";
             if (status === 401 || status === 403) {
-              alert(`Permission Denied or Session Expired: ${message}`);
+              alert(t('tovalidate.alerts.activateFailed.authWithMessage', { message }));
               performLogout();
             } else if (status === 404) {
-              alert(`Not Found: ${message}`);
+              alert(t('tovalidate.alerts.activateFailed.notFoundWithMessage', { message }));
             } else if (status === 400) {
-               alert(`Bad Request: ${message}`);
+               alert(t('tovalidate.alerts.activateFailed.badRequestWithMessage', { message }));
             } else {
-              alert(`Failed to activate patient: ${message}`);
+              alert(t('tovalidate.alerts.activateFailed.genericWithMessage', { message }));
             }
           } else {
-            alert("Failed to activate the patient due to a network or unexpected error.");
+            alert(t('tovalidate.alerts.activateFailed.networkError'));
           }
         });
     }
@@ -292,7 +294,7 @@ const CompteValide = () => {
 
     if (!currentUserDetails || !currentUserDetails.user || !currentUserDetails.roles) {
         console.error("[handleToggleStatus Tovalidate] Check failed: currentUserDetails incomplete.", currentUserDetails);
-        alert("User details not fully loaded. Please wait or try logging in again.");
+        alert(t('tovalidate.alerts.toggleFailed.noCurrentUser')); // Reuse key structure
         return;
     }
     const token = getToken();
@@ -304,7 +306,7 @@ const CompteValide = () => {
     console.log(`[handleToggleStatus Tovalidate] Context: Target User ID=${targetUserId}, Target Role=${targetUserRole}, Actor Roles=${actorRoles}, Actor Cabinet ID=${actorCabinetId}`);
 
     if (!token) {
-      alert("Session invalid. Please log in again.");
+      alert(t('tovalidate.alerts.sessionInvalid')); // Reuse session invalid alert
       performLogout();
       return;
     }
@@ -315,25 +317,25 @@ const CompteValide = () => {
     // Determine API endpoint based on TARGET user's role
     if (targetUserRole === 'PATIENT') {
         if (!actorCabinetId) {
-            alert("Cannot toggle patient status: Your cabinet information is missing.");
+            alert(t('tovalidate.alerts.toggleFailed.missingCabinetInfo')); // Reuse key structure
             return;
         }
         if (actorRoles.includes("ROLE_ADMIN")) {
-             alert("Admin role cannot use this toggle button for patients without specifying a target cabinet (UI enhancement needed).");
+             alert(t('tovalidate.alerts.toggleFailed.adminLimitation')); // Reuse key structure
              return;
         }
         // Corrected URL
         toggleUrl = `http://localhost:6952/Users/cabinet/${actorCabinetId}/user/${targetUserId}/toggle-status`;
         // Since this list shows inactive users, toggling likely means activating
-        confirmationMessage = `Are you sure you want to activate patient ID ${targetUserId} in your cabinet (ID: ${actorCabinetId})?`;
+        confirmationMessage = t('tovalidate.confirmations.activatePatient', { patientId: targetUserId, cabinetId: actorCabinetId }); // Reuse activate confirmation
 
     } else if (targetUserRole === 'DOCTOR' || targetUserRole === 'ASSISTANT') {
         // Toggling Doctor/Assistant status might not be relevant in "Tovalidate" list
         // but implement the call if needed.
         toggleUrl = `http://localhost:6952/Users/users/${targetUserId}/toggle-direct-status`;
-        confirmationMessage = `Are you sure you want to toggle the active status for ${targetUserRole.toLowerCase()} ID ${targetUserId}? (This user might be removed from this list if activated)`;
+        confirmationMessage = t('tovalidate.confirmations.toggleDoctorAssistant', { role: targetUserRole.toLowerCase(), userId: targetUserId });
     } else {
-        alert(`Cannot toggle status for user role: ${targetUserRole}`);
+        alert(t('tovalidate.alerts.toggleFailed.invalidRole', { role: targetUserRole })); // Reuse key structure
         return;
     }
 
@@ -345,7 +347,7 @@ const CompteValide = () => {
         })
         .then((response) => {
           const newStatus = response.data?.isActiveNow;
-          alert(`${targetUserRole} status successfully toggled. New status: ${newStatus ? 'Active' : 'Inactive'}.`);
+          alert(t('tovalidate.alerts.toggleSuccess', { role: targetUserRole, status: newStatus ? t('tovalidate.status.active') : t('tovalidate.status.inactive') }));
           console.log("Toggle status response:", response.data);
           fetchUsers(); // Refetch the list
         })
@@ -355,17 +357,17 @@ const CompteValide = () => {
             const status = error.response.status;
             const message = error.response.data?.message || "An error occurred.";
             if (status === 401 || status === 403) {
-              alert(`Permission Denied or Session Expired: ${message}`);
+              alert(t('tovalidate.alerts.toggleFailed.authWithMessage', { message })); // Reuse key structure
               performLogout();
             } else if (status === 404) {
-              alert(`Not Found: ${message}`);
+              alert(t('tovalidate.alerts.toggleFailed.notFoundWithMessage', { message })); // Reuse key structure
             } else if (status === 400) {
-              alert(`Bad Request: ${message}`);
+              alert(t('tovalidate.alerts.toggleFailed.badRequestWithMessage', { message })); // Reuse key structure
             } else {
-              alert(`Failed to toggle status: ${message}`);
+              alert(t('tovalidate.alerts.toggleFailed.genericWithMessage', { message })); // Reuse key structure
             }
           } else {
-            alert(`Failed to toggle the ${targetUserRole} status due to a network or unexpected error.`);
+            alert(t('tovalidate.alerts.toggleFailed.networkError', { role: targetUserRole })); // Reuse key structure
           }
         })
         .finally(() => {
@@ -387,33 +389,33 @@ const CompteValide = () => {
   // Render the user table
   return (
     <div>
-      <h2>Users Pending Validation</h2>
+      <h2>{t('tovalidate.title')}</h2>
       <input
         type="text"
-        placeholder="Search by first name and last name (e.g., John Doe)"
+        placeholder={t('tovalidate.searchPlaceholder')}
         value={searchTerm}
          onChange={(e) => setSearchTerm(e.target.value)}
          className="form-control mb-4" // Use Bootstrap class
        />
-       {loading && <p>Loading...</p>}
+       {loading && <p>{t('tovalidate.loading')}</p>}
        {/* Add Bootstrap responsive table wrapper */}
        <div className="table-responsive">
          <table className="table table-striped table-hover custom-table"> {/* Add Bootstrap table classes */}
         <thead>
           <tr>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th> {/* Changed header */}
-            <th>Actions</th>
+            <th>{t('tovalidate.tableHeaders.id')}</th>
+            <th>{t('tovalidate.tableHeaders.firstName')}</th>
+            <th>{t('tovalidate.tableHeaders.lastName')}</th>
+            <th>{t('tovalidate.tableHeaders.email')}</th>
+            <th>{t('tovalidate.tableHeaders.role')}</th>
+            <th>{t('tovalidate.tableHeaders.status')}</th> {/* Changed header */}
+            <th>{t('tovalidate.tableHeaders.actions')}</th>
           </tr>
         </thead>
         <tbody>
           {!loading && filteredUsers.length === 0 ? (
             <tr>
-              <td colSpan="7">No users pending validation found</td>
+              <td colSpan="7">{t('tovalidate.noUsersFound')}</td>
             </tr>
           ) : (
             filteredUsers.map((user) => (
@@ -423,14 +425,14 @@ const CompteValide = () => {
                 <td>{user.lastName}</td>
                 <td>{user.email}</td>
                 <td>{user.role}</td>
-                <td>{user.displayStatus ? <span className="badge bg-success">Active</span> : <span className="badge bg-secondary">Inactive/Pending</span>}</td> {/* Use Bootstrap badges */}
+                <td>{user.displayStatus ? <span className="badge bg-success">{t('tovalidate.status.active')}</span> : <span className="badge bg-secondary">{t('tovalidate.status.inactivePending')}</span>}</td> {/* Use Bootstrap badges */}
                 <td>
                   {/* Use Bootstrap button classes */}
                   <button onClick={() => handleToggleStatus(user)} className="btn btn-sm btn-success me-1" disabled={loading}> {/* Activate button */}
-                    Activate
+                    {t('tovalidate.buttons.activate')}
                   </button>
                   <button onClick={() => deleteUserRegistration(user.id)} className="btn btn-sm btn-danger" disabled={loading}> {/* Cancel/Delete button */}
-                    Cancel
+                    {t('tovalidate.buttons.cancel')}
                   </button>
                 </td>
               </tr>

@@ -14,9 +14,12 @@ public class VerificationRequest {
     private String role;
     private byte[] photoProfil; // Stocker la photo sous forme de byte[]
     private String verificationCode;
-    private Long cabinetId; // Added cabinetId
+    private Long cabinetId; // For Patient/Cabinet registration
+    private Long centreId; // For DoctorCentreDexamen registration
+    private String speciality; // For DoctorCentreDexamen registration
 
-    public VerificationRequest(String firstName, String lastName, String email, String birthDate, String password, String tel, String address, String gendre, String role, byte[] photoProfil, String verificationCode, Long cabinetId) { // Added cabinetId to constructor
+    // Constructor updated to include new fields (make them nullable or adjust calls)
+    public VerificationRequest(String firstName, String lastName, String email, String birthDate, String password, String tel, String address, String gendre, String role, byte[] photoProfil, String verificationCode, Long cabinetId, Long centreId, String speciality) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -28,7 +31,9 @@ public class VerificationRequest {
         this.role = role;
         this.photoProfil = photoProfil;
         this.verificationCode = verificationCode;
-        this.cabinetId = cabinetId; // Assign cabinetId
+        this.cabinetId = cabinetId;
+        this.centreId = centreId;
+        this.speciality = speciality;
     }
 
 
@@ -127,5 +132,22 @@ public class VerificationRequest {
 
     public void setCabinetId(Long cabinetId) {
         this.cabinetId = cabinetId;
+    }
+
+    // Getters and Setters for new fields
+    public Long getCentreId() {
+        return centreId;
+    }
+
+    public void setCentreId(Long centreId) {
+        this.centreId = centreId;
+    }
+
+    public String getSpeciality() {
+        return speciality;
+    }
+
+    public void setSpeciality(String speciality) {
+        this.speciality = speciality;
     }
 }

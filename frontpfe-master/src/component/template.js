@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useContext } from "react"; // Import useContext
 import { useTranslation } from "react-i18next";
+import ThemeContext from "../utils/ThemeContext"; // Import ThemeContext
 
 const Template = () => {
   const { t, i18n } = useTranslation();
+  const { theme, toggleTheme } = useContext(ThemeContext); // Get theme and toggle function
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -71,6 +73,19 @@ const Template = () => {
                       <option value="en">English</option>
                       <option value="fr">Français</option>
                      </select>
+                     {/* Theme Toggle Button */}
+                     <button
+                       onClick={toggleTheme}
+                       className="btn btn-outline-secondary ml-2" // Added margin-left
+                       style={{ padding: "5px 10px", borderRadius: "5px" }}
+                       aria-label="Toggle theme"
+                     >
+                       {theme === 'light' ? (
+                         <i className="fa fa-moon-o" aria-hidden="true"></i> // Moon icon for dark mode
+                       ) : (
+                         <i className="fa fa-sun-o" aria-hidden="true"></i> // Sun icon for light mode
+                       )}
+                     </button>
                      <a>
                       <i></i>
                       <span>{}</span>
@@ -94,103 +109,104 @@ const Template = () => {
         </header>
 
         
-    <section class="slider_section ">
-      <div class="dot_design">
+    <section className="slider_section ">
+      <div className="dot_design">
         <img src="images/dots.png" alt=""/>
       </div>
-      <div id="customCarousel1" class="carousel slide" data-ride="carousel">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <div class="container ">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="detail-box">
-                    <div class="play_btn">
+      <div id="customCarousel1" className="carousel slide" data-ride="carousel">
+        <div className="carousel-inner">
+          <div className="carousel-item active">
+            <div className="container ">
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="detail-box">
+                    <div className="play_btn">
                       <button>
-                        <i class="fa fa-play" aria-hidden="true"></i>
+                        <i className="fa fa-play" aria-hidden="true"></i>
                       </button>
                     </div>
                     <h1>
-                      Mico <br></br>
+                      {t('home.slider.title')} <br></br>
                       <span>
-                        Hospital
-                      </span> 
-
+                        {t('home.slider.subtitle')}
+                      </span>
                     </h1>
                     <p>
-                      when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to
+                      {t('home.slider.description')}
                     </p>
                     <a href="">
-                      Contact Us
+                      {t('home.slider.contactButton')}
                     </a>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="img-box">
+                <div className="col-md-6">
+                  <div className="img-box">
                     <img src="images/slider-img.jpg" alt=""/>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="carousel-item">
-            <div class="container ">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="detail-box">
-                    <div class="play_btn">
+          <div className="carousel-item">
+            <div className="container ">
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="detail-box">
+                    <div className="play_btn">
                       <button>
-                        <i class="fa fa-play" aria-hidden="true"></i>
+                        <i className="fa fa-play" aria-hidden="true"></i>
                       </button>
                     </div>
+                    {/* Repeat the same content for other carousel items or customize */}
                     <h1>
-                    Mico <br></br>
-                    <span>
-                        Hospital
+                      {t('home.slider.title')} <br></br>
+                      <span>
+                        {t('home.slider.subtitle')}
                       </span>
                     </h1>
                     <p>
-                      when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to
+                      {t('home.slider.description')}
                     </p>
                     <a href="">
-                      Contact Us
+                      {t('home.slider.contactButton')}
                     </a>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="img-box">
+                <div className="col-md-6">
+                  <div className="img-box">
                     <img src="images/slider-img.jpg" alt=""/>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="carousel-item">
-            <div class="container ">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="detail-box">
-                    <div class="play_btn">
+          <div className="carousel-item">
+            <div className="container ">
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="detail-box">
+                    <div className="play_btn">
                       <button>
-                        <i class="fa fa-play" aria-hidden="true"></i>
+                        <i className="fa fa-play" aria-hidden="true"></i>
                       </button>
                     </div>
-                    <h1>
-                      Mico <br></br>
+                    {/* Repeat the same content for other carousel items or customize */}
+                     <h1>
+                      {t('home.slider.title')} <br></br>
                       <span>
-                        Hospital
+                        {t('home.slider.subtitle')}
                       </span>
                     </h1>
                     <p>
-                      when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to
+                      {t('home.slider.description')}
                     </p>
                     <a href="">
-                      Contact Us
+                      {t('home.slider.contactButton')}
                     </a>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="img-box">
+                <div className="col-md-6">
+                  <div className="img-box">
                     <img src="images/slider-img.jpg" alt=""/>
                   </div>
                 </div>
@@ -198,14 +214,14 @@ const Template = () => {
             </div>
           </div>
         </div>
-        <div class="carousel_btn-box">
-          <a class="carousel-control-prev" href="#customCarousel1" role="button" data-slide="prev">
+        <div className="carousel_btn-box">
+          <a className="carousel-control-prev" href="#customCarousel1" role="button" data-slide="prev">
             <img src="images/prev.png" alt=""/>
-            <span class="sr-only">Previous</span>
+            <span className="sr-only">{t('previous')}</span>
           </a>
-          <a class="carousel-control-next" href="#customCarousel1" role="button" data-slide="next">
+          <a className="carousel-control-next" href="#customCarousel1" role="button" data-slide="next">
             <img src="images/next.png" alt=""/>
-            <span class="sr-only">Next</span>
+            <span className="sr-only">{t('next')}</span>
           </a>
         </div>
       </div>
@@ -215,57 +231,55 @@ const Template = () => {
 
 
  
-  <section class="book_section layout_padding">
-    <div class="container">
-      <div class="row">
-        <div class="col">
+  <section className="book_section layout_padding">
+    <div className="container">
+      <div className="row">
+        <div className="col">
           <form>
             <h4>
-              BOOK <span>APPOINTMENT</span>
+              {t('home.bookAppointment.title')} <span>{t('home.bookAppointment.titleHighlight')}</span>
             </h4>
-            <div class="form-row ">
-              <div class="form-group col-lg-4">
-                <label for="inputPatientName">Patient Name </label>
-                <input type="text" class="form-control" id="inputPatientName" placeholder=""/>
+            <div className="form-row ">
+              <div className="form-group col-lg-4">
+                <label htmlFor="inputPatientName">{t('patientName')}</label>
+                <input type="text" className="form-control" id="inputPatientName" placeholder={t('fullName')} readOnly />
               </div>
-              <div class="form-group col-lg-4">
-                <label for="inputDoctorName">Doctor's Name</label>
-                <select name="" class="form-control wide" id="inputDoctorName">
-                  <option value="Normal distribution ">Normal distribution </option>
-                  <option value="Normal distribution ">Normal distribution </option>
-                  <option value="Normal distribution ">Normal distribution </option>
+              <div className="form-group col-lg-4">
+                <label htmlFor="inputDoctorName">{t('doctorsName')}</label>
+                <select name="" className="form-control wide" id="inputDoctorName" disabled>
+                  <option value="">{t('home.bookAppointment.doctorPlaceholder')}</option>
+                  {/* Add actual doctor options dynamically later */}
                 </select>
               </div>
-              <div class="form-group col-lg-4">
-                <label for="inputDepartmentName">Department's Name</label>
-                <select name="" class="form-control wide" id="inputDepartmentName">
-                  <option value="Normal distribution ">Normal distribution </option>
-                  <option value="Normal distribution ">Normal distribution </option>
-                  <option value="Normal distribution ">Normal distribution </option>
+              <div className="form-group col-lg-4">
+                <label htmlFor="inputDepartmentName">{t('departmentName')}</label>
+                <select name="" className="form-control wide" id="inputDepartmentName" disabled>
+                  <option value="">{t('home.bookAppointment.departmentPlaceholder')}</option>
+                   {/* Add actual department options dynamically later */}
                 </select>
               </div>
             </div>
-            <div class="form-row ">
-              <div class="form-group col-lg-4">
-                <label for="inputPhone">Phone Number</label>
-                <input type="number" class="form-control" id="inputPhone" placeholder="XXXXXXXXXX"/>
+            <div className="form-row ">
+              <div className="form-group col-lg-4">
+                <label htmlFor="inputPhone">{t('phoneNumber')}</label>
+                <input type="number" className="form-control" id="inputPhone" placeholder={t('home.bookAppointment.phonePlaceholder')} readOnly/>
               </div>
-              <div class="form-group col-lg-4">
-                <label for="inputSymptoms">Symptoms</label>
-                <input type="text" class="form-control" id="inputSymptoms" placeholder=""/>
+              <div className="form-group col-lg-4">
+                <label htmlFor="inputSymptoms">{t('symptoms')}</label>
+                <input type="text" className="form-control" id="inputSymptoms" placeholder={t('home.bookAppointment.symptomsPlaceholder')} readOnly/>
               </div>
-              <div class="form-group col-lg-4">
-                <label for="inputDate">Choose Date </label>
-                <div class="input-group date" id="inputDate" data-date-format="mm-dd-yyyy">
-                  <input type="text" class="form-control" readonly/>
-                  <span class="input-group-addon date_icon">
-                    <i class="fa fa-calendar" aria-hidden="true"></i>
+              <div className="form-group col-lg-4">
+                <label htmlFor="inputDate">{t('chooseDate')}</label>
+                <div className="input-group date" id="inputDate" data-date-format="mm-dd-yyyy">
+                  <input type="text" className="form-control" readOnly/>
+                  <span className="input-group-addon date_icon">
+                    <i className="fa fa-calendar" aria-hidden="true"></i>
                   </span>
                 </div>
               </div>
             </div>
-            <div class="btn-box">
-              <button type="submit" class="btn ">Submit Now</button>
+            <div className="btn-box">
+              <button type="submit" className="btn ">{t('submitNow')}</button>
             </div>
           </form>
         </div>
@@ -276,26 +290,26 @@ const Template = () => {
 
  
 
-  <section class="about_section">
-    <div class="container  ">
-      <div class="row">
-        <div class="col-md-6 ">
-          <div class="img-box">
-            <img src="images/about-img.jpg" alt=""/>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="detail-box">
-            <div class="heading_container">
+  <section className="about_section">
+    <div className="container  ">
+      <div className="row">
+         <div className="col-md-6 ">
+           <div className="img-box">
+             <img src="images/about-img.jpg" alt=""/>
+           </div>
+         </div>
+        <div className="col-md-6">
+          <div className="detail-box">
+            <div className="heading_container">
               <h2>
-                About <span>Hospital</span>
+                {t('home.about.title')} <span>{t('home.about.subtitle')}</span>
               </h2>
             </div>
             <p>
-              has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors
+              {t('home.about.description')}
             </p>
             <a href="">
-              Read More
+              {t('home.about.readMoreButton')}
             </a>
           </div>
         </div>
@@ -305,85 +319,84 @@ const Template = () => {
 
    
 
-  <section class="treatment_section layout_padding">
-    <div class="side_img">
+  <section className="treatment_section layout_padding">
+    <div className="side_img">
       <img src="images/treatment-side-img.jpg" alt=""/>
     </div>
-    <div class="container">
-      <div class="heading_container heading_center">
+    <div className="container">
+      <div className="heading_container heading_center">
         <h2>
-          Hospital <span>Treatment</span>
+          {t('home.features.title')} <span>{t('home.features.subtitle')}</span>
         </h2>
       </div>
-      <div class="row">
-        <div class="col-md-6 col-lg-3">
-          <div class="box ">
-            <div class="img-box">
+      <div className="row">
+        <div className="col-md-6 col-lg-3">
+          <div className="box ">
+            <div className="img-box">
               <img src="images/t1.png" alt=""/>
             </div>
-            <div class="detail-box">
+            <div className="detail-box">
               <h4>
-                Nephrologist Care
+                {t('home.features.appointments.title')}
               </h4>
               <p>
-                alteration in some form, by injected humour, or randomised words which don't look even slightly e sure there isn't anything
+                {t('home.features.appointments.description')}
               </p>
               <a href="">
-                Read More
+                {t('home.features.readMoreButton')}
               </a>
             </div>
           </div>
         </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="box ">
-            <div class="img-box">
+        <div className="col-md-6 col-lg-3">
+          <div className="box ">
+            <div className="img-box">
               <img src="images/t2.png" alt=""/>
             </div>
-            <div class="detail-box">
+            <div className="detail-box">
               <h4>
-                Eye Care
+                {t('home.features.consultations.title')}
               </h4>
               <p>
-                alteration in some form, by injected humour, or randomised words which don't look even slightly e sure there isn't anything
+                {t('home.features.consultations.description')}
               </p>
               <a href="">
-                Read More
+                {t('home.features.readMoreButton')}
               </a>
             </div>
           </div>
         </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="box ">
-            <div class="img-box">
+        <div className="col-md-6 col-lg-3">
+          <div className="box ">
+            <div className="img-box">
               <img src="images/t3.png" alt=""/>
             </div>
-            <div class="detail-box">
+            <div className="detail-box">
               <h4>
-                Pediatrician Clinic
+                {t('home.features.exams.title')}
               </h4>
               <p>
-                alteration in some form, by injected humour, or randomised words which don't look even slightly e sure there isn't anything
+                {t('home.features.exams.description')}
               </p>
               <a href="">
-                Read More
+                {t('home.features.readMoreButton')}
               </a>
             </div>
           </div>
         </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="box ">
-            <div class="img-box">
-              <img src="images/t4.png" alt=""/>
-            </div>
-            <div class="detail-box">
+        <div className="col-md-6 col-lg-3">
+          <div className="box ">
+            {/* Removed img-box again for alignment */}
+            <div className="detail-box">
+              <img src="/images/t4.png" alt={t('home.features.reports.title')} style={{ maxWidth: '100%', height: 'auto', marginBottom: '10px' }} />
               <h4>
-                Parental Care
+                {t('home.features.reports.title')}
               </h4>
               <p>
-                alteration in some form, by injected humour, or randomised words which don't look even slightly e sure there isn't anything
+                {t('home.features.reports.description')}
               </p>
               <a href="">
-                Read More
+                {t('home.features.readMoreButton')}
               </a>
             </div>
           </div>
@@ -393,97 +406,98 @@ const Template = () => {
   </section>
 
    
-  <section class="team_section layout_padding">
-    <div class="container">
-      <div class="heading_container heading_center">
+  <section className="team_section layout_padding">
+    <div className="container">
+      <div className="heading_container heading_center">
+        {/* Removed span for uniform color */}
         <h2>
-          Our <span>Doctors</span>
+          {t('home.doctors.title')} {t('home.doctors.titleHighlight')}
         </h2>
       </div>
-      <div class="carousel-wrap ">
-        <div class="owl-carousel team_carousel">
-          <div class="item">
-            <div class="box">
-              <div class="img-box">
+      <div className="carousel-wrap ">
+        <div className="owl-carousel team_carousel">
+          <div className="item">
+            <div className="box">
+              <div className="img-box">
                 <img src="images/team1.jpg" alt="" />
               </div>
-              <div class="detail-box">
+              <div className="detail-box">
                 <h5>
-                  Hennry
+                  {t('home.doctors.doctor1.name')}
                 </h5>
                 <h6>
-                  MBBS
+                  {t('home.doctors.doctor1.specialty')}
                 </h6>
-                <div class="social_box">
+                <div className="social_box">
                   <a href="">
-                    <i class="fa fa-facebook" aria-hidden="true"></i>
+                    <i className="fa fa-facebook" aria-hidden="true"></i>
                   </a>
                   <a href="">
-                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                    <i className="fa fa-twitter" aria-hidden="true"></i>
                   </a>
                   <a href="">
-                    <i class="fa fa-linkedin" aria-hidden="true"></i>
+                    <i className="fa fa-linkedin" aria-hidden="true"></i>
                   </a>
                   <a href="">
-                    <i class="fa fa-instagram" aria-hidden="true"></i>
+                    <i className="fa fa-instagram" aria-hidden="true"></i>
                   </a>
                 </div>
               </div>
             </div>
           </div>
-          <div class="item">
-            <div class="box">
-              <div class="img-box">
+          <div className="item">
+            <div className="box">
+              <div className="img-box">
                 <img src="images/team2.jpg" alt="" />
               </div>
-              <div class="detail-box">
+              <div className="detail-box">
                 <h5>
-                  Jenni
+                  {t('home.doctors.doctor2.name')}
                 </h5>
                 <h6>
-                  MBBS
+                  {t('home.doctors.doctor2.specialty')}
                 </h6>
-                <div class="social_box">
+                <div className="social_box">
                   <a href="">
-                    <i class="fa fa-facebook" aria-hidden="true"></i>
+                    <i className="fa fa-facebook" aria-hidden="true"></i>
                   </a>
                   <a href="">
-                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                    <i className="fa fa-twitter" aria-hidden="true"></i>
                   </a>
                   <a href="">
-                    <i class="fa fa-linkedin" aria-hidden="true"></i>
+                    <i className="fa fa-linkedin" aria-hidden="true"></i>
                   </a>
                   <a href="">
-                    <i class="fa fa-instagram" aria-hidden="true"></i>
+                    <i className="fa fa-instagram" aria-hidden="true"></i>
                   </a>
                 </div>
               </div>
             </div>
           </div>
-          <div class="item">
-            <div class="box">
-              <div class="img-box">
+          <div className="item">
+            <div className="box">
+              <div className="img-box">
                 <img src="images/team3.jpg" alt="" />
               </div>
-              <div class="detail-box">
+              <div className="detail-box">
                 <h5>
-                  Morco
+                  {t('home.doctors.doctor3.name')}
                 </h5>
                 <h6>
-                  MBBS
+                  {t('home.doctors.doctor3.specialty')}
                 </h6>
-                <div class="social_box">
+                <div className="social_box">
                   <a href="">
-                    <i class="fa fa-facebook" aria-hidden="true"></i>
+                    <i className="fa fa-facebook" aria-hidden="true"></i>
                   </a>
                   <a href="">
-                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                    <i className="fa fa-twitter" aria-hidden="true"></i>
                   </a>
                   <a href="">
-                    <i class="fa fa-linkedin" aria-hidden="true"></i>
+                    <i className="fa fa-linkedin" aria-hidden="true"></i>
                   </a>
                   <a href="">
-                    <i class="fa fa-instagram" aria-hidden="true"></i>
+                    <i className="fa fa-instagram" aria-hidden="true"></i>
                   </a>
                 </div>
               </div>
@@ -496,119 +510,119 @@ const Template = () => {
 
  
 
-   <section class="client_section layout_padding">
-    <div class="container">
-      <div class="heading_container">
+   <section className="client_section layout_padding">
+    <div className="container">
+      <div className="heading_container">
         <h2>
-          <span>Testimonial</span>
+          {t('testimonialTitle')} <span>{t('testimonialTitleHighlight')}</span>
         </h2>
       </div>
     </div>
-    <div class="container px-0">
-      <div id="customCarousel2" class="carousel  carousel-fade" data-ride="carousel">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <div class="box">
-              <div class="client_info">
-                <div class="client_name">
+    <div className="container px-0">
+      <div id="customCarousel2" className="carousel  carousel-fade" data-ride="carousel">
+        <div className="carousel-inner">
+          <div className="carousel-item active">
+            <div className="box">
+              <div className="client_info">
+                <div className="client_name">
                   <h5>
-                    Morijorch
+                    {t('testimonial1Author')}
                   </h5>
                   <h6>
-                    Default model text
+                    {t('testimonial1Location')}
                   </h6>
                 </div>
-                <i class="fa fa-quote-left" aria-hidden="true"></i>
+                <i className="fa fa-quote-left" aria-hidden="true"></i>
               </div>
               <p>
-                editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Variouseditors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Variouseditors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various
+                {t('testimonial1Text')}
               </p>
             </div>
           </div>
-          <div class="carousel-item">
-            <div class="box">
-              <div class="client_info">
-                <div class="client_name">
+          <div className="carousel-item">
+            <div className="box">
+              <div className="client_info">
+                <div className="client_name">
                   <h5>
-                    Rochak
+                    {t('testimonial2Author')}
                   </h5>
                   <h6>
-                    Default model text
+                    {t('testimonial2Location')}
                   </h6>
                 </div>
-                <i class="fa fa-quote-left" aria-hidden="true"></i>
+                <i className="fa fa-quote-left" aria-hidden="true"></i>
               </div>
               <p>
-                Variouseditors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Variouseditors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy.
+                {t('testimonial2Text')}
               </p>
             </div>
           </div>
-          <div class="carousel-item">
-            <div class="box">
-              <div class="client_info">
-                <div class="client_name">
+          <div className="carousel-item">
+            <div className="box">
+              <div className="client_info">
+                <div className="client_name">
                   <h5>
-                    Brad Johns
+                    {t('testimonial3Author')}
                   </h5>
                   <h6>
-                    Default model text
+                    {t('testimonial3Location')}
                   </h6>
                 </div>
-                <i class="fa fa-quote-left" aria-hidden="true"></i>
+                <i className="fa fa-quote-left" aria-hidden="true"></i>
               </div>
               <p>
-                Variouseditors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy, editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Variouseditors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various
+                {t('testimonial3Text')}
               </p>
             </div>
           </div>
         </div>
-        <div class="carousel_btn-box">
-          <a class="carousel-control-prev" href="#customCarousel2" role="button" data-slide="prev">
-            <i class="fa fa-angle-left" aria-hidden="true"></i>
-            <span class="sr-only">Previous</span>
+        <div className="carousel_btn-box">
+          <a className="carousel-control-prev" href="#customCarousel2" role="button" data-slide="prev">
+            <i className="fa fa-angle-left" aria-hidden="true"></i>
+            <span className="sr-only">{t('previous')}</span>
           </a>
-          <a class="carousel-control-next" href="#customCarousel2" role="button" data-slide="next">
-            <i class="fa fa-angle-right" aria-hidden="true"></i>
-            <span class="sr-only">Next</span>
+          <a className="carousel-control-next" href="#customCarousel2" role="button" data-slide="next">
+            <i className="fa fa-angle-right" aria-hidden="true"></i>
+            <span className="sr-only">{t('next')}</span>
           </a>
         </div>
       </div>
     </div>
   </section>
  
-   <section class="contact_section layout_padding-bottom">
-    <div class="container">
-      <div class="heading_container">
+   <section className="contact_section layout_padding-bottom">
+    <div className="container">
+      <div className="heading_container">
         <h2>
-          Get In Touch
+          {t('contactTitle')} <span>{t('contactTitleHighlight')}</span>
         </h2>
       </div>
-      <div class="row">
-        <div class="col-md-7">
-          <div class="form_container">
+      <div className="row">
+        <div className="col-md-7">
+          <div className="form_container">
             <form action="">
               <div>
-                <input type="text" placeholder="Full Name" />
+                <input type="text" placeholder={t('contactNamePlaceholder')} readOnly />
               </div>
               <div>
-                <input type="email" placeholder="Email" />
+                <input type="email" placeholder={t('contactEmailPlaceholder')} readOnly />
               </div>
               <div>
-                <input type="text" placeholder="Phone Number" />
+                <input type="text" placeholder={t('contactPhonePlaceholder')} readOnly />
               </div>
               <div>
-                <input type="text" class="message-box" placeholder="Message" />
+                <input type="text" className="message-box" placeholder={t('contactMessagePlaceholder')} readOnly />
               </div>
-              <div class="btn_box">
+              <div className="btn_box">
                 <button>
-                  SEND
+                  {t('send')}
                 </button>
               </div>
             </form>
           </div>
         </div>
-        <div class="col-md-5">
-          <div class="img-box">
+        <div className="col-md-5">
+          <div className="img-box">
             <img src="images/contact-img.jpg" alt=""/>
           </div>
         </div>
@@ -616,137 +630,132 @@ const Template = () => {
     </div>
   </section>
  
-   <section class="info_section ">
-    <div class="container">
-      <div class="info_top">
-        <div class="info_logo">
+   <section className="info_section ">
+    <div className="container">
+      <div className="info_top">
+        <div className="info_logo">
           <a href="">
             <img src="images/logo.png" alt=""/>
           </a>
         </div>
-        <div class="info_form">
+        <div className="info_form">
           <form action="">
-            <input type="email" placeholder="Your email"/>
+            <input type="email" placeholder={t('footer.subscribePlaceholder')}/>
             <button>
-              Subscribe
+              {t('footer.subscribeButton')}
             </button>
           </form>
         </div>
       </div>
-      <div class="info_bottom layout_padding2">
-        <div class="row info_main_row">
-          <div class="col-md-6 col-lg-3">
+      <div className="info_bottom layout_padding2">
+        <div className="row info_main_row">
+          <div className="col-md-6 col-lg-3">
             <h5>
-              Address
+              {t('footer.addressTitle')}
             </h5>
-            <div class="info_contact">
+            <div className="info_contact">
               <a href="">
-                <i class="fa fa-map-marker" aria-hidden="true"></i>
+                <i className="fa fa-map-marker" aria-hidden="true"></i>
                 <span>
-                  Location
+                  {t('footer.addressLine1')}
                 </span>
               </a>
               <a href="">
-                <i class="fa fa-phone" aria-hidden="true"></i>
+                <i className="fa fa-phone" aria-hidden="true"></i>
                 <span>
-                  Call +01 1234567890
+                  {t('footer.phone')}
                 </span>
               </a>
               <a href="">
-                <i class="fa fa-envelope"></i>
+                <i className="fa fa-envelope"></i>
                 <span>
-                  demo@gmail.com
+                  {t('footer.email')}
                 </span>
               </a>
             </div>
-            <div class="social_box">
+            <div className="social_box">
               <a href="">
-                <i class="fa fa-facebook" aria-hidden="true"></i>
+                <i className="fa fa-facebook" aria-hidden="true"></i>
               </a>
               <a href="">
-                <i class="fa fa-twitter" aria-hidden="true"></i>
+                <i className="fa fa-twitter" aria-hidden="true"></i>
               </a>
               <a href="">
-                <i class="fa fa-linkedin" aria-hidden="true"></i>
+                <i className="fa fa-linkedin" aria-hidden="true"></i>
               </a>
               <a href="">
-                <i class="fa fa-instagram" aria-hidden="true"></i>
+                <i className="fa fa-instagram" aria-hidden="true"></i>
               </a>
             </div>
           </div>
-          <div class="col-md-6 col-lg-3">
-            <div class="info_links">
+          <div className="col-md-6 col-lg-3">
+            <div className="info_links">
               <h5>
-                Useful link
+                {t('footer.linksTitle')}
               </h5>
-              <div class="info_links_menu">
-                <a class="active" href="index.html">
-                  Home
+              <div className="info_links_menu">
+                <a className="active" href="#">
+                  {t('footer.homeLink')}
                 </a>
-                <a href="about.html">
-                  About
+                <a href="#">
+                  {t('footer.aboutLink')}
                 </a>
-                <a href="treatment.html">
-                  Treatment
+                <a href="#">
+                  {t('footer.servicesLink')}
                 </a>
-                <a href="doctor.html">
-                  Doctors
-                </a>
-                <a href="testimonial.html">
-                  Testimonial
-                </a>
-                <a href="contact.html">
-                  Contact us
+                {/* <a href="#">{t('footer.whyUsLink')}</a> */}
+                {/* <a href="#">{t('footer.teamLink')}</a> */}
+                <a href="#">
+                  {t('contactUs')}
                 </a>
               </div>
             </div>
           </div>
-          <div class="col-md-6 col-lg-3">
-            <div class="info_post">
+          <div className="col-md-6 col-lg-3">
+            <div className="info_post">
               <h5>
-                LATEST POSTS
+                {t('footer.postsTitle')}
               </h5>
-              <div class="post_box">
-                <div class="img-box">
+              <div className="post_box">
+                <div className="img-box">
                   <img src="images/post1.jpg" alt=""/>
                 </div>
                 <p>
-                  Normal
-                  distribution
+                  {t('footer.post1Title')} <br/>
+                  <small>{t('footer.post1Author')} - {t('footer.post1Date')}</small>
                 </p>
               </div>
-              <div class="post_box">
-                <div class="img-box">
+              <div className="post_box">
+                <div className="img-box">
                   <img src="images/post2.jpg" alt=""/>
                 </div>
                 <p>
-                  Normal
-                  distribution
+                  {t('footer.post2Title')} <br/>
+                  <small>{t('footer.post2Author')} - {t('footer.post2Date')}</small>
                 </p>
               </div>
             </div>
           </div>
-          <div class="col-md-6 col-lg-3">
-            <div class="info_post">
+          <div className="col-md-6 col-lg-3">
+            <div className="info_post">
               <h5>
-                News
+                {t('footer.newsTitle')}
               </h5>
-              <div class="post_box">
-                <div class="img-box">
+              <div className="post_box">
+                <div className="img-box">
                   <img src="images/post3.jpg" alt=""/>
                 </div>
                 <p>
-                  Normal
-                  distribution
+                  {t('footer.post3Title')} <br/>
+                  <small>{t('footer.post3Author')} - {t('footer.post3Date')}</small>
                 </p>
               </div>
-              <div class="post_box">
-                <div class="img-box">
+              <div className="post_box">
+                <div className="img-box">
                   <img src="images/post4.png" alt=""/>
                 </div>
                 <p>
-                  Normal
-                  distribution
+                  {t('footer.newsText')}
                 </p>
               </div>
             </div>
@@ -757,21 +766,15 @@ const Template = () => {
   </section>
  
 
-   <footer class="footer_section">
-    <div class="container">
+   <footer className="footer_section">
+    <div className="container">
       <p>
-        &copy; <span id="displayYear"></span>  2025 All Rights Reserved By
-        <a href="https://html.design/"> Zimys</a>
+        &copy; <span id="displayYear">{new Date().getFullYear()}</span> {t('footer.copyright')}
+        <a href="#"> {t('footer.copyrightLinkText')}</a>
       </p>
     </div>
   </footer>
  
-
-
-
-
-
-
 
 
 

@@ -1,0 +1,136 @@
+/* Styles for EditUserForm component - Harmonized */
+
+/* Assuming root variables are globally available */
+
+.edit-user-container { /* Assuming a container div wraps the component */
+  padding: 30px;
+  max-width: 600px;
+  margin: 40px auto;
+  background-color: var(--background-color, #ffffff);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-family, 'Roboto', sans-serif);
+}
+
+.edit-user-container h2 {
+  color: var(--text-color, #0c0c0c);
+  text-align: center;
+  margin-bottom: 25px;
+  border-bottom: 2px solid var(--primary-color, #00c6a9);
+  padding-bottom: 10px;
+  display: inline-block;
+}
+
+.edit-user-container form div {
+  margin-bottom: 20px;
+}
+
+.edit-user-container label {
+  display: block; /* Ensure label is above input */
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: var(--text-color, #0c0c0c);
+}
+
+.edit-user-container input[type="text"],
+.edit-user-container input[type="date"],
+.edit-user-container input[type="tel"], /* Added tel */
+.edit-user-container select { /* Added select */
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.edit-user-container input:focus,
+.edit-user-container select:focus { /* Added select */
+  border-color: var(--primary-color, #00c6a9);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 198, 169, 0.2);
+}
+
+.edit-user-container button[type="submit"],
+.edit-user-container button[type="button"] { /* Added button type */
+  display: inline-block;
+  padding: 12px 30px;
+  background-color: var(--primary-color, #00c6a9);
+  color: var(--white, #ffffff);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.edit-user-container button.btn-secondary { /* Style for secondary button */
+    background-color: var(--secondary-color, #6c757d); /* Use a secondary color variable or default */
+}
+
+
+.edit-user-container button[type="submit"]:hover,
+.edit-user-container button[type="button"]:hover { /* Added button type */
+  background-color: #00937d; /* Darker primary */
+  transform: translateY(-1px);
+}
+
+.edit-user-container button.btn-secondary:hover {
+    background-color: #5a6268; /* Darker secondary */
+}
+
+.edit-user-container button:disabled { /* General disabled style */
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none; /* Prevent hover effect on disabled */
+}
+
+/* Error message styling */
+.edit-user-container .alert-danger { /* Use Bootstrap class */
+  color: var(--error-color, #721c24); /* Bootstrap danger text color */
+  background-color: var(--error-bg-color, #f8d7da); /* Bootstrap danger background */
+  border-color: var(--error-border-color, #f5c6cb); /* Bootstrap danger border */
+  font-size: 0.9rem;
+  margin-top: 10px;
+  padding: 10px 15px; /* Adjusted padding */
+  border: 1px solid transparent; /* Bootstrap style */
+  border-radius: .25rem; /* Bootstrap style */
+  text-align: center;
+}
+
+/* Loading message styling */
+.edit-user-container p:first-of-type { /* Target loading message if it's the first p */
+  font-style: italic;
+  color: var(--light-text-color, #555555);
+  text-align: center;
+  padding: 20px;
+}
+
+/* Add required indicator styling */
+.edit-user-container label.required::after {
+  content: " *";
+  color: var(--error-color, red); /* Or your theme's required color */
+  margin-left: 2px;
+}
+
+/* Style for invalid feedback (using Bootstrap class) */
+.edit-user-container .invalid-feedback {
+    display: block; /* Ensure it shows */
+    width: 100%;
+    margin-top: .25rem;
+    font-size: .875em; /* Bootstrap default */
+    color: #dc3545; /* Bootstrap default danger color */
+}
+
+/* Adjustments for Bootstrap grid layout */
+.edit-user-container .row {
+    margin-bottom: 1rem; /* Add some space between rows */
+}
+
+/* Center align buttons */
+.edit-user-container .text-center {
+    text-align: center;
+}

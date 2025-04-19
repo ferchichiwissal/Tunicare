@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 import apiClient from "../utils/apiClient";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -11,6 +12,7 @@ import "./logout.css" // Importez le fichier CSS
 
 const Logout = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(); // Get translation function
   const [open, setOpen] = useState(true); // La boîte de dialogue s'ouvre directement
 
   const handleClose = () => {
@@ -55,11 +57,11 @@ const Logout = () => {
         className="logout-dialog" // Appliquez la classe CSS
       >
         <DialogTitle id="alert-dialog-title" className="logout-dialog-title">
-          Confirm Logout
+          {t('logout.dialog.title')}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description" className="logout-dialog-content">
-            Are you sure you want to logout?
+            {t('logout.dialog.confirmationText')}
           </DialogContentText>
         </DialogContent>
         <DialogActions className="logout-dialog-actions">
@@ -67,14 +69,14 @@ const Logout = () => {
             onClick={handleClose}
             className="logout-dialog-button cancel"
           >
-            Cancel
+            {t('logout.dialog.cancelButton')}
           </Button>
           <Button
             onClick={handleLogout}
             className="logout-dialog-button confirm"
             autoFocus
           >
-            Logout
+            {t('logout.dialog.logoutButton')}
           </Button>
         </DialogActions>
       </Dialog>
