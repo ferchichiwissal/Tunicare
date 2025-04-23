@@ -1,6 +1,5 @@
 package pi.pperformance.elite.UserServices;
 
-import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +15,6 @@ import java.time.LocalDate; // Import LocalDate
 import org.springframework.beans.factory.annotation.Autowired; // Import Autowired
 
 @Service
-// @AllArgsConstructor // Removed Lombok annotation
 public class DoctorCentreDexamenService {
 
     private final DoctorCentreDexamenRepository doctorCentreDexamenRepository;

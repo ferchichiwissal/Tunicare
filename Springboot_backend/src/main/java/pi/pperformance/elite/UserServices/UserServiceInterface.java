@@ -129,4 +129,14 @@ public interface UserServiceInterface{
 	    * @throws IllegalArgumentException If the new password is invalid (e.g., too weak - implementation specific).
 	    */
 	   boolean changeUserPassword(String email, String oldPassword, String newPassword);
+
+	   /**
+	    * Finds an active patient within a specific cabinet by their first and last name.
+	    *
+	    * @param cabinetId The ID of the cabinet to search within.
+	    * @param firstName The first name of the patient.
+	    * @param lastName The last name of the patient.
+	    * @return An Optional containing the Patient if found and active in the cabinet, otherwise empty.
+	    */
+	   java.util.Optional<Patient> findActivePatientByCabinetAndName(Long cabinetId, String firstName, String lastName); // Added for patient search
 	 }

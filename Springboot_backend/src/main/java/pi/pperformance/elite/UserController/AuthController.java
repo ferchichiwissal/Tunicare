@@ -252,8 +252,30 @@ public class AuthController {
         // --- Add requested fields ---
         userInfo.put("birthDate", baseUser.getBirthDate() != null ? baseUser.getBirthDate().toString() : null); // Format as ISO string
         userInfo.put("gender", baseUser.getGender());
-        userInfo.put("address", baseUser.getAddress());
-        userInfo.put("tel", baseUser.getTel());
+        userInfo.put("address", baseUser.getAddress()); // User's own address
+        userInfo.put("tel", baseUser.getTel()); // User's own tel
+
+        // Add active cabinet details if a cabinetIdForToken was determined
+        if (cabinetIdForToken != null && !(baseUser instanceof Admin)) { // Admins don't have an active cabinet in this context
+            Optional<CabinetDr> activeCabinetOpt = cabinetDrRepository.findById(cabinetIdForToken);
+            if (activeCabinetOpt.isPresent()) {
+                CabinetDr activeCabinet = activeCabinetOpt.get();
+                Map<String, Object> activeCabinetInfo = new HashMap<>();
+                activeCabinetInfo.put("id", activeCabinet.getIdSite());
+                activeCabinetInfo.put("name", activeCabinet.getName());
+                activeCabinetInfo.put("address", activeCabinet.getAddress());
+                activeCabinetInfo.put("tel", activeCabinet.getTel());
+                // Add other cabinet details if needed
+                userInfo.put("activeCabinet", activeCabinetInfo);
+                log.info("Included active cabinet details for cabinetId: {}", cabinetIdForToken);
+            } else {
+                log.warn("Could not find details for active cabinetId: {}", cabinetIdForToken);
+                userInfo.put("activeCabinet", null); // Indicate cabinet details couldn't be found
+            }
+        } else {
+             userInfo.put("activeCabinet", null); // No active cabinet applicable (e.g., Admin) or determined
+        }
+
 
         // Handle photoProfil (convert byte[] to Base64 string)
         if (baseUser.getPhotoProfil() != null && baseUser.getPhotoProfil().length > 0) {

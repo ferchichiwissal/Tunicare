@@ -12,11 +12,12 @@ import pi.pperformance.elite.entities.PasswordResetToken;
 
 @RestController
 @RequestMapping("/forget")
-@RequiredArgsConstructor
  public class ForgetPasswordController {
     private final PasswordResetTokenService passwordResetTokenService;
 
-
+    public ForgetPasswordController(PasswordResetTokenService passwordResetTokenService) {
+        this.passwordResetTokenService = passwordResetTokenService;
+    }
 
     //send mail for email verification
      

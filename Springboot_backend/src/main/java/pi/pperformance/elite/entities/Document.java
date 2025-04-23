@@ -1,19 +1,17 @@
 package pi.pperformance.elite.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set; // For OneToMany relationships
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
 public class Document implements Serializable {
+
+    // Explicit no-argument constructor
+    public Document() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,5 +44,55 @@ public class Document implements Serializable {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = new Date();
+    }
+
+    // Getters
+    public Long getIdDoc() {
+        return idDoc;
+    }
+
+    public String getDocName() {
+        return docName;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public DoctorCentreDexamen getDoctorCentreDexamen() {
+        return doctorCentreDexamen;
+    }
+
+    public Set<CompteRendu> getCompteRendus() {
+        return compteRendus;
+    }
+
+    // Setters
+    public void setIdDoc(Long idDoc) {
+        this.idDoc = idDoc;
+    }
+
+    public void setDocName(String docName) {
+        this.docName = docName;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setDoctorCentreDexamen(DoctorCentreDexamen doctorCentreDexamen) {
+        this.doctorCentreDexamen = doctorCentreDexamen;
+    }
+
+    public void setCompteRendus(Set<CompteRendu> compteRendus) {
+        this.compteRendus = compteRendus;
     }
 }

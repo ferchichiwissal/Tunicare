@@ -35,7 +35,8 @@ public class CentreDexamenController {
     // --- CRUD Operations ---
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    // Allow Doctors and Assistants to fetch the list as well
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'ASSISTANT')")
     public ResponseEntity<List<CentreDexamen>> getAllCentres() {
         List<CentreDexamen> centres = centreDexamenService.getAllCentres();
         return ResponseEntity.ok(centres);

@@ -1,19 +1,17 @@
 package pi.pperformance.elite.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set; // For OneToMany relationship
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
 public class CentreDexamen implements Serializable {
+
+    // Explicit no-argument constructor
+    public CentreDexamen() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,5 +42,63 @@ public class CentreDexamen implements Serializable {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = new Date();
+    }
+
+    // Getters
+    public Long getIdCentre() {
+        return idCentre;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getAdress() {
+        return adress;
+    }
+
+    public String getTel() {
+        return tel;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Set<DoctorCentreDexamen> getDoctorCentreDexamens() {
+        return doctorCentreDexamens;
+    }
+
+    // Setters
+    public void setIdCentre(Long idCentre) {
+        this.idCentre = idCentre;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAdress(String adress) {
+        this.adress = adress;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setDoctorCentreDexamens(Set<DoctorCentreDexamen> doctorCentreDexamens) {
+        this.doctorCentreDexamens = doctorCentreDexamens;
     }
 }

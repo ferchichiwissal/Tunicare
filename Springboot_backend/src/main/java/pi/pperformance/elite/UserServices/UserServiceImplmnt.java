@@ -1557,4 +1557,25 @@ private Patient addPatient(Patient patient, Long targetCabinetId, boolean passwo
         return true; // Indicate success
     }
     // --- End Implementation for Change Password ---
+
+    // --- Implementation for findActivePatientByCabinetAndName ---
+    @Override
+    @Transactional(readOnly = true) // Read-only as we are just searching
+    public Optional<Patient> findActivePatientByCabinetAndName(Long cabinetId, String firstName, String lastName) {
+        log.debug("Searching for active patient with name '{} {}' in cabinet ID {}", firstName, lastName, cabinetId);
+
+        // Call the updated repository method which directly returns Optional<Patient>
+        Optional<Patient> patientOpt = userCabinetRegistrationRepository
+                .findActivePatientByUserFirstNameAndLastNameAndCabinetId(firstName, lastName, cabinetId);
+
+        if (patientOpt.isPresent()) {
+            log.info("Active patient found for name '{} {}' in cabinet {}: ID {}", firstName, lastName, cabinetId, patientOpt.get().getId());
+        } else {
+            log.warn("Active patient not found for name '{} {}' in cabinet {}", firstName, lastName, cabinetId);
+        }
+
+        // Directly return the result from the repository method
+        return patientOpt;
+    }
+    // --- End Implementation for findActivePatientByCabinetAndName ---
 }

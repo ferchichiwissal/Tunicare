@@ -50,6 +50,7 @@ import org.springframework.security.crypto.password.PasswordEncoder; // Added fo
 import java.util.Map; // Added for response map
 import java.util.Optional; // Added for Optional
 import java.util.Optional; // Added for Optional
+import java.util.HashMap; // Added for Map response
 
 @RestController
 @RequestMapping("/Users")
@@ -1287,5 +1288,57 @@ public class UserController {
         }
     }
     // --- End Change Password Endpoint ---
+
+
+    // --- New Endpoint for Searching Patient in Cabinet by Name ---
+    @GetMapping("/cabinet/{cabinetId}/patients/search")
+    public ResponseEntity<?> findPatientInCabinetByName(
+            @PathVariable Long cabinetId,
+            @RequestParam String firstName,
+            @RequestParam String lastName,
+            Authentication authentication) { // Added Authentication for potential permission checks
+
+        String actionDescription = String.format("search for patient '%s %s' in cabinet ID %d", firstName, lastName, cabinetId);
+        try {
+            // --- Optional Permission Check ---
+            // You might want to ensure the user making the request (e.g., Doctor/Assistant)
+            // belongs to the same cabinetId they are searching within, or is an Admin.
+            // User currentUser = checkPermissions(authentication, cabinetId, actionDescription);
+            // log.info("User {} permitted to {}", currentUser.getEmail(), actionDescription);
+            // --- End Optional Permission Check ---
+
+            // TODO: Implement findActivePatientByCabinetAndName in UserServiceInterface and UserServiceImplmnt
+            // This service method should find a User with Role.PATIENT matching firstName and lastName,
+            // AND having an *active* UserCabinetRegistration for the given cabinetId.
+            Optional<Patient> patientOpt = usrService.findActivePatientByCabinetAndName(cabinetId, firstName, lastName);
+
+            if (patientOpt.isPresent()) {
+                Patient patient = patientOpt.get();
+                // Return data compatible with frontend expectation (idPatient)
+                Map<String, Object> patientData = new HashMap<>();
+                patientData.put("idPatient", patient.getId()); // Frontend expects idPatient
+                patientData.put("id", patient.getId()); // Include standard 'id' as well
+                patientData.put("firstName", patient.getFirstName());
+                patientData.put("lastName", patient.getLastName());
+                patientData.put("email", patient.getEmail());
+                // Add other fields if needed by the frontend upon successful search
+                log.info("Patient found for search '{} {}' in cabinet {}: ID {}", firstName, lastName, cabinetId, patient.getId());
+                return ResponseEntity.ok(patientData);
+            } else {
+                log.warn("Patient not found for search '{} {}' in cabinet {}", firstName, lastName, cabinetId);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                     .body(Map.of("message", "Patient not found in this cabinet."));
+            }
+
+        } catch (AccessDeniedException e) {
+             log.warn("Permission denied during {}: {}", actionDescription, e.getMessage());
+             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error during {}: {}", actionDescription, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Map.of("message", "An unexpected server error occurred during patient search."));
+        }
+    }
+    // --- End New Endpoint ---
 
 }

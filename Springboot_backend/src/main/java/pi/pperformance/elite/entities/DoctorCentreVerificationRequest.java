@@ -8,7 +8,7 @@ public class DoctorCentreVerificationRequest {
     private String password;
     private String tel;
     private String address;
-    private String gendre;
+    private String gender;
     private String role;
     private byte[] photoProfil;
     private String verificationCode;
@@ -16,7 +16,7 @@ public class DoctorCentreVerificationRequest {
     private String speciality; // Specific to DoctorCentreDexamen registration
 
     // Constructor for DoctorCentreDexamen registration
-    public DoctorCentreVerificationRequest(String firstName, String lastName, String email, String birthDate, String password, String tel, String address, String gendre, String role, byte[] photoProfil, String verificationCode, Long centreId, String speciality) {
+    public DoctorCentreVerificationRequest(String firstName, String lastName, String email, String birthDate, String password, String tel, String address, String gender, String role, byte[] photoProfil, String verificationCode, Long centreId, String speciality) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -24,7 +24,7 @@ public class DoctorCentreVerificationRequest {
         this.password = password;
         this.tel = tel;
         this.address = address;
-        this.gendre = gendre;
+        this.gender = gender;
         this.role = role;
         this.photoProfil = photoProfil;
         this.verificationCode = verificationCode;
@@ -90,12 +90,12 @@ public class DoctorCentreVerificationRequest {
         this.address = address;
     }
 
-    public String getGendre() {
-        return gendre;
+    public String getGender() {
+        return gender;
     }
 
-    public void setGendre(String gendre) {
-        this.gendre = gendre;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getRole() {

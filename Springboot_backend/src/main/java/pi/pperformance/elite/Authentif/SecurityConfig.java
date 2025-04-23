@@ -23,12 +23,6 @@ import jakarta.annotation.PostConstruct; // Import PostConstruct
 @EnableMethodSecurity // Re-enable method-level security
 public class SecurityConfig {
 
-    // Set SecurityContextHolder strategy at initialization
-    @PostConstruct
-    public void enableInheritableThreadLocal() {
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-    }
-
     private final UserDetailsService userDetailsService;
     private final JwtRequestFilter jwtRequestFilter;
 
@@ -54,6 +48,7 @@ public class SecurityConfig {
                 // Other public endpoints
                 .requestMatchers("/Users/admin/patientsWithRegistrations").permitAll() // Permit path in filter chain, rely on @PreAuthorize
                 .requestMatchers("/Users/addadmin").permitAll()
+                .requestMatchers("/error").permitAll() // Allow access to the default error page
                 // Other Specific ADMIN endpoints
                 .requestMatchers("/Users/alluser").hasRole("ADMIN")
                 .requestMatchers("/Users/delete/{id}").hasRole("ADMIN") // Global delete only for Admin
@@ -72,6 +67,12 @@ public class SecurityConfig {
                  // Specific Authenticated User endpoints (regardless of role, but must be logged in)
                 .requestMatchers("/Users/update/{id}").authenticated() // Allow any logged-in user to update their own info (service layer should check ID match)
                 .requestMatchers("/Users/allid/**", "/Users/useremail/**", "/Users/findByEmail/**").authenticated() // General user info lookup
+
+                // Consultation endpoints (Doctors/Assistants)
+                .requestMatchers("/api/consultations/**").hasAnyRole("DOCTOR", "ASSISTANT")
+
+                // Medical Examination endpoints (Doctors) - Added explicit rule
+                .requestMatchers("/api/medical-examinations/**").hasRole("DOCTOR")
 
                 // Fallback: Authenticate any other request not explicitly permitted
                 .anyRequest().authenticated()

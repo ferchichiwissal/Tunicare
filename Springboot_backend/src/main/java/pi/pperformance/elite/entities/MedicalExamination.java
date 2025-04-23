@@ -1,18 +1,18 @@
 package pi.pperformance.elite.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import pi.pperformance.elite.entities.RendezVous; // Added import
+// import pi.pperformance.elite.entities.Patient; // Removed import
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
 public class MedicalExamination implements Serializable {
+
+    // Explicit no-argument constructor
+    public MedicalExamination() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,15 +27,19 @@ public class MedicalExamination implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    // Relationship: MedicalExamination 'prescrire' PrescribedMedications (1 to 0..1 - Owning Side)
-    @OneToOne(cascade = CascadeType.ALL) // Cascade operations if needed
-    @JoinColumn(name = "id_ord", referencedColumnName = "id_ord") // Link to PrescribedMedications PK
-    private PrescribedMedications prescribedMedications;
+    // Relationship: RendezVous 'avoir' MedicalExamination (1 to 0..* - Many side)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idRendezVous")
+    private RendezVous rendezVous;
 
-    // Relationship: Consultation 'avoir' MedicalExamination (1 to 0..* - Many side)
-    @ManyToOne
-    @JoinColumn(name = "idConsultation")
-    private Consultation consultation;
+    // Patient can be accessed via rendezVous.getPatient()
+    // Removed direct link to Patient
+
+    private Long consultationId;
+
+    // Store the name of the selected centre (either from CentreDexamen or "Autre")
+    @Column(name = "centre_name") // Added column for centre name
+    private String centreName;
 
     // Relationship: MedicalExamination 'avoir' CompteRendu (1 to 1 - Owning Side? Diagram unclear, assuming 1-to-1)
     // If one MedicalExamination can have only one CompteRendu
@@ -53,5 +57,85 @@ public class MedicalExamination implements Serializable {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = new Date();
+    }
+
+    // Getters
+    public Long getIdExam() {
+        return idExam;
+    }
+
+    public String getAct() {
+        return act;
+    }
+
+    public String getRecommandation() {
+        return recommandation;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public RendezVous getRendezVous() { // Changed return type and name
+        return rendezVous;
+    }
+
+    // Removed getPatient()
+
+    public Long getConsultationId() {
+        return consultationId;
+    }
+
+    public String getCentreName() { // Added getter
+        return centreName;
+    }
+
+    public CompteRendu getCompteRendu() {
+        return compteRendu;
+    }
+
+    // Setters
+    public void setIdExam(Long idExam) {
+        this.idExam = idExam;
+    }
+
+    public void setAct(String act) {
+        this.act = act;
+    }
+
+    public void setRecommandation(String recommandation) {
+        this.recommandation = recommandation;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setRendezVous(RendezVous rendezVous) { // Changed parameter type and name
+        this.rendezVous = rendezVous;
+    }
+
+    // Removed setPatient()
+
+    public void setConsultationId(Long consultationId) {
+        this.consultationId = consultationId;
+    }
+
+    // Removed erroneous setPatient and duplicate setConsultationId from failed diff apply
+
+    public void setCentreName(String centreName) { // Added setter
+        this.centreName = centreName;
+    }
+
+    public void setCompteRendu(CompteRendu compteRendu) {
+        this.compteRendu = compteRendu;
     }
 }

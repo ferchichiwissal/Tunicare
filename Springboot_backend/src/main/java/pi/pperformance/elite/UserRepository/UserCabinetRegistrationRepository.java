@@ -24,6 +24,9 @@ public interface UserCabinetRegistrationRepository extends JpaRepository<UserCab
     // Check if a registration exists for a specific User ID and Cabinet ID
     boolean existsByUserIdAndCabinetIdSite(Long userId, Long cabinetId);
 
+    // Check if an *active* registration exists for a specific User ID and Cabinet ID
+    boolean existsByUserIdAndCabinetIdSiteAndIsActiveTrue(Long userId, Long cabinetId);
+
     // Find all registrations for a specific user
     List<UserCabinetRegistration> findByUser(User user);
 
@@ -56,4 +59,17 @@ public interface UserCabinetRegistrationRepository extends JpaRepository<UserCab
     @Modifying // Required for delete operations
     @Query("DELETE FROM UserCabinetRegistration r WHERE r.user.id = :userId")
     void deleteByUserId(@Param("userId") Long userId);
+
+    // Find an active Patient entity (by name) associated with a specific cabinet via an active registration
+    // Used by UserServiceImplmnt.findActivePatientByCabinetAndName
+    // Made case-insensitive using LOWER() and checks for swapped names
+    // Selects the User 'u' directly, cast to Patient in the query result type.
+    @Query("SELECT u FROM UserCabinetRegistration r JOIN r.user u JOIN r.cabinet c " +
+           "WHERE c.idSite = :cabinetId AND u.role = pi.pperformance.elite.entities.Role.PATIENT AND r.isActive = true " +
+           "AND ( (LOWER(u.firstName) = LOWER(:firstName) AND LOWER(u.lastName) = LOWER(:lastName)) OR " +
+           "      (LOWER(u.firstName) = LOWER(:lastName) AND LOWER(u.lastName) = LOWER(:firstName)) )")
+    Optional<pi.pperformance.elite.entities.Patient> findActivePatientByUserFirstNameAndLastNameAndCabinetId( // Changed return type and method name slightly for clarity
+            @Param("firstName") String firstName,
+            @Param("lastName") String lastName,
+            @Param("cabinetId") Long cabinetId);
 }

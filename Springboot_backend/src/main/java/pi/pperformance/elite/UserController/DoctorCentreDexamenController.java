@@ -211,7 +211,7 @@ public class DoctorCentreDexamenController {
         }
         newDoctor.setTel(request.getTel());
         newDoctor.setAddress(request.getAddress());
-        newDoctor.setGender(request.getGendre()); // Ensure frontend sends 'gender' consistently
+        newDoctor.setGender(request.getGender()); // Ensure frontend sends 'gender' consistently
         newDoctor.setSpeciality(request.getSpeciality());
         newDoctor.setRole(Role.DOCTOR_CENTRE_EXAMEN); // Set role
         newDoctor.setActive(false); // Set as inactive initially

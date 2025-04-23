@@ -33,7 +33,7 @@ public class JwtUtils {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) { // Changed from private to public
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody(); // Revert to older parser syntax
     }
      // Retrieve email from JWT token
