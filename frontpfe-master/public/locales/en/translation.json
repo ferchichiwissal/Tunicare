@@ -875,5 +875,108 @@
       "scanMessage": "Scan this code to register in this cabinet."
     },
     "notAvailable": "N/A"
+  },
+  "manageAppointments": {
+    "title": "Manage Appointments",
+    "filter": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "dateLabel": "Date:",
+      "searchLabel": "Search:",
+      "searchPlaceholder": "Search by name..."
+    },
+    "buttons": {
+      "addAppointment": "Add Appointment",
+      "cancelAdd": "Cancel Add",
+      "accept": "Accept",
+      "refusePropose": "Refuse/Propose",
+      "startConsultation": "Start Consultation"
+    },
+    "table": {
+      "header": {
+        "patient": "Patient",
+        "date": "Date & Time",
+        "type": "Type",
+        "status": "Status",
+        "action": "Action"
+      },
+      "noResultsSearch": "No appointments found matching your search.",
+      "noResultsCriteria": "No appointments found for the selected criteria."
+    },
+    "appointmentType": {
+      "nouvelleconsultation": "New Consultation",
+      "séancedecontrôle": "Follow-up Session"
+    },
+    "appointmentState": {
+      "enattente": "Pending",
+      "accepté": "Accepted",
+      "refusé": "Refused",
+      "réalisé": "Completed",
+      "annulé": "Cancelled"
+    },
+    "addForm": {
+      "title": "Add New Appointment (Internal)",
+      "firstNameLabel": "Patient First Name",
+      "lastNameLabel": "Patient Last Name",
+      "dateTimeLabel": "Date & Time",
+      "typeLabel": "Appointment Type",
+      "typeOptions": {
+        "newConsultation": "New Consultation",
+        "followUp": "Follow-up Session"
+      },
+      "validationError": "⚠️ Please fill in all required fields.",
+      "patientNotFound": "❌ Patient not found in this cabinet.",
+      "patientSearchError": "❌ Error searching for patient: {{error}}",
+      "addSuccess": "✅ Appointment added successfully!",
+      "addError": "❌ Error adding appointment: {{error}}",
+      "submitting": "Adding...",
+      "submitButton": "Add Appointment"
+    },
+    "modal": {
+      "refuse": {
+        "title": "Refuse and Propose New Date",
+        "appointmentIdLabel": "Appointment ID: {{refusalTargetId}}",
+        "newDateTimeLabel": "Propose new date and time:",
+        "validationError": "⚠️ Please select a new date and time.",
+        "success": "✅ Appointment ID {{refusalTargetId}} refused. New date proposed.",
+        "failure": "❌ Failed to refuse/propose for ID {{refusalTargetId}}: {{error}}",
+        "sending": "Sending...",
+        "confirmButton": "Confirm Refusal & Proposal"
+      }
+    },
+    "action": {
+      "acceptSuccess": "✅ Appointment ID {{appointmentId}} accepted.",
+      "acceptFailed": "❌ Failed to accept Appt ID {{appointmentId}}. Error: {{error}}",
+      "markDoneSuccess": "✅ Appointment ID {{appointmentId}} marked as done.",
+      "markDoneFailed": "❌ Failed to mark as done for Appt ID {{appointmentId}}. Error: {{error}}"
+    },
+    "error": {
+      "missingCabinetId": "Error: Cabinet ID not found in user data.",
+      "missingCabinetIdMessage": "Cannot load appointments. Your cabinet ID is not set.",
+      "fetchFailed": "Failed to load appointments ({{filterState}}).",
+      "generic": "An error occurred."
+    },
+    "loading": "Loading appointments..."
+  },
+  "addAppointment": {
+    "title": "Request an Appointment",
+    "rescheduleTitle": "Reschedule Appointment",
+    "dateLabel": "Date and Time",
+    "typeLabel": "Appointment Type",
+    "typeOptionNew": "New Consultation",
+    "typeOptionControl": "Follow-up Session",
+    "fillFieldsError": "Please fill in the date, time, and type.",
+    "successMessage": "Appointment requested successfully for {{dateTime}}! Status: {{status}}",
+    "failureMessage": "Failed to create appointment. Please try again.",
+    "addingButton": "Requesting...",
+    "addButton": "Request Appointment",
+    "rescheduleButton": "Reschedule Appointment"
+  },
+  "common": {
+    "notAvailable": "N/A",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "invalidDate": "Invalid Date",
+    "dateError": "Date Error"
   }
 }

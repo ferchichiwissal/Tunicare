@@ -65,7 +65,8 @@ const ProtectedLayout = ({ requiredRole, children  }) => {
 
   // Redirect based on authentication and role
   if (!isAuthenticated) {
-    return <Navigate to="/" />;
+    // Redirect unauthenticated users to the login page
+    return <Navigate to="/sign-in" />;
   }
   if (!hasRequiredRole) {
     // Redirect directly if unauthorized

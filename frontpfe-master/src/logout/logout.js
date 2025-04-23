@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react"; // Import useContext
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next"; // Import useTranslation
 import apiClient from "../utils/apiClient";
+import AuthContext from '../context/AuthContext'; // Import AuthContext
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -13,6 +14,7 @@ import "./logout.css" // Importez le fichier CSS
 const Logout = () => {
   const navigate = useNavigate();
   const { t } = useTranslation(); // Get translation function
+  const { logout: contextLogout } = useContext(AuthContext); // Get logout from context
   const [open, setOpen] = useState(true); // La boîte de dialogue s'ouvre directement
 
   const handleClose = () => {
@@ -35,6 +37,9 @@ const Logout = () => {
       localStorage.removeItem("refreshToken");
       sessionStorage.removeItem("accessToken");
       sessionStorage.removeItem("refreshToken");
+
+      // Call context logout to clear user state
+      contextLogout(); 
 
       // Navigate to the login page
       navigate("/sign-in");

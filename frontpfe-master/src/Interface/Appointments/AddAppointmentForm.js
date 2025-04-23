@@ -1,0 +1,131 @@
+import React, { useState, useEffect } from 'react'; // Removed useContext as it's not used here
+import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
+import axios from 'axios'; // Keep axios or use apiClient consistently
+import './AddAppointmentForm.css';
+// Backend now handles patient and cabinet ID automatically based on authenticated user
+// import { AuthContext } from '../../context/AuthContext'; // Example context import (if needed elsewhere)
+import apiClient from '../../utils/apiClient'; // Keep apiClient if used
+
+const AddAppointmentForm = () => { // Removed patientId prop
+    const { t } = useTranslation(); // Initialize useTranslation
+    const location = useLocation(); // Get location object
+    const proposedDateTime = location.state?.proposedDateTime; // Get proposed date from navigation state
+    const originalAppointmentId = location.state?.originalAppointmentId; // Get original ID if rescheduling
+
+    // Function to format LocalDateTime string (YYYY-MM-DDTHH:mm:ss) to datetime-local format (YYYY-MM-DDTHH:mm)
+    const formatDateTimeLocal = (dateTimeString) => {
+        if (!dateTimeString) return '';
+        // Assuming dateTimeString is in ISO format like '2024-05-20T14:30:00'
+        // We need 'YYYY-MM-DDTHH:mm'
+        return dateTimeString.substring(0, 16); // Take the first 16 characters
+    };
+
+    const [apptDateTime, setApptDateTime] = useState(formatDateTimeLocal(proposedDateTime) || ''); // Updated state name and initial value
+    // Use the canonical French string for the state, translate only for display
+    const [apptType, setApptType] = useState('Nouvelle consultation');
+    // Removed cabinetId state and cabinets state
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    // Removed isLoadingCabinets state
+
+    // Effect to update state if proposedDateTime changes (e.g., navigating back and forth)
+    useEffect(() => {
+        setApptDateTime(formatDateTimeLocal(proposedDateTime) || '');
+    }, [proposedDateTime]);
+
+    // Removed useEffect for fetching cabinets
+
+    // const { user } = useContext(AuthContext); // Example: Get user context if needed for other purposes
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setMessage('');
+        setError('');
+        setIsLoading(true);
+
+        // Removed patientId check
+
+        // Updated validation: only check apptDateTime and apptType
+        if (!apptDateTime || !apptType) { // Updated state name
+            setError(t('addAppointment.fillFieldsError', 'Veuillez remplir la date, l\'heure et le type.')); // Use translation
+            setIsLoading(false);
+            return;
+        }
+
+        // Prepare data according to the DTO expected by the backend (datetime and type)
+        // Cabinet ID is now handled by the backend using the auth token
+        const appointmentData = {
+            apptDateTime: apptDateTime, // Updated key and value
+            apptType: apptType,
+            originalAppointmentId: originalAppointmentId, // Add original ID (will be null if not rescheduling)
+            // cabinetId removed from payload
+        };
+
+        try {
+            // Call the endpoint that uses authentication context
+            // Use apiClient for consistency
+            const response = await apiClient.post(`/api/rendezvous/mine`, appointmentData);
+
+            // Format the returned date/time for display
+            const formattedDateTime = formatDateTimeLocal(response.data.apptDateTime).replace('T', ' à ');
+            setMessage(t('addAppointment.successMessage', 'Rendez-vous demandé avec succès pour le {{dateTime}}! Statut: {{status}}', { dateTime: formattedDateTime, status: response.data.apptState })); // Use translation with interpolation
+
+            setApptDateTime(''); // Clear form using updated setter
+            setApptType('Nouvelle consultation'); // Reset to the canonical French string
+            // Removed setSelectedCabinetId('')
+        } catch (err) {
+            console.error("Error creating appointment:", err);
+            const backendError = err.response?.data?.error || err.response?.data?.message;
+            setError(backendError || t('addAppointment.failureMessage', 'Failed to create appointment. Please try again.')); // Use translation for fallback
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="add-appointment-container">
+            <h2>{originalAppointmentId ? t('addAppointment.rescheduleTitle', 'Reprogrammer un rendez-vous') : t('addAppointment.title', 'Ajouter un rendez-vous')}</h2>
+            <form onSubmit={handleSubmit} className="add-appointment-form">
+                {/* Cabinet Selection Dropdown Removed */}
+
+                <div className="form-group">
+                    <label htmlFor="appt_datetime" className="required">📅 {t('addAppointment.dateLabel', 'Date et Heure du rendez-vous')}</label> {/* Added required class, removed colon from fallback */}
+                    <input
+                        type="datetime-local" /* Updated type */
+                        id="appt_datetime" /* Updated id */
+                        value={apptDateTime} /* Updated state variable */
+                        onChange={(e) => setApptDateTime(e.target.value)} /* Updated setter */
+                        required
+                        className="form-control"
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="appt_type" className="required">📄 {t('addAppointment.typeLabel', 'Type de rendez-vous')}</label> {/* Added required class, removed colon from fallback */}
+                    <select
+                        id="appt_type"
+                        value={apptType}
+                        onChange={(e) => setApptType(e.target.value)}
+                        required
+                        className="form-control"
+                    >
+                        {/* Use canonical French strings for value, translate display text */}
+                        <option value="Nouvelle consultation">{t('addAppointment.typeOptionNew', 'Nouvelle consultation')}</option>
+                        <option value="Séance de contrôle">{t('addAppointment.typeOptionControl', 'Séance de contrôle')}</option>
+                        {/* Add other types if needed, ensuring they have corresponding translation keys and use the canonical value */}
+                    </select>
+                </div>
+                 {/* Input for Cabinet ID Removed */}
+
+                <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                    {isLoading ? t('addAppointment.addingButton', 'Ajout en cours...') : (originalAppointmentId ? `✅ ${t('addAppointment.rescheduleButton', 'Reprogrammer')}` : `✅ ${t('addAppointment.addButton', 'Ajouter')}`)}
+                </button>
+            </form>
+            {message && <p className="success-message">{message}</p>}
+            {error && <p className="error-message">{error}</p>}
+        </div>
+    );
+};
+
+export default AddAppointmentForm;

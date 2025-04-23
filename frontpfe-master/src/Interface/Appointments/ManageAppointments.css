@@ -1,0 +1,524 @@
+/* Light Mode Styles (Default) */
+.manage-appointments-container {
+    max-width: 900px; /* Wider container for table */
+    margin: 2rem auto;
+    padding: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Smooth transition */
+}
+
+.manage-appointments-container h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.filters {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 1.5rem; /* Space between filter groups */
+    margin-bottom: 1rem; /* Reduced margin */
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    /* Removed search bar from here */
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Space between label and input */
+}
+
+.filter-group label {
+    font-weight: bold;
+    color: #555;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    font-weight: normal; /* Normal weight for radio labels */
+    color: #333; /* Ensure text color is set */
+}
+
+.radio-group input[type="radio"] {
+    margin-right: 0.2rem;
+}
+
+.filter-group .form-control {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Search Bar Specific Styles */
+.search-bar-container {
+    margin-bottom: 1rem; /* Space below search bar */
+    width: 100%; /* Make container full width */
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%; /* Make search bar elements take full width */
+}
+
+.search-bar label {
+    font-weight: bold;
+    color: #555;
+    flex-shrink: 0; /* Prevent label from shrinking */
+}
+
+.search-bar input[type="text"] {
+    flex-grow: 1; /* Allow input to take remaining space */
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+}
+
+
+/* Add Appointment Button Container */
+.add-appointment-button-container {
+    display: flex;
+    justify-content: flex-start; /* Align button to the left */
+    margin-bottom: 1.5rem; /* Space below the button */
+    width: 100%; /* Ensure container takes full width */
+}
+
+.btn-add-appointment {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    background-color: #20c997; /* Teal/Aqua Green */
+    border-color: #20c997;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    border: none;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-add-appointment:hover {
+    background-color: #1baa80; /* Darker teal on hover */
+    border-color: #1baa80;
+}
+
+
+/* Add Appointment Form Styling */
+.add-appointment-form-container.card {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff; /* Light background for form card */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.add-appointment-form-container .card-body {
+    padding: 1.5rem;
+}
+
+.add-appointment-form-container .card-title {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.add-appointment-form .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #555;
+}
+
+.add-appointment-form .form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 1rem; /* Space below inputs */
+    background-color: #fff;
+    color: #333;
+}
+
+.add-appointment-form .form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap; /* Allow wrapping */
+}
+
+.add-appointment-form .form-group.col-md-6 {
+    flex: 1 1 calc(50% - 0.5rem); /* Adjust basis for gap */
+    min-width: 200px; /* Prevent excessive shrinking */
+}
+
+
+/* Basic table styling */
+.appointments-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.appointments-table th,
+.appointments-table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+    vertical-align: middle;
+    color: #333; /* Default text color */
+}
+
+.appointments-table thead th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #333;
+}
+
+.appointments-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.appointments-table tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Button styling within table */
+.appointments-table .btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+    margin-right: 0.3rem; /* Space between buttons */
+    cursor: pointer;
+    border-radius: 4px;
+    border: none;
+    color: white;
+}
+
+.appointments-table .btn-sm { /* Ensure consistency if using btn-sm */
+     padding: 0.25rem 0.5rem;
+     font-size: 0.8rem;
+}
+
+
+.appointments-table .btn-success {
+    background-color: #28a745; /* Green */
+}
+.appointments-table .btn-success:hover {
+    background-color: #218838;
+}
+
+.appointments-table .btn-danger {
+    background-color: #dc3545; /* Red */
+}
+.appointments-table .btn-danger:hover {
+    background-color: #c82333;
+}
+
+.appointments-table .btn-info {
+    background-color: #17a2b8; /* Blue */
+}
+.appointments-table .btn-info:hover {
+    background-color: #138496;
+}
+
+/* Message styling */
+.action-message, .success-message { /* Combine common styles */
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 4px;
+    background-color: #d4edda; /* Light green */
+    color: #155724; /* Dark green */
+    border: 1px solid #c3e6cb;
+    text-align: center;
+}
+
+.error-message {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 4px;
+    background-color: #f8d7da; /* Light red */
+    color: #721c24; /* Dark red */
+    border: 1px solid #f5c6cb;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Modal Styling */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050; /* Ensure modal is on top */
+}
+
+.modal-dialog {
+    max-width: 500px;
+    width: 90%;
+}
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #dee2e6;
+    color: #333;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.modal-header .close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000;
+    opacity: 0.5;
+    cursor: pointer;
+}
+.modal-header .close:hover {
+    opacity: 0.8;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    color: #333;
+}
+
+.modal-body .form-group label {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.modal-body .form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.modal-footer .btn {
+    padding: 0.5rem 1rem;
+    color: white; /* Ensure text is white */
+    border: none;
+    transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out; /* Added opacity transition */
+    cursor: pointer; /* Ensure cursor is pointer by default */
+}
+
+/* Specific Modal Button Colors (Light Mode) */
+.modal-footer .btn-primary,
+.modal-footer .btn-secondary {
+    background-color: #20c997; /* Teal/Aqua Green */
+    border-color: #20c997;
+}
+
+.modal-footer .btn-primary:hover,
+.modal-footer .btn-secondary:hover {
+    background-color: #1baa80; /* Darker teal on hover */
+    border-color: #1baa80;
+}
+
+/* Explicit Disabled Styles for Modal Buttons (Light Mode) */
+.modal-footer .btn:disabled {
+    background-color: #6c757d; /* Standard Bootstrap disabled grey */
+    border-color: #6c757d;
+    opacity: 0.65;
+    cursor: not-allowed; /* Indicate non-interactive */
+    pointer-events: none; /* Explicitly disable pointer events */
+}
+
+
+/* --- Dark Mode Styles --- */
+
+.manage-appointments-container.dark {
+    background-color: #2c3034; /* Dark background */
+    border-color: #444;
+    color: #e0e0e0; /* Light text */
+}
+
+.manage-appointments-container.dark h2 {
+    color: #f1f1f1; /* Lighter heading */
+}
+
+.manage-appointments-container.dark .filters {
+    border-bottom-color: #444;
+}
+
+.manage-appointments-container.dark .filter-group label,
+.manage-appointments-container.dark .radio-group label,
+.manage-appointments-container.dark .search-bar label { /* Added search bar label */
+    color: #bbb; /* Lighter label text */
+}
+
+.manage-appointments-container.dark .filter-group .form-control,
+.manage-appointments-container.dark .add-appointment-form .form-control,
+.manage-appointments-container.dark .modal-body .form-control,
+.manage-appointments-container.dark .search-bar input[type="text"] { /* Added search bar input */
+    background-color: #3a3f44; /* Darker input background */
+    color: #e0e0e0; /* Light input text */
+    border-color: #555;
+}
+.manage-appointments-container.dark .filter-group .form-control::placeholder,
+.manage-appointments-container.dark .search-bar input[type="text"]::placeholder { /* Added search bar placeholder */
+    color: #888;
+}
+
+/* Dark mode Add Appointment Button */
+.manage-appointments-container.dark .btn-add-appointment {
+    background-color: #20c997; /* Keep same teal for consistency */
+    border-color: #20c997;
+}
+.manage-appointments-container.dark .btn-add-appointment:hover {
+    background-color: #1baa80; /* Darker teal hover */
+    border-color: #1baa80;
+}
+
+
+/* Dark mode for Add Appointment Form Card */
+.manage-appointments-container.dark .add-appointment-form-container.card {
+    background-color: #3a3f44; /* Darker card background */
+    border-color: #555;
+}
+
+.manage-appointments-container.dark .add-appointment-form-container .card-title {
+    color: #f1f1f1;
+}
+
+.manage-appointments-container.dark .add-appointment-form .form-group label {
+    color: #bbb;
+}
+
+
+/* Dark mode table */
+.manage-appointments-container.dark .appointments-table th,
+.manage-appointments-container.dark .appointments-table td {
+    border-color: #555; /* Darker borders */
+    color: #e0e0e0; /* Light text in cells */
+}
+
+.manage-appointments-container.dark .appointments-table thead th {
+    background-color: #3a3f44; /* Darker header background */
+    color: #f1f1f1; /* Lighter header text */
+}
+
+.manage-appointments-container.dark .appointments-table tbody tr:nth-child(even) {
+    background-color: #313539; /* Slightly darker even rows */
+}
+
+.manage-appointments-container.dark .appointments-table tbody tr {
+    background-color: #2c3034; /* Default dark row background */
+}
+
+
+.manage-appointments-container.dark .appointments-table tbody tr:hover {
+    background-color: #4a4f54; /* Darker hover */
+}
+
+/* Dark mode messages */
+.manage-appointments-container.dark .action-message,
+.manage-appointments-container.dark .success-message {
+    background-color: #2a4a3a; /* Darker green background */
+    color: #a3e6bd; /* Lighter green text */
+    border-color: #3c765a;
+}
+
+.manage-appointments-container.dark .error-message {
+    background-color: #5a2a2a; /* Darker red background */
+    color: #f5c6cb; /* Lighter red text */
+    border-color: #8b3d3d;
+}
+
+/* Dark Mode Modal */
+.modal-backdrop.dark {
+    background-color: rgba(0, 0, 0, 0.7); /* Slightly darker backdrop */
+}
+
+.modal-content.dark {
+    background-color: #3a3f44; /* Dark modal background */
+    border-color: #555;
+    color: #e0e0e0; /* Light text */
+}
+
+.modal-content.dark .modal-header {
+    border-bottom-color: #555;
+    color: #f1f1f1; /* Lighter header text */
+}
+
+.modal-content.dark .modal-header .close {
+    color: #ccc; /* Lighter close button */
+    opacity: 0.7;
+}
+.modal-content.dark .modal-header .close:hover {
+    opacity: 1;
+}
+
+.modal-content.dark .modal-body {
+    color: #e0e0e0; /* Light body text */
+}
+
+.modal-content.dark .modal-body .form-group label {
+    color: #bbb; /* Lighter label */
+}
+
+.modal-content.dark .modal-footer {
+    border-top-color: #555;
+}
+
+/* Specific Modal Button Colors (Dark Mode) */
+.modal-content.dark .modal-footer .btn-primary,
+.modal-content.dark .modal-footer .btn-secondary {
+    background-color: #20c997; /* Teal/Aqua Green */
+    border-color: #20c997;
+    color: white; /* Ensure text is white */
+}
+
+.modal-content.dark .modal-footer .btn-primary:hover,
+.modal-content.dark .modal-footer .btn-secondary:hover {
+    background-color: #1baa80; /* Darker teal on hover */
+    border-color: #1baa80;
+}
+
+/* Explicit Disabled Styles for Modal Buttons (Dark Mode) */
+.modal-content.dark .modal-footer .btn:disabled {
+    background-color: #5a6268; /* Darker grey for dark mode */
+    border-color: #545b62;
+    opacity: 0.5; /* Adjust opacity for dark mode */
+    cursor: not-allowed;
+    pointer-events: none;
+}

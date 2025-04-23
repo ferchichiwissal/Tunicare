@@ -1,0 +1,153 @@
+/* General Styles for MyAppointments */
+
+.my-appointments-container {
+    /* Add padding or margins if needed, Bootstrap container class already adds some */
+    padding: 1rem;
+}
+
+.appointments-table {
+    width: 100%;
+    margin-top: 1rem;
+    border-collapse: collapse; /* Ensure borders look clean */
+}
+
+.appointments-table th,
+.appointments-table td {
+    padding: 0.75rem;
+    vertical-align: middle; /* Align content vertically */
+    border-top: 1px solid #dee2e6; /* Default Bootstrap table border */
+}
+
+.appointments-table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6; /* Heavier border for header */
+    text-align: left;
+}
+
+/* Style for action buttons column */
+.appointments-table td:last-child {
+    text-align: center; /* Center buttons */
+    white-space: nowrap; /* Prevent buttons from wrapping */
+}
+
+/* Ensure badges have consistent vertical alignment */
+.badge {
+    vertical-align: middle;
+}
+
+/* Modal Styling (Bootstrap handles most, but we can override) */
+.modal-content {
+    border-radius: 0.3rem; /* Standard Bootstrap border radius */
+}
+
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+/* --- Light Mode Specific Styles --- */
+body.light-mode .my-appointments-container {
+    background-color: #ffffff; /* White background */
+    color: #212529; /* Dark text */
+}
+
+body.light-mode .appointments-table {
+    /* Bootstrap default light mode table styles are usually sufficient */
+    /* Example: override border color if needed */
+    /* border-color: #ccc; */
+}
+
+body.light-mode .modal-content {
+    background-color: #ffffff;
+    color: #212529;
+}
+
+body.light-mode .modal-header,
+body.light-mode .modal-footer {
+    border-color: #dee2e6;
+}
+
+body.light-mode .form-control,
+body.light-mode .form-select {
+    background-color: #fff;
+    color: #495057;
+    border: 1px solid #ced4da;
+}
+
+/* --- Dark Mode Specific Styles --- */
+body.dark-mode .my-appointments-container {
+    background-color: #212529; /* Dark background */
+    color: #f8f9fa; /* Light text */
+}
+
+body.dark-mode .appointments-table {
+    color: #f8f9fa; /* Light text for table */
+    border-color: #495057; /* Darker borders */
+}
+
+body.dark-mode .appointments-table th,
+body.dark-mode .appointments-table td {
+    border-top-color: #495057;
+}
+
+body.dark-mode .appointments-table thead th {
+    border-bottom-color: #6c757d;
+}
+
+/* Override Bootstrap dark table styles if needed */
+body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) > * {
+    --bs-table-accent-bg: rgba(255, 255, 255, 0.05); /* Slightly lighter dark for striped rows */
+    color: #f8f9fa;
+}
+body.dark-mode .table-hover > tbody > tr:hover > * {
+     --bs-table-accent-bg: rgba(255, 255, 255, 0.075); /* Slightly lighter dark for hover */
+     color: #f8f9fa;
+}
+
+
+body.dark-mode .modal-content {
+    background-color: #343a40; /* Dark modal background */
+    color: #f8f9fa; /* Light text in modal */
+    border: 1px solid #495057;
+}
+
+body.dark-mode .modal-header,
+body.dark-mode .modal-footer {
+    border-color: #495057; /* Darker borders for modal header/footer */
+}
+
+body.dark-mode .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%); /* Make close button white */
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: #495057; /* Darker input background */
+    color: #f8f9fa; /* Light text in inputs */
+    border: 1px solid #6c757d; /* Darker input border */
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #adb5bd; /* Lighter placeholder text */
+}
+
+body.dark-mode .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); /* Dark mode arrow */
+}
+
+/* Adjust badge colors for dark mode if needed (Bootstrap defaults might be okay) */
+body.dark-mode .badge.bg-light {
+    background-color: #6c757d !important; /* Darker light badge */
+    color: #f8f9fa !important; /* Light text */
+}
+body.dark-mode .badge.bg-warning {
+     background-color: #ffc107 !important; /* Keep warning yellow */
+     color: #000 !important; /* Ensure dark text on yellow */
+}
+body.dark-mode .badge.bg-info {
+     background-color: #0dcaf0 !important; /* Keep info cyan */
+     color: #000 !important; /* Ensure dark text on cyan */
+}

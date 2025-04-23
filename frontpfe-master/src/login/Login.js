@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react"; // Import useEffect
+import React, { useState, useEffect, useContext } from "react"; // Import useContext
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next"; // Import useTranslation
 import styles from "./login.module.css";
 import apiClient from "../utils/apiClient";
-import { storeUserData } from "../utils/auth";
+import { storeUserData } from "../utils/auth"; // Restore this import
+import AuthContext from '../context/AuthContext'; // Import AuthContext
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -17,6 +18,7 @@ const Login = () => {
 
   const navigate = useNavigate();
   const { t } = useTranslation(); // Get the translation function
+  const { refreshUser } = useContext(AuthContext); // Get refreshUser from context
 
   // useEffect to check for remembered email on component mount
   useEffect(() => {
@@ -60,12 +62,23 @@ const Login = () => {
       const responseData = response.data;
 
       // If status is 200, login is successful for the returned context (user/cabinet)
-      if (response.status === 200 && responseData.user) {
+      // Reverted condition check to original
+      if (response.status === 200 && responseData.user) { 
         setLoginMessage({ key: 'loginSuccess' });
+        
         // Pass the rememberMe state to storeUserData for token storage duration
-        storeUserData(responseData, rememberMe); 
+        // Restore the original call to storeUserData
+        storeUserData(responseData, rememberMe);
 
-        // Handle remembering the email address itself
+        // Explicitly refresh the AuthContext state AFTER storing data
+        if (refreshUser) {
+          refreshUser();
+          console.log("AuthContext state refreshed after login.");
+        } else {
+           console.error("Could not refresh AuthContext state after login.");
+        }
+
+        // Handle remembering the email address itself (remains unchanged)
         if (rememberMe) {
           localStorage.setItem('rememberedEmail', email);
         } else {

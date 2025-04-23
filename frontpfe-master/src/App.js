@@ -25,6 +25,7 @@ import ResetPasswordPage from "./login/ResetPasswordPage";
 import ChangePassword from './Interface/ChangePassword'; // Import ChangePassword component
 import ProtectedLayout from './utils/ProtectedLayout'; // Assuming ProtectedLayout exists
 import { ThemeProvider } from './utils/ThemeContext'; // Import ThemeProvider
+import { AuthProvider } from './context/AuthContext'; // Import AuthProvider
 import Activation from './Interface/CRUD users/Activation'; // Import the new Activation component
 
 // Import CentreDexamen components
@@ -33,6 +34,15 @@ import AddCentreDexamenForm from './Interface/CRUD_Centres/AddCentreDexamenForm'
 import EditCentreDexamenForm from './Interface/CRUD_Centres/EditCentreDexamenForm';
 import RegisterDoctorCentreForm from './Interface/CRUD_Centres/RegisterDoctorCentreForm';
 import EditDoctorCentreForm from './Interface/CRUD users/EditDoctorCentreForm'; // Import the new form
+import ConsultationPage from './Interface/Appointments/ConsultationPage'; // Import ConsultationPage
+import MedicalExaminationForm from './Interface/Appointments/MedicalExaminationForm'; // Import MedicalExaminationForm
+import ConsultationDashboard from './Interface/Appointments/ConsultationDashboard'; // Import ConsultationDashboard
+import OrdonnanceEditPage from './Interface/Appointments/OrdonnanceEditPage'; // Import OrdonnanceEditPage
+import MyConsultationsPage from './Interface/Appointments/MyConsultationsPage'; // Import MyConsultationsPage
+import MyExaminationsPage from './Interface/Appointments/MyExaminationsPage'; // Import MyExaminationsPage
+import AddAppointmentForm from './Interface/Appointments/AddAppointmentForm'; // Import AddAppointmentForm
+import MyAppointments from './Interface/Appointments/MyAppointments'; // Import MyAppointments
+import ManageAppointments from './Interface/Appointments/ManageAppointments'; // Import ManageAppointments
 
 const onLogout = () => {
   // Clear tokens from localStorage and sessionStorage
@@ -45,9 +55,10 @@ const onLogout = () => {
 function App() {
   return (
     <ThemeProvider>
-      <Router>
-      {/* Wrap Routes with Suspense for i18next loading */}
-      <Suspense fallback={<div>Loading translations...</div>}>
+      <AuthProvider> {/* Wrap Router with AuthProvider */}
+        <Router>
+        {/* Wrap Routes with Suspense for i18next loading */}
+        <Suspense fallback={<div>Loading translations...</div>}>
         <Routes>
           <Route path="/sign-in" element={<Login />} />
           <Route path="/Logout" element={<Logout />} />
@@ -132,9 +143,74 @@ function App() {
             </ProtectedLayout>
           } />
 
+          {/* Route for Consultation Page, protected for Doctor */}
+          {/* Renamed param to match component */}
+          <Route path="/consultation/:appointmentId" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR">
+              <ConsultationPage />
+            </ProtectedLayout>
+          } />
+
+          {/* Route for Medical Examination Form, protected for Doctor */}
+          <Route path="/consultation/exam/new" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR">
+              <MedicalExaminationForm />
+            </ProtectedLayout>
+          } />
+
+          {/* Route for Consultation Dashboard, protected for Doctor/Assistant */}
+          <Route path="/consultation/all" element={
+            <ProtectedLayout requiredRole={["ROLE_DOCTOR", "ROLE_ASSISTANT"]}>
+              <ConsultationDashboard />
+            </ProtectedLayout>
+          } />
+
+          {/* Route for Prescription Edit Page, protected for Doctor */}
+          <Route path="/ordonnance/edit" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR">
+              <OrdonnanceEditPage />
+            </ProtectedLayout>
+          } />
+
+          {/* Route for Patient's Consultations Page */}
+          <Route path="/my-consultations" element={
+            <ProtectedLayout requiredRole="ROLE_PATIENT">
+              <MyConsultationsPage />
+            </ProtectedLayout>
+          } />
+
+          {/* Route for Patient's Examinations Page */}
+          <Route path="/my-examinations" element={
+            <ProtectedLayout requiredRole="ROLE_PATIENT">
+              <MyExaminationsPage />
+            </ProtectedLayout>
+          } />
+
+          {/* Route for Adding Appointment, protected for Doctor/Assistant */}
+          <Route path="/add-appointment" element={
+            <ProtectedLayout requiredRole={["ROLE_DOCTOR", "ROLE_ASSISTANT", "ROLE_PATIENT"]}>
+              <AddAppointmentForm />
+            </ProtectedLayout>
+          } />
+
+          {/* Route for Patient's Appointments Page */}
+          <Route path="/my-appointments" element={
+            <ProtectedLayout requiredRole="ROLE_PATIENT">
+              <MyAppointments />
+            </ProtectedLayout>
+          } />
+
+          {/* Route for Staff Appointment Management */}
+          <Route path="/manage-appointments" element={
+            <ProtectedLayout requiredRole={["ROLE_DOCTOR", "ROLE_ASSISTANT"]}>
+              <ManageAppointments />
+            </ProtectedLayout>
+          } />
+
            </Routes>
         </Suspense>
-      </Router>
+        </Router>
+      </AuthProvider> {/* Close AuthProvider */}
     </ThemeProvider>
   );
 }

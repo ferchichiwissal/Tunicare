@@ -875,5 +875,108 @@
         "scanMessage": "Scannez ce code pour vous inscrire dans ce cabinet."
       },
       "notAvailable": "N/D"
+    },
+    "manageAppointments": {
+      "title": "Gérer les Rendez-vous",
+      "filter": {
+        "pending": "En attente",
+        "accepted": "Accepté",
+        "dateLabel": "Date :",
+        "searchLabel": "Rechercher :",
+        "searchPlaceholder": "Rechercher par nom..."
+      },
+      "buttons": {
+        "addAppointment": "Ajouter un Rendez-vous",
+        "cancelAdd": "Annuler l'ajout",
+        "accept": "Accepter",
+        "refusePropose": "Refuser/Proposer",
+        "startConsultation": "Commencer Consultation"
+      },
+      "table": {
+        "header": {
+          "patient": "Patient",
+          "date": "Date et Heure",
+          "type": "Type",
+          "status": "Statut",
+          "action": "Action"
+        },
+        "noResultsSearch": "Aucun rendez-vous trouvé correspondant à votre recherche.",
+        "noResultsCriteria": "Aucun rendez-vous trouvé pour les critères sélectionnés."
+      },
+      "appointmentType": {
+        "nouvelleconsultation": "Nouvelle consultation",
+        "séancedecontrôle": "Séance de contrôle"
+      },
+      "appointmentState": {
+        "enattente": "En attente",
+        "accepté": "Accepté",
+        "refusé": "Refusé",
+        "réalisé": "Réalisé",
+        "annulé": "Annulé"
+      },
+      "addForm": {
+        "title": "Ajouter un Nouveau Rendez-vous (Interne)",
+        "firstNameLabel": "Prénom du Patient",
+        "lastNameLabel": "Nom du Patient",
+        "dateTimeLabel": "Date et Heure",
+        "typeLabel": "Type de Rendez-vous",
+        "typeOptions": {
+          "newConsultation": "Nouvelle consultation",
+          "followUp": "Séance de contrôle"
+        },
+        "validationError": "⚠️ Veuillez remplir tous les champs requis.",
+        "patientNotFound": "❌ Patient non trouvé dans ce cabinet.",
+        "patientSearchError": "❌ Erreur lors de la recherche du patient : {{error}}",
+        "addSuccess": "✅ Rendez-vous ajouté avec succès !",
+        "addError": "❌ Erreur lors de l'ajout du rendez-vous : {{error}}",
+        "submitting": "Ajout en cours...",
+        "submitButton": "Ajouter le Rendez-vous"
+      },
+      "modal": {
+        "refuse": {
+          "title": "Refuser et Proposer une Nouvelle Date",
+          "appointmentIdLabel": "Rendez-vous ID : {{refusalTargetId}}",
+          "newDateTimeLabel": "Proposer une nouvelle date et heure :",
+          "validationError": "⚠️ Veuillez sélectionner une nouvelle date et heure.",
+          "success": "✅ Rendez-vous ID {{refusalTargetId}} refusé. Nouvelle date proposée.",
+          "failure": "❌ Échec du refus/proposition pour ID {{refusalTargetId}} : {{error}}",
+          "sending": "Envoi...",
+          "confirmButton": "Confirmer Refus & Proposition"
+        }
+      },
+      "action": {
+        "acceptSuccess": "✅ Rendez-vous ID {{appointmentId}} accepté.",
+        "acceptFailed": "❌ Échec de l'acceptation du RDV ID {{appointmentId}}. Erreur: {{error}}",
+        "markDoneSuccess": "✅ Rendez-vous ID {{appointmentId}} marqué comme réalisé.",
+        "markDoneFailed": "❌ Échec du marquage comme réalisé pour RDV ID {{appointmentId}}. Erreur: {{error}}"
+      },
+      "error": {
+        "missingCabinetId": "Erreur : ID du cabinet non trouvé dans les données utilisateur.",
+        "missingCabinetIdMessage": "Impossible de charger les rendez-vous. L'ID de votre cabinet n'est pas défini.",
+        "fetchFailed": "Échec du chargement des rendez-vous ({{filterState}}).",
+        "generic": "Une erreur s'est produite."
+      },
+      "loading": "Chargement des rendez-vous..."
+    },
+    "addAppointment": {
+      "title": "Demander un Rendez-vous",
+      "rescheduleTitle": "Reprogrammer un Rendez-vous",
+      "dateLabel": "Date et Heure",
+      "typeLabel": "Type de Rendez-vous",
+      "typeOptionNew": "Nouvelle consultation",
+      "typeOptionControl": "Séance de contrôle",
+      "fillFieldsError": "Veuillez remplir la date, l'heure et le type.",
+      "successMessage": "Rendez-vous demandé avec succès pour le {{dateTime}}! Statut: {{status}}",
+      "failureMessage": "Échec de la création du rendez-vous. Veuillez réessayer.",
+      "addingButton": "Demande en cours...",
+      "addButton": "Demander Rendez-vous",
+      "rescheduleButton": "Reprogrammer Rendez-vous"
+    },
+    "common": {
+      "notAvailable": "N/D",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "invalidDate": "Date invalide",
+      "dateError": "Erreur Date"
     }
 }
