@@ -23,4 +23,11 @@ public interface IPrescribedMedicationsService {
     PrescribedMedications updatePrescription(Long prescriptionId, String updatedText);
 
     // Add other methods as needed (e.g., getById)
+
+    /**
+     * Retrieves the prescription associated with a specific consultation.
+     * @param consultationId The ID of the consultation.
+     * @return The PrescribedMedications entity, or null if not found.
+     */
+    PrescribedMedications getPrescriptionByConsultationId(Long consultationId);
 }

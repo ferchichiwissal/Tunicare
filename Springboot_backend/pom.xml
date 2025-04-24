@@ -125,6 +125,13 @@
 			<!-- Version is managed by Spring Boot parent POM -->
 		</dependency>
 
+		<!-- OpenPDF for PDF Generation -->
+		<dependency>
+			<groupId>com.github.librepdf</groupId>
+			<artifactId>openpdf</artifactId>
+			<version>1.3.30</version> <!-- Use a recent stable version -->
+		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -9,15 +9,19 @@ import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 // import './ConsultationPage.css';
 
 const ConsultationPage = () => {
-    const { appointmentId } = useParams(); // Get appointmentId from URL (renamed from consultationId)
+    // Get EITHER appointmentId OR consultationId from URL params
+    const { appointmentId, consultationId } = useParams();
     const navigate = useNavigate(); // Hook for navigation
+
+    // Mode state
+    const [isEditMode, setIsEditMode] = useState(!!consultationId); // True if consultationId exists
 
     // State for appointment/consultation data
     const [appointment, setAppointment] = useState(null); // Store fetched appointment
     const [patient, setPatient] = useState(null);
     const [consultationText, setConsultationText] = useState(''); // Initialize as empty for new consultation
     const [prescriptionText, setPrescriptionText] = useState(''); // Initialize as empty for new consultation
-    const [savedConsultationId, setSavedConsultationId] = useState(null); // Store ID after saving
+    const [savedConsultationId, setSavedConsultationId] = useState(consultationId ? Number(consultationId) : null); // Initialize if editing
 
     // State for history
     const [showHistory, setShowHistory] = useState(false);
@@ -39,50 +43,105 @@ const ConsultationPage = () => {
         console.log("ConsultationPage - User from context:", JSON.stringify(user, null, 2)); // Log user object from context
     }, [user]);
 
-    // Fetch initial APPOINTMENT data to get patient info
+    // Combined useEffect for fetching data based on mode (New vs Edit)
     useEffect(() => {
-        const fetchAppointmentDetails = async () => {
+        const fetchData = async () => {
             setIsLoading(true);
             setError('');
             setSaveStatus('');
-            setConsultationText(''); // Reset editors for new consultation
+            setConsultationText('');
             setPrescriptionText('');
-            setSavedConsultationId(null); // Reset saved ID when loading new appointment
-            try {
-                // Fetch the specific APPOINTMENT details using apiClient
-                console.log(`Fetching appointment details for ID: ${appointmentId}`);
-                const response = await apiClient.get(`/api/rendezvous/${appointmentId}`); // Fetch appointment by ID
-                console.log("Fetched appointment details:", response.data);
-                const data = response.data;
-                setAppointment(data); // Store appointment data if needed later
-                setPatient(data.patient || null); // Set patient from appointment data
+            setPatient(null);
+            setAppointment(null); // Reset appointment too
 
-                if (!data.patient) {
-                    setError('Détails du patient non trouvés dans les données du rendez-vous.');
+            if (consultationId) {
+                // --- EDIT/VIEW MODE ---
+                setIsEditMode(true);
+                setSavedConsultationId(Number(consultationId)); // Ensure ID is set for saving updates
+                console.log(`EDIT MODE: Fetching consultation details for ID: ${consultationId}`);
+                try {
+                    // Fetch the specific CONSULTATION details using apiClient
+                    const response = await apiClient.get(`/api/consultations/${consultationId}`);
+                    const consultData = response.data;
+                    console.log("Fetched consultation details:", consultData);
+
+                    // Populate state from fetched consultation DTO
+                    setConsultationText(consultData.text || '');
+                    setPrescriptionText(consultData.prescriptionText || ''); // Use the new field from DTO
+
+                   // Fetch full patient details using the patientId from the consultation
+                   if (consultData.patientId) {
+                       try {
+                           console.log(`Fetching full patient details for ID: ${consultData.patientId}`);
+                           // Corrected endpoint based on UserController.java
+                           const patientResponse = await apiClient.get(`/Users/allid/${consultData.patientId}`);
+                           console.log("Fetched full patient details:", patientResponse.data);
+                           setPatient(patientResponse.data || null); // Set patient state with full details
+                           if (!patientResponse.data) {
+                               setError('Détails complets du patient non trouvés.');
+                           }
+                       } catch (patientErr) {
+                           console.error("Error fetching full patient details:", patientErr);
+                           // Check specifically for 404 on the new endpoint
+                           if (patientErr.response && patientErr.response.status === 404) {
+                               setError(`Patient avec ID ${consultData.patientId} non trouvé via /Users/allid/.`);
+                           } else {
+                               setError(patientErr.response?.data?.message || `Échec de la récupération des détails pour le patient ${consultData.patientId}.`);
+                           }
+                           setPatient(null); // Clear patient on error
+                       }
+                   } else {
+                       setError('ID du patient manquant dans les données de consultation.');
+                       setPatient(null);
+                   }
+
+                } catch (err) {
+                    console.error("Error fetching consultation details:", err);
+                    if (err.response && err.response.status === 404) {
+                        setError(`Consultation avec ID ${consultationId} non trouvée.`);
+                    } else {
+                        setError(err.response?.data?.message || `Échec de la récupération des détails pour la consultation ${consultationId}.`);
+                    }
+                    setPatient(null); // Clear patient on error
+                } finally {
+                    setIsLoading(false);
                 }
 
-            } catch (err) {
-                console.error("Error fetching appointment details:", err);
-                // Handle 404 specifically if needed, otherwise show generic error
-                if (err.response && err.response.status === 404) {
-                     setError(`Rendez-vous avec ID ${appointmentId} non trouvé.`);
-                } else {
-                    setError(err.response?.data?.message || `Échec de la récupération des détails pour le rendez-vous ${appointmentId}.`);
+            } else if (appointmentId) {
+                // --- NEW CONSULTATION MODE (Existing Logic) ---
+                setIsEditMode(false);
+                setSavedConsultationId(null); // Ensure no ID for new consultation save
+                console.log(`NEW MODE: Fetching appointment details for ID: ${appointmentId}`);
+                try {
+                    const response = await apiClient.get(`/api/rendezvous/${appointmentId}`);
+                    console.log("Fetched appointment details:", response.data);
+                    const apptData = response.data;
+                    setAppointment(apptData);
+                    setPatient(apptData.patient || null);
+
+                    if (!apptData.patient) {
+                        setError('Détails du patient non trouvés dans les données du rendez-vous.');
+                    }
+                } catch (err) {
+                    console.error("Error fetching appointment details:", err);
+                    if (err.response && err.response.status === 404) {
+                        setError(`Rendez-vous avec ID ${appointmentId} non trouvé.`);
+                    } else {
+                        setError(err.response?.data?.message || `Échec de la récupération des détails pour le rendez-vous ${appointmentId}.`);
+                    }
+                    setPatient(null);
+                } finally {
+                    setIsLoading(false);
                 }
-                setAppointment(null);
-                setPatient(null);
-            } finally {
+            } else {
+                // --- INVALID STATE ---
+                setError("ID de rendez-vous ou de consultation manquant dans l'URL.");
                 setIsLoading(false);
             }
         };
 
-        if (appointmentId) {
-            fetchAppointmentDetails();
-        } else {
-            setError("ID de rendez-vous manquant dans l'URL.");
-            setIsLoading(false);
-        }
-    }, [appointmentId]); // Depend on appointmentId
+        fetchData();
+    }, [appointmentId, consultationId]); // Depend on both IDs
 
     // --- Helper Functions ---
     const formatDate = (dateString) => {
@@ -118,8 +177,15 @@ const ConsultationPage = () => {
             setHistoryError('');
             try {
                 // Fetch history using apiClient
-                const response = await apiClient.get(`/api/consultations/patient/${patient.id}/history`); // Corrected: Use patient.id
-                setConsultationHistory(response.data || []);
+                const response = await apiClient.get(`/api/consultations/patient/${patient.id}/history`);
+                let historyData = response.data || [];
+
+                // Filter out the current consultation if in edit mode
+                if (isEditMode && consultationId) {
+                    historyData = historyData.filter(hist => hist.idConsultation !== Number(consultationId));
+                }
+
+                setConsultationHistory(historyData);
             } catch (err) {
                 console.error("Error fetching consultation history:", err);
                 setHistoryError(err.response?.data?.message || 'Échec de la récupération de l\'historique.');
@@ -141,6 +207,14 @@ const ConsultationPage = () => {
         setSaveStatus('Sauvegarde en cours...');
         setError('');
 
+        // Add check for user, user.id, user.activeCabinet, and user.activeCabinet.id
+        if (!user || !user.id || !user.activeCabinet || !user.activeCabinet.id) {
+             setError("Impossible de récupérer l'ID du médecin ou du cabinet actif. Veuillez vérifier votre session.");
+             setSaveStatus('Erreur');
+             console.log("[handleSave] Error: Logged-in user ID or active cabinet ID missing from context.");
+             return;
+        }
+
         if (!patient) {
             setError("ID Patient manquant pour la sauvegarde.");
             setSaveStatus('Erreur'); // Indicate error state
@@ -148,9 +222,12 @@ const ConsultationPage = () => {
             return;
         }
 
+
         try {
             const payload = {
                 patientId: patient.id,
+                doctorId: user.id, // Add the logged-in doctor's ID
+                cabinetId: user.activeCabinet.id, // Add the active cabinet's ID
                 rendezVousId: appointmentId, // Keep sending appointmentId for context if needed by backend
                 consultationText: consultationText,
                 prescriptionText: prescriptionText,
@@ -168,16 +245,21 @@ const ConsultationPage = () => {
             const response = await apiClient.post(`/api/consultations`, payload);
             console.log("[handleSave] Received response:", response.data); // Log full response
 
-            const newConsultationId = response.data.idConsultation;
-            console.log("[handleSave] Received newConsultationId from backend:", newConsultationId); // Log received ID
+            const returnedConsultationId = response.data.idConsultation; // Use the ID returned by backend
+            console.log("[handleSave] Received consultationId from backend:", returnedConsultationId); // Log received ID
             // Update success message based on whether it was a create or update
-            const currentSavedIdBeforeUpdate = savedConsultationId; // Capture state before update for message logic
-            setSaveStatus(currentSavedIdBeforeUpdate ? 'Consultation mise à jour avec succès !' : 'Consultation créée avec succès !');
-            setSavedConsultationId(newConsultationId); // Store/update the ID state
+            setSaveStatus(isEditMode ? 'Consultation mise à jour avec succès !' : 'Consultation créée avec succès !');
+            setSavedConsultationId(returnedConsultationId); // Store/update the ID state
+            // If it was a new consultation, update the mode and URL potentially? Or just rely on state.
+            if (!isEditMode) {
+                 setIsEditMode(true); // Now we are editing the newly created one
+                 // Optionally update URL without full reload if needed, but might be complex
+                 // navigate(`/consultation/details/${returnedConsultationId}`, { replace: true });
+            }
 
         } catch (err) {
             console.error("[handleSave] Error saving consultation:", err); // Log error details
-            const errorMsg = err.response?.data?.message || (savedConsultationId ? 'Échec de la mise à jour de la consultation.' : 'Échec de la création de la consultation.');
+            const errorMsg = err.response?.data?.message || (isEditMode ? 'Échec de la mise à jour de la consultation.' : 'Échec de la création de la consultation.');
             setError(errorMsg);
             setSaveStatus('Erreur'); // Indicate error state
         } finally {
@@ -194,238 +276,120 @@ const ConsultationPage = () => {
         }
     };
 
-    // Basic print function - Opens a new window with content and tries to close it
+    // Print function using a hidden iframe - Refined for stability and cleanup
     const printContent = (content) => {
-        const printWindow = window.open('', '_blank', 'height=600,width=800');
-        if (printWindow) {
-            printWindow.document.write('<html><head><title>Ordonnance Médicale</title>');
-            // Add new styling for the teal template layout
-            printWindow.document.write(`
-                <style>
-                    html, body {
-                        height: 100%; /* Needed for flex layout to work correctly */
-                        margin: 0;
-                        padding: 0;
-                    }
-                    body {
-                        font-family: Arial, sans-serif;
-                        font-size: 12px;
-                        color: #333;
-                        background-color: #fff;
-                    }
-                    .page-container {
-                        width: 100%;
-                        max-width: 800px;
-                        margin: 0 auto;
-                        padding: 0;
-                        background-color: white;
-                        position: relative;
-                        min-height: 100%; /* Use 100% height */
-                        display: flex;
-                        flex-direction: column;
-                    }
-                    .content-wrapper {
-                        flex: 1 0 auto; /* Grow, don't shrink, basis auto */
-                        padding: 20px 40px; /* Add padding */
-                        z-index: 1;
-                    }
+        const iframeId = 'print-iframe';
+        let iframe = document.getElementById(iframeId);
 
-                    /* Header Styles - Teal Gradient Bar */
-                    .header {
-                        background: linear-gradient(to right, #008080, #20B2AA, #48D1CC); /* Teal gradient */
-                        color: white;
-                        padding: 10px 40px;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        min-height: 60px;
-                    }
-                    .header .doctor-info {
-                        text-align: left;
-                    }
-                    .header .doctor-name {
-                        font-size: 1.3em;
-                        font-weight: bold;
-                        margin: 0 0 2px 0;
-                    }
-                    .header .doctor-qualification {
-                        font-size: 0.9em;
-                        margin: 0;
-                        text-transform: uppercase;
-                        letter-spacing: 0.5px;
-                        opacity: 0.9;
-                    }
-                    .header .header-icon-container {
-                        background-color: #48D1CC; /* Match lighter end of gradient */
-                        border-radius: 50%;
-                        width: 50px;
-                        height: 50px;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                    }
-                    .header .header-icon { /* Placeholder for stethoscope */
-                        font-size: 1.8em;
-                        color: white;
-                    }
-                     /* Title moved below header */
-                     .prescription-title-container {
-                         text-align: center;
-                         margin: 20px 0 15px 0;
-                         font-size: 1.4em;
-                         font-weight: bold;
-                         color: #333;
-                     }
-
-                    /* Body Content */
-                    .body-content {
-                        display: flex;
-                        margin-top: 10px; /* Reduced top margin */
-                        padding-bottom: 20px;
-                    }
-                    .body-left {
-                        width: 50%; /* Adjusted width */
-                        padding-right: 20px;
-                    }
-                    .body-right {
-                        width: 50%; /* Adjusted width */
-                        padding-left: 20px;
-                    }
-                    /* Removed .caduceus-symbol */
-                    .patient-details label, .insurance-diagnosis label {
-                        display: block;
-                        font-weight: bold;
-                        margin-bottom: 2px;
-                        font-size: 0.9em;
-                    }
-                    .patient-details span, .insurance-diagnosis span {
-                        display: block;
-                        border-bottom: 1px dotted #aaa;
-                        margin-bottom: 10px;
-                        padding: 2px 0;
-                        min-height: 1.2em;
-                        font-size: 1em;
-                    }
-                    .insurance-diagnosis {
-                         margin-top: 0; /* Align with patient details */
-                    }
-
-                    /* Removed Watermark */
-
-                    /* Signature */
-                    .signature-area {
-                        text-align: right;
-                        margin-top: 60px; /* Fine-tuned margin */
-                        margin-right: 0; /* Align to edge */
-                        padding-bottom: 20px; /* Keep some padding below */
-                    }
-                    .signature-line {
-                        border-bottom: 1px solid #555;
-                        width: 200px;
-                        display: block;
-                        margin-bottom: 5px;
-                        margin-left: auto;
-                    }
-                    .signature-label {
-                        font-size: 0.9em;
-                        color: #555;
-                    }
-
-                    /* Footer Styles - Teal Gradient Bar */
-                    .footer {
-                        background: linear-gradient(to right, #008080, #20B2AA, #48D1CC); /* Teal gradient */
-                        padding: 10px 40px;
-                        font-size: 0.85em;
-                        color: white; /* White text on teal */
-                        display: flex;
-                        justify-content: space-around;
-                        align-items: center;
-                        flex-wrap: wrap;
-                        margin-top: auto; /* Push footer to bottom in normal view */
-                        flex-shrink: 0; /* Prevent footer from shrinking */
-                    }
-                    /* Removed .footer::before */
-                    .footer span {
-                        margin: 3px 10px;
-                        white-space: nowrap;
-                    }
-                    .footer i { /* Using text emojis as placeholders */
-                        margin-right: 5px;
-                        color: white; /* White icons */
-                    }
-
-                    /* Print specific styles */
-                    @media print {
-                        body {
-                            font-size: 10pt;
-                            color: #000;
-                            background-color: #fff;
-                        }
-                        .page-container {
-                            border: none;
-                            box-shadow: none;
-                            margin: 0;
-                            width: 100%;
-                            max-width: none;
-                            min-height: 100%; /* Re-add min-height for print */
-                            height: 100%; /* Re-add height for print */
-                            /* position: relative; /* Not needed for flex */
-                            /* padding-bottom: 60px; /* Not needed if flex works */
-                        }
-                        .header {
-                             background: linear-gradient(to right, #008080, #20B2AA, #48D1CC) !important; /* Ensure gradient prints */
-                            -webkit-print-color-adjust: exact;
-                            color-adjust: exact;
-                            color: white !important;
-                        }
-                         .header .header-icon-container {
-                             background-color: #48D1CC !important;
-                             -webkit-print-color-adjust: exact;
-                             color-adjust: exact;
-                         }
-                        .patient-details span, .insurance-diagnosis span {
-                             border-bottom: 1px solid #777;
-                         }
-                        .footer {
-                            background: linear-gradient(to right, #008080, #20B2AA, #48D1CC) !important; /* Teal gradient */
-                            color: white !important;
-                            -webkit-print-color-adjust: exact;
-                            color-adjust: exact;
-                            /* position: fixed; /* Revert to flex for print */
-                            /* bottom: 0; */
-                            /* left: 0; */
-                            /* right: 0; */
-                            /* width: 100%; */
-                            padding: 10px 40px; /* Re-apply padding */
-                            /* box-sizing: border-box; */
-                            /* z-index: 10; */
-                            page-break-inside: avoid; /* Keep avoid for flex */
-                        }
-                        /* Removed watermark print styles */
-                        /* Removed caduceus print styles */
-                    }
-                </style>
-            `);
-            printWindow.document.write('</head><body>');
-            printWindow.document.write('<div class="page-container">'); // Wrap content
-            printWindow.document.write(content);
-            printWindow.document.write('</div>'); // Close wrapper
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.focus(); // Focus the new window
+        // Remove existing iframe if it exists (clean slate)
+        if (iframe) {
             try {
-                 // Call print directly, without setTimeout
-                 printWindow.print();
+                iframe.parentNode.removeChild(iframe);
             } catch (e) {
-                 console.error("Error initiating print:", e);
+                console.warn("Could not remove existing print iframe:", e);
             }
-        } else {
-            // Use doctor's preferred language from context for the alert
-            const userLang = user?.languagePreference || 'fr'; // Corrected: use 'user'
-            const alertMsg = userLang === 'en'
-                ? "Could not open print window. Please check your browser settings (pop-up blocker)."
-                : "Impossible d'ouvrir la fenêtre d'impression. Vérifiez les paramètres de votre navigateur (bloqueur de pop-up).";
-            alert(alertMsg);
+        }
+
+        // Create the iframe
+        iframe = document.createElement('iframe');
+        iframe.id = iframeId;
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        iframe.style.visibility = 'hidden'; // Hide the iframe
+        iframe.style.left = '-9999px'; // Move off-screen
+
+        document.body.appendChild(iframe);
+
+        // Get the iframe's document context and window
+        const iframeDoc = iframe.contentWindow.document;
+        const iframeWin = iframe.contentWindow;
+
+        // Write the HTML content to the iframe
+        iframeDoc.open();
+        iframeDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Ordonnance Médicale</title>'); // Added Doctype and charset
+        // Add styles directly here (same styles as before)
+        iframeDoc.write(`
+            <style>
+                /* Ensure styles are applied correctly */
+                @page { size: A4; margin: 0; } /* Optional: Define page size */
+                html, body { height: 100%; margin: 0; padding: 0; }
+                body { font-family: Arial, sans-serif; font-size: 12px; color: #333; background-color: #fff; }
+                .page-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 0; background-color: white; position: relative; min-height: 100%; display: flex; flex-direction: column; }
+                .content-wrapper { flex: 1 0 auto; padding: 20px 40px; z-index: 1; }
+                .header { background: linear-gradient(to right, #008080, #20B2AA, #48D1CC); color: white; padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; min-height: 60px; }
+                .header .doctor-info { text-align: left; }
+                .header .doctor-name { font-size: 1.3em; font-weight: bold; margin: 0 0 2px 0; }
+                .header .doctor-qualification { font-size: 0.9em; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; }
+                .header .header-icon-container { background-color: #48D1CC; border-radius: 50%; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; }
+                .header .header-icon { font-size: 1.8em; color: white; }
+                .prescription-title-container { text-align: center; margin: 20px 0 15px 0; font-size: 1.4em; font-weight: bold; color: #333; }
+                .body-content { display: flex; margin-top: 10px; padding-bottom: 20px; }
+                .body-left { width: 50%; padding-right: 20px; box-sizing: border-box; } /* Added box-sizing */
+                .body-right { width: 50%; padding-left: 20px; box-sizing: border-box; } /* Added box-sizing */
+                .patient-details label, .insurance-diagnosis label { display: block; font-weight: bold; margin-bottom: 2px; font-size: 0.9em; }
+                .patient-details span, .insurance-diagnosis span { display: block; border-bottom: 1px dotted #aaa; margin-bottom: 10px; padding: 2px 0; min-height: 1.2em; font-size: 1em; }
+                .insurance-diagnosis { margin-top: 0; }
+                .signature-area { text-align: right; margin-top: 60px; margin-right: 0; padding-bottom: 20px; }
+                .signature-line { border-bottom: 1px solid #555; width: 200px; display: block; margin-bottom: 5px; margin-left: auto; }
+                .signature-label { font-size: 0.9em; color: #555; }
+                .footer { background: linear-gradient(to right, #008080, #20B2AA, #48D1CC); padding: 10px 40px; font-size: 0.85em; color: white; display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; margin-top: auto; flex-shrink: 0; }
+                .footer span { margin: 3px 10px; white-space: nowrap; }
+                .footer i { margin-right: 5px; color: white; }
+                @media print {
+                    html, body { height: auto; } /* Allow content height */
+                    body { font-size: 10pt; color: #000; background-color: #fff; -webkit-print-color-adjust: exact; color-adjust: exact; }
+                    .page-container { border: none; box-shadow: none; margin: 0; width: 100%; max-width: none; min-height: initial; height: auto; } /* Adjust height for print */
+                    .header { background: linear-gradient(to right, #008080, #20B2AA, #48D1CC) !important; color: white !important; }
+                    .header .header-icon-container { background-color: #48D1CC !important; }
+                    .patient-details span, .insurance-diagnosis span { border-bottom: 1px solid #777; }
+                    .footer { background: linear-gradient(to right, #008080, #20B2AA, #48D1CC) !important; color: white !important; padding: 10px 40px; page-break-inside: avoid; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; box-sizing: border-box; } /* Fixed footer for print */
+                    .content-wrapper { padding-bottom: 60px; } /* Add padding to avoid overlap with fixed footer */
+                }
+            </style>
+        `);
+        iframeDoc.write('</head><body>');
+        iframeDoc.write('<div class="page-container">'); // Wrap content
+        iframeDoc.write(content); // The actual prescription HTML
+        iframeDoc.write('</div>'); // Close wrapper
+        iframeDoc.write('</body></html>');
+        iframeDoc.close();
+
+        // Function to handle cleanup
+        const cleanupIframe = () => {
+            const iframeToRemove = document.getElementById(iframeId);
+            if (iframeToRemove) {
+                try {
+                    iframeToRemove.parentNode.removeChild(iframeToRemove);
+                    console.log("Print iframe removed.");
+                } catch (e) {
+                    console.warn("Could not remove print iframe after print:", e);
+                }
+            }
+        };
+
+        // Trigger print on the iframe's window after a short delay
+        try {
+            setTimeout(() => {
+                try {
+                    iframeWin.focus(); // Focus iframe window before print
+                    const printResult = iframeWin.print(); // Call print
+
+                    // Fallback cleanup using setTimeout, as onafterprint is unreliable
+                    // Give it a bit longer to ensure the print dialog interaction is complete
+                    setTimeout(cleanupIframe, 2000); // Cleanup after 2 seconds
+
+                } catch (printError) {
+                    console.error("Error during iframe print execution:", printError);
+                    alert("Erreur lors de l'exécution de l'impression.");
+                    cleanupIframe(); // Clean up immediately on error during print call
+                }
+            }, 100); // Increased delay slightly to 100ms
+        } catch (e) {
+            console.error("Error setting up print via iframe:", e);
+            alert("Erreur lors de la préparation de l'impression.");
+            cleanupIframe(); // Clean up immediately if setup fails
         }
     };
 
@@ -610,8 +574,8 @@ const ConsultationPage = () => {
 
     return (
         <div className="consultation-page-container" style={{ padding: '20px' }}>
-            {/* Title reflects new consultation based on appointment */}
-            <h2>Nouvelle Consultation </h2>
+            {/* Dynamic Title */}
+            <h2>{isEditMode ? 'Détails Consultation / Modification' : 'Nouvelle Consultation'}</h2>
 
             {/* --- Patient Info --- */}
             <h3>Informations Patient</h3>
@@ -687,14 +651,18 @@ const ConsultationPage = () => {
                     style={{ marginRight: '10px' }}
                     disabled={saveStatus === 'Sauvegarde en cours...'} // Disable button while saving
                 >
-                    {saveStatus === 'Sauvegarde en cours...' ? 'Sauvegarde...' : (savedConsultationId ? '🔵 METTRE À JOUR' : '🔵 ENREGISTRER')}
+                    {/* Dynamic Button Text */}
+                    {saveStatus === 'Sauvegarde en cours...' ? 'Sauvegarde...' : (isEditMode ? '🔵 METTRE À JOUR' : '🔵 ENREGISTRER')}
                 </button>
+                {/* Print button is now always visible */}
                 <button onClick={handlePrint} className="btn btn-info" style={{ marginRight: '10px' }}>
                     🖨️ IMPRIMER
                 </button>
+                {/* Exam button is now always visible */}
                 <button onClick={handleExamRedirect} className="btn btn-warning">
                     🔬 EXAM
                 </button>
+                {/* Removed duplicated button and closing tag */}
             </div>
         </div>
     );

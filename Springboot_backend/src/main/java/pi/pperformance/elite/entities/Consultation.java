@@ -7,6 +7,12 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set; // For the OneToMany relationship
 
+// Assuming User entity exists and represents doctors
+import pi.pperformance.elite.entities.User;
+// Corrected import for the cabinet entity using the correct class name
+import pi.pperformance.elite.entities.CabinetDr;
+
+
 @Entity
 public class Consultation implements Serializable {
 
@@ -41,6 +47,17 @@ public class Consultation implements Serializable {
     // Removed @JoinColumn, as the FK is now in prescribed_medications table
     @JsonManagedReference // To handle circular reference during JSON serialization
     private PrescribedMedications prescribedMedications;
+
+    // Relationship: Doctor 'effectuer' Consultation (1 to *)
+    @ManyToOne
+    @JoinColumn(name = "id_doctor") // Name of the foreign key column in the consultation table
+    private User doctor;
+
+    // Relationship: Cabinet 'ou se déroule' Consultation (1 to *)
+    @ManyToOne
+    @JoinColumn(name = "id_cabinet") // Name of the foreign key column in the consultation table
+    private CabinetDr cabinet; // Corrected type
+
 
     // Explicit Setters (Workaround for potential Lombok issue)
     public void setIdConsultation(Long idConsultation) {
@@ -82,6 +99,14 @@ public class Consultation implements Serializable {
         return prescribedMedications;
     }
 
+    public User getDoctor() {
+        return doctor;
+    }
+
+    public CabinetDr getCabinet() { // Corrected return type
+        return cabinet;
+    }
+
     // Setters (excluding idConsultation and text which are already defined)
     public void setDateConsultation(Date dateConsultation) {
         this.dateConsultation = dateConsultation;
@@ -105,7 +130,13 @@ public class Consultation implements Serializable {
         this.prescribedMedications = prescribedMedications;
     }
 
+    public void setDoctor(User doctor) {
+        this.doctor = doctor;
+    }
 
+    public void setCabinet(CabinetDr cabinet) { // Corrected parameter type
+        this.cabinet = cabinet;
+    }
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();

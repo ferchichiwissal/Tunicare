@@ -43,6 +43,7 @@ import MyExaminationsPage from './Interface/Appointments/MyExaminationsPage'; //
 import AddAppointmentForm from './Interface/Appointments/AddAppointmentForm'; // Import AddAppointmentForm
 import MyAppointments from './Interface/Appointments/MyAppointments'; // Import MyAppointments
 import ManageAppointments from './Interface/Appointments/ManageAppointments'; // Import ManageAppointments
+import CabinetSettingsPage from './Interface/CabinetSettingsPage'; // Import the new settings page
 
 const onLogout = () => {
   // Clear tokens from localStorage and sessionStorage
@@ -143,9 +144,15 @@ function App() {
             </ProtectedLayout>
           } />
 
-          {/* Route for Consultation Page, protected for Doctor */}
-          {/* Renamed param to match component */}
+          {/* Route for NEW Consultation Page (from appointment), protected for Doctor */}
           <Route path="/consultation/:appointmentId" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR">
+              <ConsultationPage />
+            </ProtectedLayout>
+          } />
+
+          {/* Route for VIEW/EDIT Consultation Page (from dashboard), protected for Doctor */}
+          <Route path="/consultation/details/:consultationId" element={
             <ProtectedLayout requiredRole="ROLE_DOCTOR">
               <ConsultationPage />
             </ProtectedLayout>
@@ -204,6 +211,13 @@ function App() {
           <Route path="/manage-appointments" element={
             <ProtectedLayout requiredRole={["ROLE_DOCTOR", "ROLE_ASSISTANT"]}>
               <ManageAppointments />
+            </ProtectedLayout>
+          } />
+
+          {/* Route for Cabinet Settings Page, protected for Doctor */}
+          <Route path="/parametres-cabinet" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR">
+              <CabinetSettingsPage />
             </ProtectedLayout>
           } />
 

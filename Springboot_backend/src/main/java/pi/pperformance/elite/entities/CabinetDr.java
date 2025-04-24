@@ -23,6 +23,7 @@ public class CabinetDr {
     private String taxNumber;
     private LocalDate createdAt; // Change type
     private LocalDate updatedAt; // Change type
+    private String signatureImagePath; // Path to the doctor's signature image
 
     // Relation inverse: Un CabinetDr a un seul Doctor
     @OneToOne(mappedBy = "cabinet", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -50,6 +51,7 @@ public class CabinetDr {
         this.taxNumber = taxNumber;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        // Note: signatureImagePath is not included in this constructor
     }
 
     // Getters et Setters
@@ -76,6 +78,9 @@ public class CabinetDr {
 
     public LocalDate getUpdatedAt() { return updatedAt; } // Change return type
     public void setUpdatedAt(LocalDate updatedAt) { this.updatedAt = updatedAt; } // Change parameter type
+
+    public String getSignatureImagePath() { return signatureImagePath; }
+    public void setSignatureImagePath(String signatureImagePath) { this.signatureImagePath = signatureImagePath; }
 
     // Getters and Setters for the specific relationships
     @JsonIgnore // Prevent serialization loop/unnecessary data

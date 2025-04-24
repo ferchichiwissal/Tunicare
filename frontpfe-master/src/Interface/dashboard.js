@@ -234,8 +234,8 @@ const Dashboard = ({ onLogout }) => {
         {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a> {/* Consider filtering users by their cabinet */}
         <a href="/UserManagement">{t('nav.changeRole')}</a> {/* Consider filtering users by their cabinet */}
         <a href="/consultation/all">{t('nav.consultationDashboard', 'Tableau de Bord Consultations')}</a> {/* Added Consultation Dashboard Link */}
-        <a href="/ordonnance/edit">{t('nav.managePrescriptions', 'Gestion des Ordonnances')}</a> {/* Added Prescription Management Link */}
         <a href="/manage-appointments">{t('nav.manageAppointments', 'Manage Appointments')}</a> {/* Added Manage Appointments Link */}
+        <a href="/parametres-cabinet">{t('nav.cabinetSettings', 'Paramètres du Cabinet')}</a> {/* Added Cabinet Settings Link */}
         <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
         <a href="/change-password">{t('nav.changePassword')}</a>
         <a href="/Logout">{t('nav.logout')}</a>

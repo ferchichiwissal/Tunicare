@@ -117,7 +117,7 @@ const MedicalExaminationForm = () => {
         } catch (e) { return 'N/A'; }
     };
 
-    // --- Print Function ---
+    // --- Print Function (using refined iframe method) ---
     const handlePrint = () => {
         if (!patient) {
             alert("Impossible d'imprimer : données patient non chargées.");
@@ -135,71 +135,135 @@ const MedicalExaminationForm = () => {
             }
         }
 
-        const printWindow = window.open('', '_blank', 'height=600,width=800');
-        if (printWindow) {
-            printWindow.document.write('<html><head><title>Demande d\'Examen Médical</title>');
-            printWindow.document.write(`
-                <style>
-                    body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; }
-                    .header, .footer { text-align: center; margin-bottom: 20px; font-size: 10px; color: #555; }
-                    .content { border: 1px solid #ccc; padding: 15px; }
-                    h2 { text-align: center; margin-bottom: 25px; }
-                    .section { margin-bottom: 15px; }
-                    .section h4 { margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 3px; }
-                    .section p { margin: 3px 0; }
-                    strong { display: inline-block; width: 150px; }
-                </style>
-            `);
-            printWindow.document.write('</head><body>');
+        // --- Generate HTML Content ---
+        let printHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Demande d\'Examen Médical</title>'; // Added Doctype and charset
+        printHtml += `
+            <style>
+                @page { size: A4; margin: 20mm; } /* Define page size and margins */
+                body { font-family: Arial, sans-serif; font-size: 12px; }
+                .header, .footer { text-align: center; margin-bottom: 20px; font-size: 10px; color: #555; }
+                .content { border: 1px solid #ccc; padding: 15px; }
+                h2 { text-align: center; margin-bottom: 25px; }
+                .section { margin-bottom: 15px; }
+                .section h4 { margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 3px; }
+                .section p { margin: 3px 0; }
+                strong { display: inline-block; width: 150px; font-weight: bold; } /* Ensure strong is bold */
+                .recommendation-content { margin-left: 20px; border: 1px dashed #eee; padding: 5px; margin-top: 5px; } /* Style for recommendation */
+                .footer { margin-top: 50px; }
+                @media print {
+                    body { font-size: 10pt; color: #000; background-color: #fff; -webkit-print-color-adjust: exact; color-adjust: exact; }
+                    .header, .footer { color: #000; }
+                    .content { border: 1px solid #000; }
+                    .recommendation-content { border-color: #ccc; }
+                }
+            </style>
+        `;
+        printHtml += '</head><body>';
 
-            // Header (Optional Doctor Info)
-            printWindow.document.write(`<div class="header">`);
-            if (user) {
-                printWindow.document.write(`Dr. ${user.name || ''}<br>`);
-                printWindow.document.write(`${user.activeCabinet?.address || ''} - Tel: ${user.activeCabinet?.tel || ''}<br>`);
-            }
-            printWindow.document.write(`Date: ${formatDate(new Date())}`);
-            printWindow.document.write(`</div>`);
+        // Header
+        printHtml += `<div class="header">`;
+        if (user) {
+            printHtml += `Dr. ${user.name || '[Nom Docteur]'}<br>`;
+            printHtml += `${user.activeCabinet?.address || '[Adresse Cabinet]'} - Tel: ${user.activeCabinet?.tel || '[Tel Cabinet]'}<br>`;
+        }
+        printHtml += `Date: ${formatDate(new Date())}`;
+        printHtml += `</div>`;
 
-            printWindow.document.write('<h2>Demande d\'Examen Médical</h2>');
-            printWindow.document.write('<div class="content">');
+        printHtml += '<h2>Demande d\'Examen Médical</h2>';
+        printHtml += '<div class="content">';
 
-            // Patient Section
-            printWindow.document.write('<div class="section"><h4>Patient</h4>');
-            printWindow.document.write(`<p><strong>Nom:</strong> ${patient.lastName || 'N/A'}</p>`);
-            printWindow.document.write(`<p><strong>Prénom:</strong> ${patient.firstName || 'N/A'}</p>`);
-            printWindow.document.write(`<p><strong>Date de Naissance:</strong> ${formatDate(patient.birthDate)}</p>`);
-            printWindow.document.write(`<p><strong>Âge:</strong> ${calculateAge(patient.birthDate)} ans</p>`);
-            printWindow.document.write('</div>');
+        // Patient Section
+        printHtml += '<div class="section"><h4>Patient</h4>';
+        printHtml += `<p><strong>Nom:</strong> ${patient.lastName || 'N/A'}</p>`;
+        printHtml += `<p><strong>Prénom:</strong> ${patient.firstName || 'N/A'}</p>`;
+        printHtml += `<p><strong>Date de Naissance:</strong> ${formatDate(patient.birthDate)}</p>`;
+        printHtml += `<p><strong>Âge:</strong> ${calculateAge(patient.birthDate)} ans</p>`;
+        printHtml += '</div>';
 
-            // Examination Section
-            printWindow.document.write('<div class="section"><h4>Examen Demandé</h4>');
-            printWindow.document.write(`<p><strong>Type d'examen:</strong> ${examenType || 'Non spécifié'}</p>`);
-            printWindow.document.write(`<p><strong>Centre:</strong> ${centreName}</p>`);
-            if (recommandation) {
-                printWindow.document.write(`<p><strong>Recommandation:</strong> ${recommandation}</p>`);
-            }
-            printWindow.document.write('</div>');
-
-            printWindow.document.write('</div>'); // Close content
-
-            // Footer (Optional Signature)
-            printWindow.document.write(`<div class="footer" style="margin-top: 50px;">`);
-            printWindow.document.write(`Signature du Médecin: _________________________`);
-            printWindow.document.write(`</div>`);
-
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.focus(); // Restore focus call, might be needed
-            try {
-                 // Call print directly, without setTimeout
-                 printWindow.print();
-            } catch (e) {
-                 console.error("Error initiating print:", e);
-                 alert("Erreur lors du lancement de l'impression.");
-            }
+        // Examination Section
+        printHtml += '<div class="section"><h4>Examen Demandé</h4>';
+        printHtml += `<p><strong>Type d'examen:</strong> ${examenType || 'Non spécifié'}</p>`;
+        printHtml += `<p><strong>Centre:</strong> ${centreName}</p>`;
+        // Handle Quill content for recommendation
+        if (recommandation && recommandation !== '<p><br></p>') { // Check if not empty Quill content
+             printHtml += `<p><strong>Recommandation:</strong></p><div class="recommendation-content">${recommandation}</div>`;
         } else {
-            alert("Impossible d'ouvrir la fenêtre d'impression. Vérifiez les paramètres de votre navigateur (bloqueur de pop-up).");
+             printHtml += `<p><strong>Recommandation:</strong> <i>Aucune</i></p>`;
+        }
+        printHtml += '</div>';
+
+        printHtml += '</div>'; // Close content
+
+        // Footer
+        printHtml += `<div class="footer">`;
+        printHtml += `Signature du Médecin: _________________________`;
+        printHtml += `</div>`;
+
+        printHtml += '</body></html>';
+
+        // --- Use refined iframe method to print ---
+        const iframeId = 'print-iframe-exam';
+        let iframe = document.getElementById(iframeId);
+
+        // Remove existing iframe if it exists
+        if (iframe) {
+            try {
+                iframe.parentNode.removeChild(iframe);
+            } catch (e) {
+                console.warn("Could not remove existing exam print iframe:", e);
+            }
+        }
+
+        // Create the iframe
+        iframe = document.createElement('iframe');
+        iframe.id = iframeId;
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        iframe.style.visibility = 'hidden';
+        iframe.style.left = '-9999px'; // Move off-screen
+
+        document.body.appendChild(iframe);
+
+        const iframeDoc = iframe.contentWindow.document;
+        const iframeWin = iframe.contentWindow;
+
+        iframeDoc.open();
+        iframeDoc.write(printHtml);
+        iframeDoc.close();
+
+        // Function to handle cleanup
+        const cleanupIframe = () => {
+            const iframeToRemove = document.getElementById(iframeId);
+            if (iframeToRemove) {
+                try {
+                    iframeToRemove.parentNode.removeChild(iframeToRemove);
+                    console.log("Exam print iframe removed.");
+                } catch (e) {
+                    console.warn("Could not remove exam print iframe after print:", e);
+                }
+            }
+        };
+
+        // Trigger print after a short delay
+        try {
+            setTimeout(() => {
+                try {
+                    iframeWin.focus();
+                    iframeWin.print();
+                    // Fallback cleanup using setTimeout
+                    setTimeout(cleanupIframe, 2000); // Cleanup after 2 seconds
+                } catch (printError) {
+                    console.error("Error during exam iframe print execution:", printError);
+                    alert("Erreur lors de l'exécution de l'impression.");
+                    cleanupIframe(); // Clean up immediately on error
+                }
+            }, 100); // 100ms delay
+        } catch (e) {
+            console.error("Error setting up exam print via iframe:", e);
+            alert("Erreur lors de la préparation de l'impression.");
+            cleanupIframe(); // Clean up immediately if setup fails
         }
     };
 
@@ -218,7 +282,7 @@ const MedicalExaminationForm = () => {
             {patient && (
                  <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #eee' }}>
                     <h4>Patient</h4>
-                    <p>{patient.firstName} {patient.lastName} (ID: {patient.idPatient})</p>
+                    <p>{patient.firstName} {patient.lastName} </p>
                     {/* Add more patient details if needed */}
                 </div>
             )}

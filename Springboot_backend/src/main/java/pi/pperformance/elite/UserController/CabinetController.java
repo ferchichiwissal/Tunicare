@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication; // For checking user
+import org.springframework.security.core.context.SecurityContextHolder; // For checking user
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile; // For file upload
 
 import pi.pperformance.elite.entities.CabinetDr;
 import pi.pperformance.elite.UserRepository.CabinetDrRepository;
@@ -18,7 +21,12 @@ import java.util.List; // Import List
 import java.time.LocalDate;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Files; // For file operations
+import java.nio.file.Path; // For file operations
+import java.nio.file.Paths; // For file operations
+import java.nio.file.StandardCopyOption; // For file operations
 import java.util.Optional;
+import java.util.UUID; // For unique filenames
 
 import javax.imageio.ImageIO; // Correct import for ImageIO
 
@@ -227,4 +235,85 @@ public ResponseEntity<?> updateCabinet(@PathVariable Long id, @RequestBody Cabin
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting cabinet: " + e.getMessage());
         }
     }
+
+    // --- Signature Upload Endpoint ---
+
+    // Define the upload directory relative to the application's running location
+    // IMPORTANT: In production, make this path configurable and external if possible.
+    private static final String SIGNATURE_UPLOAD_DIR = "uploads/signatures/";
+
+    @PostMapping("/{id}/signature")
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
+    @Transactional
+    public ResponseEntity<?> uploadSignature(@PathVariable Long id, @RequestParam("signatureFile") MultipartFile file) {
+        try {
+            // 1. Validate Cabinet Exists
+            Optional<CabinetDr> cabinetOpt = cabinetRepository.findById(id);
+            if (!cabinetOpt.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cabinet not found with id: " + id);
+            }
+            CabinetDr cabinet = cabinetOpt.get();
+
+            // 2. Security Check: Ensure the logged-in user is the doctor associated with this cabinet or an Admin
+            // TODO: Implement more robust security check. Compare authenticated user's ID/Cabinet ID
+            //       with the cabinet being modified, especially for the DOCTOR role.
+            // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            // String currentUsername = authentication.getName();
+            // User currentUser = userRepository.findByEmail(currentUsername).orElse(null);
+            // if (currentUser == null || (!currentUser.getRole().equals(Role.ADMIN) &&
+            //     (currentUser.getRole().equals(Role.DOCTOR) && (cabinet.getDoctor() == null || !cabinet.getDoctor().getId().equals(currentUser.getId()))))) {
+            //     return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to update this cabinet's signature.");
+            // }
+
+
+            // 3. Validate File
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("Please select a signature file to upload.");
+            }
+
+            // Basic content type validation (allow common image types)
+            String contentType = file.getContentType();
+            if (contentType == null || (!contentType.equals("image/png") && !contentType.equals("image/jpeg") && !contentType.equals("image/jpg"))) {
+                 return ResponseEntity.badRequest().body("Invalid file type. Only PNG, JPG, or JPEG are allowed.");
+            }
+
+            // 4. Prepare Storage Path and Filename
+            Path uploadPath = Paths.get(SIGNATURE_UPLOAD_DIR);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath); // Create directories if they don't exist
+            }
+
+            // Create a unique filename or use a predictable one (e.g., based on cabinet ID)
+            String originalFilename = file.getOriginalFilename();
+            String fileExtension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            // Using cabinet ID for predictability, ensure extension is valid
+            String filename = "signature_cabinet_" + id + (fileExtension.isEmpty() ? ".png" : fileExtension); // Default to .png if no extension found
+            Path filePath = uploadPath.resolve(filename);
+
+            // 5. Save the File
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // 6. Update Cabinet Entity
+            // Store the relative path or a path identifier in the database
+            cabinet.setSignatureImagePath(SIGNATURE_UPLOAD_DIR + filename); // Store relative path
+            cabinet.setUpdatedAt(LocalDate.now()); // Update timestamp
+            cabinetRepository.save(cabinet);
+
+            return ResponseEntity.ok().body("Signature uploaded successfully for cabinet " + id);
+
+        } catch (IOException e) {
+            // Log the exception
+             System.err.println("Could not save signature file: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not save signature file: " + e.getMessage());
+        } catch (Exception e) {
+            // Log the exception
+             System.err.println("Error uploading signature: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading signature: " + e.getMessage());
+        }
+    }
+
+
 } // End of CabinetController class

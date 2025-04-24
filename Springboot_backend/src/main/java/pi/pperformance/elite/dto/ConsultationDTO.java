@@ -11,19 +11,21 @@ public class ConsultationDTO {
     private Long patientId;
     private String patientFirstName;
     private String patientLastName;
-    // Add other fields as needed by the frontend, e.g., prescription summary
+    private String prescriptionText; // Added field
 
     // Constructors
     public ConsultationDTO() {
     }
 
-    public ConsultationDTO(Long idConsultation, Date dateConsultation, String text, Long patientId, String patientFirstName, String patientLastName) {
+    // Original constructor (assuming 7 arguments)
+    public ConsultationDTO(Long idConsultation, Date dateConsultation, String text, Long patientId, String patientFirstName, String patientLastName, String prescriptionText) {
         this.idConsultation = idConsultation;
         this.dateConsultation = dateConsultation;
         this.text = text;
         this.patientId = patientId;
         this.patientFirstName = patientFirstName;
         this.patientLastName = patientLastName;
+        this.prescriptionText = prescriptionText;
     }
 
     // Getters and Setters
@@ -74,4 +76,14 @@ public class ConsultationDTO {
     public void setPatientLastName(String patientLastName) {
         this.patientLastName = patientLastName;
     }
+
+    public String getPrescriptionText() { // Added getter
+        return prescriptionText;
+    }
+
+    public void setPrescriptionText(String prescriptionText) { // Added setter
+        this.prescriptionText = prescriptionText;
+    }
+
+    // Removed getters/setters for patientBirthDate and patientEmail
 }

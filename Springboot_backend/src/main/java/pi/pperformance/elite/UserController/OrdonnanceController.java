@@ -3,13 +3,16 @@ package pi.pperformance.elite.UserController;
 // Removed Lombok import
 import org.springframework.beans.factory.annotation.Autowired; // Import Autowired
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders; // Added for download
+import org.springframework.http.MediaType; // Added for download
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pi.pperformance.elite.UserServices.IPrescribedMedicationsService;
-import pi.pperformance.elite.UserServices.IConsultationService; // Needed for print data
+import pi.pperformance.elite.UserServices.IConsultationService;
+import pi.pperformance.elite.UserServices.PdfGenerationService; // Import PDF Service
 import pi.pperformance.elite.entities.PrescribedMedications;
-import pi.pperformance.elite.entities.Consultation; // Needed for print data
+import pi.pperformance.elite.entities.Consultation;
 import pi.pperformance.elite.dto.ConsultationDTO; // Import the DTO
 import pi.pperformance.elite.dto.PrescriptionUpdateDTO; // DTO for updating text
 // Import necessary DTO for print data later
@@ -25,12 +28,16 @@ public class OrdonnanceController {
 
     private final IPrescribedMedicationsService prescribedMedicationsService;
     private final IConsultationService consultationService;
+    private final PdfGenerationService pdfGenerationService; // Inject PDF Service
 
     // Explicit constructor for dependency injection
     @Autowired
-    public OrdonnanceController(IPrescribedMedicationsService prescribedMedicationsService, IConsultationService consultationService) {
+    public OrdonnanceController(IPrescribedMedicationsService prescribedMedicationsService,
+                                IConsultationService consultationService,
+                                PdfGenerationService pdfGenerationService) { // Add PDF Service
         this.prescribedMedicationsService = prescribedMedicationsService;
         this.consultationService = consultationService;
+        this.pdfGenerationService = pdfGenerationService; // Assign PDF Service
     }
 
     // Endpoint pour récupérer toutes les ordonnances d'un patient (Médecin)
@@ -89,6 +96,44 @@ public class OrdonnanceController {
 
          // Placeholder implementation until service method and DTO are created:
          return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("Print data endpoint requires Consultation link to Doctor and OrdonnancePrintDataDTO.");
+    }
+
+    // Endpoint pour générer et télécharger l'ordonnance en PDF (Patient/Doctor)
+    @GetMapping("/consultation/{consultationId}/download")
+    @PreAuthorize("hasRole('PATIENT') or hasRole('DOCTOR')") // Allow Patient and Doctor
+    public ResponseEntity<?> downloadOrdonnancePdf(@PathVariable Long consultationId) {
+        try {
+            // Fetch the full Consultation object which includes patient, cabinet, prescription etc.
+            // Note: Ensure ConsultationService fetches related entities eagerly or handle lazy loading.
+            Consultation consultation = consultationService.getConsultationEntityById(consultationId); // Assuming a method returning the entity
+
+            if (consultation == null) {
+                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Consultation not found.");
+            }
+             if (consultation.getPrescribedMedications() == null) {
+                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Prescription details not found for this consultation.");
+             }
+             // Add checks for patient and cabinet if necessary
+
+            // Generate the PDF using the service
+            byte[] pdfBytes = pdfGenerationService.generatePrescriptionPdf(consultation);
+
+            // Set headers for PDF download
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            // Suggest filename for the browser
+            String filename = "ordonnance_" + consultationId + ".pdf";
+            headers.setContentDispositionFormData("attachment", filename);
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+
+        } catch (Exception e) {
+            // Log the exception properly
+            System.err.println("Error generating PDF for consultation " + consultationId + ": " + e.getMessage());
+            e.printStackTrace(); // For detailed debugging
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error generating prescription PDF: " + e.getMessage());
+        }
     }
 
 }

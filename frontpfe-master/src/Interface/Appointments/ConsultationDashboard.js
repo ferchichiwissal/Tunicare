@@ -1,46 +1,55 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react'; // Import useContext
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { getUserData } from '../../utils/auth'; // Use getUserData instead
+// import axios from 'axios'; // Use apiClient instead
+import apiClient from '../../utils/apiClient'; // Import apiClient
+// import { getUserData } from '../../utils/auth'; // Use AuthContext instead
+import AuthContext from '../../context/AuthContext'; // Import AuthContext
 
 // import './ConsultationDashboard.css'; // Optional CSS
 
 const ConsultationDashboard = () => {
     const navigate = useNavigate();
-    const [user, setUser] = useState(null); // State to hold user info
+    const { user } = useContext(AuthContext); // Get user from context
     const [consultations, setConsultations] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
-    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
+    // const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952'; // apiClient handles base URL
 
     useEffect(() => {
-        // Fetch user data on mount
-        const userData = getUserData();
-        setUser(userData.user); // Store user object in state
-
         const fetchConsultations = async () => {
+            // Ensure user and user ID are available from context
+            if (!user || !user.id) {
+                setError("Impossible de récupérer l'ID du médecin connecté.");
+                setIsLoading(false);
+                return;
+            }
+
             setIsLoading(true);
             setError('');
             try {
-                // Fetch all consultations - backend needs refinement for filtering by cabinet/role
-                const response = await axios.get(`${API_URL}/api/consultations/all`, {
-                    headers: { // Add Authorization header if needed
-                        // Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-                    }
+                // Fetch consultations for the specific doctor using apiClient
+                console.log(`Fetching consultations for doctor ID: ${user.id}`);
+                const response = await apiClient.get(`/api/consultations/doctor/${user.id}`);
+                // Sort consultations by date descending (optional, backend might do it)
+                const sortedConsultations = (response.data || []).sort((a, b) => {
+                    const dateA = a.dateConsultation || 0;
+                    const dateB = b.dateConsultation || 0;
+                    return new Date(dateB) - new Date(dateA);
                 });
-                setConsultations(response.data || []);
+                setConsultations(sortedConsultations);
             } catch (err) {
-                console.error("Error fetching consultations:", err);
-                setError(err.response?.data?.message || 'Échec de la récupération des consultations.');
+                console.error("Error fetching doctor's consultations:", err);
+                setError(err.response?.data?.message || 'Échec de la récupération de vos consultations.');
                 setConsultations([]);
             } finally {
                 setIsLoading(false);
             }
         };
+
         fetchConsultations();
-    }, [API_URL]);
+    }, [user]); // Depend on user object from context
 
     // Filter consultations based on search term (client-side)
     const filteredConsultations = useMemo(() => {
@@ -52,12 +61,14 @@ const ConsultationDashboard = () => {
             (consult.patient?.firstName?.toLowerCase().includes(lowerSearchTerm) ||
              consult.patient?.lastName?.toLowerCase().includes(lowerSearchTerm))
         );
-    }, [consultations, searchTerm]);
+     }, [consultations, searchTerm]);
 
-    const handleEdit = (consultationId) => {
-        // Navigate to the consultation page for editing
-        navigate(`/consultation/${consultationId}`);
-    };
+     // Renamed function for clarity
+     const handleViewDetails = (consultationId) => {
+         // Navigate to the consultation page, passing consultationId
+         // We'll use a different route or parameter to indicate "view/edit" mode vs "new" mode
+         navigate(`/consultation/details/${consultationId}`);
+     };
 
     // Helper function to format date
      const formatDate = (dateString) => {
@@ -97,7 +108,8 @@ const ConsultationDashboard = () => {
                         <th>Patient</th>
                         <th>Date</th>
                         <th>Type (Placeholder)</th>
-                        {user?.role === 'ROLE_DOCTOR' && <th>Actions</th>}
+                        {/* Corrected role check */}
+                        {user?.role === 'DOCTOR' && <th>Actions</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -107,21 +119,24 @@ const ConsultationDashboard = () => {
                                 <td>{consult.patient ? `${consult.patient.firstName} ${consult.patient.lastName}` : 'N/A'}</td>
                                 <td>{formatDate(consult.dateConsultation)}</td>
                                 <td>{consult.type || 'Consultation Générale'}</td> {/* Assuming a type field or default */}
-                                {user?.role === 'ROLE_DOCTOR' && (
-                                    <td>
-                                        <button
-                                            className="btn btn-sm btn-primary"
-                                            onClick={() => handleEdit(consult.idConsultation)}
-                                        >
-                                            Modifier
-                                        </button>
-                                    </td>
+                                {/* Corrected role check */}
+                                {user?.role === 'DOCTOR' && (
+                                     <td>
+                                         {/* Changed button text and handler */}
+                                         <button
+                                             className="btn btn-sm btn-info" // Changed style for visual difference
+                                             onClick={() => handleViewDetails(consult.idConsultation)}
+                                         >
+                                             Afficher Détails
+                                         </button>
+                                     </td>
                                 )}
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={user?.role === 'ROLE_DOCTOR' ? 4 : 3} style={{ textAlign: 'center' }}>
+                            {/* Corrected role check for colSpan */}
+                            <td colSpan={user?.role === 'DOCTOR' ? 4 : 3} style={{ textAlign: 'center' }}>
                                 Aucune consultation trouvée.
                             </td>
                         </tr>

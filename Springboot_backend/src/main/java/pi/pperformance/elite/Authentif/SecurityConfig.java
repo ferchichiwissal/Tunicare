@@ -68,8 +68,10 @@ public class SecurityConfig {
                 .requestMatchers("/Users/update/{id}").authenticated() // Allow any logged-in user to update their own info (service layer should check ID match)
                 .requestMatchers("/Users/allid/**", "/Users/useremail/**", "/Users/findByEmail/**").authenticated() // General user info lookup
 
-                // Consultation endpoints (Doctors/Assistants)
-                .requestMatchers("/api/consultations/**").hasAnyRole("DOCTOR", "ASSISTANT")
+                // Specific endpoint for patients to view their own consultations in a cabinet
+                .requestMatchers("/api/consultations/my-consultations/**").authenticated() // Allow any authenticated user, @PreAuthorize will check role/ID match
+                // Other Consultation endpoints (Doctors/Assistants)
+                .requestMatchers("/api/consultations/**").hasAnyRole("DOCTOR", "ASSISTANT") // This rule now applies to remaining /api/consultations paths
 
                 // Medical Examination endpoints (Doctors) - Added explicit rule
                 .requestMatchers("/api/medical-examinations/**").hasRole("DOCTOR")

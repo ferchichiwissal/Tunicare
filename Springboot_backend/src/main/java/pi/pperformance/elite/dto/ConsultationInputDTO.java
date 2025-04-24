@@ -6,6 +6,8 @@ public class ConsultationInputDTO {
 
     private Long idConsultation;
     private Long patientId;
+    private Long doctorId; // Added doctorId
+    private Long cabinetId; // Added cabinetId
     private String consultationText;
     private String prescriptionText;
 
@@ -20,6 +22,14 @@ public class ConsultationInputDTO {
 
     public Long getPatientId() {
         return patientId;
+    }
+
+    public Long getDoctorId() { // Added getter for doctorId
+        return doctorId;
+    }
+
+    public Long getCabinetId() { // Added getter for cabinetId
+        return cabinetId;
     }
 
     public String getConsultationText() {
@@ -37,6 +47,14 @@ public class ConsultationInputDTO {
 
     public void setPatientId(Long patientId) {
         this.patientId = patientId;
+    }
+
+    public void setDoctorId(Long doctorId) { // Added setter for doctorId
+        this.doctorId = doctorId;
+    }
+
+    public void setCabinetId(Long cabinetId) { // Added setter for cabinetId
+        this.cabinetId = cabinetId;
     }
 
     public void setConsultationText(String consultationText) {

@@ -14,4 +14,13 @@ public interface PrescribedMedicationsRepository extends JpaRepository<Prescribe
     // List<PrescribedMedications> findByConsultationPatientIdPatientOrderByConsultationDateConsultationDesc(Long patientId); // Example
 
     // Add other custom query methods if needed later
+
+    /**
+     * Finds the prescription associated with a specific consultation ID.
+     * Assumes a 'consultation' field exists in PrescribedMedications entity
+     * linked via 'consultation_id'.
+     * @param consultationId The ID of the consultation.
+     * @return The PrescribedMedications entity, or null if not found.
+     */
+    PrescribedMedications findByConsultation_IdConsultation(Long consultationId);
 }

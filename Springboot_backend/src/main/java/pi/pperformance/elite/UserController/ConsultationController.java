@@ -45,6 +45,17 @@ public class ConsultationController {
         // TODO: Consider returning DTOs that maybe exclude prescription text for Assistants?
         return ResponseEntity.ok(history);
     }
+// Endpoint pour récupérer les consultations d'un patient POUR UN CABINET SPECIFIQUE (Patient)
+    // Utilisé par la page "Mes Consultations" du patient
+    @GetMapping("/my-consultations/{patientId}")
+    @PreAuthorize("hasRole('PATIENT') and #patientId == principal.id") // Ensure patient can only access their own data
+    public ResponseEntity<List<ConsultationDTO>> getMyConsultationsForCabinet(
+            @PathVariable Long patientId,
+            @RequestParam Long cabinetId) { // Get cabinetId from query parameter
+        // Call a new service method that filters by both patientId and cabinetId
+        List<ConsultationDTO> consultations = consultationService.getPatientConsultationsByCabinet(patientId, cabinetId);
+        return ResponseEntity.ok(consultations);
+    }
 
     // Endpoint pour enregistrer une nouvelle consultation ou mettre à jour une existante (Médecin)
     // Utilisé par le bouton ENREGISTRER dans /consultation/:idConsultation
@@ -59,22 +70,37 @@ public class ConsultationController {
          }
          consultation.setText(consultationInput.getConsultationText());
          // Assuming patientId is part of the input DTO or fetched differently
+         // Pass doctorId from the DTO to the service method
+         // Pass doctorId and cabinetId from the DTO to the service method
          Consultation savedConsultation = consultationService.saveConsultation(
                  consultation,
                  consultationInput.getPatientId(),
+                 consultationInput.getDoctorId(),
+                 consultationInput.getCabinetId(), // Added cabinetId
                  consultationInput.getPrescriptionText()
          );
-         // TODO: Return a DTO
+         // TODO: Return a DTO representing the saved consultation, including doctor and cabinet info if needed
          return new ResponseEntity<>(savedConsultation, HttpStatus.CREATED); // Or OK if updated
+    }
+
+    // Endpoint pour récupérer les consultations d'un médecin spécifique
+    @GetMapping("/doctor/{doctorId}")
+    @PreAuthorize("hasRole('DOCTOR') or #doctorId == principal.id") // Allow doctor to see their own, or potentially admin/assistant in future
+    public ResponseEntity<List<Consultation>> getConsultationsByDoctorId(@PathVariable Long doctorId) {
+        List<Consultation> consultations = consultationService.getConsultationsByDoctorId(doctorId);
+        // TODO: Consider returning DTOs
+        return ResponseEntity.ok(consultations);
     }
 
 
     // Endpoint pour récupérer toutes les consultations (Dashboard Médecin/Assistant)
     // TODO: Implement filtering/pagination and role-based data access
+    // This might be replaced or refined now that we have /doctor/{doctorId}
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('DOCTOR', 'ASSISTANT')")
     public ResponseEntity<List<Consultation>> getAllConsultations() {
         // Needs refinement: Filter by cabinet, apply security checks based on user role
+        // This endpoint might be less useful now, or needs better filtering (e.g., by cabinet for assistants)
         List<Consultation> consultations = consultationService.getAllConsultations();
         // TODO: Return DTOs, potentially filtered based on role
         return ResponseEntity.ok(consultations);

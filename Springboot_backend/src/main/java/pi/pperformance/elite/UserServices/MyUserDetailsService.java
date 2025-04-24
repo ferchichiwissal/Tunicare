@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import pi.pperformance.elite.UserRepository.UserRepository;
 import pi.pperformance.elite.entities.Role;
 import pi.pperformance.elite.entities.User;
+import pi.pperformance.elite.Authentif.CustomUserDetails; // Import CustomUserDetails
 
 import org.slf4j.Logger; // Add logger import
 import org.slf4j.LoggerFactory; // Add logger import
@@ -34,7 +35,8 @@ public class MyUserDetailsService implements UserDetailsService {
             log.warn("User not found with email: {}", email); // Log if not found
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
-        log.info("User found with email: {}. Role: {}", email, user.getRole()); // Log if found
+        // Log user ID as well
+        log.info("User found with email: {}. ID: {}. Role: {}", email, user.getId(), user.getRole());
 
         // Removed isActive check here. The UserDetails.isEnabled() is checked by Spring Security.
         // Our User entity implements isEnabled() to return true.
@@ -48,9 +50,13 @@ public class MyUserDetailsService implements UserDetailsService {
         
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + userRole.name());
 
-        return new org.springframework.security.core.userdetails.User(
+        // Return CustomUserDetails including the user ID
+        return new CustomUserDetails(
+                user.getId(), // Pass the user ID
                 user.getEmail(),
                 user.getPassword(),
+                // Pass other UserDetails flags (enabled, etc.) - assuming they are true based on previous logic
+                true, true, true, true,
                 List.of(authority)
         );
     }

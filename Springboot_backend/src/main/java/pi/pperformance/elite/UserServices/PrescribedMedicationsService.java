@@ -65,4 +65,12 @@ public class PrescribedMedicationsService implements IPrescribedMedicationsServi
         // Save the updated prescription
         return prescribedMedicationsRepository.save(prescription);
     }
+
+    @Override
+    public PrescribedMedications getPrescriptionByConsultationId(Long consultationId) {
+        // Use the repository method to find the prescription by consultation ID
+        // This might return null if no prescription is found for the given consultation ID
+        return prescribedMedicationsRepository.findByConsultation_IdConsultation(consultationId);
+        // Consider adding error handling or Optional return type if needed
+    }
 }

@@ -14,13 +14,15 @@ public interface IConsultationService {
     List<Consultation> getConsultationHistoryByPatientId(Long patientId);
 
     /**
-     * Saves a new consultation, potentially including a prescription.
-     * @param consultation The consultation entity to save.
+     * Saves a new consultation or updates an existing one, potentially including a prescription.
+     * @param consultation The consultation entity to save (can have null ID for new).
      * @param patientId The ID of the patient associated with this consultation.
+     * @param doctorId The ID of the doctor performing the consultation.
+     * @param cabinetId The ID of the cabinet where the consultation took place.
      * @param prescriptionText The text of the prescription (optional).
-     * @return The saved consultation entity.
+     * @return The saved or updated consultation entity.
      */
-    Consultation saveConsultation(Consultation consultation, Long patientId, String prescriptionText);
+    Consultation saveConsultation(Consultation consultation, Long patientId, Long doctorId, Long cabinetId, String prescriptionText);
 
     /**
      * Retrieves a single consultation by its ID as a DTO.
@@ -43,6 +45,30 @@ public interface IConsultationService {
      * @return The updated consultation entity.
      */
     Consultation updateConsultation(Long consultationId, Consultation updatedConsultation);
+
+    /**
+     * Retrieves the consultation history for a specific doctor.
+     * @param doctorId The ID of the doctor.
+     * @return A list of consultations performed by the doctor, ordered by date descending.
+     */
+    List<Consultation> getConsultationsByDoctorId(Long doctorId);
+
+/**
+     * Retrieves consultations for a specific patient within a specific cabinet.
+     * Used by the patient to view their consultations for the currently logged-in cabinet context.
+     * @param patientId The ID of the patient.
+     * @param cabinetId The ID of the cabinet.
+     * @return A list of ConsultationDTOs for the patient in the specified cabinet, ordered by date descending.
+     */
+    List<ConsultationDTO> getPatientConsultationsByCabinet(Long patientId, Long cabinetId);
+
+    /**
+     * Retrieves a single consultation entity by its ID, ensuring related entities
+     * needed for PDF generation (Patient, Cabinet, Prescription) are fetched.
+     * @param consultationId The ID of the consultation.
+     * @return The Consultation entity with necessary related data, or null/throws exception if not found.
+     */
+    Consultation getConsultationEntityById(Long consultationId);
 
     // Add other methods as needed
 }
