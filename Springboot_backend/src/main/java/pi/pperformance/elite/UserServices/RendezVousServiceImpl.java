@@ -233,35 +233,10 @@ public class RendezVousServiceImpl implements RendezVousService { // Implements 
          rendezVous.setApptState("réalisé");
          RendezVous savedRendezVous = rendezVousRepository.save(rendezVous); // Save updated RDV
 
-         // --- Create the corresponding Consultation record ---
-         // Check if patient exists on the RDV
-         if (savedRendezVous.getPatient() == null) {
-             // Log error and potentially throw exception, as we cannot create a consultation without a patient
-             org.slf4j.LoggerFactory.getLogger(getClass()).error("Cannot create Consultation for RendezVous ID {} because Patient is null.", appointmentId);
-             // Depending on requirements, you might throw an exception or just return the savedRendezVous
-             throw new IllegalStateException("Cannot complete appointment: Patient details are missing.");
-         }
-
-         Consultation newConsultation = new Consultation();
-         newConsultation.setPatient(savedRendezVous.getPatient()); // Link to the patient
-         newConsultation.setDateConsultation(new java.util.Date()); // Set consultation date to now
-         newConsultation.setText(""); // Initialize with empty text for the doctor to fill
-
-         // Save the new consultation
-         try {
-             Consultation createdConsultation = consultationRepository.save(newConsultation);
-             org.slf4j.LoggerFactory.getLogger(getClass()).info("Created new Consultation with ID {} for completed RendezVous ID {}", createdConsultation.getIdConsultation(), appointmentId);
-             // Optionally link Consultation back to RendezVous if the entity relationship exists
-             // savedRendezVous.setConsultation(createdConsultation); // If RendezVous has a @OneToOne field for Consultation
-             // rendezVousRepository.save(savedRendezVous); // Save again if RDV was modified
-         } catch (Exception e) {
-             // Log error during consultation creation but potentially still return the updated RDV
-             org.slf4j.LoggerFactory.getLogger(getClass()).error("Failed to create Consultation record for completed RendezVous ID {}: {}", appointmentId, e.getMessage(), e);
-             // Decide on error handling: re-throw, return RDV anyway, etc.
-             // For now, let's re-throw to make the transaction rollback
-             throw new RuntimeException("Failed to create consultation record after completing appointment.", e);
-         }
-         // --- End Consultation Creation ---
+         // --- Removed automatic Consultation creation ---
+         // The consultation should only be created when the doctor explicitly saves it
+         // on the consultation page via the ConsultationController.
+         // --- End Removed Consultation Creation ---
 
          return savedRendezVous; // Return the updated RendezVous
      }

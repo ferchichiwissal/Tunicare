@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'; // Import useContext
+import React, { useState, useEffect, useContext, useRef } from 'react'; // Import useContext AND useRef
 import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
 import apiClient from '../../utils/apiClient'; // Import apiClient instead of axios
 import ReactQuill from 'react-quill'; // Import ReactQuill
@@ -33,6 +33,7 @@ const ConsultationPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [saveStatus, setSaveStatus] = useState(''); // To show save success/error messages
+    const isSavingRef = useRef(false); // Ref to track saving state synchronously
 
     // Get user details from AuthContext
     // Ensure AuthContext provides user object with name, languagePreference, activeCabinet { address, tel }
@@ -121,42 +122,9 @@ const ConsultationPage = () => {
 
                     if (!apptData.patient) {
                         setError('Détails du patient non trouvés dans les données du rendez-vous.');
-                    } else {
-                        // --> START: Create Draft Consultation (Moved inside try block) <--
-                        if (apptData?.patient?.id && user?.id && user?.activeCabinet?.id) {
-                            console.log("Attempting to create draft consultation...");
-                            try {
-                                const draftPayload = {
-                                    patientId: apptData.patient.id,
-                                    doctorId: user.id,
-                                    cabinetId: user.activeCabinet.id,
-                                    rendezVousId: appointmentId, // Link to the appointment
-                                    consultationText: "", // Empty initial text
-                                    prescriptionText: "" // Empty initial prescription
-                                };
-                                // Assume endpoint exists: POST /api/consultations/draft
-                                // NOTE: This endpoint needs to be created in the backend.
-                                // Using the main save endpoint for now, assuming it returns the ID
-                                // If a dedicated draft endpoint is made, change the URL below.
-                                const draftResponse = await apiClient.post(`/api/consultations`, draftPayload);
-                                if (draftResponse.data && draftResponse.data.idConsultation) {
-                                    console.log("Draft consultation created with ID:", draftResponse.data.idConsultation);
-                                    setSavedConsultationId(draftResponse.data.idConsultation); // Set the ID for later use
-                                    setIsEditMode(true); // Treat as edit mode now since a record exists
-                                } else {
-                                    console.error("Draft creation response did not contain idConsultation:", draftResponse.data);
-                                    setError("Erreur lors de la création de la consultation préliminaire.");
-                                }
-                            } catch (draftErr) {
-                                console.error("Error creating draft consultation:", draftErr);
-                                setError(draftErr.response?.data?.message || "Impossible de créer une consultation préliminaire.");
-                            }
-                        } else {
-                             console.warn("Cannot create draft: Missing patientId, doctorId, or cabinetId.");
-                             // Optionally set an error state here
-                        }
-                        // --> END: Create Draft Consultation <--
                     }
+                    // Draft creation logic removed from here to prevent auto-creation on load.
+                    // Consultation will now only be created/saved when the 'handleSave' button is clicked.
                 } catch (err) {
                     console.error("Error fetching appointment details:", err);
                     if (err.response && err.response.status === 404) {
@@ -233,28 +201,33 @@ const ConsultationPage = () => {
     };
 
     const handleSave = async () => {
-        // Prevent duplicate clicks while saving
-        if (saveStatus === 'Sauvegarde en cours...') {
-            console.log("Save already in progress...");
+        // Prevent duplicate clicks using the ref
+        if (isSavingRef.current) {
+            console.log(`[handleSave ENTRY BLOCKED] isSavingRef=${isSavingRef.current}`);
             return;
         }
+        console.log(`[handleSave ENTRY] isSavingRef=${isSavingRef.current}, isEditMode=${isEditMode}, savedConsultationId=${savedConsultationId}`);
 
-        console.log("[handleSave] Starting save. Current savedConsultationId:", savedConsultationId); // Log ID at start
-        setSaveStatus('Sauvegarde en cours...');
+        isSavingRef.current = true; // Set saving flag
+        console.log(`[handleSave SET isSavingRef=true]`);
+
+        setSaveStatus('Sauvegarde en cours...'); // Still use state for UI feedback
         setError('');
 
         // Add check for user, user.id, user.activeCabinet, and user.activeCabinet.id
         if (!user || !user.id || !user.activeCabinet || !user.activeCabinet.id) {
              setError("Impossible de récupérer l'ID du médecin ou du cabinet actif. Veuillez vérifier votre session.");
              setSaveStatus('Erreur');
-             console.log("[handleSave] Error: Logged-in user ID or active cabinet ID missing from context.");
+             console.log("[handleSave EXIT] Error: Logged-in user ID or active cabinet ID missing.");
+             isSavingRef.current = false; // Reset flag on early exit
              return;
         }
 
         if (!patient) {
             setError("ID Patient manquant pour la sauvegarde.");
+            console.log("[handleSave EXIT] Error: Patient missing."); // Log error
             setSaveStatus('Erreur'); // Indicate error state
-            console.log("[handleSave] Error: Patient missing."); // Log error
+            isSavingRef.current = false; // Reset flag on early exit
             return;
         }
 
@@ -269,46 +242,45 @@ const ConsultationPage = () => {
                 prescriptionText: prescriptionText,
             };
 
-            // If we have a savedConsultationId, include it in the payload for update
-            if (savedConsultationId) {
+            // If we have a savedConsultationId (FROM STATE), include it in the payload for update
+            if (savedConsultationId) { // <--- Check state variable
                 payload.idConsultation = savedConsultationId;
-                console.log("[handleSave] Included existing savedConsultationId in payload:", savedConsultationId); // Log if ID is included
+                console.log(`[handleSave PAYLOAD] Included existing savedConsultationId: ${savedConsultationId}`);
             }
 
-            console.log("[handleSave] Sending payload:", JSON.stringify(payload)); // Log final payload
-
+            console.log(`[handleSave REQUEST] Sending payload: ${JSON.stringify(payload)}`);
+            console.time("apiClient.post"); // Start timer
             // Use the same POST endpoint; backend service differentiates create/update based on idConsultation presence
-            const response = await apiClient.post(`/api/consultations`, payload);
-            console.log("[handleSave] Received response:", response.data); // Log full response
+            const response = await apiClient.post(`/api/consultations`, payload); // <--- Send payload
+            console.log("[handleSave RESPONSE] Received response:", response.data); // Log full response
 
             const returnedConsultationId = response.data.idConsultation; // Use the ID returned by backend
-            console.log("[handleSave] Received consultationId from backend:", returnedConsultationId); // Log received ID
-            // Update success message based on whether it was a create or update
-            setSaveStatus(isEditMode ? 'Consultation mise à jour avec succès !' : 'Consultation créée avec succès !');
-            setSavedConsultationId(returnedConsultationId); // Store/update the ID state
-            // If it was a new consultation, update the mode and URL potentially? Or just rely on state.
-            if (!isEditMode) {
-                 setIsEditMode(true); // Now we are editing the newly created one
+            console.log(`[handleSave RESPONSE] Received consultationId: ${returnedConsultationId}`); // Log received ID
+            // Update success message and state based on whether it was a create or update
+
+            // If it was a new consultation, update the mode FIRST.
+            if (!isEditMode && returnedConsultationId) { // Check we got an ID back
+                 setIsEditMode(true); // Set edit mode first
+                 setSavedConsultationId(returnedConsultationId); // Then set the ID
+                 setSaveStatus('Consultation créée avec succès !'); // Then set status
                  // Optionally update URL without full reload if needed, but might be complex
                  // navigate(`/consultation/details/${returnedConsultationId}`, { replace: true });
+            } else {
+                // If it was an update or no ID returned, just set status and potentially the ID again
+                setSavedConsultationId(returnedConsultationId); // Ensure ID state is updated even on update
+                setSaveStatus('Consultation mise à jour avec succès !');
             }
 
         } catch (err) {
-            console.error("[handleSave] Error saving consultation:", err); // Log error details
+            console.error("[handleSave ERROR] Error saving consultation:", err); // Log error details
+            console.timeEnd("apiClient.post"); // End timer on error
             const errorMsg = err.response?.data?.message || (isEditMode ? 'Échec de la mise à jour de la consultation.' : 'Échec de la création de la consultation.');
             setError(errorMsg);
             setSaveStatus('Erreur'); // Indicate error state
         } finally {
-            // Reset status immediately unless it was an error.
-            // Keep 'Erreur' status displayed until next action.
-            // Keep success/update message displayed until next action or component reload.
-            if (saveStatus === 'Sauvegarde en cours...') {
-                 // If save finished (not an error), status would have been updated in try/catch.
-                 // If it's still 'Sauvegarde en cours...', it means an unexpected issue occurred. Reset.
-                 setSaveStatus('');
-            }
-            // We no longer automatically clear the success/update/error message here.
-            // It will persist until the next save attempt or page navigation.
+            console.timeEnd("apiClient.post"); // End timer in finally
+            isSavingRef.current = false; // Reset saving flag in finally block
+            console.log(`[handleSave EXIT] isSavingRef reset to false.`);
         }
     };
 
@@ -686,9 +658,9 @@ const ConsultationPage = () => {
                     onClick={handleSave}
                     className="btn btn-primary"
                     style={{ marginRight: '10px' }}
-                    disabled={saveStatus === 'Sauvegarde en cours...'} // Disable button while saving
+                    disabled={isSavingRef.current} // Disable button based on the ref
                 >
-                    {/* Dynamic Button Text */}
+                    {/* Dynamic Button Text - still use state for text */}
                     {saveStatus === 'Sauvegarde en cours...' ? 'Sauvegarde...' : (isEditMode ? '🔵 METTRE À JOUR' : '🔵 ENREGISTRER')}
                 </button>
                 {/* Print button is now always visible */}
