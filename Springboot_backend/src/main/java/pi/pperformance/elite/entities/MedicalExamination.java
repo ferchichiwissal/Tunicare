@@ -3,6 +3,7 @@ package pi.pperformance.elite.entities;
 import jakarta.persistence.*;
 import pi.pperformance.elite.entities.RendezVous; // Added import
 // import pi.pperformance.elite.entities.Patient; // Removed import
+import pi.pperformance.elite.entities.Doctor; // Import Doctor
 
 import java.io.Serializable;
 import java.util.Date;
@@ -35,6 +36,7 @@ public class MedicalExamination implements Serializable {
     // Patient can be accessed via rendezVous.getPatient()
     // Removed direct link to Patient
 
+    @Column(name = "consultation_id") // Explicitly map to the database column name
     private Long consultationId;
 
     // Store the name of the selected centre (either from CentreDexamen or "Autre")
@@ -47,6 +49,11 @@ public class MedicalExamination implements Serializable {
     @JoinColumn(name = "idDoc", referencedColumnName = "idDoc") // Link to CompteRendu PK
     private CompteRendu compteRendu;
     // If one MedicalExamination can have multiple CompteRendu, change to @OneToMany
+
+    // Add relationship to the Doctor who created the examination
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "doctor_id") // Name of the foreign key column in medical_examination table
+    private Doctor doctor;
 
     @PrePersist
     protected void onCreate() {
@@ -137,5 +144,14 @@ public class MedicalExamination implements Serializable {
 
     public void setCompteRendu(CompteRendu compteRendu) {
         this.compteRendu = compteRendu;
+    }
+
+    // Add getter and setter for Doctor
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
     }
 }

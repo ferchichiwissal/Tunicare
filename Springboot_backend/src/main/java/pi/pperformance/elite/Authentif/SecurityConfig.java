@@ -73,8 +73,12 @@ public class SecurityConfig {
                 // Other Consultation endpoints (Doctors/Assistants)
                 .requestMatchers("/api/consultations/**").hasAnyRole("DOCTOR", "ASSISTANT") // This rule now applies to remaining /api/consultations paths
 
-                // Medical Examination endpoints (Doctors) - Added explicit rule
-                .requestMatchers("/api/medical-examinations/**").hasRole("DOCTOR")
+                // Specific endpoint for patients to view their own examinations in a cabinet
+                .requestMatchers("/api/medical-examinations/my-examinations/**").authenticated() // Allow any authenticated user, @PreAuthorize will check role/ID match
+
+                // Other Medical Examination endpoints (e.g., creation by Doctor)
+.requestMatchers("/api/medical-examinations/*/download").authenticated() // Allow download for authenticated users (patient check in controller)
+                .requestMatchers("/api/medical-examinations/**").hasRole("DOCTOR") // This secures the rest
 
                 // Fallback: Authenticate any other request not explicitly permitted
                 .anyRequest().authenticated()

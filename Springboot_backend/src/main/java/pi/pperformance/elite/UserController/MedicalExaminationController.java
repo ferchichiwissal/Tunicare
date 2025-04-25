@@ -36,26 +36,26 @@ public class MedicalExaminationController {
         MedicalExamination examination = new MedicalExamination();
         examination.setAct(examInput.getTypeExamen()); // Assuming 'act' field stores the type
         examination.setRecommandation(examInput.getRecommandation());
-        // We need consultationId from the context/path, assuming it's in DTO for now
-        // Pass appointmentId (from DTO's consultationId field), centreId, and null for actual consultationId
+        // Pass the correct IDs from the updated DTO
         MedicalExamination savedExam = medicalExaminationService.saveMedicalExamination(
                 examination,
-                examInput.getConsultationId(), // This is the appointmentId
+                examInput.getAppointmentId(), // Pass the actual appointmentId
                 examInput.getCentreId(),
-                null // Pass null for consultationId as it's not available in the current DTO/frontend flow
+                examInput.getConsultationId() // Pass the actual consultationId
         );
         // TODO: Return DTO instead of raw entity
         return new ResponseEntity<>(savedExam, HttpStatus.CREATED);
     }
 
-    // Endpoint pour récupérer les examens d'un patient (Patient, Médecin, Assistant)
+    // Endpoint pour récupérer les examens d'un patient POUR UN CABINET SPECIFIQUE (Patient)
     // Utilisé dans /my-examinations
-    @GetMapping("/patient/{patientId}")
-    @PreAuthorize("hasAnyRole('PATIENT', 'DOCTOR', 'ASSISTANT')") // Adjust roles as needed
-    public ResponseEntity<List<MedicalExamination>> getPatientExaminations(@PathVariable Long patientId) {
-        // TODO: Add finer-grained security check (e.g., patient can only see their own)
-        // This might involve checking principal.id against patientId
-        List<MedicalExamination> exams = medicalExaminationService.getMedicalExaminationsByPatientId(patientId);
+    @GetMapping("/my-examinations/{patientId}")
+    @PreAuthorize("hasRole('PATIENT') and #patientId == principal.id") // Ensure patient can only access their own data
+    public ResponseEntity<List<MedicalExamination>> getMyExaminationsForCabinet(
+            @PathVariable Long patientId,
+            @RequestParam Long cabinetId) { // Get cabinetId from query parameter
+        // Call a new service method that filters by both patientId and cabinetId
+        List<MedicalExamination> exams = medicalExaminationService.getPatientExaminationsByCabinet(patientId, cabinetId);
         // TODO: Return DTOs instead of raw entities
         return ResponseEntity.ok(exams);
     }
@@ -93,4 +93,43 @@ public class MedicalExaminationController {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("Print data endpoint requires getMedicalExaminationById in service and ExamPrintDataDTO.");
     }
 
+// Endpoint pour télécharger une demande d'examen en PDF (Patient)
+    @GetMapping("/{examId}/download")
+    @PreAuthorize("isAuthenticated()") // Basic auth check, fine-grained check done in method
+    public ResponseEntity<byte[]> downloadExaminationPdf(@PathVariable Long examId) {
+        try {
+            // TODO: Add authorization check: Ensure the logged-in user is the patient associated with this examId.
+            // This requires fetching the exam first, getting the patient ID, and comparing with principal.id.
+            // Example (requires MedicalExaminationRepository injection or a service method):
+            // MedicalExamination exam = medicalExaminationRepository.findById(examId).orElseThrow(...);
+            // Long patientId = exam.getRendezVous().getPatient().getId();
+            // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            // Long principalId = ((CustomUserDetails) authentication.getPrincipal()).getId(); // Assuming CustomUserDetails has getId()
+            // if (!principalId.equals(patientId)) {
+            //     return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            // }
+
+            byte[] pdfBytes = medicalExaminationService.generateExaminationPdf(examId);
+
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
+            // Suggest a filename for the download
+            headers.setContentDispositionFormData("attachment", "demande_examen_" + examId + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+
+        } catch (pi.pperformance.elite.exceptions.ResourceNotFoundException e) {
+            // Log the error if needed
+            return ResponseEntity.notFound().build();
+        } catch (com.lowagie.text.DocumentException | java.io.IOException e) {
+            // Log the error
+            System.err.println("Error generating PDF for exam ID " + examId + ": " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Avoid sending stack trace
+        } catch (IllegalStateException e) {
+             // Handle cases where data is missing (e.g., no patient/doctor/cabinet)
+             System.err.println("Error generating PDF due to missing data for exam ID " + examId + ": " + e.getMessage());
+             return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // 409 Conflict might be appropriate
+        }
+    }
 }

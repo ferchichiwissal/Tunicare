@@ -121,6 +121,41 @@ const ConsultationPage = () => {
 
                     if (!apptData.patient) {
                         setError('Détails du patient non trouvés dans les données du rendez-vous.');
+                    } else {
+                        // --> START: Create Draft Consultation (Moved inside try block) <--
+                        if (apptData?.patient?.id && user?.id && user?.activeCabinet?.id) {
+                            console.log("Attempting to create draft consultation...");
+                            try {
+                                const draftPayload = {
+                                    patientId: apptData.patient.id,
+                                    doctorId: user.id,
+                                    cabinetId: user.activeCabinet.id,
+                                    rendezVousId: appointmentId, // Link to the appointment
+                                    consultationText: "", // Empty initial text
+                                    prescriptionText: "" // Empty initial prescription
+                                };
+                                // Assume endpoint exists: POST /api/consultations/draft
+                                // NOTE: This endpoint needs to be created in the backend.
+                                // Using the main save endpoint for now, assuming it returns the ID
+                                // If a dedicated draft endpoint is made, change the URL below.
+                                const draftResponse = await apiClient.post(`/api/consultations`, draftPayload);
+                                if (draftResponse.data && draftResponse.data.idConsultation) {
+                                    console.log("Draft consultation created with ID:", draftResponse.data.idConsultation);
+                                    setSavedConsultationId(draftResponse.data.idConsultation); // Set the ID for later use
+                                    setIsEditMode(true); // Treat as edit mode now since a record exists
+                                } else {
+                                    console.error("Draft creation response did not contain idConsultation:", draftResponse.data);
+                                    setError("Erreur lors de la création de la consultation préliminaire.");
+                                }
+                            } catch (draftErr) {
+                                console.error("Error creating draft consultation:", draftErr);
+                                setError(draftErr.response?.data?.message || "Impossible de créer une consultation préliminaire.");
+                            }
+                        } else {
+                             console.warn("Cannot create draft: Missing patientId, doctorId, or cabinetId.");
+                             // Optionally set an error state here
+                        }
+                        // --> END: Create Draft Consultation <--
                     }
                 } catch (err) {
                     console.error("Error fetching appointment details:", err);
@@ -130,6 +165,7 @@ const ConsultationPage = () => {
                         setError(err.response?.data?.message || `Échec de la récupération des détails pour le rendez-vous ${appointmentId}.`);
                     }
                     setPatient(null);
+                    // Draft creation logic was moved up into the try block
                 } finally {
                     setIsLoading(false);
                 }
@@ -549,10 +585,11 @@ const ConsultationPage = () => {
     };
 
     const handleExamRedirect = () => {
-        // Pass patientId or consultationId if needed by the exam form
-        // Pass appointmentId instead of consultationId
+        // Removed the check for savedConsultationId. It should be populated by the draft creation logic on load.
+        // If it's somehow still null, the exam form itself will show an error.
+        // Pass patientId, appointmentId, AND the (potentially draft) consultationId
         // Corrected: Use patient?.id instead of patient?.idPatient
-        navigate(`/consultation/exam/new?patientId=${patient?.id}&appointmentId=${appointmentId}`);
+        navigate(`/consultation/exam/new?patientId=${patient?.id}&appointmentId=${appointmentId}&consultationId=${savedConsultationId}`);
     };
 
 

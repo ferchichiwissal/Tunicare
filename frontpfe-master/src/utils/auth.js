@@ -33,7 +33,7 @@ export const storeUserData = (data, remember = false) => {
   storage.setItem('accessToken', data.accessToken);
   storage.setItem('refreshToken', data.refreshToken);
   storage.setItem('roles', JSON.stringify(data.roles || []));
-  storage.setItem('user', JSON.stringify(data.user || {}));
+  storage.setItem('user', JSON.stringify(data.user || {})); // Store original user object
   // Store the preference itself so getUserData knows where to look first next time
   storage.setItem('rememberPreference', JSON.stringify(remember));
 };

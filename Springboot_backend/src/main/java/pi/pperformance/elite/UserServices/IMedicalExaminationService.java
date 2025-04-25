@@ -27,5 +27,15 @@ public interface IMedicalExaminationService {
      */
     List<MedicalExamination> getMedicalExaminationsByPatientId(Long patientId);
 
+    /**
+     * Retrieves all medical examinations for a specific patient within a specific cabinet.
+     * @param patientId The ID of the patient.
+     * @param cabinetId The ID of the cabinet.
+     * @return A list of medical examinations for the patient in the specified cabinet.
+     */
+    List<MedicalExamination> getPatientExaminationsByCabinet(Long patientId, Long cabinetId);
+
     // Add other methods as needed (e.g., getById, update)
+
+    byte[] generateExaminationPdf(Long examId) throws com.lowagie.text.DocumentException, java.io.IOException; // Added for PDF generation
 }

@@ -12,6 +12,7 @@ const MedicalExaminationForm = () => {
     const queryParams = new URLSearchParams(location.search);
     const patientId = queryParams.get('patientId');
     const appointmentId = queryParams.get('appointmentId'); // Renamed for clarity
+    const consultationId = queryParams.get('consultationId'); // Retrieve consultationId
 
     const { user } = useContext(AuthContext); // Get user details from context
 
@@ -73,8 +74,15 @@ const MedicalExaminationForm = () => {
         }
         // Removed validation check for 'autreCentreName' as the input field was removed.
 
+        if (!consultationId) { // Add check for consultationId
+            setError('ID de consultation manquant dans l\'URL.');
+            setSubmitStatus('');
+            return;
+        }
+
         const payload = {
-            consultationId: appointmentId, // Use renamed variable
+            appointmentId: appointmentId, // Send appointmentId
+            consultationId: consultationId, // Send consultationId retrieved from URL
             typeExamen: examenType,
             centreId: selectedCentre !== 'AUTRE' ? selectedCentre : null,
             // centreAutre is no longer sent as input field is removed

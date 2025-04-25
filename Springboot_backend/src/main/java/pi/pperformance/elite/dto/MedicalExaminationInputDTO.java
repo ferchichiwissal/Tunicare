@@ -7,7 +7,8 @@ public class MedicalExaminationInputDTO {
     public MedicalExaminationInputDTO() {
     }
 
-    private Long consultationId; // Required: To link the exam request back to the consultation
+    private Long consultationId; // Required: ID of the Consultation this exam is part of
+    private Long appointmentId;  // Required: ID of the RendezVous (Appointment) associated
     private String typeExamen;   // Required: e.g., "IRM", "Radio", "Analyse sanguine"
     private Long centreId;       // Optional: ID of the selected CentreDexamen
     private String centreAutre;  // Optional: Name if "Autre" is selected (consider how to store this)
@@ -19,6 +20,10 @@ public class MedicalExaminationInputDTO {
     // Getters
     public Long getConsultationId() {
         return consultationId;
+    }
+
+    public Long getAppointmentId() { // Added getter
+        return appointmentId;
     }
 
     public String getTypeExamen() {
@@ -40,6 +45,10 @@ public class MedicalExaminationInputDTO {
     // Setters
     public void setConsultationId(Long consultationId) {
         this.consultationId = consultationId;
+    }
+
+    public void setAppointmentId(Long appointmentId) { // Added setter
+        this.appointmentId = appointmentId;
     }
 
     public void setTypeExamen(String typeExamen) {
