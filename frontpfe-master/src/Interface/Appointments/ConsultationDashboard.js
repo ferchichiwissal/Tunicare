@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useMemo, useContext } from 'react'; // Import useContext
+import React, { useState, useEffect, useMemo, useContext, useCallback } from 'react'; // Import useContext, useCallback
 import { useNavigate } from 'react-router-dom';
-// import axios from 'axios'; // Use apiClient instead
 import apiClient from '../../utils/apiClient'; // Import apiClient
-// import { getUserData } from '../../utils/auth'; // Use AuthContext instead
 import AuthContext from '../../context/AuthContext'; // Import AuthContext
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { getToken, clearUserData, isTokenExpired } from '../../utils/auth'; // Added auth utils
 
 import './ConsultationDashboard.css'; // Import the CSS file
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const ConsultationDashboard = () => {
     const navigate = useNavigate();
@@ -17,8 +18,55 @@ const ConsultationDashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
-    // const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952'; // apiClient handles base URL
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('consultationDashboard.alerts.sessionExpired', 'Session expired. Please log in again.')); // Add translation key
+        navigate("/sign-in");
+    }, [navigate, t]);
 
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
+
+    // --- Fetch Consultations ---
     useEffect(() => {
         const fetchConsultations = async () => {
             // Ensure user and user ID are available from context
@@ -51,8 +99,17 @@ const ConsultationDashboard = () => {
             }
         };
 
-        fetchConsultations();
-    }, [user]); // Depend on user object from context
+        // Check if user exists before fetching
+        if (user) {
+            fetchConsultations();
+        } else {
+            // Handle case where user context might not be ready yet or is null
+            console.log("User context not available yet for fetching consultations.");
+            // Optionally set an error or wait
+            // setError(t('consultationDashboard.errors.userContextUnavailable'));
+            setIsLoading(false); // Stop loading if user isn't available
+        }
+    }, [user, t, performLogout]); // Added t and performLogout as dependencies
 
     // Filter consultations based on search term (client-side)
     const filteredConsultations = useMemo(() => {

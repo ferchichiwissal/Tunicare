@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import apiClient from '../../utils/apiClient'; // Import apiClient
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 import ThemeContext from '../../utils/ThemeContext'; // Import default export ThemeContext
-import { getUserData } from '../../utils/auth'; // Import getUserData
+import { getUserData, getToken, clearUserData, isTokenExpired } from '../../utils/auth'; // Import getUserData and auth utils
 import './ManageAppointments.css'; // Import CSS
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 // Helper function to format LocalDateTime string (e.g., "2024-05-20T10:30:00") to "DD/MM/YYYY HH:mm"
 // Now accepts the 't' function as an argument
@@ -66,6 +68,53 @@ const ManageAppointments = () => {
     const [preFormFilterState, setPreFormFilterState] = useState(filterState);
     const [preFormSelectedDate, setPreFormSelectedDate] = useState(selectedDate);
 
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('manageAppointments.alerts.sessionExpired', 'Session expired. Please log in again.')); // Add translation key
+        navigate("/sign-in");
+    }, [navigate, t]);
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
     // State for the Refusal Modal
     const [showRefuseModal, setShowRefuseModal] = useState(false);
     const [refusalTargetId, setRefusalTargetId] = useState(null);
@@ -91,6 +140,9 @@ const ManageAppointments = () => {
         if (!cabinetId) {
             setError(t('manageAppointments.error.missingCabinetId'));
             console.error("Cabinet ID not found in user data:", userData); // Debug log
+            console.error("Cabinet ID not found in user data:", userData); // Debug log
+            // Optionally call performLogout if cabinetId is essential and missing
+            // performLogout();
             return;
         }
         setIsLoading(true);
@@ -134,12 +186,15 @@ const ManageAppointments = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [cabinetId, filterState, selectedDate, API_URL]);
+    }, [cabinetId, filterState, selectedDate, API_URL, t]); // Added t dependency
 
     // Effect to fetch appointments
     useEffect(() => {
-        fetchAppointments();
-    }, [fetchAppointments]); // Re-fetch when filters change (date, state)
+        // Fetch only if cabinetId is available
+        if (cabinetId) {
+            fetchAppointments();
+        }
+    }, [fetchAppointments, cabinetId]); // Re-fetch when filters change OR cabinetId becomes available
 
     // Effect to filter appointments locally when appointments or searchTerm change
     useEffect(() => {

@@ -6,6 +6,8 @@ import { getToken, clearUserData, isTokenExpired, getUserData } from '../../util
 // Assuming similar styling needs, import a relevant CSS file or create a new one
 import './EditDoctorCentreForm.css'; // Import the specific CSS
 
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
 const EditDoctorCentreForm = () => {
     const { id } = useParams(); // Get the doctor ID from the URL
     const navigate = useNavigate();
@@ -30,12 +32,55 @@ const EditDoctorCentreForm = () => {
         navigate("/sign-in");
     }, [navigate, t]);
 
-    // --- Fetch Doctor Data ---
+    // --- Token Expiry & Inactivity Checks ---
     useEffect(() => {
         const token = getToken();
         if (!token || isTokenExpired(token)) {
             performLogout();
             return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
+
+    // --- Fetch Doctor Data ---
+    useEffect(() => {
+        // Token check is now handled in the dedicated effect above
+        const token = getToken(); // Still need token for the request
+        if (!token) {
+             // Should have been caught by the other effect, but double-check
+             performLogout();
+             return;
         }
 
         setLoading(true);

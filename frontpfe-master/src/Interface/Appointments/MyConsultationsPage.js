@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
 import axios from 'axios'; // Keep axios
-import { getUserData, getCabinetId } from '../../utils/auth'; // Keep getUserData/getCabinetId
+import { useNavigate } from 'react-router-dom'; // Added useNavigate
+import { getUserData, getCabinetId, getToken, clearUserData, isTokenExpired } from '../../utils/auth'; // Keep getUserData/getCabinetId and add auth utils
 import { useTranslation } from 'react-i18next'; // Add useTranslation back
 
 import './MyConsultationsPage.css'; // Keep the new CSS file import
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const MyConsultationsPage = () => {
     const { t } = useTranslation(); // Initialize translation function
@@ -13,10 +16,60 @@ const MyConsultationsPage = () => {
     const [consultations, setConsultations] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const navigate = useNavigate(); // Initialize useNavigate
 
     // Revert API_URL definition
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
 
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('myConsultationsPage.alerts.sessionExpired', 'Session expired. Please log in again.')); // Add translation key
+        navigate("/sign-in");
+    }, [navigate, t]);
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
+
+    // --- Fetch User Data and Consultations ---
     useEffect(() => {
         // Revert fetching user data and cabinet ID
         const userData = getUserData();
@@ -69,9 +122,19 @@ const MyConsultationsPage = () => {
             }
         };
 
+        // Check if user data is available before proceeding
+        if (!userData || !userData.user || !userData.user.id || !userData.accessToken) {
+            console.error("User data or token missing, cannot fetch consultations.");
+            setError(t('myConsultationsPage.errors.authError')); // Use a generic auth error
+            setIsLoading(false);
+            // Optionally logout if critical data is missing
+            // performLogout();
+            return;
+        }
+
         fetchMyConsultations();
-        // Revert dependencies
-    }, [API_URL]);
+        // Revert dependencies, add t and performLogout
+    }, [API_URL, t, performLogout]);
 
     // Keep formatDate function but use translation
     const formatDate = (dateString) => {
@@ -88,6 +151,7 @@ const MyConsultationsPage = () => {
         const userData = getUserData();
         if (!userData || !userData.accessToken) {
             setError(t('myConsultationsPage.errors.authErrorDownload')); // Use translation
+            performLogout(); // Logout if no token
             return;
         }
 

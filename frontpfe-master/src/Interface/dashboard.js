@@ -210,13 +210,14 @@ const Dashboard = ({ onLogout }) => {
         <a href="#">{t('nav.dashboard')}</a>
        {/* <a href="/add">{t('nav.addAccount')}</a>*/}
         {/* <a href="/Tovalidate">{t('nav.confirmation')}</a>*/}
-        <a href="/users">{t('nav.doctorsManagement')}</a>
-         {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a>*/}
-        <a href="/UserManagement">{t('nav.changeRole')}</a>
         <a href="/add-cabinet">{t('nav.addCabinet')}</a>
         <a href="/manage-cabinets">{t('nav.manageCabinets')}</a> {/* Link for Admin Cabinets */}
         <a href="/add-centre">{t('nav.addExamCentre')}</a> {/* Link for Admin Centres */}
         <a href="/manage-centres">{t('nav.manageExamCentres')}</a> {/* Link for Admin Centres */}
+        <a href="/UserManagement">{t('nav.changeRole')}</a>
+
+        <a href="/users">{t('nav.doctorsManagement')}</a>
+         {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a>*/}
         <a href="/activation">{t('nav.activationManagement')}</a> {/* Added Activation Link */}
         <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
         <a href="/change-password">{t('nav.changePassword')}</a>
@@ -230,11 +231,13 @@ const Dashboard = ({ onLogout }) => {
         {/* Assistants/Doctors might not need 'Add an Account' directly, adjust if needed */}
          <a href="/add">{t('nav.addAccount')}</a>
         <a href="/Tovalidate">{t('nav.confirmation')}</a>
-        <a href="/users">{t('nav.userManagement')}</a> {/* Consider filtering users by their cabinet */}
-        {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a> {/* Consider filtering users by their cabinet */}
         <a href="/UserManagement">{t('nav.changeRole')}</a> {/* Consider filtering users by their cabinet */}
-        <a href="/consultation/all">{t('nav.consultationDashboard')}</a> {/* Added Consultation Dashboard Link */}
+
+        <a href="/users">{t('nav.userManagement')}</a> {/* Consider filtering users by their cabinet */}
         <a href="/manage-appointments">{t('nav.manageAppointments')}</a> {/* Added Manage Appointments Link */}
+
+        {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a> {/* Consider filtering users by their cabinet */}
+        <a href="/consultation/all">{t('nav.consultationDashboard')}</a> {/* Added Consultation Dashboard Link */}
         <a href="/parametres-cabinet">{t('nav.cabinetSettings')}</a> {/* Added Cabinet Settings Link */}
         <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
         <a href="/change-password">{t('nav.changePassword')}</a>
@@ -250,10 +253,10 @@ const Dashboard = ({ onLogout }) => {
         {/* Assistants/Doctors might not need 'Add an Account' directly, adjust if needed */}
          <a href="/add">{t('nav.addAccountAssistant')}</a>
         <a href="/Tovalidate">{t('nav.confirmation')}</a>
+        <a href="/UserManagement">{t('nav.changeRole')}</a> {/* Consider filtering users by their cabinet */}
+
         <a href="/users">{t('nav.userManagement')}</a> {/* Consider filtering users by their cabinet */}
         {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a> {/* Consider filtering users by their cabinet */}
-        <a href="/UserManagement">{t('nav.changeRole')}</a> {/* Consider filtering users by their cabinet */}
-        <a href="/consultation/all">{t('nav.consultationDashboard')}</a> {/* Added Consultation Dashboard Link */}
         {/* Assistant does not manage prescriptions directly */}
         <a href="/manage-appointments">{t('nav.manageAppointments')}</a> {/* Added Manage Appointments Link */}
         <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
@@ -272,10 +275,11 @@ const Dashboard = ({ onLogout }) => {
       <>
         <a href="#">{t('nav.dashboard')}</a>
         {/* Add patient-specific links here based on scenario */}
+        <a href="/add-appointment">{t('nav.addAppointment')}</a>
+        <a href="/my-appointments">{t('nav.myAppointments')}</a>
+
         <a href="/my-consultations">{t('nav.myConsultations')}</a>
         <a href="/my-examinations">{t('nav.myExaminations')}</a>
-        <a href="/my-appointments">{t('nav.myAppointments')}</a>
-        <a href="/add-appointment">{t('nav.addAppointment')}</a>
         <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
         <a href="/change-password">{t('nav.changePassword')}</a>
         <a href="/Logout">{t('nav.logout')}</a>

@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react'; // Import useContext
+import React, { useState, useEffect, useContext, useCallback } from 'react'; // Import useContext, useCallback
 import axios from 'axios';
-import { getUserData, getCabinetId } from '../../utils/auth'; // Import getCabinetId
+import { useNavigate } from 'react-router-dom'; // Added useNavigate
+import { getUserData, getCabinetId, getToken, clearUserData, isTokenExpired } from '../../utils/auth'; // Import getCabinetId and auth utils
 import ThemeContext from '../../utils/ThemeContext'; // Corrected: Import ThemeContext as default
 import './MyExaminationsPage.css'; // Import the CSS file
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const MyExaminationsPage = () => {
     const { t } = useTranslation(); // Initialize translation hook
@@ -14,8 +17,57 @@ const MyExaminationsPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [downloading, setDownloading] = useState(null); // Track which exam is downloading
+    const navigate = useNavigate(); // Initialize useNavigate
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
+
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('myExaminationsPage.alerts.sessionExpired', 'Session expired. Please log in again.')); // Add translation key
+        navigate("/sign-in");
+    }, [navigate, t]);
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
 
     // Function to handle the download click
     const handleDownload = async (examId) => {
@@ -33,11 +85,11 @@ const MyExaminationsPage = () => {
 
         // Example of how it *would* work with axios if the endpoint existed:
         // UNCOMMENTED THE ACTUAL LOGIC:
-        const userData = getUserData();
-        const token = userData?.accessToken;
+        const token = getToken(); // Use getToken
         if (!token) {
             setError(t('myExaminationsPage.errors.authMissing')); // Use translation key
             setDownloading(null);
+            performLogout(); // Logout if no token
             return;
         }
 
@@ -141,8 +193,18 @@ const MyExaminationsPage = () => {
             }
         };
 
+        // Check if user data is available before proceeding
+        if (!userData || !userData.user || !userData.user.id || !userData.accessToken) {
+            console.error("User data or token missing, cannot fetch examinations.");
+            setError(t('myExaminationsPage.errors.authError')); // Use a generic auth error
+            setIsLoading(false);
+            // Optionally logout if critical data is missing
+            // performLogout();
+            return;
+        }
+
         fetchMyExaminations();
-    }, [API_URL]); // Dependencies removed as data is fetched once on mount
+    }, [API_URL, t, performLogout]); // Added t and performLogout dependencies
 
     // Helper function to format date
     const formatDate = (dateString) => {

@@ -2,9 +2,11 @@ import React, { useState, useEffect, useCallback, useContext } from 'react'; // 
 import apiClient from '../../utils/apiClient'; // Import apiClient
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getUserData } from '../../utils/auth';
+import { getUserData, getToken, clearUserData, isTokenExpired } from '../../utils/auth'; // Added auth utils
 import ThemeContext from '../../utils/ThemeContext'; // Import ThemeContext
 import './MyAppointments.css'; // Import CSS
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 // Helper function to format LocalDateTime string (using t for fallbacks)
 const formatLocalDateTime = (dateTimeString, t) => {
@@ -109,6 +111,54 @@ const MyAppointments = () => {
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
 
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('myAppointments.alerts.sessionExpired', 'Session expired. Please log in again.')); // Add translation key
+        navigate("/sign-in");
+    }, [navigate, t]);
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
+
     // Effect to load user data after mount
     useEffect(() => {
         const data = getUserData();
@@ -117,9 +167,11 @@ const MyAppointments = () => {
         } else {
             console.error("Failed to get user data or user ID from storage.");
             setError(t('myAppointments.errorFetchUser', 'Unable to retrieve user information. Please log in again.'));
-            // Optionally navigate to login: navigate('/sign-in');
+            // Optionally navigate to login or logout
+            // navigate('/sign-in');
+            // performLogout();
         }
-    }, [t]);
+    }, [t, performLogout]); // Added performLogout dependency
 
     const fetchAppointments = useCallback(async () => {
         if (!userData || !userData.user || !userData.user.id) {
@@ -140,7 +192,7 @@ const MyAppointments = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [userData, API_URL, t]);
+    }, [userData, API_URL, t, performLogout]); // Added performLogout dependency
 
     useEffect(() => {
         // Only fetch if userData is available

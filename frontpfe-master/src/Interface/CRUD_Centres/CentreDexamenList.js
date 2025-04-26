@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
 import apiClient from '../../utils/apiClient'; // Import the shared apiClient
 import { Link, useNavigate } from 'react-router-dom'; // Import Link and useNavigate
-import './CentreDexamenList.css'; // Import the CSS file
 import { useTranslation } from 'react-i18next'; // For localization
+import { getToken, clearUserData, isTokenExpired } from '../../utils/auth'; // Added auth utils
+import './CentreDexamenList.css'; // Import the CSS file
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const CentreDexamenList = () => {
     const { t } = useTranslation();
@@ -14,9 +17,57 @@ const CentreDexamenList = () => {
     const [selectedCentreDetails, setSelectedCentreDetails] = useState(null);
     const navigate = useNavigate(); // Hook for navigation
 
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('manageCentres.alerts.sessionExpired', 'Session expired. Please log in again.')); // Add translation key
+        navigate("/sign-in");
+    }, [navigate, t]);
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
+    // --- Fetch Centres ---
     useEffect(() => {
         fetchCentres();
-    }, []); // Empty dependency array means run once on mount
+    }, [performLogout, t]); // Added performLogout and t to dependencies
 
     const fetchCentres = async () => {
         setLoading(true);
@@ -96,9 +147,10 @@ const CentreDexamenList = () => {
     const handleDelete = async (id) => {
         if (window.confirm(t('confirm_delete_centre'))) { // Use specific key
             setError(''); // Clear previous errors
-            const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+            const token = getToken(); // Use getToken()
             if (!token) {
                 setError(t('manageCabinets.deleteAuthRequired')); // Reuse key
+                performLogout(); // Logout if no token
                 return;
             }
             try {
@@ -121,6 +173,8 @@ const CentreDexamenList = () => {
                  } else {
                      setError(t('manageCabinets.deleteNetworkError')); // Reuse key
                  }
+                 // Consider calling performLogout on auth errors
+                 // if (err.response && (err.response.status === 401 || err.response.status === 403)) { performLogout(); }
                  alert(error); // Show error in alert
             }
         }

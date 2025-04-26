@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react'; // Import useContext
+import React, { useState, useEffect, useContext, useCallback } from 'react'; // Import useContext, useCallback
 import axios from 'axios';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import ThemeContext from '../utils/ThemeContext'; // Corrected Import Path for ThemeContext
-import { getUserData, getCabinetId } from '../utils/auth';
+import { getUserData, getCabinetId, getToken, clearUserData, isTokenExpired } from '../utils/auth'; // Added auth utils
 import './CabinetSettingsPage.css'; // Import the CSS file
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const CabinetSettingsPage = () => {
     const { t } = useTranslation(); // Initialize translation
@@ -13,17 +16,68 @@ const CabinetSettingsPage = () => {
     const [message, setMessage] = useState(''); // Success messages
     const [error, setError] = useState(''); // Error messages
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate(); // Initialize useNavigate
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
+
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('cabinetSettings.alerts.sessionExpired', 'Session expired. Please log in again.')); // Add translation key
+        navigate("/sign-in");
+    }, [navigate, t]);
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
 
     // Fetch cabinet ID on mount
     useEffect(() => {
         const currentCabinetId = getCabinetId();
         if (!currentCabinetId) {
             setError(t('cabinetSettings.cabinetIdError')); // Use translation
+            // Optionally logout if cabinet ID is crucial and missing
+            // performLogout();
         }
         setCabinetId(currentCabinetId);
-    }, [t]); // Add t to dependency array
+    }, [t, performLogout]); // Added performLogout dependency
 
     // Handle file input change
     const handleFileChange = (event) => {
@@ -43,9 +97,10 @@ const CabinetSettingsPage = () => {
             return;
         }
 
-        const userData = getUserData();
-        if (!userData || !userData.accessToken) {
+        const token = getToken(); // Get token using the function
+        if (!token) {
             setError(t('cabinetSettings.authError')); // Use translation
+            performLogout(); // Logout if no token
             return;
         }
 
@@ -58,11 +113,11 @@ const CabinetSettingsPage = () => {
 
         try {
             const response = await axios.post(
-                `${API_URL}/cabinets/${cabinetId}/signature`,
+                `${API_URL}/cabinets/${cabinetId}/signature`, // Use API_URL directly
                 formData,
                 {
                     headers: {
-                        'Authorization': `Bearer ${userData.accessToken}`,
+                        'Authorization': `Bearer ${token}`, // Use the fetched token
                         'Content-Type': 'multipart/form-data',
                     },
                 }

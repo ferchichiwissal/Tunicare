@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react'; // Removed useContext as it's not used here
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
+import { useLocation, useNavigate } from 'react-router-dom'; // Added useNavigate
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 import axios from 'axios'; // Keep axios or use apiClient consistently
 import './AddAppointmentForm.css';
+import { getToken, clearUserData, isTokenExpired } from '../../utils/auth'; // Added auth utils
 // Backend now handles patient and cabinet ID automatically based on authenticated user
 // import { AuthContext } from '../../context/AuthContext'; // Example context import (if needed elsewhere)
 import apiClient from '../../utils/apiClient'; // Keep apiClient if used
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const AddAppointmentForm = () => { // Removed patientId prop
     const { t } = useTranslation(); // Initialize useTranslation
@@ -28,7 +31,56 @@ const AddAppointmentForm = () => { // Removed patientId prop
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate(); // Initialize useNavigate
     // Removed isLoadingCabinets state
+
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('addAppointment.alerts.sessionExpired', 'Session expired. Please log in again.')); // Add translation key
+        navigate("/sign-in");
+    }, [navigate, t]);
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
 
     // Effect to update state if proposedDateTime changes (e.g., navigating back and forth)
     useEffect(() => {

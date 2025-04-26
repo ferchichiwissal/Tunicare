@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { getToken, clearUserData, isTokenExpired } from '../../utils/auth'; // Added auth utils
 // Optional: Add CSS for styling
 import './CabinetList.css'; // Import the CSS file
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const CabinetList = () => {
     const { t } = useTranslation(); // Initialize translation function
@@ -14,6 +17,62 @@ const CabinetList = () => {
     const [selectedCabinetDetails, setSelectedCabinetDetails] = useState(null); // To store details for printing
     const navigate = useNavigate();
 
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('manageCabinets.sessionExpired', 'Session expired due to inactivity or invalid token.')); // Add a translation key
+        navigate("/sign-in");
+    }, [navigate, t]); // Add dependencies
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return; // Stop further execution in this effect
+        }
+
+        // Token expiry timer
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout(); // Token already expired
+                return; // Stop further execution
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout(); // Logout on error
+            return; // Stop further execution
+        }
+
+        // Inactivity timer setup
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer(); // Initial setup
+
+        // Cleanup function
+        return () => {
+            clearTimeout(expiryTimer); // Clear token expiry timer
+            clearTimeout(inactivityTimer); // Clear inactivity timer
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer)); // Remove listeners
+        };
+    }, [performLogout]); // Dependency array includes performLogout
+
+
+    // --- Fetch Cabinets ---
     useEffect(() => {
         const fetchCabinets = async () => {
             setLoading(true);
@@ -54,7 +113,8 @@ const CabinetList = () => {
         };
 
         fetchCabinets();
-    }, [navigate]);
+    // Removed navigate from dependency array as it's covered by performLogout -> navigate
+    }, [t, performLogout]); // Added t and performLogout as dependencies if needed by error messages/logout logic inside fetch
 
     const handleShowQrCode = async (cabinet) => { // Pass the whole cabinet object
         setError('');
@@ -63,11 +123,13 @@ const CabinetList = () => {
          const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
          if (!token) {
              setError(t('manageCabinets.authRequired'));
+             // Maybe call performLogout() here instead of just returning?
+             // performLogout();
              return;
          }
 
         try {
-             // Assuming the backend URL is http://localhost:8081
+             // Assuming the backend URL is http://localhost:6952
             const response = await axios.get(`http://localhost:6952/cabinets/${cabinet.idSite}/qrcode`, { // Use cabinet.idSite
                 headers: { 'Authorization': `Bearer ${token}` },
                 responseType: 'arraybuffer' // Important to get image data correctly
@@ -184,6 +246,8 @@ const CabinetList = () => {
                  setError(t('manageCabinets.deleteNetworkError'));
             }
              // Display error in an alert as well for immediate feedback
+             // Consider calling performLogout on auth errors here too
+             // if (err.response && (err.response.status === 401 || err.response.status === 403)) { performLogout(); }
              alert(error); // Alert the already translated error message from setError
         }
     };
