@@ -28,6 +28,7 @@ const MedicalExaminationForm = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [submitStatus, setSubmitStatus] = useState('');
+    const [createdExamId, setCreatedExamId] = useState(null); // State to store the ID of the created exam
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
 
@@ -84,8 +85,8 @@ const MedicalExaminationForm = () => {
         }
 
         const payload = {
-            appointmentId: appointmentId, // Send appointmentId
-            consultationId: consultationId, // Send consultationId retrieved from URL
+            appointmentId: appointmentId, // Send appointmentId (might not be needed for update, but good to have)
+            consultationId: consultationId, // Send consultationId retrieved from URL (might not be needed for update)
             typeExamen: examenType,
             centreId: selectedCentre !== 'AUTRE' ? selectedCentre : null,
             // centreAutre is no longer sent as input field is removed
@@ -93,20 +94,41 @@ const MedicalExaminationForm = () => {
         };
 
         try {
-            // Use apiClient which should handle headers automatically
-            const response = await apiClient.post(`/api/medical-examinations`, payload);
-            console.log("Exam request saved:", response.data);
-            setSubmitStatus(t('medicalExaminationForm.status.saveSuccess')); // Use translation key
-            // Optionally redirect back or clear form
-             setTimeout(() => {
-                 setSubmitStatus('');
-                 // navigate(`/consultation/${consultationId}`); // Example redirect
-             }, 2000);
+            let response;
+            if (createdExamId) {
+                // --- Update existing examination ---
+                setSubmitStatus(t('medicalExaminationForm.status.updating')); // Add translation key for updating status
+                response = await apiClient.put(`/api/medical-examinations/${createdExamId}`, payload);
+                console.log("Exam request updated:", response.data);
+                setSubmitStatus(t('medicalExaminationForm.status.updateSuccess')); // Add translation key for update success
+            } else {
+                // --- Create new examination ---
+                setSubmitStatus(t('medicalExaminationForm.status.saving')); // Use existing translation key
+                response = await apiClient.post(`/api/medical-examinations`, payload);
+                console.log("Exam request saved:", response.data);
+                // Assuming the response contains the saved entity with its ID
+                // Corrected field name from 'id' to 'idExam' based on backend entity
+                if (response.data && response.data.idExam) { // Check if idExam exists in response
+                    setCreatedExamId(response.data.idExam); // Store the ID using the correct field name
+                    setSubmitStatus(t('medicalExaminationForm.status.saveSuccess')); // Use existing translation key
+                } else {
+                     console.error("Exam created but ID (idExam) not found in response:", response.data);
+                     // Handle case where ID is missing - maybe show a specific error?
+                     setSubmitStatus(t('medicalExaminationForm.errors.saveSuccessIdMissing')); // Add translation key
+                }
+            }
+
+            // Clear status message after a delay
+            setTimeout(() => {
+                setSubmitStatus('');
+            }, 3000); // Increased delay slightly
 
         } catch (err) {
-            console.error("Error saving examination request:", err);
-            // Use translation key for fallback message
-            setError(err.response?.data?.message || t('medicalExaminationForm.errors.saveFailedFallback'));
+            const actionType = createdExamId ? 'updating' : 'saving';
+            console.error(`Error ${actionType} examination request:`, err);
+            // Use translation keys for fallback messages
+            const fallbackKey = createdExamId ? 'medicalExaminationForm.errors.updateFailedFallback' : 'medicalExaminationForm.errors.saveFailedFallback';
+            setError(err.response?.data?.message || t(fallbackKey)); // Add update fallback key
             setSubmitStatus('');
         }
     };
@@ -369,9 +391,12 @@ const MedicalExaminationForm = () => {
 
                 <div className="form-actions">
                     <button type="submit" className="btn btn-primary" style={{ marginRight: '10px' }}>
-                        {t('medicalExaminationForm.buttons.save')} {/* Use translation key */}
+                        {createdExamId
+                            ? t('medicalExaminationForm.buttons.update') // Use new translation key
+                            : t('medicalExaminationForm.buttons.save')   // Use existing translation key
+                        }
                     </button>
-                    <button type="button" onClick={handlePrint} className="btn btn-info">
+                    <button type="button" onClick={handlePrint} className="btn btn-info" disabled={!createdExamId}> {/* Disable print if not saved yet */}
                         {t('medicalExaminationForm.buttons.print')} {/* Use translation key */}
                     </button>
                      <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary" style={{ marginLeft: '10px' }}>

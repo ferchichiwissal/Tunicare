@@ -1,7 +1,7 @@
 package pi.pperformance.elite.UserServices;
 
 import pi.pperformance.elite.entities.MedicalExamination;
-// Import DTOs if needed
+import pi.pperformance.elite.dto.MedicalExaminationInputDTO; // Import DTO
 import java.util.List;
 
 public interface IMedicalExaminationService {
@@ -36,6 +36,15 @@ public interface IMedicalExaminationService {
     List<MedicalExamination> getPatientExaminationsByCabinet(Long patientId, Long cabinetId);
 
     // Add other methods as needed (e.g., getById, update)
+
+    /**
+     * Updates an existing medical examination.
+     * @param examId The ID of the examination to update.
+     * @param examInput The DTO containing the updated data.
+     * @return The updated medical examination entity.
+     * @throws pi.pperformance.elite.exceptions.ResourceNotFoundException if the examination is not found.
+     */
+    MedicalExamination updateMedicalExamination(Long examId, MedicalExaminationInputDTO examInput);
 
     byte[] generateExaminationPdf(Long examId) throws com.lowagie.text.DocumentException, java.io.IOException; // Added for PDF generation
 }

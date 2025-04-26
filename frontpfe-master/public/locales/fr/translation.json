@@ -1037,12 +1037,15 @@
       "other": "Autre (préciser)"
     },
     "buttons": {
-      "save": "🔘 OK (Enregistrer)",
+      "save": "🔘 Enregistrer",
+      "update": "🔄 Mettre à jour",
       "print": "🖨️ Imprimer"
     },
     "status": {
       "saving": "Enregistrement en cours...",
-      "saveSuccess": "Demande d'examen enregistrée avec succès !"
+      "saveSuccess": "Demande d'examen enregistrée avec succès !",
+      "updating": "Mise à jour en cours...",
+      "updateSuccess": "Demande d'examen mise à jour avec succès !"
     },
     "errors": {
       "missingPatientId": "ID Patient manquant dans l'URL.",
@@ -1050,6 +1053,8 @@
       "selectExamType": "Veuillez sélectionner un type d'examen.",
       "missingConsultationId": "ID de consultation manquant dans l'URL.",
       "saveFailedFallback": "Erreur lors de l'enregistrement de la demande.",
+      "updateFailedFallback": "Erreur lors de la mise à jour de la demande.",
+      "saveSuccessIdMissing": "Examen créé mais ID non trouvé dans la réponse.",
       "printPatientDataMissing": "Impossible d'imprimer : données patient non chargées.",
       "printExecutionFailed": "Erreur lors de l'exécution de l'impression.",
       "printSetupFailed": "Erreur lors de la préparation de l'impression."

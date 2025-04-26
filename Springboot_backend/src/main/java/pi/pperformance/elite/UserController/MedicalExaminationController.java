@@ -47,6 +47,19 @@ public class MedicalExaminationController {
         return new ResponseEntity<>(savedExam, HttpStatus.CREATED);
     }
 
+    // Endpoint pour mettre à jour une demande d'examen existante (Médecin)
+    @PutMapping("/{examId}")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<MedicalExamination> updateMedicalExamination(
+            @PathVariable Long examId,
+            @RequestBody MedicalExaminationInputDTO examInput) {
+        // TODO: Add authorization check: Ensure the doctor updating the exam is the one who created it or has appropriate permissions.
+        MedicalExamination updatedExam = medicalExaminationService.updateMedicalExamination(examId, examInput);
+        // TODO: Return DTO instead of raw entity
+        return ResponseEntity.ok(updatedExam);
+    }
+
+
     // Endpoint pour récupérer les examens d'un patient POUR UN CABINET SPECIFIQUE (Patient)
     // Utilisé dans /my-examinations
     @GetMapping("/my-examinations/{patientId}")

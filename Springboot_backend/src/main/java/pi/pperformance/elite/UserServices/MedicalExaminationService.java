@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Optional; // Added import for Optional
 import java.util.stream.Collectors;
 
+import pi.pperformance.elite.dto.MedicalExaminationInputDTO; // Import DTO for update method
+
 @Service
 // Removed @AllArgsConstructor
 public class MedicalExaminationService implements IMedicalExaminationService {
@@ -281,4 +283,45 @@ public class MedicalExaminationService implements IMedicalExaminationService {
         }
         return Period.between(birthLocalDate, LocalDate.now()).getYears();
     }
-}
+
+    @Override
+    @Transactional
+    public MedicalExamination updateMedicalExamination(Long examId, MedicalExaminationInputDTO examInput) {
+        // 1. Find the existing examination
+        MedicalExamination existingExam = medicalExaminationRepository.findById(examId)
+                .orElseThrow(() -> new ResourceNotFoundException("Medical Examination not found with id: " + examId));
+
+        // 2. Update fields from DTO
+        existingExam.setAct(examInput.getTypeExamen());
+        existingExam.setRecommandation(examInput.getRecommandation());
+
+        // 3. Update Centre information
+        Long centreId = examInput.getCentreId();
+        if (centreId != null) {
+            CentreDexamen centre = centreDexamenRepository.findById(centreId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Centre d'examen not found with id: " + centreId));
+            existingExam.setCentreName(centre.getName()); // Update the name
+        } else {
+            // Handle 'Autre' case - assuming 'Autre' means no specific centre is linked
+            existingExam.setCentreName("Autre");
+        }
+
+        // 4. Update associated RendezVous and Consultation if provided and different (Optional - depends on requirements)
+        // For now, we assume these don't change during an exam update.
+        // If appointmentId or consultationId in DTO are different, handle logic here.
+        // Example:
+        // if (examInput.getAppointmentId() != null && !examInput.getAppointmentId().equals(existingExam.getRendezVous().getId())) {
+        //     RendezVous newRendezVous = rendezVousRepository.findById(examInput.getAppointmentId())
+        //             .orElseThrow(() -> new ResourceNotFoundException("New RendezVous not found with id: " + examInput.getAppointmentId()));
+        //     existingExam.setRendezVous(newRendezVous);
+        // }
+        // if (examInput.getConsultationId() != null && !examInput.getConsultationId().equals(existingExam.getConsultationId())) {
+        //     existingExam.setConsultationId(examInput.getConsultationId());
+        // }
+
+
+        // 5. Save the updated examination
+        // The @PreUpdate annotation in the entity should handle the updatedAt timestamp automatically
+        return medicalExaminationRepository.save(existingExam);
+    }
+} // Added missing closing brace for the class

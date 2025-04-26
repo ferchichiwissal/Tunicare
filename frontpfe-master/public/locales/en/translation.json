@@ -1040,12 +1040,15 @@
       "other": "Other (specify)"
     },
     "buttons": {
-      "save": "🔘 OK (Save)",
+      "save": "🔘 Save",
+      "update": "🔄 Update",
       "print": "🖨️ Print"
     },
     "status": {
       "saving": "Saving...",
-      "saveSuccess": "Exam request saved successfully!"
+      "saveSuccess": "Exam request saved successfully!",
+      "updating": "Updating...",
+      "updateSuccess": "Exam request updated successfully!"
     },
     "errors": {
       "missingPatientId": "Patient ID missing in URL.",
@@ -1053,6 +1056,8 @@
       "selectExamType": "Please select an exam type.",
       "missingConsultationId": "Consultation ID missing in URL.",
       "saveFailedFallback": "Error saving the request.",
+      "updateFailedFallback": "Error updating the request.",
+      "saveSuccessIdMissing": "Exam created but ID not found in response.",
       "printPatientDataMissing": "Cannot print: patient data not loaded.",
       "printExecutionFailed": "Error during print execution.",
       "printSetupFailed": "Error preparing print."
