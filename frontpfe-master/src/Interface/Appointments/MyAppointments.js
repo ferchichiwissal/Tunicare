@@ -6,14 +6,14 @@ import { getUserData } from '../../utils/auth';
 import ThemeContext from '../../utils/ThemeContext'; // Import ThemeContext
 import './MyAppointments.css'; // Import CSS
 
-// Helper function to format LocalDateTime string
-const formatLocalDateTime = (dateTimeString) => {
-    if (!dateTimeString) return 'N/A';
+// Helper function to format LocalDateTime string (using t for fallbacks)
+const formatLocalDateTime = (dateTimeString, t) => {
+    if (!dateTimeString) return t('common.notAvailable', 'N/A');
     try {
         const date = new Date(dateTimeString);
         if (isNaN(date.getTime())) {
              console.warn("Invalid date string received:", dateTimeString);
-             return 'Invalid Date';
+             return t('common.invalidDate', 'Invalid Date');
         }
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
@@ -23,7 +23,7 @@ const formatLocalDateTime = (dateTimeString) => {
         return `${day}/${month}/${year} ${hours}:${minutes}`;
     } catch (error) {
         console.error("Error formatting date:", dateTimeString, error);
-        return 'Date Error';
+        return t('common.dateError', 'Date Error');
     }
 };
 
@@ -53,37 +53,47 @@ const formatForInput = (dateTimeString) => {
 };
 
 
-// Helper function to determine badge class based on status
-const getStatusBadgeClass = (status) => {
-    switch (status?.toLowerCase()) {
-        case 'accepté':
-            return 'bg-success'; // Green for accepted
-        case 'en attente':
-            return 'bg-warning text-dark'; // Yellow for pending (ensure text is dark for contrast)
-        case 'refusé':
-            return 'bg-danger'; // Red for refused
-        case 'annulé': // Assuming 'annulé' is a possible status
-            return 'bg-secondary'; // Grey for cancelled
-        case 'réalisé': // Assuming 'réalisé' is a possible status
-             return 'bg-info text-dark'; // Blue for completed (ensure text is dark for contrast)
-        default:
-            return 'bg-light text-dark'; // Default fallback
+// Helper function to determine badge class based on status (using translated status if possible)
+const getStatusBadgeClass = (status, t) => {
+    // Normalize status for comparison, potentially using translated values if needed
+    const normalizedStatus = status?.toLowerCase();
+
+    // Compare against potential keys or normalized English/French terms
+    if (normalizedStatus === t('myAppointments.statusAccepted', 'accepté').toLowerCase()) {
+        return 'bg-success';
+    } else if (normalizedStatus === t('myAppointments.statusPending', 'en attente').toLowerCase()) {
+        return 'bg-warning text-dark';
+    } else if (normalizedStatus === t('myAppointments.statusRefused', 'refusé').toLowerCase()) {
+        return 'bg-danger';
+    } else if (normalizedStatus === t('myAppointments.statusCancelled', 'annulé').toLowerCase()) {
+        return 'bg-secondary';
+    } else if (normalizedStatus === t('myAppointments.statusCompleted', 'réalisé').toLowerCase()) {
+        return 'bg-info text-dark';
+    } else {
+        return 'bg-light text-dark'; // Default fallback
     }
 };
 
 
-// Mapping for status keys
+// Mapping for status keys to use in translation lookup
 const statusKeyMap = {
-    'en attente': 'EnAttente',
-    'accepté': 'Accepté',
-    'refusé': 'Refusé',
-    'annulé': 'Annulé',
-    'réalisé': 'Réalisé'
+    'en attente': 'Pending', // Map original backend values to consistent keys
+    'accepté': 'Accepted',
+    'refusé': 'Refused',
+    'annulé': 'Cancelled',
+    'réalisé': 'Completed'
 };
+
+// Mapping for appointment types
+const typeKeyMap = {
+    'Nouvelle consultation': 'NewConsultation',
+    'Séance de contrôle': 'ControlSession'
+};
+
 
 const MyAppointments = () => {
     const { t } = useTranslation();
-    const { theme } = useContext(ThemeContext);
+    const { theme } = useContext(ThemeContext); // Keep theme context if needed elsewhere
     const navigate = useNavigate();
     const [appointments, setAppointments] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -109,7 +119,7 @@ const MyAppointments = () => {
             setError(t('myAppointments.errorFetchUser', 'Unable to retrieve user information. Please log in again.'));
             // Optionally navigate to login: navigate('/sign-in');
         }
-    }, [t]); // Added t to dependency array
+    }, [t]);
 
     const fetchAppointments = useCallback(async () => {
         if (!userData || !userData.user || !userData.user.id) {
@@ -130,7 +140,7 @@ const MyAppointments = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [userData, API_URL, t]); // Added t to dependency array
+    }, [userData, API_URL, t]);
 
     useEffect(() => {
         // Only fetch if userData is available
@@ -240,9 +250,9 @@ const MyAppointments = () => {
             {appointments.length === 0 && !isLoading ? (
                  <p>{t('myAppointments.noAppointments', 'You have no appointments at the moment.')}</p>
             ) : (
-                 // Add Bootstrap table classes and responsive wrapper
+                 // Add Bootstrap table classes (including table-bordered) and responsive wrapper
                  <div className="table-responsive">
-                     <table className="table table-striped table-hover appointments-table">
+                     <table className="table table-striped table-hover table-bordered appointments-table"> {/* Added table-bordered */}
                          <thead>
                              <tr>
                                  <th>📅 {t('myAppointments.tableHeaderDate', 'Date and Time')}</th>
@@ -255,25 +265,30 @@ const MyAppointments = () => {
                              {appointments
                                  .filter(appt => appt.apptState !== 'réalisé') // Filter out completed appointments
                                  .map((appt) => {
-                                     // Use the map to get the key suffix
+                                     // Use the map to get the key suffix for status
                                      const statusKeySuffix = statusKeyMap[appt.apptState] || appt.apptState; // Fallback to raw state if not in map
                                      const statusTranslationKey = `myAppointments.status${statusKeySuffix}`;
+                                     // Use the map to get the key suffix for type
+                                     const typeKeySuffix = typeKeyMap[appt.apptType] || appt.apptType;
+                                     const typeTranslationKey = `myAppointments.type${typeKeySuffix}`;
+
 
                                      return ( // Return the JSX for the row
                                          <tr key={appt.idAppointment}>
-                                             <td>{formatLocalDateTime(appt.apptDateTime) === 'Invalid Date' ? t('myAppointments.invalidDate', 'Invalid Date') : formatLocalDateTime(appt.apptDateTime) === 'Date Error' ? t('myAppointments.dateError', 'Date Error') : formatLocalDateTime(appt.apptDateTime)}</td>
-                                             <td>{appt.apptType === 'Nouvelle consultation' ? t('myAppointments.typeNew', 'New Consultation') : appt.apptType === 'Séance de contrôle' ? t('myAppointments.typeControl', 'Follow-up Session') : appt.apptType}</td>
+                                             <td>{formatLocalDateTime(appt.apptDateTime, t)}</td> {/* Pass t to formatter */}
+                                             <td>{t(typeTranslationKey, appt.apptType)}</td> {/* Translate type */}
                                              {/* Use Bootstrap badges for status */}
                                              <td>
-                                                 <span className={`badge ${getStatusBadgeClass(appt.apptState)}`}>
+                                                 <span className={`badge ${getStatusBadgeClass(appt.apptState, t)}`}> {/* Pass t to badge function */}
                                                      {/* Use the mapped key */}
-                                                     {t(statusTranslationKey, appt.apptState)}
+                                                     {t(statusTranslationKey, appt.apptState)} {/* Translate status */}
                                                  </span>
                                              </td>
                                              <td>
                                          {/* Add margin between buttons */}
+                                         {/* Check status using direct backend string values */}
                                          {appt.apptState === 'accepté' && (
-                                             <button onClick={() => handleCancel(appt.idAppointment)} className="btn btn-warning btn-sm me-1" disabled={isLoading}>
+                                             <button onClick={() => handleCancel(appt.idAppointment)} className="btn btn-danger btn-sm me-1" disabled={isLoading}> {/* Changed btn-warning to btn-danger */}
                                                  {t('myAppointments.buttonCancel', 'Cancel')}
                                              </button>
                                          )}
@@ -285,10 +300,10 @@ const MyAppointments = () => {
                                          {appt.apptState === 'refusé' && appt.apptProposedDateTime && (
                                              <>
                                                  <div className="mb-1"> {/* Use Bootstrap margin class */}
-                                                     <small>{t('myAppointments.proposedDateLabel', 'Proposed Date:')} {formatLocalDateTime(appt.apptProposedDateTime)}</small>
+                                                     <small>{t('myAppointments.proposedDateLabel', 'Proposed Date:')} {formatLocalDateTime(appt.apptProposedDateTime, t)}</small> {/* Pass t */}
                                                  </div>
                                                  <button onClick={() => handleFixNewAppointment(appt.idAppointment, appt.apptProposedDateTime)} className="btn btn-primary btn-sm" disabled={isLoading}>
-                                                     {t('myAppointments.buttonFixNew', 'Schedule New')}
+                                                     {t('myAppointments.buttonFixNew', 'Schedule New')} {/* Translate button */}
                                                  </button>
                                              </>
                                          )}
@@ -330,14 +345,14 @@ const MyAppointments = () => {
                                       <label htmlFor="modifyType" className="form-label">📄 {t('myAppointments.modalTypeLabel', 'Appointment Type:')}</label>
                                       <select
                                           id="modifyType"
-                                          value={modifyType}
-                                          onChange={(e) => setModifyType(e.target.value)}
+                                          value={modifyType} // Keep original value for selection state
+                                          onChange={(e) => setModifyType(e.target.value)} // Update state with original value
                                           required
                                           className="form-select" // Use form-select for Bootstrap styling
                                       >
-                                          {/* Ensure values match backend/logic if needed, or use keys */}
-                                          <option value="Nouvelle consultation">{t('myAppointments.typeNew', 'New Consultation')}</option>
-                                          <option value="Séance de contrôle">{t('myAppointments.typeControl', 'Follow-up Session')}</option>
+                                          {/* Use original backend values but display translated text */}
+                                          <option value="Nouvelle consultation">{t('myAppointments.typeNewConsultation', 'New Consultation')}</option>
+                                          <option value="Séance de contrôle">{t('myAppointments.typeControlSession', 'Follow-up Session')}</option>
                                           {/* Add other types if they exist */}
                                       </select>
                                   </div>

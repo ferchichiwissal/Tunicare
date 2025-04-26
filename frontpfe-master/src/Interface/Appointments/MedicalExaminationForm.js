@@ -4,9 +4,11 @@ import ReactQuill from 'react-quill'; // Import ReactQuill
 import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 import apiClient from '../../utils/apiClient'; // Import apiClient instead of axios
 import AuthContext from '../../context/AuthContext'; // Import AuthContext
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 // import './MedicalExaminationForm.css'; // Optional CSS
 
 const MedicalExaminationForm = () => {
+    const { t } = useTranslation(); // Initialize translation function
     const location = useLocation();
     const navigate = useNavigate();
     const queryParams = new URLSearchParams(location.search);
@@ -42,7 +44,7 @@ const MedicalExaminationForm = () => {
                     const patientRes = await apiClient.get(`/Users/allid/${patientId}`);
                     setPatient(patientRes.data);
                 } else {
-                    throw new Error("ID Patient manquant dans l'URL.");
+                    throw new Error(t('medicalExaminationForm.errors.missingPatientId')); // Use translation key
                 }
 
                 // Fetch Centres d'examen (adjust endpoint if needed)
@@ -52,7 +54,8 @@ const MedicalExaminationForm = () => {
 
             } catch (err) {
                 console.error("Error fetching initial data:", err);
-                setError(err.response?.data?.message || err.message || 'Erreur lors du chargement des données.');
+                // Use translation key for fallback message
+                setError(err.response?.data?.message || err.message || t('medicalExaminationForm.errors.loadFailedFallback'));
                 setPatient(null);
                 setCentres([]);
             } finally {
@@ -64,18 +67,18 @@ const MedicalExaminationForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitStatus('Enregistrement en cours...');
+        setSubmitStatus(t('medicalExaminationForm.status.saving')); // Use translation key
         setError('');
 
         if (!examenType) {
-            setError('Veuillez sélectionner un type d\'examen.');
+            setError(t('medicalExaminationForm.errors.selectExamType')); // Use translation key
             setSubmitStatus('');
             return;
         }
         // Removed validation check for 'autreCentreName' as the input field was removed.
 
         if (!consultationId) { // Add check for consultationId
-            setError('ID de consultation manquant dans l\'URL.');
+            setError(t('medicalExaminationForm.errors.missingConsultationId')); // Use translation key
             setSubmitStatus('');
             return;
         }
@@ -93,7 +96,7 @@ const MedicalExaminationForm = () => {
             // Use apiClient which should handle headers automatically
             const response = await apiClient.post(`/api/medical-examinations`, payload);
             console.log("Exam request saved:", response.data);
-            setSubmitStatus('Demande d\'examen enregistrée avec succès !');
+            setSubmitStatus(t('medicalExaminationForm.status.saveSuccess')); // Use translation key
             // Optionally redirect back or clear form
              setTimeout(() => {
                  setSubmitStatus('');
@@ -102,49 +105,51 @@ const MedicalExaminationForm = () => {
 
         } catch (err) {
             console.error("Error saving examination request:", err);
-            setError(err.response?.data?.message || 'Erreur lors de l\'enregistrement de la demande.');
+            // Use translation key for fallback message
+            setError(err.response?.data?.message || t('medicalExaminationForm.errors.saveFailedFallback'));
             setSubmitStatus('');
         }
     };
 
     // --- Helper Functions ---
     const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
+        if (!dateString) return t('common.notAvailable'); // Use translation key
         try {
+            // Consider using i18n locale for formatting if available/needed
             return new Date(dateString).toLocaleDateString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit' });
-        } catch (e) { return 'Date invalide'; }
+        } catch (e) { return t('common.invalidDate'); } // Use translation key
     };
 
     const calculateAge = (dobString) => {
-        if (!dobString) return 'N/A';
+        if (!dobString) return t('common.notAvailable'); // Use translation key
         try {
             const dob = new Date(dobString);
             const ageDiffMs = Date.now() - dob.getTime();
             const ageDate = new Date(ageDiffMs);
             return Math.abs(ageDate.getUTCFullYear() - 1970);
-        } catch (e) { return 'N/A'; }
+        } catch (e) { return t('common.notAvailable'); } // Use translation key
     };
 
     // --- Print Function (using refined iframe method) ---
     const handlePrint = () => {
         if (!patient) {
-            alert("Impossible d'imprimer : données patient non chargées.");
+            alert(t('medicalExaminationForm.errors.printPatientDataMissing')); // Use translation key
             return;
         }
 
         // Find selected centre name
-        let centreName = "Autre";
+        let centreName = t('medicalExaminationForm.print.otherCentre'); // Use translation key
         if (selectedCentre && selectedCentre !== 'AUTRE') {
             const centre = centres.find(c => c.idCentre.toString() === selectedCentre);
             if (centre) {
                 centreName = `${centre.name} (${centre.adress})`;
             } else {
-                centreName = `Centre ID: ${selectedCentre} (Nom non trouvé)`;
+                centreName = t('medicalExaminationForm.print.centreNotFound', { id: selectedCentre }); // Use translation key
             }
         }
 
         // --- Generate HTML Content ---
-        let printHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Demande d\'Examen Médical</title>'; // Added Doctype and charset
+        let printHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${t('medicalExaminationForm.print.title')}</title>`; // Use translation key
         printHtml += `
             <style>
                 @page { size: A4; margin: 20mm; } /* Define page size and margins */
@@ -171,32 +176,33 @@ const MedicalExaminationForm = () => {
         // Header
         printHtml += `<div class="header">`;
         if (user) {
-            printHtml += `Dr. ${user.name || '[Nom Docteur]'}<br>`;
-            printHtml += `${user.activeCabinet?.address || '[Adresse Cabinet]'} - Tel: ${user.activeCabinet?.tel || '[Tel Cabinet]'}<br>`;
+            // Use translation keys for fallbacks
+            printHtml += `${t('medicalExaminationForm.print.doctorPrefix')}${user.name || t('medicalExaminationForm.print.fallbackDoctorName')}<br>`;
+            printHtml += `${user.activeCabinet?.address || t('medicalExaminationForm.print.fallbackCabinetAddress')} - Tel: ${user.activeCabinet?.tel || t('medicalExaminationForm.print.fallbackCabinetPhone')}<br>`;
         }
-        printHtml += `Date: ${formatDate(new Date())}`;
+        printHtml += `${t('medicalExaminationForm.print.dateLabel')} ${formatDate(new Date())}`; // Use translation key
         printHtml += `</div>`;
 
-        printHtml += '<h2>Demande d\'Examen Médical</h2>';
+        printHtml += `<h2>${t('medicalExaminationForm.print.title')}</h2>`; // Use translation key
         printHtml += '<div class="content">';
 
         // Patient Section
-        printHtml += '<div class="section"><h4>Patient</h4>';
-        printHtml += `<p><strong>Nom:</strong> ${patient.lastName || 'N/A'}</p>`;
-        printHtml += `<p><strong>Prénom:</strong> ${patient.firstName || 'N/A'}</p>`;
-        printHtml += `<p><strong>Date de Naissance:</strong> ${formatDate(patient.birthDate)}</p>`;
-        printHtml += `<p><strong>Âge:</strong> ${calculateAge(patient.birthDate)} ans</p>`;
+        printHtml += `<div class="section"><h4>${t('medicalExaminationForm.print.patientSectionTitle')}</h4>`; // Use translation key
+        printHtml += `<p><strong>${t('medicalExaminationForm.print.lastNameLabel')}</strong> ${patient.lastName || t('common.notAvailable')}</p>`; // Use translation keys
+        printHtml += `<p><strong>${t('medicalExaminationForm.print.firstNameLabel')}</strong> ${patient.firstName || t('common.notAvailable')}</p>`; // Use translation keys
+        printHtml += `<p><strong>${t('medicalExaminationForm.print.dobLabel')}</strong> ${formatDate(patient.birthDate)}</p>`; // Use translation key
+        printHtml += `<p><strong>${t('medicalExaminationForm.print.ageLabel')}</strong> ${calculateAge(patient.birthDate)} ${t('medicalExaminationForm.print.ageSuffix')}</p>`; // Use translation keys
         printHtml += '</div>';
 
         // Examination Section
-        printHtml += '<div class="section"><h4>Examen Demandé</h4>';
-        printHtml += `<p><strong>Type d'examen:</strong> ${examenType || 'Non spécifié'}</p>`;
-        printHtml += `<p><strong>Centre:</strong> ${centreName}</p>`;
+        printHtml += `<div class="section"><h4>${t('medicalExaminationForm.print.examSectionTitle')}</h4>`; // Use translation key
+        printHtml += `<p><strong>${t('medicalExaminationForm.print.examTypeLabel')}</strong> ${examenType || t('medicalExaminationForm.print.fallbackExamType')}</p>`; // Use translation keys
+        printHtml += `<p><strong>${t('medicalExaminationForm.print.centreLabel')}</strong> ${centreName}</p>`; // Use translation key
         // Handle Quill content for recommendation
         if (recommandation && recommandation !== '<p><br></p>') { // Check if not empty Quill content
-             printHtml += `<p><strong>Recommandation:</strong></p><div class="recommendation-content">${recommandation}</div>`;
+             printHtml += `<p><strong>${t('medicalExaminationForm.print.recommendationLabel')}</strong></p><div class="recommendation-content">${recommandation}</div>`; // Use translation key
         } else {
-             printHtml += `<p><strong>Recommandation:</strong> <i>Aucune</i></p>`;
+             printHtml += `<p><strong>${t('medicalExaminationForm.print.recommendationLabel')}</strong> <i>${t('medicalExaminationForm.print.fallbackRecommendation')}</i></p>`; // Use translation keys
         }
         printHtml += '</div>';
 
@@ -204,7 +210,7 @@ const MedicalExaminationForm = () => {
 
         // Footer
         printHtml += `<div class="footer">`;
-        printHtml += `Signature du Médecin: _________________________`;
+        printHtml += `${t('medicalExaminationForm.print.signatureLabel')} _________________________`; // Use translation key
         printHtml += `</div>`;
 
         printHtml += '</body></html>';
@@ -264,42 +270,42 @@ const MedicalExaminationForm = () => {
                     setTimeout(cleanupIframe, 2000); // Cleanup after 2 seconds
                 } catch (printError) {
                     console.error("Error during exam iframe print execution:", printError);
-                    alert("Erreur lors de l'exécution de l'impression.");
+                    alert(t('medicalExaminationForm.errors.printExecutionFailed')); // Use translation key
                     cleanupIframe(); // Clean up immediately on error
                 }
             }, 100); // 100ms delay
         } catch (e) {
             console.error("Error setting up exam print via iframe:", e);
-            alert("Erreur lors de la préparation de l'impression.");
+            alert(t('medicalExaminationForm.errors.printSetupFailed')); // Use translation key
             cleanupIframe(); // Clean up immediately if setup fails
         }
     };
 
     if (isLoading) {
-        return <div style={{ padding: '20px' }}>Chargement du formulaire...</div>;
+        return <div style={{ padding: '20px' }}>{t('medicalExaminationForm.loading')}</div>; // Use translation key
     }
 
     if (error && !patient) { // Show main error only if patient couldn't load
-        return <div className="error-message" style={{ padding: '20px', color: 'red' }}>Erreur : {error}</div>;
+        return <div className="error-message" style={{ padding: '20px', color: 'red' }}>{t('medicalExaminationForm.errorPrefix')}{error}</div>; // Use translation key
     }
 
     return (
         <div className="medical-exam-form-container" style={{ padding: '20px' }}>
-            <h2>Création d'une Demande d'Examen Médical</h2>
+            <h2>{t('medicalExaminationForm.title')}</h2> {/* Use translation key */}
 
             {patient && (
                  <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #eee' }}>
-                    <h4>Patient</h4>
+                    <h4>{t('medicalExaminationForm.patientSectionTitle')}</h4> {/* Use translation key */}
                     <p>{patient.firstName} {patient.lastName} </p>
                     {/* Add more patient details if needed */}
                 </div>
             )}
 
-            {error && <p style={{ color: 'red', marginBottom: '10px' }}>Erreur: {error}</p>}
+            {error && <p style={{ color: 'red', marginBottom: '10px' }}>{t('medicalExaminationForm.errorPrefix')}{error}</p>} {/* Use translation key */}
 
             <form onSubmit={handleSubmit}>
                 <div className="form-group" style={{ marginBottom: '15px' }}>
-                    <label htmlFor="examenType">🔽 Type d’examen :</label>
+                    <label htmlFor="examenType">{t('medicalExaminationForm.labels.examType')}</label> {/* Use translation key */}
                     <select
                         id="examenType"
                         className="form-control"
@@ -307,20 +313,20 @@ const MedicalExaminationForm = () => {
                         onChange={(e) => setExamenType(e.target.value)}
                         required
                     >
-                        <option value="">-- Sélectionner --</option>
-                        <option value="IRM">IRM</option>
-                        <option value="Radio">Radio</option>
-                        <option value="Analyse sanguine">Analyse sanguine</option>
-                        <option value="Scanner">Scanner</option>
-                        <option value="Echographie">Échographie</option>
+                        <option value="">{t('medicalExaminationForm.placeholders.select')}</option> {/* Use translation key */}
+                        <option value="IRM">{t('medicalExaminationForm.examTypes.irm')}</option> {/* Use translation key */}
+                        <option value="Radio">{t('medicalExaminationForm.examTypes.radio')}</option> {/* Use translation key */}
+                        <option value="Analyse sanguine">{t('medicalExaminationForm.examTypes.bloodTest')}</option> {/* Use translation key */}
+                        <option value="Scanner">{t('medicalExaminationForm.examTypes.scanner')}</option> {/* Use translation key */}
+                        <option value="Echographie">{t('medicalExaminationForm.examTypes.ultrasound')}</option> {/* Use translation key */}
                         {/* Add other common exam types */}
-                        <option value="Autre">Autre (préciser)</option>
+                        <option value="Autre">{t('medicalExaminationForm.examTypes.other')}</option> {/* Use translation key */}
                     </select>
                      {examenType === 'Autre' && (
                         <input
                             type="text"
                             className="form-control"
-                            placeholder="Préciser le type d'examen"
+                            placeholder={t('medicalExaminationForm.placeholders.specifyExamType')} // Use translation key
                             value={recommandation} // Or a dedicated state? Let's reuse recommandation for now
                             onChange={(e) => setRecommandation(e.target.value)} // Adjust if needed
                             style={{ marginTop: '5px' }}
@@ -329,7 +335,7 @@ const MedicalExaminationForm = () => {
                 </div>
 
                 <div className="form-group" style={{ marginBottom: '15px' }}>
-                    <label htmlFor="centreExamen">🏥 Centre :</label>
+                    <label htmlFor="centreExamen">{t('medicalExaminationForm.labels.centre')}</label> {/* Use translation key */}
                     <select
                         id="centreExamen"
                         className="form-control"
@@ -337,19 +343,19 @@ const MedicalExaminationForm = () => {
                         onChange={(e) => setSelectedCentre(e.target.value)}
                         required
                     >
-                        <option value="">-- Sélectionner un centre --</option>
+                        <option value="">{t('medicalExaminationForm.placeholders.selectCentre')}</option> {/* Use translation key */}
                         {centres.map(centre => (
                             <option key={centre.idCentre} value={centre.idCentre}>
                                 {centre.name} ({centre.adress})
                             </option>
                         ))}
-                        <option value="AUTRE">Autre (préciser)</option>
+                        <option value="AUTRE">{t('medicalExaminationForm.examTypes.other')}</option> {/* Reuse translation key */}
                     </select>
                     {/* Removed the input field for 'Autre' centre name */}
                 </div>
 
                 <div className="form-group" style={{ marginBottom: '20px' }}>
-                    <label htmlFor="recommandation">🗒️ Recommandation (facultatif) :</label>
+                    <label htmlFor="recommandation">{t('medicalExaminationForm.labels.recommendation')}</label> {/* Use translation key */}
                     <ReactQuill
                         id="recommandation"
                         theme="snow"
@@ -363,13 +369,13 @@ const MedicalExaminationForm = () => {
 
                 <div className="form-actions">
                     <button type="submit" className="btn btn-primary" style={{ marginRight: '10px' }}>
-                        🔘 OK (Enregistrer)
+                        {t('medicalExaminationForm.buttons.save')} {/* Use translation key */}
                     </button>
                     <button type="button" onClick={handlePrint} className="btn btn-info">
-                        🖨️ Imprimer
+                        {t('medicalExaminationForm.buttons.print')} {/* Use translation key */}
                     </button>
                      <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary" style={{ marginLeft: '10px' }}>
-                        Annuler
+                        {t('common.cancel')} {/* Use translation key */}
                     </button>
                 </div>
             </form>

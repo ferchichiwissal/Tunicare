@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react'; // Import useContext AND useRef
 import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 import apiClient from '../../utils/apiClient'; // Import apiClient instead of axios
 import ReactQuill from 'react-quill'; // Import ReactQuill
 // Assuming AuthContext exists and provides user details
@@ -9,6 +10,7 @@ import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 // import './ConsultationPage.css';
 
 const ConsultationPage = () => {
+    const { t, i18n } = useTranslation(); // Initialize useTranslation hook and get i18n instance
     // Get EITHER appointmentId OR consultationId from URL params
     const { appointmentId, consultationId } = useParams();
     const navigate = useNavigate(); // Hook for navigation
@@ -77,31 +79,31 @@ const ConsultationPage = () => {
                            // Corrected endpoint based on UserController.java
                            const patientResponse = await apiClient.get(`/Users/allid/${consultData.patientId}`);
                            console.log("Fetched full patient details:", patientResponse.data);
-                           setPatient(patientResponse.data || null); // Set patient state with full details
-                           if (!patientResponse.data) {
-                               setError('Détails complets du patient non trouvés.');
-                           }
-                       } catch (patientErr) {
-                           console.error("Error fetching full patient details:", patientErr);
-                           // Check specifically for 404 on the new endpoint
-                           if (patientErr.response && patientErr.response.status === 404) {
-                               setError(`Patient avec ID ${consultData.patientId} non trouvé via /Users/allid/.`);
-                           } else {
-                               setError(patientErr.response?.data?.message || `Échec de la récupération des détails pour le patient ${consultData.patientId}.`);
-                           }
-                           setPatient(null); // Clear patient on error
-                       }
-                   } else {
-                       setError('ID du patient manquant dans les données de consultation.');
-                       setPatient(null);
-                   }
+                            setPatient(patientResponse.data || null); // Set patient state with full details
+                            if (!patientResponse.data) {
+                                setError(t('consultation.error.patientDetailsNotFound'));
+                            }
+                        } catch (patientErr) {
+                            console.error("Error fetching full patient details:", patientErr);
+                            // Check specifically for 404 on the new endpoint
+                            if (patientErr.response && patientErr.response.status === 404) {
+                                setError(t('consultation.error.patientNotFoundById', { id: consultData.patientId }));
+                            } else {
+                                setError(patientErr.response?.data?.message || t('consultation.error.fetchPatientDetailsFailed', { id: consultData.patientId }));
+                            }
+                            setPatient(null); // Clear patient on error
+                        }
+                    } else {
+                        setError(t('consultation.error.patientIdMissing'));
+                        setPatient(null);
+                    }
 
                 } catch (err) {
                     console.error("Error fetching consultation details:", err);
                     if (err.response && err.response.status === 404) {
-                        setError(`Consultation avec ID ${consultationId} non trouvée.`);
+                        setError(t('consultation.error.consultationNotFound', { id: consultationId }));
                     } else {
-                        setError(err.response?.data?.message || `Échec de la récupération des détails pour la consultation ${consultationId}.`);
+                        setError(err.response?.data?.message || t('consultation.error.fetchConsultationFailed', { id: consultationId }));
                     }
                     setPatient(null); // Clear patient on error
                 } finally {
@@ -121,16 +123,16 @@ const ConsultationPage = () => {
                     setPatient(apptData.patient || null);
 
                     if (!apptData.patient) {
-                        setError('Détails du patient non trouvés dans les données du rendez-vous.');
+                        setError(t('consultation.error.patientDetailsNotFoundInAppointment'));
                     }
                     // Draft creation logic removed from here to prevent auto-creation on load.
                     // Consultation will now only be created/saved when the 'handleSave' button is clicked.
                 } catch (err) {
                     console.error("Error fetching appointment details:", err);
                     if (err.response && err.response.status === 404) {
-                        setError(`Rendez-vous avec ID ${appointmentId} non trouvé.`);
+                        setError(t('consultation.error.appointmentNotFound', { id: appointmentId }));
                     } else {
-                        setError(err.response?.data?.message || `Échec de la récupération des détails pour le rendez-vous ${appointmentId}.`);
+                        setError(err.response?.data?.message || t('consultation.error.fetchAppointmentFailed', { id: appointmentId }));
                     }
                     setPatient(null);
                     // Draft creation logic was moved up into the try block
@@ -139,7 +141,7 @@ const ConsultationPage = () => {
                 }
             } else {
                 // --- INVALID STATE ---
-                setError("ID de rendez-vous ou de consultation manquant dans l'URL.");
+                setError(t('consultation.error.missingId'));
                 setIsLoading(false);
             }
         };
@@ -150,25 +152,28 @@ const ConsultationPage = () => {
     // --- Helper Functions ---
     const formatDate = (dateString) => {
         // Simplified date formatting
-        if (!dateString) return 'N/A';
+        if (!dateString) return t('common.notAvailable');
         try {
-            return new Date(dateString).toLocaleDateString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            // Use locale from i18next if available, fallback to 'fr-FR' or 'en-US'
+            const currentLang = i18n.language || 'fr';
+            const locale = currentLang === 'fr' ? 'fr-FR' : 'en-US';
+            return new Date(dateString).toLocaleDateString(locale, { year: 'numeric', month: '2-digit', day: '2-digit' });
         } catch (e) {
-            return 'Date invalide';
+            return t('common.invalidDate');
         }
     };
 
     const calculateAge = (dobString) => {
-        if (!dobString) return 'N/A';
+        if (!dobString) return t('common.notAvailable');
         try {
             const dob = new Date(dobString);
             const ageDiffMs = Date.now() - dob.getTime();
             const ageDate = new Date(ageDiffMs);
             const calculatedAge = Math.abs(ageDate.getUTCFullYear() - 1970);
-            return calculatedAge >= 0 ? calculatedAge : 'N/A';
+            return calculatedAge >= 0 ? calculatedAge : t('common.notAvailable');
         } catch (e) {
             console.error("Error calculating age:", e);
-            return 'N/A';
+            return t('common.notAvailable');
         }
     };
 
@@ -192,7 +197,7 @@ const ConsultationPage = () => {
                 setConsultationHistory(historyData);
             } catch (err) {
                 console.error("Error fetching consultation history:", err);
-                setHistoryError(err.response?.data?.message || 'Échec de la récupération de l\'historique.');
+                setHistoryError(err.response?.data?.message || t('consultation.history.fetchError'));
                 setConsultationHistory([]); // Clear history on error
             } finally {
                 setHistoryLoading(false);
@@ -211,22 +216,22 @@ const ConsultationPage = () => {
         isSavingRef.current = true; // Set saving flag
         console.log(`[handleSave SET isSavingRef=true]`);
 
-        setSaveStatus('Sauvegarde en cours...'); // Still use state for UI feedback
+        setSaveStatus(t('consultation.status.saving')); // Still use state for UI feedback
         setError('');
 
         // Add check for user, user.id, user.activeCabinet, and user.activeCabinet.id
         if (!user || !user.id || !user.activeCabinet || !user.activeCabinet.id) {
-             setError("Impossible de récupérer l'ID du médecin ou du cabinet actif. Veuillez vérifier votre session.");
-             setSaveStatus('Erreur');
+             setError(t('consultation.error.missingDoctorOrCabinetId'));
+             setSaveStatus(t('common.error'));
              console.log("[handleSave EXIT] Error: Logged-in user ID or active cabinet ID missing.");
              isSavingRef.current = false; // Reset flag on early exit
              return;
         }
 
         if (!patient) {
-            setError("ID Patient manquant pour la sauvegarde.");
+            setError(t('consultation.error.missingPatientIdForSave'));
             console.log("[handleSave EXIT] Error: Patient missing."); // Log error
-            setSaveStatus('Erreur'); // Indicate error state
+            setSaveStatus(t('common.error')); // Indicate error state
             isSavingRef.current = false; // Reset flag on early exit
             return;
         }
@@ -262,21 +267,21 @@ const ConsultationPage = () => {
             if (!isEditMode && returnedConsultationId) { // Check we got an ID back
                  setIsEditMode(true); // Set edit mode first
                  setSavedConsultationId(returnedConsultationId); // Then set the ID
-                 setSaveStatus('Consultation créée avec succès !'); // Then set status
+                 setSaveStatus(t('consultation.status.createSuccess')); // Then set status
                  // Optionally update URL without full reload if needed, but might be complex
                  // navigate(`/consultation/details/${returnedConsultationId}`, { replace: true });
             } else {
                 // If it was an update or no ID returned, just set status and potentially the ID again
                 setSavedConsultationId(returnedConsultationId); // Ensure ID state is updated even on update
-                setSaveStatus('Consultation mise à jour avec succès !');
+                setSaveStatus(t('consultation.status.updateSuccess'));
             }
 
         } catch (err) {
             console.error("[handleSave ERROR] Error saving consultation:", err); // Log error details
             console.timeEnd("apiClient.post"); // End timer on error
-            const errorMsg = err.response?.data?.message || (isEditMode ? 'Échec de la mise à jour de la consultation.' : 'Échec de la création de la consultation.');
+            const errorMsg = err.response?.data?.message || (isEditMode ? t('consultation.error.updateFailed') : t('consultation.error.createFailed'));
             setError(errorMsg);
-            setSaveStatus('Erreur'); // Indicate error state
+            setSaveStatus(t('common.error')); // Indicate error state
         } finally {
             console.timeEnd("apiClient.post"); // End timer in finally
             isSavingRef.current = false; // Reset saving flag in finally block
@@ -390,13 +395,13 @@ const ConsultationPage = () => {
 
                 } catch (printError) {
                     console.error("Error during iframe print execution:", printError);
-                    alert("Erreur lors de l'exécution de l'impression.");
+                    alert(t('consultation.print.executionError'));
                     cleanupIframe(); // Clean up immediately on error during print call
                 }
             }, 100); // Increased delay slightly to 100ms
         } catch (e) {
             console.error("Error setting up print via iframe:", e);
-            alert("Erreur lors de la préparation de l'impression.");
+            alert(t('consultation.print.setupError'));
             cleanupIframe(); // Clean up immediately if setup fails
         }
     };
@@ -413,34 +418,33 @@ const ConsultationPage = () => {
             consultationText: consultationText, // Keep for date logic, but won't be displayed
             prescriptionText: prescriptionText,
             // Use doctor details from context
-            doctorName: user?.name || "[Nom Docteur Manquant]", // Corrected: use 'user'
-            doctorAddress: user?.activeCabinet?.address || "[Adresse Cabinet Manquante]", // Corrected: use 'user'
-            doctorTel: user?.activeCabinet?.tel || "[Tel Cabinet Manquant]", // Corrected: use 'user'
+            doctorName: user?.name || t('consultation.print.missingDoctorName'), // Corrected: use 'user'
+            doctorAddress: user?.activeCabinet?.address || t('consultation.print.missingCabinetAddress'), // Corrected: use 'user'
+            doctorTel: user?.activeCabinet?.tel || t('consultation.print.missingCabinetTel'), // Corrected: use 'user'
         };
 
         // Determine language for labels from context
-        const lang = user?.languagePreference === 'en' ? 'en' : 'fr'; // Corrected: use 'user'
+        // const lang = user?.languagePreference === 'en' ? 'en' : 'fr'; // Corrected: use 'user' - No longer needed, use t()
         const labels = {
-            title: lang === 'en' ? "Medical Prescription" : "Ordonnance Médicale",
-            doctorInfo: lang === 'en' ? "Doctor Information" : "Informations Docteur",
-            nameLabel: lang === 'en' ? "Patient Name" : "Nom Patient",
-            // addressLabel removed
-            ageLabel: lang === 'en' ? "Age" : "Age",
-            telLabel: lang === 'en' ? "Tel" : "Tél",
-            patientInfo: lang === 'en' ? "Patient Information" : "Informations Patient",
-            dobLabel: lang === 'en' ? "Date of Birth" : "Date de Naissance",
-            yearsLabel: lang === 'en' ? "years" : "ans",
-            prescriptionLabel: lang === 'en' ? "Prescription" : "Prescription",
-            noPrescription: lang === 'en' ? "<i>No prescription text.</i>" : "<i>Aucune prescription.</i>",
-            dateLabel: lang === 'en' ? "Date" : "Date",
-            signatureLabel: lang === 'en' ? "Signature" : "Signature", // Adjusted label
+            title: t('consultation.print.title'),
+            doctorInfo: t('consultation.print.doctorInfo'),
+            nameLabel: t('consultation.print.patientNameLabel'),
+            ageLabel: t('consultation.print.ageLabel'),
+            telLabel: t('consultation.print.telLabel'),
+            patientInfo: t('consultation.print.patientInfo'),
+            dobLabel: t('consultation.print.dobLabel'),
+            yearsLabel: t('consultation.print.yearsLabel'),
+            prescriptionLabel: t('consultation.print.prescriptionLabel'),
+            noPrescription: t('consultation.print.noPrescription'),
+            dateLabel: t('consultation.print.dateLabel'),
+            signatureLabel: t('consultation.print.signatureLabel'),
         };
 
 
         if (savedConsultationId) {
             // --- Option 1: Fetch definitive data from backend (Preferred if endpoint exists) ---
             try {
-                setSaveStatus('Chargement des données d\'impression...'); // Use saveStatus for feedback
+                setSaveStatus(t('consultation.print.loadingData')); // Use saveStatus for feedback
                 // Assume an endpoint exists to get all necessary print data
                 const response = await apiClient.get(`/api/ordonnances/consultation/${savedConsultationId}/print-data`);
                 const fetchedData = response.data;
@@ -463,10 +467,8 @@ const ConsultationPage = () => {
 
              } catch (err) {
                  console.error("Error fetching print data:", err);
-                 const errorLang = user?.languagePreference === 'en' ? 'en' : 'fr'; // Corrected: use 'user'
-                 const errorMsg = errorLang === 'en'
-                    ? `Error fetching print data (ID: ${savedConsultationId}). Printing with current data.`
-                    : `Erreur lors de la récupération des données pour l'impression (ID: ${savedConsultationId}). Impression avec les données actuelles.`;
+                 // const errorLang = user?.languagePreference === 'en' ? 'en' : 'fr'; // Corrected: use 'user' - No longer needed
+                 const errorMsg = t('consultation.print.fetchDataError', { id: savedConsultationId });
                  setError(errorMsg);
                  setSaveStatus(''); // Clear loading message
                  // Fallback: Use data currently in state if fetch fails
@@ -482,19 +484,13 @@ const ConsultationPage = () => {
 
 
         // --- Generate HTML Content for the new teal template ---
-        // Define labels based on language (simplified for this example)
-        const nameLabel = lang === 'en' ? "Patient Name" : "Nom Patient";
-        const addressLabel = lang === 'en' ? "Address" : "Adresse";
-        const dateLabel = lang === 'en' ? "Date" : "Date";
-        const insuranceLabel = lang === 'en' ? "Insurance" : "Assurance";
-        const diagnosisLabel = lang === 'en' ? "Diagnosis" : "Diagnostic";
-        const signatureLabel = lang === 'en' ? "Signature" : "Signature";
-        const prescriptionTitleLabel = "Ordonnance Médicale"; // Changed title
+        // Labels are now fetched using t() within the labels object above
+        const prescriptionTitleLabel = t('consultation.print.title'); // Use translated title
 
         const printHtml = `
             <div class="header">
                  <div class="doctor-info">
-                    <div class="doctor-name">Dr. ${printData.doctorName === '[Nom Docteur Manquant]' ? 'N/A' : printData.doctorName}</div>
+                    <div class="doctor-name">Dr. ${printData.doctorName === t('consultation.print.missingDoctorName') ? t('common.notAvailable') : printData.doctorName}</div>
                     <div class="doctor-qualification">${user?.qualification || ''}</div>
                  </div>
                  <div class="header-icon-container">
@@ -508,11 +504,11 @@ const ConsultationPage = () => {
                  <div class="body-content">
                      <div class="body-left">
                          <div class="patient-details">
-                             <label>${nameLabel}:</label>
+                             <label>${labels.nameLabel}:</label>
                              <span>${printData.patientName || ''}</span>
                              <label>${labels.ageLabel}:</label>
-                             <span>${printData.patientAge !== 'N/A' ? `${printData.patientAge} ${labels.yearsLabel}` : ''}</span>
-                             <label>${dateLabel}:</label>
+                             <span>${printData.patientAge !== t('common.notAvailable') ? `${printData.patientAge} ${labels.yearsLabel}` : ''}</span>
+                             <label>${labels.dateLabel}:</label>
                              <span>${printData.consultationDate || ''}</span>
                          </div>
                      </div>
@@ -522,19 +518,19 @@ const ConsultationPage = () => {
                  </div>
 
                  <div class="prescription-content" style="margin-top: 20px; padding-bottom: 40px;">
-                     ${printData.prescriptionText || '<i>Aucune prescription.</i>'}
+                     ${printData.prescriptionText || labels.noPrescription}
                  </div>
 
                  <div class="signature-area">
                      <div class="signature-line"></div>
-                     <div class="signature-label">${signatureLabel}</div>
+                     <div class="signature-label">${labels.signatureLabel}</div>
                  </div>
             </div>
 
             <div class="footer">
-                 <span>📞 ${printData.doctorTel && printData.doctorTel !== '[Tel Cabinet Manquant]' ? printData.doctorTel : '50879558'}</span>
+                 <span>📞 ${printData.doctorTel && printData.doctorTel !== t('consultation.print.missingCabinetTel') ? printData.doctorTel : '50879558'}</span>
                  <span>✉️ ${user?.email || 'dr1wissalferchichi28@gmail.com'}</span>
-                 <span>📍 ${printData.doctorAddress && printData.doctorAddress !== '[Adresse Cabinet Manquante]' ? printData.doctorAddress : 'france'}</span>
+                 <span>📍 ${printData.doctorAddress && printData.doctorAddress !== t('consultation.print.missingCabinetAddress') ? printData.doctorAddress : 'france'}</span>
             </div>
         `;
 
@@ -567,60 +563,60 @@ const ConsultationPage = () => {
 
     // --- Render Logic ---
     if (isLoading) {
-        return <div style={{ padding: '20px' }}>Chargement des détails du rendez-vous...</div>;
+        return <div style={{ padding: '20px' }}>{t('consultation.loading')}</div>;
     }
 
     if (error && !patient) { // Show main error if patient couldn't be loaded
-        return <div className="error-message" style={{ padding: '20px', color: 'red' }}>Erreur : {error}</div>;
+        return <div className="error-message" style={{ padding: '20px', color: 'red' }}>{t('common.error')}: {error}</div>;
     }
 
     // We don't have a consultation object initially, we rely on patient object
     if (!patient) {
          // This case might be covered by the error check above, but good as a fallback
-        return <div style={{ padding: '20px' }}>Impossible de charger les informations du patient pour ce rendez-vous.</div>;
+        return <div style={{ padding: '20px' }}>{t('consultation.error.cannotLoadPatient')}</div>;
     }
 
 
     return (
         <div className="consultation-page-container" style={{ padding: '20px' }}>
             {/* Dynamic Title */}
-            <h2>{isEditMode ? 'Détails Consultation / Modification' : 'Nouvelle Consultation'}</h2>
+            <h2>{isEditMode ? t('consultation.title.edit') : t('consultation.title.new')}</h2>
 
             {/* --- Patient Info --- */}
-            <h3>Informations Patient</h3>
+            <h3>{t('consultation.patientInfo.title')}</h3>
             {patient ? (
                 <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #eee' }}>
-                    <p><strong>Nom :</strong> {patient.lastName || 'N/A'} {patient.firstName || 'N/A'}</p>
-                    <p><strong>Date de Naissance :</strong> {formatDate(patient.birthDate)} <br></br>
+                    <p><strong>{t('consultation.patientInfo.name')}:</strong> {patient.lastName || t('common.notAvailable')} {patient.firstName || t('common.notAvailable')}</p>
+                    <p><strong>{t('consultation.patientInfo.dob')}:</strong> {formatDate(patient.birthDate)} <br></br>
                     <p></p>
-                    <p><strong>Age:</strong>  {calculateAge(patient.birthDate)} ans</p></p>
-                    <p><strong>Email :</strong> {patient.email || 'N/A'}</p>
- 
+                    <p><strong>{t('consultation.patientInfo.age')}:</strong> {calculateAge(patient.birthDate)} {t('consultation.patientInfo.years')}</p></p>
+                    <p><strong>{t('consultation.patientInfo.email')}:</strong> {patient.email || t('common.notAvailable')}</p>
+
                  </div>
             ) : (
-                <p>Chargement des informations du patient...</p>
+                <p>{t('consultation.patientInfo.loading')}</p>
             )}
 
             {/* --- History Section --- */}
             <div style={{ marginBottom: '30px' }}>
                 <button onClick={handleToggleHistory} className="btn btn-secondary">
-                    🕘 {showHistory ? 'Masquer' : 'Afficher'} l'Historique Consultations & Ordonnances
+                    🕘 {showHistory ? t('consultation.history.hide') : t('consultation.history.show')}
                 </button>
                 {showHistory && (
                     <div style={{ marginTop: '15px', padding: '15px', border: '1px solid #ddd', backgroundColor: '#f9f9f9' }}>
-                        <h4>Historique</h4>
-                        {historyLoading && <p>Chargement de l'historique...</p>}
-                        {historyError && <p style={{ color: 'red' }}>Erreur historique : {historyError}</p>}
-                        {!historyLoading && !historyError && consultationHistory.length === 0 && <p>Aucun historique trouvé.</p>}
+                        <h4>{t('consultation.history.title')}</h4>
+                        {historyLoading && <p>{t('consultation.history.loading')}</p>}
+                        {historyError && <p style={{ color: 'red' }}>{t('consultation.history.errorLabel')}: {historyError}</p>}
+                        {!historyLoading && !historyError && consultationHistory.length === 0 && <p>{t('consultation.history.noneFound')}</p>}
                         {!historyLoading && !historyError && consultationHistory.map((histConsult) => (
                             <div key={histConsult.idConsultation} style={{ marginBottom: '15px', padding: '10px', borderBottom: '1px solid #eee' }}>
-                                <p><strong>Date :</strong> {formatDate(histConsult.dateConsultation)}</p>
-                                <p><strong>Consultation :</strong></p>
-                                <div dangerouslySetInnerHTML={{ __html: histConsult.text || '<i>Aucun texte</i>' }} />
+                                <p><strong>{t('consultation.history.date')}:</strong> {formatDate(histConsult.dateConsultation)}</p>
+                                <p><strong>{t('consultation.history.consultation')}:</strong></p>
+                                <div dangerouslySetInnerHTML={{ __html: histConsult.text || t('consultation.history.noText') }} />
                                 {histConsult.prescribedMedications && (
                                     <>
-                                        <p style={{ marginTop: '10px' }}><strong>Ordonnance :</strong></p>
-                                        <div dangerouslySetInnerHTML={{ __html: histConsult.prescribedMedications.prescribedMedications || '<i>Aucune ordonnance</i>' }} />
+                                        <p style={{ marginTop: '10px' }}><strong>{t('consultation.history.prescription')}:</strong></p>
+                                        <div dangerouslySetInnerHTML={{ __html: histConsult.prescribedMedications.prescribedMedications || t('consultation.history.noPrescription') }} />
                                     </>
                                 )}
                             </div>
@@ -631,7 +627,7 @@ const ConsultationPage = () => {
 
             {/* --- Consultation Editors --- */}
             <div style={{ marginBottom: '20px' }}>
-                <h4>📝 Consultation</h4>
+                <h4>📝 {t('consultation.section.consultation')}</h4>
                 <ReactQuill
                     theme="snow"
                     value={consultationText}
@@ -641,7 +637,7 @@ const ConsultationPage = () => {
             </div>
 
             <div style={{ marginBottom: '30px' }}>
-                <h4>💊 Ordonnance</h4>
+                <h4>💊 {t('consultation.section.prescription')}</h4>
                  <ReactQuill
                     theme="snow"
                     value={prescriptionText}
@@ -652,8 +648,8 @@ const ConsultationPage = () => {
 
              {/* --- Action Buttons --- */}
             <div className="consultation-actions">
-                 {saveStatus && <p style={{ color: error ? 'red' : 'green', marginBottom: '10px' }}>{saveStatus}</p>}
-                 {error && <p style={{ color: 'red', marginBottom: '10px' }}>Erreur: {error}</p>}
+                 {saveStatus && <p style={{ color: saveStatus === t('common.error') ? 'red' : 'green', marginBottom: '10px' }}>{saveStatus}</p>}
+                 {error && !saveStatus.includes(t('common.error')) && <p style={{ color: 'red', marginBottom: '10px' }}>{t('common.error')}: {error}</p>} {/* Show general error only if saveStatus isn't already showing it */}
                 <button
                     onClick={handleSave}
                     className="btn btn-primary"
@@ -661,15 +657,15 @@ const ConsultationPage = () => {
                     disabled={isSavingRef.current} // Disable button based on the ref
                 >
                     {/* Dynamic Button Text - still use state for text */}
-                    {saveStatus === 'Sauvegarde en cours...' ? 'Sauvegarde...' : (isEditMode ? '🔵 METTRE À JOUR' : '🔵 ENREGISTRER')}
+                    {saveStatus === t('consultation.status.saving') ? t('consultation.button.saving') : (isEditMode ? t('consultation.button.update') : t('consultation.button.save'))}
                 </button>
                 {/* Print button is now always visible */}
                 <button onClick={handlePrint} className="btn btn-info" style={{ marginRight: '10px' }}>
-                    🖨️ IMPRIMER
+                    🖨️ {t('consultation.button.print')}
                 </button>
                 {/* Exam button is now always visible */}
                 <button onClick={handleExamRedirect} className="btn btn-warning">
-                    🔬 EXAM
+                    🔬 {t('consultation.button.exam')}
                 </button>
                 {/* Removed duplicated button and closing tag */}
             </div>

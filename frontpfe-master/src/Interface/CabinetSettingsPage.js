@@ -1,53 +1,60 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react'; // Import useContext
 import axios from 'axios';
-import { getUserData, getCabinetId } from '../utils/auth'; // Assuming these utils provide user and cabinet info
+import { useTranslation } from 'react-i18next'; // Import useTranslation
+import ThemeContext from '../utils/ThemeContext'; // Corrected Import Path for ThemeContext
+import { getUserData, getCabinetId } from '../utils/auth';
+import './CabinetSettingsPage.css'; // Import the CSS file
 
 const CabinetSettingsPage = () => {
+    const { t } = useTranslation(); // Initialize translation
+    const { theme } = useContext(ThemeContext); // Get theme from context
     const [cabinetId, setCabinetId] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
-    const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
+    const [message, setMessage] = useState(''); // Success messages
+    const [error, setError] = useState(''); // Error messages
     const [isLoading, setIsLoading] = useState(false);
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
 
+    // Fetch cabinet ID on mount
     useEffect(() => {
-        // Get the current cabinet ID when the component mounts
         const currentCabinetId = getCabinetId();
         if (!currentCabinetId) {
-            setError("Impossible de déterminer l'ID du cabinet. Veuillez vous reconnecter.");
+            setError(t('cabinetSettings.cabinetIdError')); // Use translation
         }
         setCabinetId(currentCabinetId);
-    }, []);
+    }, [t]); // Add t to dependency array
 
+    // Handle file input change
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
-        setMessage(''); // Clear previous messages
+        setMessage('');
         setError('');
     };
 
+    // Handle signature upload
     const handleUpload = async () => {
         if (!selectedFile) {
-            setError("Veuillez sélectionner un fichier image pour la signature.");
+            setError(t('cabinetSettings.selectFileError')); // Use translation
             return;
         }
         if (!cabinetId) {
-            setError("ID du cabinet non trouvé. Impossible de téléverser.");
+            setError(t('cabinetSettings.cabinetIdError')); // Use translation
             return;
         }
 
         const userData = getUserData();
         if (!userData || !userData.accessToken) {
-            setError("Erreur d'authentification.");
+            setError(t('cabinetSettings.authError')); // Use translation
             return;
         }
 
         setIsLoading(true);
-        setMessage('');
+        setMessage(''); // Clear messages before new attempt
         setError('');
 
         const formData = new FormData();
-        formData.append('signatureFile', selectedFile); // 'signatureFile' must match the @RequestParam name in the backend
+        formData.append('signatureFile', selectedFile);
 
         try {
             const response = await axios.post(
@@ -56,54 +63,65 @@ const CabinetSettingsPage = () => {
                 {
                     headers: {
                         'Authorization': `Bearer ${userData.accessToken}`,
-                        'Content-Type': 'multipart/form-data', // Important for file uploads
+                        'Content-Type': 'multipart/form-data',
                     },
                 }
             );
-            setMessage(response.data || "Signature téléversée avec succès !");
-            setSelectedFile(null); // Clear file input after successful upload (optional)
-            // Optionally clear the file input visually: document.getElementById('signature-upload-input').value = null;
+            // Use translation for success message, fallback to response data if specific message exists
+            setMessage(response.data || t('cabinetSettings.uploadSuccess'));
+            setSelectedFile(null);
+            // Clear the file input visually
+            const fileInput = document.getElementById('signature-upload-input');
+            if (fileInput) fileInput.value = null;
 
         } catch (err) {
             console.error("Error uploading signature:", err);
-            setError(err.response?.data || "Échec du téléversement de la signature.");
-            setMessage('');
+            // Use translation for error message, fallback to server error
+            setError(err.response?.data || t('cabinetSettings.uploadFailed'));
+            setMessage(''); // Clear success message on error
         } finally {
             setIsLoading(false);
         }
     };
 
+    // Render the component
     return (
-        <div className="cabinet-settings-page" style={{ padding: '20px' }}>
-            <h2>Paramètres du Cabinet</h2>
+        // Apply theme class to the main container
+        <div className={`cabinet-settings-page ${theme}`}>
+            <h2>{t('cabinetSettings.title')}</h2>
 
-            {error && <p style={{ color: 'red' }}>Erreur : {error}</p>}
-            {message && <p style={{ color: 'green' }}>{message}</p>}
+            {/* Display error messages */}
+            {error && <p className="error-message">{error}</p>}
+            {/* Display success messages */}
+            {message && <p className="success-message">{message}</p>}
 
-            <div style={{ marginTop: '20px' }}>
-                <h3>Téléverser la Signature Électronique</h3>
-                <p>Sélectionnez une image (PNG, JPG) pour la signature qui apparaîtra sur les ordonnances.</p>
+            {/* Signature Upload Section */}
+            <div className="form-group"> {/* Use form-group for structure */}
+                <h3>{t('cabinetSettings.uploadTitle')}</h3>
+                <p>{t('cabinetSettings.uploadDescription')}</p>
 
+                {/* Consider adding a label for accessibility */}
+                {/* <label htmlFor="signature-upload-input">{t('cabinetSettings.selectFileLabel')}</label> */}
                 <input
                     type="file"
-                    id="signature-upload-input"
-                    accept="image/png, image/jpeg, image/jpg" // Restrict file types
+                    id="signature-upload-input" // Keep ID for potential label association or clearing
+                    accept="image/png, image/jpeg, image/jpg"
                     onChange={handleFileChange}
                     disabled={isLoading || !cabinetId}
-                    style={{ display: 'block', marginBottom: '10px' }}
+                    // Removed inline style, handled by CSS
                 />
 
                 <button
                     onClick={handleUpload}
                     disabled={isLoading || !selectedFile || !cabinetId}
-                    className="btn btn-primary" // Example styling
+                    className="btn btn-primary" // Use consistent button class
                 >
-                    {isLoading ? 'Téléversement...' : 'Enregistrer la Signature'}
+                    {isLoading ? t('cabinetSettings.uploading') : t('cabinetSettings.saveButton')}
                 </button>
             </div>
 
-            {/* Add other cabinet settings here if needed */}
-
+            {/* Placeholder for other future settings */}
+            {/* <div><h3>{t('cabinetSettings.otherSettingsTitle')}</h3> ... </div> */}
         </div>
     );
 };

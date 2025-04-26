@@ -233,9 +233,9 @@ const Dashboard = ({ onLogout }) => {
         <a href="/users">{t('nav.userManagement')}</a> {/* Consider filtering users by their cabinet */}
         {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a> {/* Consider filtering users by their cabinet */}
         <a href="/UserManagement">{t('nav.changeRole')}</a> {/* Consider filtering users by their cabinet */}
-        <a href="/consultation/all">{t('nav.consultationDashboard', 'Tableau de Bord Consultations')}</a> {/* Added Consultation Dashboard Link */}
-        <a href="/manage-appointments">{t('nav.manageAppointments', 'Manage Appointments')}</a> {/* Added Manage Appointments Link */}
-        <a href="/parametres-cabinet">{t('nav.cabinetSettings', 'Paramètres du Cabinet')}</a> {/* Added Cabinet Settings Link */}
+        <a href="/consultation/all">{t('nav.consultationDashboard')}</a> {/* Added Consultation Dashboard Link */}
+        <a href="/manage-appointments">{t('nav.manageAppointments')}</a> {/* Added Manage Appointments Link */}
+        <a href="/parametres-cabinet">{t('nav.cabinetSettings')}</a> {/* Added Cabinet Settings Link */}
         <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
         <a href="/change-password">{t('nav.changePassword')}</a>
         <a href="/Logout">{t('nav.logout')}</a>
@@ -253,9 +253,9 @@ const Dashboard = ({ onLogout }) => {
         <a href="/users">{t('nav.userManagement')}</a> {/* Consider filtering users by their cabinet */}
         {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a> {/* Consider filtering users by their cabinet */}
         <a href="/UserManagement">{t('nav.changeRole')}</a> {/* Consider filtering users by their cabinet */}
-        <a href="/consultation/all">{t('nav.consultationDashboard', 'Tableau de Bord Consultations')}</a> {/* Added Consultation Dashboard Link */}
+        <a href="/consultation/all">{t('nav.consultationDashboard')}</a> {/* Added Consultation Dashboard Link */}
         {/* Assistant does not manage prescriptions directly */}
-        <a href="/manage-appointments">{t('nav.manageAppointments', 'Manage Appointments')}</a> {/* Added Manage Appointments Link */}
+        <a href="/manage-appointments">{t('nav.manageAppointments')}</a> {/* Added Manage Appointments Link */}
         <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
         <a href="/change-password">{t('nav.changePassword')}</a>
         <a href="/Logout">{t('nav.logout')}</a>
@@ -272,10 +272,10 @@ const Dashboard = ({ onLogout }) => {
       <>
         <a href="#">{t('nav.dashboard')}</a>
         {/* Add patient-specific links here based on scenario */}
-        <a href="/my-consultations">{t('nav.myConsultations', 'Mes Consultations')}</a>
-        <a href="/my-examinations">{t('nav.myExaminations', 'Mes Examens')}</a>
-        <a href="/my-appointments">{t('nav.myAppointments', 'Mes Rendez-vous')}</a>
-        <a href="/add-appointment">{t('nav.addAppointment', 'Prendre Rendez-vous')}</a>
+        <a href="/my-consultations">{t('nav.myConsultations')}</a>
+        <a href="/my-examinations">{t('nav.myExaminations')}</a>
+        <a href="/my-appointments">{t('nav.myAppointments')}</a>
+        <a href="/add-appointment">{t('nav.addAppointment')}</a>
         <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
         <a href="/change-password">{t('nav.changePassword')}</a>
         <a href="/Logout">{t('nav.logout')}</a>

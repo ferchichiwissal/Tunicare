@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../utils/apiClient'; // Import apiClient
 // import { getUserData } from '../../utils/auth'; // Use AuthContext instead
 import AuthContext from '../../context/AuthContext'; // Import AuthContext
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
-// import './ConsultationDashboard.css'; // Optional CSS
+import './ConsultationDashboard.css'; // Import the CSS file
 
 const ConsultationDashboard = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation(); // Initialize translation function
     const { user } = useContext(AuthContext); // Get user from context
     const [consultations, setConsultations] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -21,7 +23,7 @@ const ConsultationDashboard = () => {
         const fetchConsultations = async () => {
             // Ensure user and user ID are available from context
             if (!user || !user.id) {
-                setError("Impossible de récupérer l'ID du médecin connecté.");
+                setError(t('consultationDashboard.errors.missingDoctorId')); // Use translation key
                 setIsLoading(false);
                 return;
             }
@@ -41,7 +43,8 @@ const ConsultationDashboard = () => {
                 setConsultations(sortedConsultations);
             } catch (err) {
                 console.error("Error fetching doctor's consultations:", err);
-                setError(err.response?.data?.message || 'Échec de la récupération de vos consultations.');
+                // Use translation key for fallback message
+                setError(err.response?.data?.message || t('consultationDashboard.errors.fetchFailedFallback'));
                 setConsultations([]);
             } finally {
                 setIsLoading(false);
@@ -70,79 +73,85 @@ const ConsultationDashboard = () => {
          navigate(`/consultation/details/${consultationId}`);
      };
 
-    // Helper function to format date
+    // Helper function to format date - Keep this as is, it's formatting, not UI text
      const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
+        if (!dateString) return t('consultationDashboard.table.notAvailable'); // Use translation for N/A
         try {
+            // Consider locale from i18n if needed, for now using 'fr-FR'
             return new Date(dateString).toLocaleDateString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit' });
         } catch (e) {
-            return 'Date invalide';
+            return t('consultationDashboard.table.invalidDate'); // Use translation
         }
     };
 
     if (isLoading) {
-        return <div style={{ padding: '20px' }}>Chargement du tableau de bord des consultations...</div>;
+        // Use Bootstrap spinner or simple text
+        return <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>{t('consultationDashboard.loading')}</div>;
     }
 
     return (
-        <div className="consultation-dashboard-container" style={{ padding: '20px' }}>
-            <h2>Tableau de Bord des Consultations</h2>
+        // Use Bootstrap container/padding classes
+        <div className="container mt-4 consultation-dashboard-container">
+            <h2>{t('consultationDashboard.title')}</h2>
 
-            {error && <p style={{ color: 'red' }}>Erreur : {error}</p>}
+            {/* Use Bootstrap alert for errors */}
+            {error && <div className="alert alert-danger" role="alert">{t('consultationDashboard.errorPrefix')}: {error}</div>}
 
-            {/* Search Bar */}
-            <div className="form-group" style={{ marginBottom: '20px', maxWidth: '400px' }}>
+            {/* Search Bar - Use Bootstrap margin bottom, remove max-width */}
+            <div className="mb-3">
                 <input
                     type="text"
                     className="form-control"
-                    placeholder="Rechercher par nom/prénom patient..."
+                    placeholder={t('consultationDashboard.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
-            {/* Consultations List/Table */}
-            <table className="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>Patient</th>
-                        <th>Date</th>
-                        <th>Type (Placeholder)</th>
-                        {/* Corrected role check */}
-                        {user?.role === 'DOCTOR' && <th>Actions</th>}
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredConsultations.length > 0 ? (
-                        filteredConsultations.map(consult => (
-                            <tr key={consult.idConsultation}>
-                                <td>{consult.patient ? `${consult.patient.firstName} ${consult.patient.lastName}` : 'N/A'}</td>
-                                <td>{formatDate(consult.dateConsultation)}</td>
-                                <td>{consult.type || 'Consultation Générale'}</td> {/* Assuming a type field or default */}
-                                {/* Corrected role check */}
-                                {user?.role === 'DOCTOR' && (
-                                     <td>
-                                         {/* Changed button text and handler */}
-                                         <button
-                                             className="btn btn-sm btn-info" // Changed style for visual difference
-                                             onClick={() => handleViewDetails(consult.idConsultation)}
-                                         >
-                                             Afficher Détails
-                                         </button>
-                                     </td>
-                                )}
-                            </tr>
-                        ))
-                    ) : (
+            {/* Consultations List/Table - Add responsive wrapper, hover effect, and custom class */}
+            <div className="table-responsive">
+                <table className="table table-striped table-bordered table-hover custom-table"> {/* Added custom-table */}
+                    <thead>
                         <tr>
-                            {/* Corrected role check for colSpan */}
-                            <td colSpan={user?.role === 'DOCTOR' ? 4 : 3} style={{ textAlign: 'center' }}>
-                                Aucune consultation trouvée.
-                            </td>
+                            <th>{t('consultationDashboard.table.patient')}</th>
+                            <th>{t('consultationDashboard.table.date')}</th>
+                            <th>{t('consultationDashboard.table.type')}</th>
+                            {/* Corrected role check */}
+                            {user?.role === 'DOCTOR' && <th>{t('consultationDashboard.table.actions')}</th>}
                         </tr>
-                    )}
+                    </thead>
+                    <tbody>
+                        {filteredConsultations.length > 0 ? (
+                            filteredConsultations.map(consult => (
+                                <tr key={consult.idConsultation}>
+                                    <td>{consult.patient ? `${consult.patient.firstName} ${consult.patient.lastName}` : t('consultationDashboard.table.notAvailable')}</td>
+                                    <td>{formatDate(consult.dateConsultation)}</td>
+                                    <td>{consult.type || t('consultationDashboard.table.defaultType')}</td> {/* Use translation for default */}
+                                    {/* Corrected role check */}
+                                    {user?.role === 'DOCTOR' && (
+                                         <td>
+                                             {/* Changed button text and handler, use btn-primary for specific teal styling */}
+                                             <button
+                                                 className="btn btn-sm btn-primary" // Using btn-primary for custom teal style
+                                                 onClick={() => handleViewDetails(consult.idConsultation)}
+                                             >
+                                                 {t('consultationDashboard.buttons.viewDetails')}
+                                             </button>
+                                         </td>
+                                    )}
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                {/* Corrected role check for colSpan, remove inline style */}
+                                <td colSpan={user?.role === 'DOCTOR' ? 4 : 3} className="text-center">
+                                    {t('consultationDashboard.table.noConsultations')}
+                                </td>
+                            </tr>
+                        )}
                 </tbody>
             </table>
+            </div> {/* Close table-responsive wrapper */}
         </div>
     );
 };

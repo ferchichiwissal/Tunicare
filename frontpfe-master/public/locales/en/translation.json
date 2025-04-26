@@ -74,7 +74,14 @@
     "changePassword": "Change Password",
     "logout": "Logout",
     "userManagement": "User Management",
+    "consultationDashboard": "Consultation Dashboard",
+    "manageAppointments": "Manage Appointments",
+    "cabinetSettings": "Cabinet Settings",
     "addAccountAssistant": "Add an Account As Assistant",
+    "myConsultations": "My Consultations",
+    "myExaminations": "My Examinations",
+    "myAppointments": "My Appointments",
+    "addAppointment": "Add Appointment",
     "activationManagement": "Doctor Activation"
   },
   "dashboard": {
@@ -970,13 +977,292 @@
     "failureMessage": "Failed to create appointment. Please try again.",
     "addingButton": "Requesting...",
     "addButton": "Request Appointment",
-    "rescheduleButton": "Reschedule Appointment"
+    "rescheduleButton": "Reschedule Appointment",
+    "pastDateError": "The selected date cannot be in the past.",
+    "pastTimeError": "The selected time must be later than the current time for today."
+  },
+  "consultationDashboard": {
+    "loading": "Loading Consultation Dashboard...",
+    "title": "Consultation Dashboard",
+    "errorPrefix": "Error",
+    "searchPlaceholder": "Search by patient first/last name...",
+    "table": {
+      "patient": "Patient",
+      "date": "Date",
+      "type": "Type",
+      "actions": "Actions",
+      "notAvailable": "N/A",
+      "invalidDate": "Invalid Date",
+      "defaultType": "General Consultation",
+      "noConsultations": "No consultations found."
+    },
+    "buttons": {
+      "viewDetails": "View Details"
+    },
+    "errors": {
+      "missingDoctorId": "Could not retrieve the logged-in doctor's ID.",
+      "fetchFailedFallback": "Failed to retrieve your consultations."
+    }
   },
   "common": {
     "notAvailable": "N/A",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "invalidDate": "Invalid Date",
-    "dateError": "Date Error"
+    "dateError": "Date Error",
+    "error": "Error",
+    "notAvailable": "N/A",
+    "invalidDate": "Invalid Date",
+    "dateError": "Date Error",
+    "close": "Close"
+  },
+  "medicalExaminationForm": {
+    "loading": "Loading form...",
+    "title": "Create Medical Exam Request",
+    "patientSectionTitle": "Patient",
+    "errorPrefix": "Error: ",
+    "labels": {
+      "examType": "🔽 Exam Type:",
+      "centre": "🏥 Centre:",
+      "recommendation": "🗒️ Recommendation (optional):"
+    },
+    "placeholders": {
+      "select": "-- Select --",
+      "selectCentre": "-- Select a centre --",
+      "specifyExamType": "Specify exam type"
+    },
+    "examTypes": {
+      "irm": "MRI",
+      "radio": "X-Ray",
+      "bloodTest": "Blood Test",
+      "scanner": "CT Scan",
+      "ultrasound": "Ultrasound",
+      "other": "Other (specify)"
+    },
+    "buttons": {
+      "save": "🔘 OK (Save)",
+      "print": "🖨️ Print"
+    },
+    "status": {
+      "saving": "Saving...",
+      "saveSuccess": "Exam request saved successfully!"
+    },
+    "errors": {
+      "missingPatientId": "Patient ID missing in URL.",
+      "loadFailedFallback": "Error loading data.",
+      "selectExamType": "Please select an exam type.",
+      "missingConsultationId": "Consultation ID missing in URL.",
+      "saveFailedFallback": "Error saving the request.",
+      "printPatientDataMissing": "Cannot print: patient data not loaded.",
+      "printExecutionFailed": "Error during print execution.",
+      "printSetupFailed": "Error preparing print."
+    },
+    "print": {
+      "otherCentre": "Other",
+      "centreNotFound": "Centre ID: {{id}} (Name not found)",
+      "title": "Medical Exam Request",
+      "doctorPrefix": "Dr. ",
+      "fallbackDoctorName": "[Doctor Name]",
+      "fallbackCabinetAddress": "[Cabinet Address]",
+      "fallbackCabinetPhone": "[Cabinet Phone]",
+      "dateLabel": "Date:",
+      "patientSectionTitle": "Patient",
+      "lastNameLabel": "Last Name:",
+      "firstNameLabel": "First Name:",
+      "dobLabel": "Date of Birth:",
+      "ageLabel": "Age:",
+      "ageSuffix": " years",
+      "examSectionTitle": "Requested Exam",
+      "examTypeLabel": "Exam Type:",
+      "fallbackExamType": "Not specified",
+      "centreLabel": "Centre:",
+      "recommendationLabel": "Recommendation:",
+      "fallbackRecommendation": "None",
+      "signatureLabel": "Doctor's Signature:"
+    }
+  },
+  "consultation": {
+    "loading": "Loading consultation details...",
+    "error": {
+      "patientDetailsNotFound": "Full patient details not found.",
+      "patientNotFoundById": "Patient with ID {{id}} not found via /Users/allid/.",
+      "fetchPatientDetailsFailed": "Failed to fetch details for patient {{id}}.",
+      "patientIdMissing": "Patient ID missing in consultation data.",
+      "consultationNotFound": "Consultation with ID {{id}} not found.",
+      "fetchConsultationFailed": "Failed to fetch details for consultation {{id}}.",
+      "patientDetailsNotFoundInAppointment": "Patient details not found in appointment data.",
+      "appointmentNotFound": "Appointment with ID {{id}} not found.",
+      "fetchAppointmentFailed": "Failed to fetch details for appointment {{id}}.",
+      "missingId": "Missing appointment or consultation ID in URL.",
+      "cannotLoadPatient": "Cannot load patient information for this consultation.",
+      "missingDoctorOrCabinetId": "Could not retrieve active doctor or cabinet ID. Please check your session.",
+      "missingPatientIdForSave": "Patient ID missing for save.",
+      "updateFailed": "Failed to update consultation.",
+      "createFailed": "Failed to create consultation."
+    },
+    "status": {
+      "saving": "Saving...",
+      "createSuccess": "Consultation created successfully!",
+      "updateSuccess": "Consultation updated successfully!"
+    },
+    "title": {
+      "edit": "Consultation Details / Edit",
+      "new": "New Consultation"
+    },
+    "patientInfo": {
+      "title": "Patient Information",
+      "name": "Name",
+      "dob": "Date of Birth",
+      "age": "Age",
+      "years": "years",
+      "email": "Email",
+      "loading": "Loading patient information..."
+    },
+    "history": {
+      "show": "Show Consultation & Prescription History",
+      "hide": "Hide Consultation & Prescription History",
+      "title": "History",
+      "loading": "Loading history...",
+      "fetchError": "Failed to fetch history.",
+      "errorLabel": "History Error",
+      "noneFound": "No history found.",
+      "date": "Date",
+      "consultation": "Consultation",
+      "noText": "<i>No text</i>",
+      "prescription": "Prescription",
+      "noPrescription": "<i>No prescription</i>"
+    },
+    "section": {
+      "consultation": "Consultation",
+      "prescription": "Prescription"
+    },
+    "button": {
+      "saving": "Saving...",
+      "update": "🔵 UPDATE",
+      "save": "🔵 SAVE",
+      "print": "🖨️ PRINT",
+      "exam": "🔬 EXAM"
+    },
+    "print": {
+      "executionError": "Error during print execution.",
+      "setupError": "Error preparing print.",
+      "missingDoctorName": "[Missing Doctor Name]",
+      "missingCabinetAddress": "[Missing Cabinet Address]",
+      "missingCabinetTel": "[Missing Cabinet Tel]",
+      "title": "Medical Prescription",
+      "doctorInfo": "Doctor Information",
+      "patientNameLabel": "Patient Name",
+      "ageLabel": "Age",
+      "telLabel": "Tel",
+      "patientInfo": "Patient Information",
+      "dobLabel": "Date of Birth",
+      "yearsLabel": "years",
+      "prescriptionLabel": "Prescription",
+      "noPrescription": "<i>No prescription text.</i>",
+      "dateLabel": "Date",
+      "signatureLabel": "Signature",
+      "loadingData": "Loading print data...",
+      "fetchDataError": "Error fetching print data (ID: {{id}}). Printing with current data."
+    }
+  },
+  "cabinetSettings": {
+    "title": "Cabinet Settings",
+    "cabinetIdError": "Could not determine Cabinet ID. Please log in again.",
+    "selectFileError": "Please select an image file for the signature.",
+    "authError": "Authentication error.",
+    "uploadSuccess": "Signature uploaded successfully!",
+    "uploadFailed": "Signature upload failed.",
+    "uploadTitle": "Upload Electronic Signature",
+    "uploadDescription": "Select an image (PNG, JPG) for the signature that will appear on prescriptions.",
+    "selectFileLabel": "Select signature file:",
+    "uploading": "Uploading...",
+    "saveButton": "Save Signature",
+    "otherSettingsTitle": "Other Settings"
+  },
+  "myConsultationsPage": {
+    "title": "My Consultations",
+    "loading": "Loading your consultations...",
+    "errorPrefix": "Error",
+    "errors": {
+      "unidentifiedUser": "Unidentified user.",
+      "cabinetContextNotFound": "Cabinet context not found. Please log in again.",
+      "fetchFailedFallback": "Failed to retrieve your consultations.",
+      "authErrorDownload": "Authentication error for download.",
+      "downloadInvalidResponse": "Could not download prescription (invalid response).",
+      "prescriptionNotFound": "No prescription found for this consultation.",
+      "downloadFailedFallback": "Failed to download the prescription."
+    },
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "prescription": "Prescription",
+      "notAvailable": "N/A",
+      "invalidDate": "Invalid Date",
+      "defaultType": "General Consultation",
+      "noConsultations": "You have no recorded consultations."
+    },
+    "buttons": {
+      "download": "Download"
+    }
+  },
+  "myExaminationsPage": {
+    "title": "My Exam Requests",
+    "loading": "Loading your exam requests...",
+    "errorPrefix": "Error:",
+    "errors": {
+      "unidentifiedUser": "Unidentified user.",
+      "cabinetContextNotFound": "Cabinet context not found. Please log in again.",
+      "authMissing": "Authentication token missing.",
+      "authMissingLogin": "Authentication token missing. Please log in again.",
+      "fetchFailedFallback": "Failed to retrieve your exam requests for this cabinet.",
+      "downloadFailed": "Failed to download exam {{examId}}. The backend endpoint might be missing."
+    },
+    "table": {
+      "dateRequested": "Date Requested",
+      "type": "Type",
+      "centre": "Centre",
+      "action": "Action"
+    },
+    "buttons": {
+      "download": "Download"
+    },
+    "common": {
+      "unspecified": "Unspecified"
+    },
+    "noExaminations": "You have no recorded exam requests."
+  },
+  "myAppointments": {
+    "title": "My Appointments",
+    "errorFetchUser": "Unable to retrieve user information. Please log in again.",
+    "errorFetchAppointments": "Error retrieving your appointments.",
+    "confirmCancel": "Are you sure you want to cancel this appointment?",
+    "cancelSuccess": "Appointment cancelled successfully.",
+    "cancelError": "Error cancelling: {{error}}",
+    "modifyFillFieldsError": "Please fill in the date/time and type.",
+    "modifySuccess": "Appointment modified successfully.",
+    "modifyError": "Error modifying: {{error}}",
+    "loading": "Loading your appointments...",
+    "noAppointments": "You have no appointments at the moment.",
+    "tableHeaderDate": "Date and Time",
+    "tableHeaderType": "Type",
+    "tableHeaderStatus": "Status",
+    "tableHeaderActions": "Actions",
+    "statusPending": "Pending",
+    "statusAccepted": "Accepted",
+    "statusRefused": "Refused",
+    "statusCancelled": "Cancelled",
+    "statusCompleted": "Completed",
+    "typeNewConsultation": "New Consultation",
+    "typeControlSession": "Follow-up Session",
+    "buttonCancel": "Cancel",
+    "buttonModify": "Modify",
+    "proposedDateLabel": "Proposed Date:",
+    "buttonFixNew": "Schedule New",
+    "modalTitleModify": "Modify Appointment",
+    "modalApptIdLabel": "Appointment ID:",
+    "modalDateLabel": "New Date and Time:",
+    "modalTypeLabel": "Appointment Type:",
+    "modalSavingButton": "Saving...",
+    "modalSaveButton": "Save Changes"
   }
 }

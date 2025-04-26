@@ -198,7 +198,39 @@ const ManageAppointments = () => {
             setActionMessage(t('manageAppointments.modal.refuse.validationError'));
             return;
         }
-        setActionMessage('');
+
+        // --- START DATE/TIME VALIDATION ---
+        const now = new Date();
+        // Use proposedDateTime from the modal state
+        const selectedDateTime = new Date(proposedDateTime);
+
+        // Create dates for comparison, ignoring time for date check
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const selectedDate = new Date(selectedDateTime.getFullYear(), selectedDateTime.getMonth(), selectedDateTime.getDate());
+
+        // 1. Check if the selected date is in the past
+        if (selectedDate < today) {
+            // Use setActionMessage as this component uses it for feedback
+            setActionMessage(t('addAppointment.pastDateError')); // Removed French fallback
+            // Don't set isLoading to false here, as it's set in the finally block
+            return; // Stop execution
+        }
+
+        // 2. Check if the selected time is in the past *if* the date is today
+        if (selectedDate.getTime() === today.getTime()) { // Compare timestamps to check if it's the same day
+            const nowTime = now.getHours() * 60 + now.getMinutes(); // Current time in minutes
+            const selectedTime = selectedDateTime.getHours() * 60 + selectedDateTime.getMinutes(); // Selected time in minutes
+
+            if (selectedTime <= nowTime) {
+                // Use setActionMessage
+                setActionMessage(t('addAppointment.pastTimeError')); // Removed French fallback
+                // Don't set isLoading to false here
+                return; // Stop execution
+            }
+        }
+        // --- END DATE/TIME VALIDATION ---
+
+        setActionMessage(''); // Clear validation message if checks pass
         setIsLoading(true); // Indicate loading
 
         try {
@@ -264,6 +296,37 @@ const ManageAppointments = () => {
             setIsLoading(false);
             return;
         }
+
+        // --- START DATE/TIME VALIDATION ---
+        const now = new Date();
+        const selectedDateTime = new Date(apptDateTime); // Parse the input string
+
+        // Create dates for comparison, ignoring time for date check
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const selectedDate = new Date(selectedDateTime.getFullYear(), selectedDateTime.getMonth(), selectedDateTime.getDate());
+
+        // 1. Check if the selected date is in the past
+        if (selectedDate < today) {
+            // Use setActionMessage as this form uses it for feedback
+            setActionMessage(t('addAppointment.pastDateError')); // Removed French fallback
+            setIsLoading(false);
+            return;
+        }
+
+        // 2. Check if the selected time is in the past *if* the date is today
+        if (selectedDate.getTime() === today.getTime()) { // Compare timestamps to check if it's the same day
+            const nowTime = now.getHours() * 60 + now.getMinutes(); // Current time in minutes
+            const selectedTime = selectedDateTime.getHours() * 60 + selectedDateTime.getMinutes(); // Selected time in minutes
+
+            if (selectedTime <= nowTime) {
+                // Use setActionMessage
+                setActionMessage(t('addAppointment.pastTimeError')); // Removed French fallback
+                setIsLoading(false);
+                return;
+            }
+        }
+        // --- END DATE/TIME VALIDATION ---
+
 
         try {
             // 1. Check if patient exists in the current cabinet

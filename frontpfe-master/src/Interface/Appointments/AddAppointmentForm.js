@@ -54,6 +54,35 @@ const AddAppointmentForm = () => { // Removed patientId prop
             return;
         }
 
+        // --- START DATE/TIME VALIDATION ---
+        const now = new Date();
+        const selectedDateTime = new Date(apptDateTime); // Parse the input string
+
+        // Create dates for comparison, ignoring time for date check
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const selectedDate = new Date(selectedDateTime.getFullYear(), selectedDateTime.getMonth(), selectedDateTime.getDate());
+
+        // 1. Check if the selected date is in the past
+        if (selectedDate < today) {
+            setError(t('addAppointment.pastDateError', 'La date sélectionnée ne peut pas être dans le passé.'));
+            setIsLoading(false);
+            return;
+        }
+
+        // 2. Check if the selected time is in the past *if* the date is today
+        if (selectedDate.getTime() === today.getTime()) { // Compare timestamps to check if it's the same day
+            const nowTime = now.getHours() * 60 + now.getMinutes(); // Current time in minutes
+            const selectedTime = selectedDateTime.getHours() * 60 + selectedDateTime.getMinutes(); // Selected time in minutes
+
+            if (selectedTime <= nowTime) {
+                setError(t('addAppointment.pastTimeError', 'L\'heure sélectionnée doit être postérieure à l\'heure actuelle pour aujourd\'hui.'));
+                setIsLoading(false);
+                return;
+            }
+        }
+        // --- END DATE/TIME VALIDATION ---
+
+
         // Prepare data according to the DTO expected by the backend (datetime and type)
         // Cabinet ID is now handled by the backend using the auth token
         const appointmentData = {

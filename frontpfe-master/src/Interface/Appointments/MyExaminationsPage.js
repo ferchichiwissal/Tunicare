@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react'; // Import useContext
 import axios from 'axios';
 import { getUserData, getCabinetId } from '../../utils/auth'; // Import getCabinetId
-
-// import './MyExaminationsPage.css'; // Optional CSS
+import ThemeContext from '../../utils/ThemeContext'; // Corrected: Import ThemeContext as default
+import './MyExaminationsPage.css'; // Import the CSS file
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 const MyExaminationsPage = () => {
+    const { t } = useTranslation(); // Initialize translation hook
+    const { theme } = useContext(ThemeContext); // Get theme from context
     const [user, setUser] = useState(null); // State to hold user info
     const [cabinetId, setCabinetId] = useState(null); // State to hold cabinet ID
     const [examinations, setExaminations] = useState([]);
@@ -33,7 +36,7 @@ const MyExaminationsPage = () => {
         const userData = getUserData();
         const token = userData?.accessToken;
         if (!token) {
-            setError("Token d'authentification manquant.");
+            setError(t('myExaminationsPage.errors.authMissing')); // Use translation key
             setDownloading(null);
             return;
         }
@@ -59,7 +62,8 @@ const MyExaminationsPage = () => {
 
         } catch (err) {
             console.error("Error downloading examination PDF:", err);
-            setError(err.response?.data?.message || `Échec du téléchargement de l'examen ${examId}. L'endpoint backend est peut-être manquant.`);
+            // Use translation key with interpolation
+            setError(err.response?.data?.message || t('myExaminationsPage.errors.downloadFailed', { examId: examId }));
         } finally {
             setDownloading(null); // Indicate download end/failure
         }
@@ -77,12 +81,12 @@ const MyExaminationsPage = () => {
 
         // Check if user and cabinetId are available
         if (!userData || !userData.user || !userData.user.id) {
-             setError("Utilisateur non identifié.");
+             setError(t('myExaminationsPage.errors.unidentifiedUser')); // Use translation key
              setIsLoading(false);
              return;
         }
         if (!currentCabinetId) {
-            setError("Contexte du cabinet non trouvé. Veuillez vous reconnecter.");
+            setError(t('myExaminationsPage.errors.cabinetContextNotFound')); // Use translation key
             setIsLoading(false);
             return;
         }
@@ -104,7 +108,7 @@ const MyExaminationsPage = () => {
             // Use accessToken from userData for authorization
             const token = userData.accessToken;
             if (!token) {
-                setError("Token d'authentification manquant. Veuillez vous reconnecter.");
+                setError(t('myExaminationsPage.errors.authMissingLogin')); // Use translation key
                 setIsLoading(false); // Re-add missing lines
                 return;             // Re-add missing lines
             }                       // Re-add missing closing brace
@@ -130,7 +134,7 @@ const MyExaminationsPage = () => {
                 setExaminations(sortedExaminations);
             } catch (err) {
                 console.error("Error fetching patient examinations for cabinet:", err);
-                 setError(err.response?.data?.message || `Échec de la récupération de vos demandes d'examen pour ce cabinet.`);
+                 setError(err.response?.data?.message || t('myExaminationsPage.errors.fetchFailedFallback')); // Use translation key
                 setExaminations([]);
             } finally {
                 setIsLoading(false);
@@ -142,46 +146,55 @@ const MyExaminationsPage = () => {
 
     // Helper function to format date
     const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
+        if (!dateString) return t('common.notAvailable'); // Use translation key
         try {
             // Using createdAt for exam request date
+            // TODO: Consider using i18n locale for date formatting if needed globally
             return new Date(dateString).toLocaleDateString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit' });
         } catch (e) {
-            return 'Date invalide';
+            return t('common.invalidDate'); // Use translation key
         }
     };
 
      // Function to display centre information using the centreName field set by the backend
      const displayCentre = (exam) => {
-        return exam.centreName || 'Non spécifié'; // Use the centreName field
+        return exam.centreName || t('myExaminationsPage.common.unspecified'); // Use translation key
     };
 
 
     if (isLoading) {
-        return <div style={{ padding: '20px' }}>Chargement de vos demandes d'examen...</div>;
+        // Use translation key for loading message
+        return <div style={{ padding: '20px' }}>{t('myExaminationsPage.loading')}</div>;
     }
 
-    return (
-        <div className="my-examinations-page" style={{ padding: '20px' }}>
-            <h2>Mes Demandes d'Examen</h2>
+    // Determine the container class based on the theme
+    const containerClass = `my-examinations-page-container ${theme === 'night' ? 'night-mode' : ''}`;
 
-            {error && <p style={{ color: 'red' }}>Erreur : {error}</p>}
+    return (
+        <div className={containerClass} style={{ padding: '20px' }}> {/* Use containerClass and remove inline style if handled by CSS */}
+            {/* Use translation key for title */}
+            <h2>{t('myExaminationsPage.title')}</h2>
+
+            {/* Use translation key for error prefix */}
+            {error && <p style={{ color: 'red' }}>{t('myExaminationsPage.errorPrefix')} {error}</p>}
 
             {examinations.length > 0 ? (
                 <table className="table table-striped">
-                    <thead>
+                    {/* Apply custom-table class for styling */}
+                    <thead className="custom-table">
                         <tr>
-                            <th>Date Demande</th>
-                            <th>Type</th>
-                            <th>Centre</th>
-                            <th>Action</th> {/* Changed Header */}
+                            {/* Use translation keys for table headers */}
+                            <th>{t('myExaminationsPage.table.dateRequested')}</th>
+                            <th>{t('myExaminationsPage.table.type')}</th>
+                            <th>{t('myExaminationsPage.table.centre')}</th>
+                            <th>{t('myExaminationsPage.table.action')}</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="custom-table"> {/* Apply custom-table class for styling */}
                         {examinations.map(exam => (
                             <tr key={exam.idExam}>
                                 <td>{formatDate(exam.createdAt)}</td> {/* Using createdAt as request date */}
-                                <td>{exam.act || 'N/A'}</td> {/* Assuming 'act' holds the type */}
+                                <td>{exam.act || t('common.notAvailable')}</td> {/* Use translation key */}
                                 <td>{displayCentre(exam)}</td> {/* Needs logic based on backend */}
                                 <td> {/* Replaced recommendation with button */}
                                     <button
@@ -189,7 +202,8 @@ const MyExaminationsPage = () => {
                                         onClick={() => handleDownload(exam.idExam)}
                                         disabled={downloading === exam.idExam} // Disable while downloading this specific exam
                                     >
-                                        {downloading === exam.idExam ? 'Chargement...' : 'Télécharger'}
+                                        {/* Use translation keys for button text */}
+                                        {downloading === exam.idExam ? t('loading') : t('myExaminationsPage.buttons.download')}
                                     </button>
                                 </td>
                             </tr>
@@ -197,7 +211,8 @@ const MyExaminationsPage = () => {
                     </tbody>
                 </table>
             ) : (
-                 !error && <p>Vous n'avez aucune demande d'examen enregistrée.</p>
+                 /* Use translation key for no examinations message */
+                 !error && <p>{t('myExaminationsPage.noExaminations')}</p>
             )}
         </div>
     );

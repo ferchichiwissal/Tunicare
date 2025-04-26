@@ -1,982 +1,1265 @@
 {
-    "welcome": "Bienvenue",
-    "call": "Appel : 1234567890",
-    "email": "Email : info@tunicare.com",
-    "location": "123, rue sante , MedCity",
-    "login": "Connexion",
-    "signUp": "S'inscrire",
-    "bookAppointment": "PRENDRE RENDEZ-VOUS",
-    "patientName": "Nom du patient",
-    "doctorsName": "Nom du médecin",
-    "departmentName": "Nom du département",
-    "phoneNumber": "Numéro de téléphone",
-    "symptoms": "Symptômes",
-    "chooseDate": "Choisir une date",
-    "submitNow": "Soumettre maintenant",
-    "aboutHospital": "À propos de l'hôpital",
-    "readMore": "Lire la suite",
-    "hospitalTreatment": "Traitement à l'hôpital",
-    "nephrologistCare": "Soins néphrologiques",
-    "eyeCare": "Soins oculaires",
-    "pediatricianClinic": "Clinique pédiatrique",
-    "parentalCare": "Soins parentaux",
-    "ourDoctors": "Nos médecins",
-    "testimonial": "Témoignage",
-    "getInTouch": "Contactez-nous",
-    "fullName": "Nom complet",
-    "message": "Message",
-    "send": "ENVOYER",
-    "address": "Adresse",
-    "usefulLink": "Liens utiles",
-    "latestPosts": "DERNIERS ARTICLES",
-    "news": "Actualités",
-    "rightsReserved": "Tous droits réservés par",
-    "contactUs": "Contactez-nous",
-    "hospitalDescription": "Lorsque vous regardez sa mise en page. L'intérêt d'utiliser Lorem Ipsum est qu'il a une distribution plus ou moins normale des lettres, par opposition à",
-    "previous": "Précédent",
-    "next": "Suivant",
-    "signInTitle": "Se connecter",
-    "emailLabel": "Adresse e-mail",
-    "emailPlaceholder": "Entrez votre e-mail",
-    "passwordLabel": "Mot de passe",
-    "passwordPlaceholder": "Entrez votre mot de passe",
-    "rememberMeLabel": "Se souvenir de moi",
-    "selectCabinetLabel": "Sélectionner le Cabinet",
-    "selectCabinetPlaceholder": "-- Sélectionnez un Cabinet --",
-    "cabinetOption": "Cabinet {{id}}",
-    "processingButton": "Traitement...",
-    "loginToCabinetButton": "Se connecter au Cabinet sélectionné",
-    "submitButton": "Soumettre",
-    "forgotPasswordPrefix": "Mot de passe",
-    "forgotPasswordLink": "oublié ?",
-    "selectCabinetError": "Veuillez sélectionner un cabinet.",
-    "missingCredentialsError": "Veuillez saisir votre e-mail et votre mot de passe",
-    "loginSuccess": "Connexion réussie !",
-    "loginSuccessIncomplete": "Connexion réussie, mais échec du chargement des détails de l'utilisateur.",
-    "multipleAccountsError": "Plusieurs comptes trouvés. Veuillez sélectionner votre cabinet.",
-    "invalidCredentialsError": "E-mail ou mot de passe invalide.",
-    "serverError": "La connexion a échoué en raison d'une erreur serveur.",
-    "connectionError": "La connexion a échoué. Veuillez vérifier votre connexion ou contacter le support.",
-    "sessionExpiredAlert": "Votre session a expiré en raison de l'inactivité. Redirection vers la page de connexion...",
-    "loading": "Chargement...",
-    "nav": {
-      "dashboard": "Tableau de bord",
-      "addAccount": "Ajouter un compte",
-      "confirmation": "Confirmation",
-      "doctorsManagement": "Gestion des médecins",
-      "deactivateAccounts": "Désactiver les comptes",
-      "changeRole": "Changer le rôle",
-      "addCabinet": "Ajouter un cabinet",
-      "manageCabinets": "Gérer les cabinets & QR Codes",
-      "manageExamCentres": "Gérer les centres d'examen",
-      "addExamCentre": "Ajouter un centre d'examen",
-      "editMyAccount": "Modifier mon compte",
-      "changePassword": "Changer le mot de passe",
-      "logout": "Déconnexion",
-      "userManagement": "Gestion des utilisateurs",
-      "addAccountAssistant": "Ajouter un compte en tant qu'assistant",
-      "activationManagement": "Activation Médecin"
+  "welcome": "Bienvenue",
+  "call": "Appel : 1234567890",
+  "email": "Email : info@tunicare.com",
+  "location": "123, rue sante , MedCity",
+  "login": "Connexion",
+  "signUp": "S'inscrire",
+  "bookAppointment": "PRENDRE RENDEZ-VOUS",
+  "patientName": "Nom du patient",
+  "doctorsName": "Nom du médecin",
+  "departmentName": "Nom du département",
+  "phoneNumber": "Numéro de téléphone",
+  "symptoms": "Symptômes",
+  "chooseDate": "Choisir une date",
+  "submitNow": "Soumettre maintenant",
+  "aboutHospital": "À propos de l'hôpital",
+  "readMore": "Lire la suite",
+  "hospitalTreatment": "Traitement à l'hôpital",
+  "nephrologistCare": "Soins néphrologiques",
+  "eyeCare": "Soins oculaires",
+  "pediatricianClinic": "Clinique pédiatrique",
+  "parentalCare": "Soins parentaux",
+  "ourDoctors": "Nos médecins",
+  "testimonial": "Témoignage",
+  "getInTouch": "Contactez-nous",
+  "fullName": "Nom complet",
+  "message": "Message",
+  "send": "ENVOYER",
+  "address": "Adresse",
+  "usefulLink": "Liens utiles",
+  "latestPosts": "DERNIERS ARTICLES",
+  "news": "Actualités",
+  "rightsReserved": "Tous droits réservés par",
+  "contactUs": "Contactez-nous",
+  "hospitalDescription": "Lorsque vous regardez sa mise en page. L'intérêt d'utiliser Lorem Ipsum est qu'il a une distribution plus ou moins normale des lettres, par opposition à",
+  "previous": "Précédent",
+  "next": "Suivant",
+  "signInTitle": "Se connecter",
+  "emailLabel": "Adresse e-mail",
+  "emailPlaceholder": "Entrez votre e-mail",
+  "passwordLabel": "Mot de passe",
+  "passwordPlaceholder": "Entrez votre mot de passe",
+  "rememberMeLabel": "Se souvenir de moi",
+  "selectCabinetLabel": "Sélectionner le Cabinet",
+  "selectCabinetPlaceholder": "-- Sélectionnez un Cabinet --",
+  "cabinetOption": "Cabinet {{id}}",
+  "processingButton": "Traitement...",
+  "loginToCabinetButton": "Se connecter au Cabinet sélectionné",
+  "submitButton": "Soumettre",
+  "forgotPasswordPrefix": "Mot de passe",
+  "forgotPasswordLink": "oublié ?",
+  "selectCabinetError": "Veuillez sélectionner un cabinet.",
+  "missingCredentialsError": "Veuillez saisir votre e-mail et votre mot de passe",
+  "loginSuccess": "Connexion réussie !",
+  "loginSuccessIncomplete": "Connexion réussie, mais échec du chargement des détails de l'utilisateur.",
+  "multipleAccountsError": "Plusieurs comptes trouvés. Veuillez sélectionner votre cabinet.",
+  "invalidCredentialsError": "E-mail ou mot de passe invalide.",
+  "serverError": "La connexion a échoué en raison d'une erreur serveur.",
+  "connectionError": "La connexion a échoué. Veuillez vérifier votre connexion ou contacter le support.",
+  "sessionExpiredAlert": "Votre session a expiré en raison de l'inactivité. Redirection vers la page de connexion...",
+  "loading": "Chargement...",
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "addAccount": "Ajouter un compte",
+    "confirmation": "Confirmation",
+    "doctorsManagement": "Gestion des médecins",
+    "deactivateAccounts": "Désactiver les comptes",
+    "changeRole": "Changer le rôle",
+    "addCabinet": "Ajouter un cabinet",
+    "manageCabinets": "Gérer les cabinets & QR Codes",
+    "manageExamCentres": "Gérer les centres d'examen",
+    "addExamCentre": "Ajouter un centre d'examen",
+    "editMyAccount": "Modifier mon compte",
+    "changePassword": "Changer le mot de passe",
+    "logout": "Déconnexion",
+    "userManagement": "Gestion des utilisateurs",
+    "consultationDashboard": "Tableau de Bord Consultations",
+    "manageAppointments": "Gérer les Rendez-vous",
+    "cabinetSettings": "Paramètres du Cabinet",
+    "addAccountAssistant": "Ajouter un compte (Assistant)",
+    "myConsultations": "Mes Consultations",
+    "myExaminations": "Mes Examens",
+    "myAppointments": "Mes Rendez-vous",
+    "addAppointment": "Prendre Rendez-vous",
+    "activationManagement": "Activation Médecin"
+  },
+  "dashboard": {
+    "title": "Tableau de bord de {{firstName}} {{lastName}}",
+    "performanceSectionTitle": "Tableau de bord des performances",
+    "tiles": {
+      "performance": {
+        "title": "Objectifs de performance",
+        "subtitle": "Réalisation de l'objectif de revenus :"
+      },
+      "sales": {
+        "title": "Ventes mensuelles",
+        "subtitle": "Objectif atteint : {{percentage}}%"
+      },
+      "teamPerformance": {
+        "title": "Performance de l'équipe",
+        "subtitle": "Équipe {{team}} : {{percentage}}% de l'objectif"
+      },
+      "projectTracking": {
+        "title": "Suivi des projets",
+        "subtitle": "Projets en cours : {{count}}"
+      },
+      "teamObjectives": {
+        "title": "Objectifs de l'équipe",
+        "subtitle": "Taux d'achèvement : {{percentage}}%"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Réunions à venir : {{count}}"
+      },
+      "viewDetails": "Voir les détails",
+      "analyzeProgress": "Analyser les progrès",
+      "viewNotifications": "Voir les notifications"
     },
-    "dashboard": {
-      "title": "Tableau de bord de {{firstName}} {{lastName}}",
-      "performanceSectionTitle": "Tableau de bord des performances",
-      "tiles": {
-        "performance": {
-          "title": "Objectifs de performance",
-          "subtitle": "Réalisation de l'objectif de revenus :"
-        },
-        "sales": {
-          "title": "Ventes mensuelles",
-          "subtitle": "Objectif atteint : {{percentage}}%"
-        },
-        "teamPerformance": {
-          "title": "Performance de l'équipe",
-          "subtitle": "Équipe {{team}} : {{percentage}}% de l'objectif"
-        },
-        "projectTracking": {
-          "title": "Suivi des projets",
-          "subtitle": "Projets en cours : {{count}}"
-        },
-        "teamObjectives": {
-          "title": "Objectifs de l'équipe",
-          "subtitle": "Taux d'achèvement : {{percentage}}%"
-        },
-        "notifications": {
-          "title": "Notifications",
-          "subtitle": "Réunions à venir : {{count}}"
-        },
-        "viewDetails": "Voir les détails",
-        "analyzeProgress": "Analyser les progrès",
-        "viewNotifications": "Voir les notifications"
+    "charts": {
+      "performanceTitle": "Performance de {{firstName}} {{lastName}}",
+      "monthAxisLabel": "Mois",
+      "payments": {
+        "label": "Paiements au fil du temps",
+        "title": "Aperçu des paiements mensuels",
+        "yAxisLabel": "Paiements (dt)"
       },
-      "charts": {
-        "performanceTitle": "Performance de {{firstName}} {{lastName}}",
-        "monthAxisLabel": "Mois",
-        "payments": {
-          "label": "Paiements au fil du temps",
-          "title": "Aperçu des paiements mensuels",
-          "yAxisLabel": "Paiements (dt)"
-        },
-        "phoneCalls": {
-          "label": "Appels téléphoniques effectués",
-          "title": "Appels téléphoniques effectués par mois",
-          "yAxisLabel": "Appels téléphoniques"
-        }
-      },
-      "tooltips": {
-        "hideSidebar": "Masquer la barre latérale",
-        "showSidebar": "Afficher la barre latérale"
-      },
-      "sidebar": {
-        "emailLabel": "E-mail",
-        "birthDateLabel": "Date de naissance",
-        "roleLabel": "Rôle",
-        "genderLabel": "Genre",
-        "addressLabel": "Adresse",
-        "phoneLabel": "Téléphone",
-        "ageLabel": "Âge",
-        "notProvided": "Non fourni",
-        "notAvailable": "N/D"
+      "phoneCalls": {
+        "label": "Appels téléphoniques effectués",
+        "title": "Appels téléphoniques effectués par mois",
+        "yAxisLabel": "Appels téléphoniques"
       }
     },
-    "editUserForm": {
-      "title": "Modifier le profil utilisateur (ID : {{id}})",
-      "loading": "Chargement des données utilisateur...",
-      "labels": {
-        "firstName": "Prénom",
-        "lastName": "Nom de famille",
-        "email": "E-mail",
-        "birthDate": "Date de naissance",
-        "telephone": "Téléphone",
-        "address": "Adresse"
-      },
-      "placeholders": {
-        "firstName": "Entrez le prénom",
-        "lastName": "Entrez le nom de famille",
-        "telephone": "Entrez le numéro de téléphone (facultatif)",
-        "address": "Entrez l'adresse (facultatif)"
-      },
-      "buttons": {
-        "updating": "Mise à jour...",
-        "updateUser": "Mettre à jour l'utilisateur"
-      },
-      "alerts": {
-        "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
-        "noChanges": "Aucun changement détecté.",
-        "updateSuccess": "Utilisateur mis à jour avec succès !"
-      },
-      "errors": {
-        "fetch": {
-          "missingId": "L'ID utilisateur est manquant.",
-          "noToken": "Jeton d'authentification introuvable.",
-          "permissionDenied": "Permission refusée ou session expirée.",
-          "notFound": "Utilisateur avec l'ID {{id}} introuvable.",
-          "generic": "Échec de la récupération des données utilisateur. Veuillez réessayer."
-        },
-        "validation": {
-          "firstNameRequired": "Le prénom est requis",
-          "lastNameRequired": "Le nom de famille est requis",
-          "emailInvalid": "Format d'e-mail invalide",
-          "birthDateRequired": "La date de naissance est requise",
-          "phoneDigitsOnly": "Le numéro de téléphone ne doit contenir que des chiffres"
-        },
-        "submit": {
-          "authRequired": "Authentification requise. Veuillez vous reconnecter.",
-          "permissionDenied": "Permission refusée ou session expirée.",
-          "notFound": "Utilisateur avec l'ID {{id}} introuvable.",
-          "generic": "Échec de la mise à jour de l'utilisateur. Veuillez réessayer.",
-          "networkError": "Erreur réseau ou serveur indisponible. Veuillez réessayer."
-        }
-      }
+    "tooltips": {
+      "hideSidebar": "Masquer la barre latérale",
+      "showSidebar": "Afficher la barre latérale"
     },
-    "addForm": {
-      "title": {
-        "admin": "Ajouter un nouvel utilisateur",
-        "patient": "Ajouter un nouveau patient"
+    "sidebar": {
+      "emailLabel": "E-mail",
+      "birthDateLabel": "Date de naissance",
+      "roleLabel": "Rôle",
+      "genderLabel": "Genre",
+      "addressLabel": "Adresse",
+      "phoneLabel": "Téléphone",
+      "ageLabel": "Âge",
+      "notProvided": "Non fourni",
+      "notAvailable": "N/D"
+    }
+  },
+  "editUserForm": {
+    "title": "Modifier le profil utilisateur (ID : {{id}})",
+    "loading": "Chargement des données utilisateur...",
+    "labels": {
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "email": "E-mail",
+      "birthDate": "Date de naissance",
+      "telephone": "Téléphone",
+      "address": "Adresse"
+    },
+    "placeholders": {
+      "firstName": "Entrez le prénom",
+      "lastName": "Entrez le nom de famille",
+      "telephone": "Entrez le numéro de téléphone (facultatif)",
+      "address": "Entrez l'adresse (facultatif)"
+    },
+    "buttons": {
+      "updating": "Mise à jour...",
+      "updateUser": "Mettre à jour l'utilisateur"
+    },
+    "alerts": {
+      "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
+      "noChanges": "Aucun changement détecté.",
+      "updateSuccess": "Utilisateur mis à jour avec succès !"
+    },
+    "errors": {
+      "fetch": {
+        "missingId": "L'ID utilisateur est manquant.",
+        "noToken": "Jeton d'authentification introuvable.",
+        "permissionDenied": "Permission refusée ou session expirée.",
+        "notFound": "Utilisateur avec l'ID {{id}} introuvable.",
+        "generic": "Échec de la récupération des données utilisateur. Veuillez réessayer."
       },
+      "validation": {
+        "firstNameRequired": "Le prénom est requis",
+        "lastNameRequired": "Le nom de famille est requis",
+        "emailInvalid": "Format d'e-mail invalide",
+        "birthDateRequired": "La date de naissance est requise",
+        "phoneDigitsOnly": "Le numéro de téléphone ne doit contenir que des chiffres"
+      },
+      "submit": {
+        "authRequired": "Authentification requise. Veuillez vous reconnecter.",
+        "permissionDenied": "Permission refusée ou session expirée.",
+        "notFound": "Utilisateur avec l'ID {{id}} introuvable.",
+        "generic": "Échec de la mise à jour de l'utilisateur. Veuillez réessayer.",
+        "networkError": "Erreur réseau ou serveur indisponible. Veuillez réessayer."
+      }
+    }
+  },
+  "addForm": {
+    "title": {
+      "admin": "Ajouter un nouvel utilisateur",
+      "patient": "Ajouter un nouveau patient"
+    },
+    "labels": {
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "email": "E-mail",
+      "birthDate": "Date de naissance",
+      "telephone": "Téléphone",
+      "address": "Adresse",
+      "gender": "Genre",
+      "photo": "Photo de profil (Facultatif)",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe"
+    },
+    "placeholders": {
+      "firstName": "Entrez le prénom",
+      "lastName": "Entrez le nom de famille",
+      "email": "Entrez l'e-mail (facultatif)",
+      "telephone": "Entrez le numéro de téléphone (facultatif)",
+      "address": "Entrez l'adresse (facultatif)",
+      "password": "Entrez le mot de passe (facultatif)",
+      "confirmPassword": "Confirmez le mot de passe (si saisi)"
+    },
+    "genderOptions": {
+      "select": "Sélectionnez le genre...",
+      "male": "Homme",
+      "female": "Femme",
+      "other": "Autre"
+    },
+    "passwordStrength": {
+      "label": "Force du mot de passe",
+      "weak": "Faible",
+      "strong": "Fort"
+    },
+    "buttons": {
+      "checking": "Vérification...",
+      "processing": "Traitement...",
+      "submit": "Soumettre"
+    },
+    "alerts": {
+      "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
+      "permissionDeniedAccess": "Vous n'avez pas la permission d'accéder à cette page.",
+      "sessionInvalid": "Session invalide. Veuillez vous reconnecter.",
+      "invalidRole": "Rôle utilisateur invalide. Impossible de continuer.",
+      "adminAddSuccess": "Utilisateur ajouté avec succès avec les privilèges d'administrateur !",
+      "patientAddSuccess": "Patient ajouté avec succès !",
+      "permissionDeniedSubmit": "Permission refusée ou session expirée."
+    },
+    "errors": {
+      "validation": {
+        "firstNameRequired": "Le prénom est requis",
+        "lastNameRequired": "Le nom de famille est requis",
+        "emailInvalidDomain": "L'e-mail doit être une adresse @gmail.com ou @yahoo.com valide",
+        "birthDateRequired": "La date de naissance est requise",
+        "phoneDigitsOnly": "Le numéro de téléphone ne doit contenir que des chiffres",
+        "genderRequired": "Le genre est requis",
+        "passwordStrength": "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial (@, #, $, %, ^, &, +, =, ou !)",
+        "passwordsMismatch": "Les mots de passe ne correspondent pas",
+        "confirmPasswordNotEmpty": "La confirmation du mot de passe doit être vide si le mot de passe est vide"
+      },
+      "existenceCheck": {
+        "noCabinet": "Impossible de déterminer votre affiliation au cabinet. Veuillez vous reconnecter.",
+        "userExists": "Un utilisateur avec cet e-mail, prénom et nom existe déjà dans ce cabinet.",
+        "generic": "Impossible de vérifier l'existence de l'utilisateur. Veuillez réessayer."
+      },
+      "submit": {
+        "generic": "Une erreur s'est produite. Veuillez vérifier les données et réessayer.",
+        "networkError": "Erreur réseau ou serveur indisponible. Veuillez réessayer plus tard."
+      }
+    }
+  },
+  "userManagement": {
+    "title": "Liste des utilisateurs",
+    "searchPlaceholder": "Rechercher par prénom et nom (ex: Jean Dupont)",
+    "loading": "Chargement des utilisateurs...",
+    "tableHeaders": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "E-mail",
+      "role": "Rôle",
+      "status": "Statut",
+      "speciality": "Spécialité",
+      "actions": "Actions"
+    },
+    "viewOptions": {
+      "doctors": "Afficher Médecins",
+      "doctorCentres": "Afficher Médecins Centre Examen"
+    },
+    "noUsersFound": "Aucun utilisateur trouvé",
+    "noEmail": "Ce patient n'a pas d'e-mail",
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "buttons": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "activate": "Activer",
+      "deactivate": "Désactiver"
+    },
+    "alerts": {
+      "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
+      "fetchFailed": {
+        "auth": "Accès refusé ou session expirée. Veuillez vous reconnecter.",
+        "generic": "Échec du chargement des données utilisateur. Veuillez réessayer plus tard."
+      },
+      "deleteFailed": {
+        "noCurrentUser": "Détails de l'utilisateur actuel non disponibles. Veuillez patienter ou essayer de vous reconnecter.",
+        "missingUserInfo": "Informations essentielles de l'utilisateur manquantes dans les détails. Veuillez patienter ou essayer de vous reconnecter.",
+        "missingUserId": "ID de l'utilisateur actuel manquant dans les détails. Veuillez patienter ou essayer de vous reconnecter.",
+        "missingUserRoles": "Rôles de l'utilisateur actuel manquants dans les détails. Veuillez patienter ou essayer de vous reconnecter.",
+        "missingCabinetInfo": "Impossible d'effectuer l'action : Vos informations de cabinet sont manquantes.",
+        "permissionOrMissingCabinet": "Vous n'avez pas la permission de supprimer des utilisateurs ou votre ID de cabinet est manquant.",
+        "auth": "Permission refusée ou session expirée.",
+        "notFound": "Utilisateur ou enregistrement introuvable.",
+        "generic": "Échec de l'opération de suppression. Veuillez réessayer plus tard.",
+        "invalidViewOrPermission": "Impossible de supprimer : Type de vue invalide ou permissions insuffisantes."
+      },
+      "deleteSuccess": {
+        "admin": "Utilisateur supprimé avec succès.",
+        "doctorAssistant": "Enregistrement de l'utilisateur supprimé de ce cabinet avec succès.",
+        "doctorCentre": "Médecin du Centre d'Examen supprimé avec succès."
+      },
+      "sessionInvalid": "Session invalide. Veuillez vous reconnecter.",
+      "toggleFailed": {
+        "missingCabinetInfo": "Impossible de basculer le statut du patient : Vos informations de cabinet sont manquantes.",
+        "adminPatientLimitation": "Le rôle Admin ne peut pas utiliser ce bouton de bascule pour les patients sans spécifier un cabinet cible (amélioration de l'interface utilisateur nécessaire).",
+        "invalidRole": "Impossible de basculer le statut pour le rôle utilisateur : {{role}}",
+        "authWithMessage": "Permission refusée ou session expirée : {{message}}",
+        "notFoundWithMessage": "Introuvable : {{message}}",
+        "badRequestWithMessage": "Mauvaise requête : {{message}}",
+        "genericWithMessage": "Échec du basculement du statut : {{message}}",
+        "networkError": "Échec du basculement du statut {{role}} en raison d'une erreur réseau ou inattendue.",
+        "invalidViewOrPermission": "Impossible de basculer le statut : Type de vue invalide ou permissions insuffisantes."
+      },
+      "toggleSuccess": "Statut {{role}} basculé avec succès. Nouveau statut : {{status}}.",
+      "toggleSuccessDoctorCentre": "Statut du Médecin du Centre d'Examen (ID : {{userId}}) basculé avec succès. Nouveau statut : {{status}}."
+    },
+    "confirmations": {
+      "deleteAdmin": "Êtes-vous sûr de vouloir supprimer définitivement l'utilisateur ID {{userId}} et tous ses enregistrements ?",
+      "deleteDoctorAssistant": "Êtes-vous sûr de vouloir supprimer l'enregistrement de l'utilisateur ID {{userId}} de votre cabinet (ID : {{cabinetId}}) ?",
+      "deleteDoctorCentre": "Êtes-vous sûr de vouloir supprimer définitivement le Médecin du Centre d'Examen ID {{userId}} ?",
+      "activatePatient": "Êtes-vous sûr de vouloir activer le patient ID {{userId}} dans le cabinet {{cabinetId}} ?",
+      "deactivatePatient": "Êtes-vous sûr de vouloir désactiver le patient ID {{userId}} dans le cabinet {{cabinetId}} ?",
+      "activateDoctorAssistant": "Êtes-vous sûr de vouloir activer {{role}} ID {{userId}} ?",
+      "deactivateDoctorAssistant": "Êtes-vous sûr de vouloir désactiver {{role}} ID {{userId}} ?",
+      "activateDoctorCentre": "Êtes-vous sûr de vouloir activer le Médecin du Centre d'Examen ID {{userId}} ?",
+      "deactivateDoctorCentre": "Êtes-vous sûr de vouloir désactiver le Médecin du Centre d'Examen ID {{userId}} ?"
+    }
+  },
+  "editDoctorCentreForm": {
+      "title": "Modifier Médecin Centre Examen",
+      "loading": "Chargement données médecin...",
       "labels": {
         "firstName": "Prénom",
-        "lastName": "Nom de famille",
-        "email": "E-mail",
-        "birthDate": "Date de naissance",
-        "telephone": "Téléphone",
+        "lastName": "Nom",
+        "birthDate": "Date de Naissance",
+        "tel": "Téléphone",
         "address": "Adresse",
         "gender": "Genre",
-        "photo": "Photo de profil (Facultatif)",
-        "password": "Mot de passe",
-        "confirmPassword": "Confirmer le mot de passe"
-      },
-      "placeholders": {
-        "firstName": "Entrez le prénom",
-        "lastName": "Entrez le nom de famille",
-        "email": "Entrez l'e-mail (facultatif)",
-        "telephone": "Entrez le numéro de téléphone (facultatif)",
-        "address": "Entrez l'adresse (facultatif)",
-        "password": "Entrez le mot de passe (facultatif)",
-        "confirmPassword": "Confirmez le mot de passe (si saisi)"
+        "speciality": "Spécialité"
       },
       "genderOptions": {
-        "select": "Sélectionnez le genre...",
+        "select": "Sélectionnez Genre...",
         "male": "Homme",
         "female": "Femme",
         "other": "Autre"
       },
-      "passwordStrength": {
-        "label": "Force du mot de passe",
-        "weak": "Faible",
-        "strong": "Fort"
-      },
       "buttons": {
-        "checking": "Vérification...",
-        "processing": "Traitement...",
-        "submit": "Soumettre"
-      },
-      "alerts": {
-        "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
-        "permissionDeniedAccess": "Vous n'avez pas la permission d'accéder à cette page.",
-        "sessionInvalid": "Session invalide. Veuillez vous reconnecter.",
-        "invalidRole": "Rôle utilisateur invalide. Impossible de continuer.",
-        "adminAddSuccess": "Utilisateur ajouté avec succès avec les privilèges d'administrateur !",
-        "patientAddSuccess": "Patient ajouté avec succès !",
-        "permissionDeniedSubmit": "Permission refusée ou session expirée."
-      },
-      "errors": {
-        "validation": {
-          "firstNameRequired": "Le prénom est requis",
-          "lastNameRequired": "Le nom de famille est requis",
-          "emailInvalidDomain": "L'e-mail doit être une adresse @gmail.com ou @yahoo.com valide",
-          "birthDateRequired": "La date de naissance est requise",
-          "phoneDigitsOnly": "Le numéro de téléphone ne doit contenir que des chiffres",
-          "genderRequired": "Le genre est requis",
-          "passwordStrength": "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial (@, #, $, %, ^, &, +, =, ou !)",
-          "passwordsMismatch": "Les mots de passe ne correspondent pas",
-          "confirmPasswordNotEmpty": "La confirmation du mot de passe doit être vide si le mot de passe est vide"
-        },
-        "existenceCheck": {
-          "noCabinet": "Impossible de déterminer votre affiliation au cabinet. Veuillez vous reconnecter.",
-          "userExists": "Un utilisateur avec cet e-mail, prénom et nom existe déjà dans ce cabinet.",
-          "generic": "Impossible de vérifier l'existence de l'utilisateur. Veuillez réessayer."
-        },
-        "submit": {
-          "generic": "Une erreur s'est produite. Veuillez vérifier les données et réessayer.",
-          "networkError": "Erreur réseau ou serveur indisponible. Veuillez réessayer plus tard."
-        }
-      }
-    },
-    "userManagement": {
-      "title": "Liste des utilisateurs",
-      "searchPlaceholder": "Rechercher par prénom et nom (ex: Jean Dupont)",
-      "loading": "Chargement des utilisateurs...",
-      "tableHeaders": {
-        "firstName": "Prénom",
-        "lastName": "Nom",
-        "email": "E-mail",
-        "role": "Rôle",
-        "status": "Statut",
-        "speciality": "Spécialité",
-        "actions": "Actions"
-      },
-      "viewOptions": {
-        "doctors": "Afficher Médecins",
-        "doctorCentres": "Afficher Médecins Centre Examen"
-      },
-      "noUsersFound": "Aucun utilisateur trouvé",
-      "noEmail": "Ce patient n'a pas d'e-mail",
-      "status": {
-        "active": "Actif",
-        "inactive": "Inactif"
-      },
-      "buttons": {
-        "edit": "Modifier",
-        "delete": "Supprimer",
-        "activate": "Activer",
-        "deactivate": "Désactiver"
-      },
-      "alerts": {
-        "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
-        "fetchFailed": {
-          "auth": "Accès refusé ou session expirée. Veuillez vous reconnecter.",
-          "generic": "Échec du chargement des données utilisateur. Veuillez réessayer plus tard."
-        },
-        "deleteFailed": {
-          "noCurrentUser": "Détails de l'utilisateur actuel non disponibles. Veuillez patienter ou essayer de vous reconnecter.",
-          "missingUserInfo": "Informations essentielles de l'utilisateur manquantes dans les détails. Veuillez patienter ou essayer de vous reconnecter.",
-          "missingUserId": "ID de l'utilisateur actuel manquant dans les détails. Veuillez patienter ou essayer de vous reconnecter.",
-          "missingUserRoles": "Rôles de l'utilisateur actuel manquants dans les détails. Veuillez patienter ou essayer de vous reconnecter.",
-          "missingCabinetInfo": "Impossible d'effectuer l'action : Vos informations de cabinet sont manquantes.",
-          "permissionOrMissingCabinet": "Vous n'avez pas la permission de supprimer des utilisateurs ou votre ID de cabinet est manquant.",
-          "auth": "Permission refusée ou session expirée.",
-          "notFound": "Utilisateur ou enregistrement introuvable.",
-          "generic": "Échec de l'opération de suppression. Veuillez réessayer plus tard.",
-          "invalidViewOrPermission": "Impossible de supprimer : Type de vue invalide ou permissions insuffisantes."
-        },
-        "deleteSuccess": {
-          "admin": "Utilisateur supprimé avec succès.",
-          "doctorAssistant": "Enregistrement de l'utilisateur supprimé de ce cabinet avec succès.",
-          "doctorCentre": "Médecin du Centre d'Examen supprimé avec succès."
-        },
-        "sessionInvalid": "Session invalide. Veuillez vous reconnecter.",
-        "toggleFailed": {
-          "missingCabinetInfo": "Impossible de basculer le statut du patient : Vos informations de cabinet sont manquantes.",
-          "adminPatientLimitation": "Le rôle Admin ne peut pas utiliser ce bouton de bascule pour les patients sans spécifier un cabinet cible (amélioration de l'interface utilisateur nécessaire).",
-          "invalidRole": "Impossible de basculer le statut pour le rôle utilisateur : {{role}}",
-          "authWithMessage": "Permission refusée ou session expirée : {{message}}",
-          "notFoundWithMessage": "Introuvable : {{message}}",
-          "badRequestWithMessage": "Mauvaise requête : {{message}}",
-          "genericWithMessage": "Échec du basculement du statut : {{message}}",
-          "networkError": "Échec du basculement du statut {{role}} en raison d'une erreur réseau ou inattendue.",
-          "invalidViewOrPermission": "Impossible de basculer le statut : Type de vue invalide ou permissions insuffisantes."
-        },
-        "toggleSuccess": "Statut {{role}} basculé avec succès. Nouveau statut : {{status}}.",
-        "toggleSuccessDoctorCentre": "Statut du Médecin du Centre d'Examen (ID : {{userId}}) basculé avec succès. Nouveau statut : {{status}}."
-      },
-      "confirmations": {
-        "deleteAdmin": "Êtes-vous sûr de vouloir supprimer définitivement l'utilisateur ID {{userId}} et tous ses enregistrements ?",
-        "deleteDoctorAssistant": "Êtes-vous sûr de vouloir supprimer l'enregistrement de l'utilisateur ID {{userId}} de votre cabinet (ID : {{cabinetId}}) ?",
-        "deleteDoctorCentre": "Êtes-vous sûr de vouloir supprimer définitivement le Médecin du Centre d'Examen ID {{userId}} ?",
-        "activatePatient": "Êtes-vous sûr de vouloir activer le patient ID {{userId}} dans le cabinet {{cabinetId}} ?",
-        "deactivatePatient": "Êtes-vous sûr de vouloir désactiver le patient ID {{userId}} dans le cabinet {{cabinetId}} ?",
-        "activateDoctorAssistant": "Êtes-vous sûr de vouloir activer {{role}} ID {{userId}} ?",
-        "deactivateDoctorAssistant": "Êtes-vous sûr de vouloir désactiver {{role}} ID {{userId}} ?",
-        "activateDoctorCentre": "Êtes-vous sûr de vouloir activer le Médecin du Centre d'Examen ID {{userId}} ?",
-        "deactivateDoctorCentre": "Êtes-vous sûr de vouloir désactiver le Médecin du Centre d'Examen ID {{userId}} ?"
-      }
-    },
-    "editDoctorCentreForm": {
-        "title": "Modifier Médecin Centre Examen",
-        "loading": "Chargement données médecin...",
-        "labels": {
-          "firstName": "Prénom",
-          "lastName": "Nom",
-          "birthDate": "Date de Naissance",
-          "tel": "Téléphone",
-          "address": "Adresse",
-          "gender": "Genre",
-          "speciality": "Spécialité"
-        },
-        "genderOptions": {
-          "select": "Sélectionnez Genre...",
-          "male": "Homme",
-          "female": "Femme",
-          "other": "Autre"
-        },
-        "buttons": {
-          "updating": "Mise à jour...",
-          "update": "Mettre à jour Médecin",
-          "cancel": "Annuler"
-        },
-        "alerts": {
-          "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
-          "updateSuccess": "Détails du médecin mis à jour avec succès !"
-        },
-        "errors": {
-          "fetchFailed": "Échec du chargement des données du médecin.",
-          "updateFailed": "Échec de la mise à jour des détails du médecin"
-        }
-    },
-    "tovalidate": {
-      "title": "Utilisateurs en attente de validation",
-      "searchPlaceholder": "Rechercher par prénom et nom (ex: Jean Dupont)",
-      "loading": "Chargement...",
-      "tableHeaders": {
-        "id": "ID",
-        "firstName": "Prénom",
-        "lastName": "Nom",
-        "email": "E-mail",
-        "role": "Rôle",
-        "status": "Statut",
-        "actions": "Actions"
-      },
-      "noUsersFound": "Aucun utilisateur en attente de validation trouvé",
-      "status": {
-        "active": "Actif",
-        "inactivePending": "Inactif/En attente"
-      },
-      "buttons": {
-        "activate": "Activer",
+        "updating": "Mise à jour...",
+        "update": "Mettre à jour Médecin",
         "cancel": "Annuler"
-      },
-      "alerts": {
-        "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
-        "fetchFailed": {
-          "auth": "Accès refusé ou session expirée. Veuillez vous reconnecter.",
-          "adminEndpointMissing": "Échec du chargement des utilisateurs inactifs : Le point de terminaison Admin pourrait ne pas être disponible.",
-          "generic": "Échec du chargement des données utilisateur inactives. Veuillez réessayer plus tard."
-        },
-        "deleteFailed": {
-          "noCurrentUser": "Détails de l'utilisateur actuel non entièrement chargés. Veuillez patienter ou essayer de vous reconnecter.",
-          "sessionInvalid": "Session invalide. Veuillez vous reconnecter.",
-          "missingCabinetInfo": "Impossible d'effectuer l'action : Vos informations de cabinet sont manquantes.",
-          "adminLimitation": "L'administrateur ne peut pas annuler l'enregistrement directement depuis cet écran sans contexte de cabinet (amélioration de l'interface utilisateur nécessaire). Utilisez l'écran principal de gestion des utilisateurs si applicable.",
-          "authWithMessage": "Permission refusée ou session expirée : {{message}}",
-          "notFoundWithMessage": "Introuvable : {{message}}",
-          "genericWithMessage": "Échec de la suppression de l'enregistrement : {{message}}",
-          "networkError": "Échec de la suppression de l'enregistrement en raison d'une erreur réseau ou inattendue."
-        },
-        "deleteSuccess": "Demande d'enregistrement de l'utilisateur annulée (supprimée).",
-        "activateFailed": {
-          "noCurrentUser": "Détails de l'utilisateur actuel non entièrement chargés. Veuillez patienter ou essayer de vous reconnecter.",
-          "permission": "Seuls les médecins ou assistants associés à un cabinet peuvent confirmer les enregistrements depuis cet écran.",
-          "stillInactive": "Statut du patient basculé, mais il est toujours inactif. Veuillez vérifier les détails.",
-          "authWithMessage": "Permission refusée ou session expirée : {{message}}",
-          "notFoundWithMessage": "Introuvable : {{message}}",
-          "badRequestWithMessage": "Mauvaise requête : {{message}}",
-          "genericWithMessage": "Échec de l'activation du patient : {{message}}",
-          "networkError": "Échec de l'activation du patient en raison d'une erreur réseau ou inattendue."
-        },
-        "activateSuccess": "Le patient a été activé avec succès.",
-        "toggleFailed": {
-          "noCurrentUser": "Détails de l'utilisateur actuel non entièrement chargés. Veuillez patienter ou essayer de vous reconnecter.",
-          "sessionInvalid": "Session invalide. Veuillez vous reconnecter.",
-          "missingCabinetInfo": "Impossible de basculer le statut du patient : Vos informations de cabinet sont manquantes.",
-          "adminLimitation": "Le rôle Admin ne peut pas utiliser ce bouton de bascule pour les patients sans spécifier un cabinet cible (amélioration de l'interface utilisateur nécessaire).",
-          "invalidRole": "Impossible de basculer le statut pour le rôle utilisateur : {{role}}",
-          "authWithMessage": "Permission refusée ou session expirée : {{message}}",
-          "notFoundWithMessage": "Introuvable : {{message}}",
-          "badRequestWithMessage": "Mauvaise requête : {{message}}",
-          "genericWithMessage": "Échec du basculement du statut : {{message}}",
-          "networkError": "Échec du basculement du statut {{role}} en raison d'une erreur réseau ou inattendue."
-        },
-        "toggleSuccess": "Statut {{role}} basculé avec succès. Nouveau statut : {{status}}."
-      },
-      "confirmations": {
-        "deleteRegistration": "Êtes-vous sûr de vouloir supprimer la demande d'enregistrement de l'utilisateur ID {{userId}} de votre cabinet (ID : {{cabinetId}}) ?",
-        "activatePatient": "Êtes-vous sûr de vouloir activer le patient ID {{patientId}} dans votre cabinet ({{cabinetId}}) ?",
-        "toggleDoctorAssistant": "Êtes-vous sûr de vouloir basculer le statut actif pour {{role}} ID {{userId}} ? (Cet utilisateur pourrait être retiré de cette liste s'il est activé)"
-      },
-      "status": {
-          "active": "Actif",
-          "inactive": "Inactif"
-      }
-    },
-    "activation": {
-      "title": "Gestion de l'Activation des Médecins",
-      "searchPlaceholder": "Rechercher par nom ou email...",
-      "loading": "Chargement...",
-      "unknownCentre": "N/D",
-      "tableHeaders": {
-        "id": "ID",
-        "firstName": "Prénom",
-        "lastName": "Nom",
-        "email": "Email",
-        "speciality": "Spécialité",
-        "centre": "Centre d'Examen",
-        "status": "Statut",
-        "actions": "Actions"
-      },
-      "noDoctorsFound": "Aucun médecin inactif trouvé.",
-      "status": {
-        "active": "Actif",
-        "inactive": "Inactif",
-        "inactivePending": "En attente d'activation"
-      },
-      "buttons": {
-        "activate": "Confirmer",
-        "cancel": "Annuler",
-        "activateTooltip": "Activer ce médecin",
-        "cancelTooltip": "Supprimer l'inscription de ce médecin"
       },
       "alerts": {
         "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
-        "accessDenied": "Accès Refusé. Seuls les administrateurs peuvent voir cette page.",
+        "updateSuccess": "Détails du médecin mis à jour avec succès !"
+      },
+      "errors": {
+        "fetchFailed": "Échec du chargement des données du médecin.",
+        "updateFailed": "Échec de la mise à jour des détails du médecin"
+      }
+  },
+  "tovalidate": {
+    "title": "Utilisateurs en attente de validation",
+    "searchPlaceholder": "Rechercher par prénom et nom (ex: Jean Dupont)",
+    "loading": "Chargement...",
+    "tableHeaders": {
+      "id": "ID",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "E-mail",
+      "role": "Rôle",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "noUsersFound": "Aucun utilisateur en attente de validation trouvé",
+    "status": {
+      "active": "Actif",
+      "inactivePending": "Inactif/En attente"
+    },
+    "buttons": {
+      "activate": "Activer",
+      "cancel": "Annuler"
+    },
+    "alerts": {
+      "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
+      "fetchFailed": {
+        "auth": "Accès refusé ou session expirée. Veuillez vous reconnecter.",
+        "adminEndpointMissing": "Échec du chargement des utilisateurs inactifs : Le point de terminaison Admin pourrait ne pas être disponible.",
+        "generic": "Échec du chargement des données utilisateur inactives. Veuillez réessayer plus tard."
+      },
+      "deleteFailed": {
+        "noCurrentUser": "Détails de l'utilisateur actuel non entièrement chargés. Veuillez patienter ou essayer de vous reconnecter.",
         "sessionInvalid": "Session invalide. Veuillez vous reconnecter.",
-        "fetchFailed": {
-          "auth": "Échec d'authentification ou session expirée. Veuillez vous connecter.",
-          "generic": "Échec du chargement des médecins inactifs. Veuillez réessayer plus tard."
-        },
-        "deleteFailed": {
-          "permission": "Permission refusée. Seuls les administrateurs peuvent supprimer des médecins.",
-          "generic": "Échec de la suppression du médecin.",
-          "authWithMessage": "Erreur d'authentification : {{message}}",
-          "notFoundWithMessage": "Introuvable : {{message}}",
-          "genericWithMessage": "Erreur lors de la suppression du médecin : {{message}}"
-        },
-        "deleteSuccess": "Inscription du médecin supprimée avec succès.",
-        "toggleFailed": {
-          "permission": "Permission refusée. Seuls les administrateurs peuvent changer le statut.",
-          "generic": "Échec du changement de statut du médecin.",
-          "authWithMessage": "Erreur d'authentification : {{message}}",
-          "notFoundWithMessage": "Introuvable : {{message}}",
-          "genericWithMessage": "Erreur lors du changement de statut : {{message}}"
-        },
-        "toggleSuccess": "Statut du médecin mis à jour avec succès. Nouveau statut : {{status}}."
+        "missingCabinetInfo": "Impossible d'effectuer l'action : Vos informations de cabinet sont manquantes.",
+        "adminLimitation": "L'administrateur ne peut pas annuler l'enregistrement directement depuis cet écran sans contexte de cabinet (amélioration de l'interface utilisateur nécessaire). Utilisez l'écran principal de gestion des utilisateurs si applicable.",
+        "authWithMessage": "Permission refusée ou session expirée : {{message}}",
+        "notFoundWithMessage": "Introuvable : {{message}}",
+        "genericWithMessage": "Échec de la suppression de l'enregistrement : {{message}}",
+        "networkError": "Échec de la suppression de l'enregistrement en raison d'une erreur réseau ou inattendue."
       },
-      "confirmations": {
-        "deleteDoctor": "Êtes-vous sûr de vouloir supprimer définitivement l'inscription du médecin ID {{doctorId}} ?",
-        "activateDoctor": "Êtes-vous sûr de vouloir activer le médecin ID {{doctorId}} ?"
+      "deleteSuccess": "Demande d'enregistrement de l'utilisateur annulée (supprimée).",
+      "activateFailed": {
+        "noCurrentUser": "Détails de l'utilisateur actuel non entièrement chargés. Veuillez patienter ou essayer de vous reconnecter.",
+        "permission": "Seuls les médecins ou assistants associés à un cabinet peuvent confirmer les enregistrements depuis cet écran.",
+        "stillInactive": "Statut du patient basculé, mais il est toujours inactif. Veuillez vérifier les détails.",
+        "authWithMessage": "Permission refusée ou session expirée : {{message}}",
+        "notFoundWithMessage": "Introuvable : {{message}}",
+        "badRequestWithMessage": "Mauvaise requête : {{message}}",
+        "genericWithMessage": "Échec de l'activation du patient : {{message}}",
+        "networkError": "Échec de l'activation du patient en raison d'une erreur réseau ou inattendue."
+      },
+      "activateSuccess": "Le patient a été activé avec succès.",
+      "toggleFailed": {
+        "noCurrentUser": "Détails de l'utilisateur actuel non entièrement chargés. Veuillez patienter ou essayer de vous reconnecter.",
+        "sessionInvalid": "Session invalide. Veuillez vous reconnecter.",
+        "missingCabinetInfo": "Impossible de basculer le statut du patient : Vos informations de cabinet sont manquantes.",
+        "adminLimitation": "Le rôle Admin ne peut pas utiliser ce bouton de bascule pour les patients sans spécifier un cabinet cible (amélioration de l'interface utilisateur nécessaire).",
+        "invalidRole": "Impossible de basculer le statut pour le rôle utilisateur : {{role}}",
+        "authWithMessage": "Permission refusée ou session expirée : {{message}}",
+        "notFoundWithMessage": "Introuvable : {{message}}",
+        "badRequestWithMessage": "Mauvaise requête : {{message}}",
+        "genericWithMessage": "Échec du basculement du statut : {{message}}",
+        "networkError": "Échec du basculement du statut {{role}} en raison d'une erreur réseau ou inattendue."
+      },
+      "toggleSuccess": "Statut {{role}} basculé avec succès. Nouveau statut : {{status}}."
+    },
+    "confirmations": {
+      "deleteRegistration": "Êtes-vous sûr de vouloir supprimer la demande d'enregistrement de l'utilisateur ID {{userId}} de votre cabinet (ID : {{cabinetId}}) ?",
+      "activatePatient": "Êtes-vous sûr de vouloir activer le patient ID {{patientId}} dans votre cabinet ({{cabinetId}}) ?",
+      "toggleDoctorAssistant": "Êtes-vous sûr de vouloir basculer le statut actif pour {{role}} ID {{userId}} ? (Cet utilisateur pourrait être retiré de cette liste s'il est activé)"
+    },
+    "status": {
+        "active": "Actif",
+        "inactive": "Inactif"
+    }
+  },
+  "activation": {
+    "title": "Gestion de l'Activation des Médecins",
+    "searchPlaceholder": "Rechercher par nom ou email...",
+    "loading": "Chargement...",
+    "unknownCentre": "N/D",
+    "tableHeaders": {
+      "id": "ID",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "speciality": "Spécialité",
+      "centre": "Centre d'Examen",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "noDoctorsFound": "Aucun médecin inactif trouvé.",
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "inactivePending": "En attente d'activation"
+    },
+    "buttons": {
+      "activate": "Confirmer",
+      "cancel": "Annuler",
+      "activateTooltip": "Activer ce médecin",
+      "cancelTooltip": "Supprimer l'inscription de ce médecin"
+    },
+    "alerts": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+      "accessDenied": "Accès Refusé. Seuls les administrateurs peuvent voir cette page.",
+      "sessionInvalid": "Session invalide. Veuillez vous reconnecter.",
+      "fetchFailed": {
+        "auth": "Échec d'authentification ou session expirée. Veuillez vous connecter.",
+        "generic": "Échec du chargement des médecins inactifs. Veuillez réessayer plus tard."
+      },
+      "deleteFailed": {
+        "permission": "Permission refusée. Seuls les administrateurs peuvent supprimer des médecins.",
+        "generic": "Échec de la suppression du médecin.",
+        "authWithMessage": "Erreur d'authentification : {{message}}",
+        "notFoundWithMessage": "Introuvable : {{message}}",
+        "genericWithMessage": "Erreur lors de la suppression du médecin : {{message}}"
+      },
+      "deleteSuccess": "Inscription du médecin supprimée avec succès.",
+      "toggleFailed": {
+        "permission": "Permission refusée. Seuls les administrateurs peuvent changer le statut.",
+        "generic": "Échec du changement de statut du médecin.",
+        "authWithMessage": "Erreur d'authentification : {{message}}",
+        "notFoundWithMessage": "Introuvable : {{message}}",
+        "genericWithMessage": "Erreur lors du changement de statut : {{message}}"
+      },
+      "toggleSuccess": "Statut du médecin mis à jour avec succès. Nouveau statut : {{status}}."
+    },
+    "confirmations": {
+      "deleteDoctor": "Êtes-vous sûr de vouloir supprimer définitivement l'inscription du médecin ID {{doctorId}} ?",
+      "activateDoctor": "Êtes-vous sûr de vouloir activer le médecin ID {{doctorId}} ?"
+    }
+  },
+  "changeRole": {
+    "title": "Gestion des rôles utilisateur",
+    "searchPlaceholder": "Rechercher par nom et prénom",
+    "loading": "Chargement...",
+    "errorPrefix": "Erreur",
+    "tableHeaders": {
+      "name": "Nom",
+      "email": "E-mail",
+      "role": "Rôle",
+      "transfer": "Transfert"
+    },
+    "noUsersFound": "Aucun utilisateur trouvé",
+    "noEmail": "Ce patient n'a pas d'e-mail",
+    "noRegistrations": "Aucun enregistrement de cabinet",
+    "roleOptions": {
+      "select": "-- Sélectionner le rôle --",
+      "doctor": "DOCTOR",
+      "assistant": "ASSISTANT"
+    },
+    "cabinetOptions": {
+      "select": "-- Sélectionner le cabinet --",
+      "cabinetId": "Cabinet ID : {{id}}"
+    },
+    "buttons": {
+      "changeToAssistant": "Changer en Assistant"
+    },
+    "tooltips": {
+      "selectCabinetFirst": "Sélectionnez d'abord un cabinet cible",
+      "missingCabinetInfo": "Vos informations de cabinet sont manquantes"
+    },
+    "alerts": {
+      "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
+      "transferFailed": {
+        "permissionDeniedAction": "Vous n'avez pas la permission d'effectuer cette action.",
+        "wrongCabinet": "Vous ne pouvez transférer des patients que dans votre propre cabinet."
+      },
+      "transferSuccess": "Patient transféré avec succès vers le rôle {{role}}. Nouvel ID utilisateur : {{newUserId}}"
+    },
+    "errors": {
+      "fetch": {
+        "permissionDeniedView": "Vous n'avez pas la permission de voir les données des patients.",
+        "auth": "Accès refusé ou session expirée.",
+        "generic": "Échec du chargement des données patient. Veuillez réessayer plus tard."
+      },
+      "transfer": {
+        "generic": "Échec du transfert du patient vers le rôle {{role}}. Veuillez réessayer plus tard.",
+        "authWithMessage": "Permission refusée ou session expirée : {{message}}",
+        "notFoundWithMessage": "Introuvable : {{message}}",
+        "badRequestWithMessage": "Mauvaise requête : {{message}}",
+        "conflictWithMessage": "Conflit : {{message}}",
+        "otherErrorWithMessage": "Erreur ({{status}}) : {{message}}"
       }
     },
-    "changeRole": {
-      "title": "Gestion des rôles utilisateur",
-      "searchPlaceholder": "Rechercher par nom et prénom",
-      "loading": "Chargement...",
-      "errorPrefix": "Erreur",
-      "tableHeaders": {
-        "name": "Nom",
-        "email": "E-mail",
-        "role": "Rôle",
-        "transfer": "Transfert"
-      },
-      "noUsersFound": "Aucun utilisateur trouvé",
-      "noEmail": "Ce patient n'a pas d'e-mail",
-      "noRegistrations": "Aucun enregistrement de cabinet",
-      "roleOptions": {
-        "select": "-- Sélectionner le rôle --",
-        "doctor": "DOCTOR",
-        "assistant": "ASSISTANT"
-      },
-      "cabinetOptions": {
-        "select": "-- Sélectionner le cabinet --",
-        "cabinetId": "Cabinet ID : {{id}}"
-      },
-      "buttons": {
-        "changeToAssistant": "Changer en Assistant"
-      },
-      "tooltips": {
-        "selectCabinetFirst": "Sélectionnez d'abord un cabinet cible",
-        "missingCabinetInfo": "Vos informations de cabinet sont manquantes"
-      },
-      "alerts": {
-        "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
-        "transferFailed": {
-          "permissionDeniedAction": "Vous n'avez pas la permission d'effectuer cette action.",
-          "wrongCabinet": "Vous ne pouvez transférer des patients que dans votre propre cabinet."
-        },
-        "transferSuccess": "Patient transféré avec succès vers le rôle {{role}}. Nouvel ID utilisateur : {{newUserId}}"
-      },
-      "errors": {
-        "fetch": {
-          "permissionDeniedView": "Vous n'avez pas la permission de voir les données des patients.",
-          "auth": "Accès refusé ou session expirée.",
-          "generic": "Échec du chargement des données patient. Veuillez réessayer plus tard."
-        },
-        "transfer": {
-          "generic": "Échec du transfert du patient vers le rôle {{role}}. Veuillez réessayer plus tard.",
-          "authWithMessage": "Permission refusée ou session expirée : {{message}}",
-          "notFoundWithMessage": "Introuvable : {{message}}",
-          "badRequestWithMessage": "Mauvaise requête : {{message}}",
-          "conflictWithMessage": "Conflit : {{message}}",
-          "otherErrorWithMessage": "Erreur ({{status}}) : {{message}}"
-        }
-      },
-      "confirmations": {
-        "transfer": "Êtes-vous sûr de vouloir transférer le patient {{firstName}} {{lastName}} (ID : {{userId}}) vers le rôle {{role}} dans le cabinet ID {{cabinetId}} ?"
-      },
-      "buttons": {
-        "changeToDoctor": "Changer en Médecin",
-        "changeToAssistant": "Changer en Assistant"
-      }
+    "confirmations": {
+      "transfer": "Êtes-vous sûr de vouloir transférer le patient {{firstName}} {{lastName}} (ID : {{userId}}) vers le rôle {{role}} dans le cabinet ID {{cabinetId}} ?"
     },
-    "changePassword": {
-      "title": "Changer le mot de passe",
-      "labels": {
-        "oldPassword": "Ancien mot de passe",
-        "newPassword": "Nouveau mot de passe",
-        "confirmPassword": "Confirmer le nouveau mot de passe"
-      },
-      "placeholders": {
-        "oldPassword": "Entrez votre mot de passe actuel",
-        "newPassword": "Entrez le nouveau mot de passe (min. 8 caractères)",
-        "confirmPassword": "Confirmez le nouveau mot de passe"
-      },
-      "buttons": {
-        "changing": "Changement...",
-        "changePassword": "Changer le mot de passe"
-      },
-      "alerts": {
-        "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
-        "success": "Mot de passe changé avec succès !"
-      },
-      "errors": {
-        "passwordsMismatch": "Les nouveaux mots de passe ne correspondent pas.",
-        "passwordTooShort": "Le nouveau mot de passe doit comporter au moins 8 caractères.",
-        "authRequired": "Authentification requise. Veuillez vous reconnecter.",
-        "generic": "Échec du changement de mot de passe."
-      }
+    "buttons": {
+      "changeToDoctor": "Changer en Médecin",
+      "changeToAssistant": "Changer en Assistant"
+    }
+  },
+  "changePassword": {
+    "title": "Changer le mot de passe",
+    "labels": {
+      "oldPassword": "Ancien mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le nouveau mot de passe"
     },
-    "logout": {
-      "dialog": {
-        "title": "Confirmer la déconnexion",
-        "confirmationText": "Êtes-vous sûr de vouloir vous déconnecter ?",
-        "cancelButton": "Annuler",
-        "logoutButton": "Déconnexion"
-      }
+    "placeholders": {
+      "oldPassword": "Entrez votre mot de passe actuel",
+      "newPassword": "Entrez le nouveau mot de passe (min. 8 caractères)",
+      "confirmPassword": "Confirmez le nouveau mot de passe"
     },
-    "home": {
-      "slider": {
-        "title": "Votre Solution Moderne de Gestion de Cabinet Médical",
-        "subtitle": "TuniCare",
-        "description": "Simplifiez les rendez-vous, gérez les consultations, suivez les examens et générez des rapports médicaux sans effort. Concentrez-vous sur les soins aux patients, laissez TuniCare s'occuper du reste.",
-        "contactButton": "En savoir plus"
-      },
-      "bookAppointment": {
-          "title": "Prendre",
-          "titleHighlight": "Rendez-vous",
-          "doctorPlaceholder": "Sélectionner un médecin",
-          "departmentPlaceholder": "Sélectionner un département",
-          "phonePlaceholder": "Entrez le numéro de téléphone",
-          "symptomsPlaceholder": "Entrez les symptômes"
-      },
-      "about": {
-        "title": "À propos de",
-        "subtitle": "TuniCare",
-        "description": "TuniCare est une plateforme complète conçue pour simplifier les opérations quotidiennes des cabinets médicaux. De la planification des rendez-vous et la gestion des dossiers patients à la gestion des consultations et la génération de rapports détaillés, notre objectif est de fournir aux professionnels de la santé les outils dont ils ont besoin pour dispenser des soins efficaces.",
-        "readMoreButton": "Lire la suite"
-      },
-      "features": {
-        "title": "Fonctionnalités de",
-        "subtitle": "l'Application",
-        "appointments": {
-          "title": "Planification des rendez-vous",
-          "description": "Réservez, reprogrammez et gérez facilement les rendez-vous des patients grâce à notre système de calendrier intuitif."
-        },
-        "consultations": {
-          "title": "Gestion des consultations",
-          "description": "Enregistrez efficacement les détails des consultations, les diagnostics, les prescriptions et les plans de suivi."
-        },
-        "exams": {
-          "title": "Suivi des examens",
-          "description": "Suivez les examens médicaux, les résultats et les documents associés pour chaque patient."
-        },
-        "reports": {
-          "title": "Rapports médicaux",
-          "description": "Générez facilement des rapports médicaux complets et des résumés."
-        },
-        "readMoreButton": "Lire la suite"
-      },
-      "doctors": {
-          "title": "Nos",
-          "titleHighlight": "Médecins",
-          "doctor1": { "name": "Dr Hennry", "specialty": "Cardiologie" },
-          "doctor2": { "name": "Dr Jenni", "specialty": "Pédiatrie" },
-          "doctor3": { "name": "Dr Morco", "specialty": "Neurologie" }
-      }
+    "buttons": {
+      "changing": "Changement...",
+      "changePassword": "Changer le mot de passe"
     },
-    "testimonialTitle": "Témoignage Patient",
-    "testimonialTitleHighlight": "Témoignage",
-    "testimonial1Text": "TuniCare a révolutionné la gestion de notre cabinet. La planification est un jeu d'enfant et l'accès aux dossiers patients est plus rapide que jamais. Fortement recommandé !",
-    "testimonial1Author": "Gestionnaire de clinique satisfait",
-    "testimonial1Location": "Clinique de la ville",
-    "testimonial2Text": "Les fonctionnalités de gestion des consultations sont fantastiques. Cela nous aide à tout suivre efficacement et améliore le suivi des patients.",
-    "testimonial2Author": "Dr Smith",
-    "testimonial2Location": "Médecine générale",
-    "testimonial3Text": "La génération de rapports prenait des heures, maintenant ce n'est plus que quelques clics. Un vrai gain de temps pour notre personnel administratif !",
-    "testimonial3Author": "Assistant médical",
-    "testimonial3Location": "Centre spécialisé",
-    "contactTitle": "Contactez",
-    "contactTitleHighlight": "Nous",
-    "contactNamePlaceholder": "Entrez votre nom complet",
-    "contactEmailPlaceholder": "Entrez votre email",
-    "contactPhonePlaceholder": "Entrez votre numéro de téléphone",
-    "contactMessagePlaceholder": "Entrez votre message",
-    "footer": {
-      "addressTitle": "Adresse",
-      "addressLine1": "123 rue de la Santé, MedCity",
-      "phone": "+01 1234567890",
-      "email": "info@tunicare.com",
-      "linksTitle": "Liens Utiles",
-      "homeLink": "Accueil",
-      "aboutLink": "À propos",
-      "servicesLink": "Fonctionnalités",
-      "whyUsLink": "Pourquoi nous",
-      "teamLink": "Équipe",
-      "postsTitle": "Dernières Mises à Jour",
-      "post1Title": "Nouvelle Fonctionnalité : Téléconsultation",
-      "post1Author": "Équipe TuniCare",
-      "post1Date": "10 Avr 2025",
-      "post2Title": "Module de Rapports Amélioré",
-      "post2Author": "Équipe TuniCare",
-      "post2Date": "05 Avr 2025",
-      "post3Title": "Améliorations de l'Interface Utilisateur",
-      "post3Author": "Équipe TuniCare",
-      "post3Date": "01 Avr 2025",
-      "newsTitle": "Newsletter",
-      "newsText": "Abonnez-vous à notre newsletter pour les dernières mises à jour et fonctionnalités.",
-      "subscribePlaceholder": "Entrez votre email",
-      "subscribeButton": "S'abonner",
-      "copyright": "© {{year}} Tous droits réservés par",
-      "copyrightLinkText": "Plateforme TuniCare"
+    "alerts": {
+      "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
+      "success": "Mot de passe changé avec succès !"
     },
-    "registration": {
-      "title": "Inscription Patient",
-      "errorTitle": "Erreur d'inscription",
-      "invalidLinkMessage": "Lien d'inscription invalide. Veuillez utiliser une URL d'inscription valide fournie par votre clinique.",
-      "contactAdminMessage": "Veuillez contacter l'administrateur de votre clinique pour obtenir de l'aide.",
-      "firstNameLabel": "Prénom",
-      "firstNamePlaceholder": "Entrez le prénom",
-      "lastNameLabel": "Nom",
-      "lastNamePlaceholder": "Entrez le nom",
-      "emailLabel": "Email",
-      "emailPlaceholder": "Entrez l'adresse email",
-      "birthDateLabel": "Date de naissance",
-      "telephoneLabel": "Téléphone",
-      "telephonePlaceholder": "Entrez le numéro de téléphone (facultatif)",
-      "addressLabel": "Adresse",
-      "addressPlaceholder": "Entrez l'adresse (facultatif)",
-      "photoLabel": "Photo de profil (Facultatif)",
-      "genderLabel": "Genre",
-      "selectGender": "Sélectionnez le genre...",
-      "genderMale": "Homme",
-      "genderFemale": "Femme",
-      "genderOther": "Autre",
-      "specialityLabel": "Spécialité",
-      "passwordLabel": "Mot de passe",
-      "passwordPlaceholder": "Entrez le mot de passe",
-      "passwordStrengthLabel": "Force du mot de passe : {{strength}}",
-      "passwordStrengthWeak": "Faible",
-      "passwordStrengthStrong": "Fort",
-      "confirmPasswordLabel": "Confirmer le mot de passe",
-      "confirmPasswordPlaceholder": "Confirmez le mot de passe",
-      "checkingButton": "Vérification...",
-      "processingButton": "Traitement...",
-      "registerButton": "S'inscrire",
-      "emailVerificationTitle": "Vérification d'Email",
-      "emailVerificationMessage": "Nous avons envoyé un code de vérification à {{email}}. Veuillez vérifier votre boîte de réception.",
-      "verificationCodePlaceholder": "Entrez le code à 6 chiffres",
-      "verifyButton": "Vérifier le compte",
-      "tryAgainButton": "Réessayer"
+    "errors": {
+      "passwordsMismatch": "Les nouveaux mots de passe ne correspondent pas.",
+      "passwordTooShort": "Le nouveau mot de passe doit comporter au moins 8 caractères.",
+      "authRequired": "Authentification requise. Veuillez vous reconnecter.",
+      "generic": "Échec du changement de mot de passe."
+    }
+  },
+  "logout": {
+    "dialog": {
+      "title": "Confirmer la déconnexion",
+      "confirmationText": "Êtes-vous sûr de vouloir vous déconnecter ?",
+      "cancelButton": "Annuler",
+      "logoutButton": "Déconnexion"
+    }
+  },
+  "home": {
+    "slider": {
+      "title": "Votre Solution Moderne de Gestion de Cabinet Médical",
+      "subtitle": "TuniCare",
+      "description": "Simplifiez les rendez-vous, gérez les consultations, suivez les examens et générez des rapports médicaux sans effort. Concentrez-vous sur les soins aux patients, laissez TuniCare s'occuper du reste.",
+      "contactButton": "En savoir plus"
+    },
+    "bookAppointment": {
+        "title": "Prendre",
+        "titleHighlight": "Rendez-vous",
+        "doctorPlaceholder": "Sélectionner un médecin",
+        "departmentPlaceholder": "Sélectionner un département",
+        "phonePlaceholder": "Entrez le numéro de téléphone",
+        "symptomsPlaceholder": "Entrez les symptômes"
+    },
+    "about": {
+      "title": "À propos de",
+      "subtitle": "TuniCare",
+      "description": "TuniCare est une plateforme complète conçue pour simplifier les opérations quotidiennes des cabinets médicaux. De la planification des rendez-vous et la gestion des dossiers patients à la gestion des consultations et la génération de rapports détaillés, notre objectif est de fournir aux professionnels de la santé les outils dont ils ont besoin pour dispenser des soins efficaces.",
+      "readMoreButton": "Lire la suite"
+    },
+    "features": {
+      "title": "Fonctionnalités de",
+      "subtitle": "l'Application",
+      "appointments": {
+        "title": "Planification des rendez-vous",
+        "description": "Réservez, reprogrammez et gérez facilement les rendez-vous des patients grâce à notre système de calendrier intuitif."
+      },
+      "consultations": {
+        "title": "Gestion des consultations",
+        "description": "Enregistrez efficacement les détails des consultations, les diagnostics, les prescriptions et les plans de suivi."
+      },
+      "exams": {
+        "title": "Suivi des examens",
+        "description": "Suivez les examens médicaux, les résultats et les documents associés pour chaque patient."
+      },
+      "reports": {
+        "title": "Rapports médicaux",
+        "description": "Générez facilement des rapports médicaux complets et des résumés."
+      },
+      "readMoreButton": "Lire la suite"
+    },
+    "doctors": {
+        "title": "Nos",
+        "titleHighlight": "Médecins",
+        "doctor1": { "name": "Dr Hennry", "specialty": "Cardiologie" },
+        "doctor2": { "name": "Dr Jenni", "specialty": "Pédiatrie" },
+        "doctor3": { "name": "Dr Morco", "specialty": "Neurologie" }
+    }
+  },
+  "testimonialTitle": "Témoignage Patient",
+  "testimonialTitleHighlight": "Témoignage",
+  "testimonial1Text": "TuniCare a révolutionné la gestion de notre cabinet. La planification est un jeu d'enfant et l'accès aux dossiers patients est plus rapide que jamais. Fortement recommandé !",
+  "testimonial1Author": "Gestionnaire de clinique satisfait",
+  "testimonial1Location": "Clinique de la ville",
+  "testimonial2Text": "Les fonctionnalités de gestion des consultations sont fantastiques. Cela nous aide à tout suivre efficacement et améliore le suivi des patients.",
+  "testimonial2Author": "Dr Smith",
+  "testimonial2Location": "Médecine générale",
+  "testimonial3Text": "La génération de rapports prenait des heures, maintenant ce n'est plus que quelques clics. Un vrai gain de temps pour notre personnel administratif !",
+  "testimonial3Author": "Assistant médical",
+  "testimonial3Location": "Centre spécialisé",
+  "contactTitle": "Contactez",
+  "contactTitleHighlight": "Nous",
+  "contactNamePlaceholder": "Entrez votre nom complet",
+  "contactEmailPlaceholder": "Entrez votre email",
+  "contactPhonePlaceholder": "Entrez votre numéro de téléphone",
+  "contactMessagePlaceholder": "Entrez votre message",
+  "footer": {
+    "addressTitle": "Adresse",
+    "addressLine1": "123 rue de la Santé, MedCity",
+    "phone": "+01 1234567890",
+    "email": "info@tunicare.com",
+    "linksTitle": "Liens Utiles",
+    "homeLink": "Accueil",
+    "aboutLink": "À propos",
+    "servicesLink": "Fonctionnalités",
+    "whyUsLink": "Pourquoi nous",
+    "teamLink": "Équipe",
+    "postsTitle": "Dernières Mises à Jour",
+    "post1Title": "Nouvelle Fonctionnalité : Téléconsultation",
+    "post1Author": "Équipe TuniCare",
+    "post1Date": "10 Avr 2025",
+    "post2Title": "Module de Rapports Amélioré",
+    "post2Author": "Équipe TuniCare",
+    "post2Date": "05 Avr 2025",
+    "post3Title": "Améliorations de l'Interface Utilisateur",
+    "post3Author": "Équipe TuniCare",
+    "post3Date": "01 Avr 2025",
+    "newsTitle": "Newsletter",
+    "newsText": "Abonnez-vous à notre newsletter pour les dernières mises à jour et fonctionnalités.",
+    "subscribePlaceholder": "Entrez votre email",
+    "subscribeButton": "S'abonner",
+    "copyright": "© {{year}} Tous droits réservés par",
+    "copyrightLinkText": "Plateforme TuniCare"
+  },
+  "registration": {
+    "title": "Inscription Patient",
+    "errorTitle": "Erreur d'inscription",
+    "invalidLinkMessage": "Lien d'inscription invalide. Veuillez utiliser une URL d'inscription valide fournie par votre clinique.",
+    "contactAdminMessage": "Veuillez contacter l'administrateur de votre clinique pour obtenir de l'aide.",
+    "firstNameLabel": "Prénom",
+    "firstNamePlaceholder": "Entrez le prénom",
+    "lastNameLabel": "Nom",
+    "lastNamePlaceholder": "Entrez le nom",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Entrez l'adresse email",
+    "birthDateLabel": "Date de naissance",
+    "telephoneLabel": "Téléphone",
+    "telephonePlaceholder": "Entrez le numéro de téléphone (facultatif)",
+    "addressLabel": "Adresse",
+    "addressPlaceholder": "Entrez l'adresse (facultatif)",
+    "photoLabel": "Photo de profil (Facultatif)",
+    "genderLabel": "Genre",
+    "selectGender": "Sélectionnez le genre...",
+    "genderMale": "Homme",
+    "genderFemale": "Femme",
+    "genderOther": "Autre",
+    "specialityLabel": "Spécialité",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Entrez le mot de passe",
+    "passwordStrengthLabel": "Force du mot de passe : {{strength}}",
+    "passwordStrengthWeak": "Faible",
+    "passwordStrengthStrong": "Fort",
+    "confirmPasswordLabel": "Confirmer le mot de passe",
+    "confirmPasswordPlaceholder": "Confirmez le mot de passe",
+    "checkingButton": "Vérification...",
+    "processingButton": "Traitement...",
+    "registerButton": "S'inscrire",
+    "emailVerificationTitle": "Vérification d'Email",
+    "emailVerificationMessage": "Nous avons envoyé un code de vérification à {{email}}. Veuillez vérifier votre boîte de réception.",
+    "verificationCodePlaceholder": "Entrez le code à 6 chiffres",
+    "verifyButton": "Vérifier le compte",
+    "tryAgainButton": "Réessayer"
+  },
+  "validation": {
+    "firstNameRequired": "Le prénom est requis",
+    "lastNameRequired": "Le nom est requis",
+    "emailRequired": "L'email est requis",
+    "emailInvalid": "L'adresse email doit être valide",
+    "birthDateRequired": "La date de naissance est requise",
+    "phoneDigitsOnly": "Le numéro de téléphone ne doit contenir que des chiffres",
+    "genderRequired": "Le genre est requis",
+    "passwordRequired": "Le mot de passe est requis",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "captchaRequired": "Veuillez compléter le reCAPTCHA"
+  },
+  "confirmation": {
+    "successTitle": "Inscription Réussie",
+    "successMessage1": "Félicitations ! Votre inscription a été complétée avec succès.",
+    "successMessage2": "Nous vous remercions pour votre confiance.",
+    "redirectMessage": "Redirection dans {{count}}s..."
+  },
+  "addCabinet": {
+    "title": "Ajouter un Nouveau Cabinet",
+    "labels": {
+      "name": "Nom du Cabinet",
+      "address": "Adresse",
+      "telephone": "Téléphone",
+      "fax": "Fax",
+      "taxNumber": "Numéro Fiscal"
+    },
+    "placeholders": {
+      "name": "Entrez le nom du cabinet",
+      "address": "Entrez l'adresse du cabinet",
+      "telephone": "Entrez le numéro de téléphone (facultatif)",
+      "fax": "Entrez le numéro de fax (facultatif)",
+      "taxNumber": "Entrez le numéro fiscal (facultatif)"
+    },
+    "buttons": {
+      "adding": "Ajout...",
+      "addCabinet": "Ajouter le Cabinet"
+    },
+    "alerts": {
+      "success": "Cabinet ajouté avec succès !",
+      "authRequired": "Authentification requise.",
+      "permissionDenied": "Permission refusée. Seuls les administrateurs peuvent ajouter des cabinets.",
+      "conflict": "Un cabinet avec ce nom/adresse existe peut-être déjà.",
+      "serverError": "Erreur serveur",
+      "noResponse": "Pas de réponse du serveur. Vérifiez votre connexion.",
+      "genericError": "Une erreur s'est produite lors de l'ajout du cabinet."
     },
     "validation": {
-      "firstNameRequired": "Le prénom est requis",
-      "lastNameRequired": "Le nom est requis",
-      "emailRequired": "L'email est requis",
-      "emailInvalid": "L'adresse email doit être valide",
-      "birthDateRequired": "La date de naissance est requise",
-      "phoneDigitsOnly": "Le numéro de téléphone ne doit contenir que des chiffres",
-      "genderRequired": "Le genre est requis",
-      "passwordRequired": "Le mot de passe est requis",
-      "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
-      "captchaRequired": "Veuillez compléter le reCAPTCHA"
+      "nameRequired": "Le nom du cabinet est requis.",
+      "addressRequired": "L'adresse du cabinet est requise.",
+      "invalidPhone": "Format de numéro de téléphone invalide.",
+      "invalidFax": "Format de numéro de fax invalide."
+    }
+  },
+  "editCabinet": {
+    "title": "Modifier le Cabinet (ID : {{id}})",
+    "loadingMessage": "Chargement des informations du cabinet...",
+    "labels": {
+      "name": "Nom du Cabinet",
+      "address": "Adresse",
+      "telephone": "Téléphone",
+      "fax": "Fax",
+      "taxNumber": "Numéro Fiscal"
     },
-    "confirmation": {
-      "successTitle": "Inscription Réussie",
-      "successMessage1": "Félicitations ! Votre inscription a été complétée avec succès.",
-      "successMessage2": "Nous vous remercions pour votre confiance.",
-      "redirectMessage": "Redirection dans {{count}}s..."
+    "placeholders": {
+      "name": "Entrez le nom du cabinet",
+      "address": "Entrez l'adresse du cabinet",
+      "telephone": "Entrez le numéro de téléphone (facultatif)",
+      "fax": "Entrez le numéro de fax (facultatif)",
+      "taxNumber": "Entrez le numéro fiscal (facultatif)"
     },
-    "addCabinet": {
-      "title": "Ajouter un Nouveau Cabinet",
-      "labels": {
-        "name": "Nom du Cabinet",
-        "address": "Adresse",
-        "telephone": "Téléphone",
-        "fax": "Fax",
-        "taxNumber": "Numéro Fiscal"
-      },
-      "placeholders": {
-        "name": "Entrez le nom du cabinet",
-        "address": "Entrez l'adresse du cabinet",
-        "telephone": "Entrez le numéro de téléphone (facultatif)",
-        "fax": "Entrez le numéro de fax (facultatif)",
-        "taxNumber": "Entrez le numéro fiscal (facultatif)"
-      },
-      "buttons": {
-        "adding": "Ajout...",
-        "addCabinet": "Ajouter le Cabinet"
-      },
-      "alerts": {
-        "success": "Cabinet ajouté avec succès !",
-        "authRequired": "Authentification requise.",
-        "permissionDenied": "Permission refusée. Seuls les administrateurs peuvent ajouter des cabinets.",
-        "conflict": "Un cabinet avec ce nom/adresse existe peut-être déjà.",
-        "serverError": "Erreur serveur",
-        "noResponse": "Pas de réponse du serveur. Vérifiez votre connexion.",
-        "genericError": "Une erreur s'est produite lors de l'ajout du cabinet."
-      },
-      "validation": {
-        "nameRequired": "Le nom du cabinet est requis.",
-        "addressRequired": "L'adresse du cabinet est requise.",
-        "invalidPhone": "Format de numéro de téléphone invalide.",
-        "invalidFax": "Format de numéro de fax invalide."
-      }
+    "buttons": {
+      "saving": "Enregistrement...",
+      "saveChanges": "Enregistrer les modifications",
+      "cancel": "Annuler"
     },
-    "editCabinet": {
-      "title": "Modifier le Cabinet (ID : {{id}})",
-      "loadingMessage": "Chargement des informations du cabinet...",
-      "labels": {
-        "name": "Nom du Cabinet",
-        "address": "Adresse",
-        "telephone": "Téléphone",
-        "fax": "Fax",
-        "taxNumber": "Numéro Fiscal"
-      },
-      "placeholders": {
-        "name": "Entrez le nom du cabinet",
-        "address": "Entrez l'adresse du cabinet",
-        "telephone": "Entrez le numéro de téléphone (facultatif)",
-        "fax": "Entrez le numéro de fax (facultatif)",
-        "taxNumber": "Entrez le numéro fiscal (facultatif)"
-      },
-      "buttons": {
-        "saving": "Enregistrement...",
-        "saveChanges": "Enregistrer les modifications",
-        "cancel": "Annuler"
-      },
-      "alerts": {
-        "success": "Cabinet mis à jour avec succès !",
-        "noChanges": "Aucun changement détecté.",
-        "authRequiredFetch": "Authentification requise.",
-        "authRequiredModify": "Authentification requise pour modifier.",
-        "permissionDeniedView": "Permission refusée pour voir ce cabinet.",
-        "permissionDeniedModify": "Permission refusée pour modifier ce cabinet.",
-        "notFound": "Cabinet avec l'ID {{id}} introuvable.",
-        "notFoundMaybeDeleted": "Cabinet introuvable (peut-être supprimé ?).",
-        "conflict": "Conflit : Un autre cabinet avec ce nom/adresse existe peut-être.",
-        "validationError": "Erreur de validation : {{message}}",
-        "serverError": "Erreur serveur",
-        "fetchError": "Erreur lors de la récupération du cabinet : {{message}}",
-        "updateError": "Une erreur s'est produite lors de la mise à jour du cabinet.",
-        "networkError": "Erreur réseau ou serveur indisponible.",
-        "missingId": "L'ID du cabinet est manquant."
-      },
-      "validation": {
-        "nameRequired": "Le nom du cabinet est requis.",
-        "addressRequired": "L'adresse du cabinet est requise.",
-        "invalidPhone": "Format de numéro de téléphone invalide.",
-        "invalidFax": "Format de numéro de fax invalide."
-      }
+    "alerts": {
+      "success": "Cabinet mis à jour avec succès !",
+      "noChanges": "Aucun changement détecté.",
+      "authRequiredFetch": "Authentification requise.",
+      "authRequiredModify": "Authentification requise pour modifier.",
+      "permissionDeniedView": "Permission refusée pour voir ce cabinet.",
+      "permissionDeniedModify": "Permission refusée pour modifier ce cabinet.",
+      "notFound": "Cabinet avec l'ID {{id}} introuvable.",
+      "notFoundMaybeDeleted": "Cabinet introuvable (peut-être supprimé ?).",
+      "conflict": "Conflit : Un autre cabinet avec ce nom/adresse existe peut-être.",
+      "validationError": "Erreur de validation : {{message}}",
+      "serverError": "Erreur serveur",
+      "fetchError": "Erreur lors de la récupération du cabinet : {{message}}",
+      "updateError": "Une erreur s'est produite lors de la mise à jour du cabinet.",
+      "networkError": "Erreur réseau ou serveur indisponible.",
+      "missingId": "L'ID du cabinet est manquant."
     },
-    "manageCabinets": {
-      "title": "Liste des Cabinets",
-      "loading": "Chargement des cabinets...",
-      "noCabinets": "Aucun cabinet trouvé.",
-      "authRequired": "Authentification requise.",
-      "permissionDenied": "Permission refusée. Seuls les administrateurs peuvent voir cette page.",
-      "unexpectedData": "Format de données inattendu reçu du serveur.",
-      "fetchError": "Erreur lors de la récupération des cabinets.",
-      "qrError": "Erreur lors de la génération du QR code.",
-      "qrPermissionDenied": "Permission refusée pour générer ce QR code.",
-      "qrNotFound": "Cabinet non trouvé pour générer le QR code.",
-      "printPopupError": "Impossible d'ouvrir la fenêtre d'impression. Vérifiez les paramètres de votre navigateur (bloqueur de pop-up).",
-      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer le cabinet ID {{id}} et tous ses utilisateurs associés ? Cette action est irréversible.",
-      "deleteAuthRequired": "Authentification requise pour supprimer.",
-      "deletePermissionDenied": "Permission refusée pour supprimer ce cabinet.",
-      "deleteNotFound": "Cabinet non trouvé pour la suppression.",
-      "deleteError": "Erreur lors de la suppression: {{message}}",
-      "deleteNetworkError": "Erreur réseau ou serveur inaccessible lors de la suppression.",
-      "deleteSuccess": "Cabinet et utilisateurs associés supprimés avec succès.",
-      "unexpectedResponse": "Réponse inattendue du serveur: {{status}}",
-      "tableHeaders": {
-        "name": "Nom",
-        "address": "Adresse",
-        "phone": "Téléphone",
-        "actions": "Actions",
-        "qrCode": "QR Code"
-      },
-      "buttons": {
-        "edit": "Modifier",
-        "delete": "Supprimer",
-        "showQr": "Afficher QR",
-        "close": "Fermer",
-        "print": "Imprimer"
-      },
-      "qrModal": {
-        "title": "QR Code pour l'inscription :",
-        "scanMessage": "Scannez ce code pour vous inscrire dans ce cabinet."
-      },
-      "notAvailable": "N/D"
+    "validation": {
+      "nameRequired": "Le nom du cabinet est requis.",
+      "addressRequired": "L'adresse du cabinet est requise.",
+      "invalidPhone": "Format de numéro de téléphone invalide.",
+      "invalidFax": "Format de numéro de fax invalide."
+    }
+  },
+  "manageCabinets": {
+    "title": "Liste des Cabinets",
+    "loading": "Chargement des cabinets...",
+    "noCabinets": "Aucun cabinet trouvé.",
+    "authRequired": "Authentification requise.",
+    "permissionDenied": "Permission refusée. Seuls les administrateurs peuvent voir cette page.",
+    "unexpectedData": "Format de données inattendu reçu du serveur.",
+    "fetchError": "Erreur lors de la récupération des cabinets.",
+    "qrError": "Erreur lors de la génération du QR code.",
+    "qrPermissionDenied": "Permission refusée pour générer ce QR code.",
+    "qrNotFound": "Cabinet non trouvé pour générer le QR code.",
+    "printPopupError": "Impossible d'ouvrir la fenêtre d'impression. Vérifiez les paramètres de votre navigateur (bloqueur de pop-up).",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer le cabinet ID {{id}} et tous ses utilisateurs associés ? Cette action est irréversible.",
+    "deleteAuthRequired": "Authentification requise pour supprimer.",
+    "deletePermissionDenied": "Permission refusée pour supprimer ce cabinet.",
+    "deleteNotFound": "Cabinet non trouvé pour la suppression.",
+    "deleteError": "Erreur lors de la suppression: {{message}}",
+    "deleteNetworkError": "Erreur réseau ou serveur inaccessible lors de la suppression.",
+    "deleteSuccess": "Cabinet et utilisateurs associés supprimés avec succès.",
+    "unexpectedResponse": "Réponse inattendue du serveur: {{status}}",
+    "tableHeaders": {
+      "name": "Nom",
+      "address": "Adresse",
+      "phone": "Téléphone",
+      "actions": "Actions",
+      "qrCode": "QR Code"
     },
-    "manageAppointments": {
-      "title": "Gérer les Rendez-vous",
-      "filter": {
-        "pending": "En attente",
-        "accepted": "Accepté",
-        "dateLabel": "Date :",
-        "searchLabel": "Rechercher :",
-        "searchPlaceholder": "Rechercher par nom..."
-      },
-      "buttons": {
-        "addAppointment": "Ajouter un Rendez-vous",
-        "cancelAdd": "Annuler l'ajout",
-        "accept": "Accepter",
-        "refusePropose": "Refuser/Proposer",
-        "startConsultation": "Commencer Consultation"
-      },
-      "table": {
-        "header": {
-          "patient": "Patient",
-          "date": "Date et Heure",
-          "type": "Type",
-          "status": "Statut",
-          "action": "Action"
-        },
-        "noResultsSearch": "Aucun rendez-vous trouvé correspondant à votre recherche.",
-        "noResultsCriteria": "Aucun rendez-vous trouvé pour les critères sélectionnés."
-      },
-      "appointmentType": {
-        "nouvelleconsultation": "Nouvelle consultation",
-        "séancedecontrôle": "Séance de contrôle"
-      },
-      "appointmentState": {
-        "enattente": "En attente",
-        "accepté": "Accepté",
-        "refusé": "Refusé",
-        "réalisé": "Réalisé",
-        "annulé": "Annulé"
-      },
-      "addForm": {
-        "title": "Ajouter un Nouveau Rendez-vous (Interne)",
-        "firstNameLabel": "Prénom du Patient",
-        "lastNameLabel": "Nom du Patient",
-        "dateTimeLabel": "Date et Heure",
-        "typeLabel": "Type de Rendez-vous",
-        "typeOptions": {
-          "newConsultation": "Nouvelle consultation",
-          "followUp": "Séance de contrôle"
-        },
-        "validationError": "⚠️ Veuillez remplir tous les champs requis.",
-        "patientNotFound": "❌ Patient non trouvé dans ce cabinet.",
-        "patientSearchError": "❌ Erreur lors de la recherche du patient : {{error}}",
-        "addSuccess": "✅ Rendez-vous ajouté avec succès !",
-        "addError": "❌ Erreur lors de l'ajout du rendez-vous : {{error}}",
-        "submitting": "Ajout en cours...",
-        "submitButton": "Ajouter le Rendez-vous"
-      },
-      "modal": {
-        "refuse": {
-          "title": "Refuser et Proposer une Nouvelle Date",
-          "appointmentIdLabel": "Rendez-vous ID : {{refusalTargetId}}",
-          "newDateTimeLabel": "Proposer une nouvelle date et heure :",
-          "validationError": "⚠️ Veuillez sélectionner une nouvelle date et heure.",
-          "success": "✅ Rendez-vous ID {{refusalTargetId}} refusé. Nouvelle date proposée.",
-          "failure": "❌ Échec du refus/proposition pour ID {{refusalTargetId}} : {{error}}",
-          "sending": "Envoi...",
-          "confirmButton": "Confirmer Refus & Proposition"
-        }
-      },
-      "action": {
-        "acceptSuccess": "✅ Rendez-vous ID {{appointmentId}} accepté.",
-        "acceptFailed": "❌ Échec de l'acceptation du RDV ID {{appointmentId}}. Erreur: {{error}}",
-        "markDoneSuccess": "✅ Rendez-vous ID {{appointmentId}} marqué comme réalisé.",
-        "markDoneFailed": "❌ Échec du marquage comme réalisé pour RDV ID {{appointmentId}}. Erreur: {{error}}"
-      },
-      "error": {
-        "missingCabinetId": "Erreur : ID du cabinet non trouvé dans les données utilisateur.",
-        "missingCabinetIdMessage": "Impossible de charger les rendez-vous. L'ID de votre cabinet n'est pas défini.",
-        "fetchFailed": "Échec du chargement des rendez-vous ({{filterState}}).",
-        "generic": "Une erreur s'est produite."
-      },
-      "loading": "Chargement des rendez-vous..."
+    "buttons": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "showQr": "Afficher QR",
+      "close": "Fermer",
+      "print": "Imprimer"
     },
-    "addAppointment": {
-      "title": "Demander un Rendez-vous",
-      "rescheduleTitle": "Reprogrammer un Rendez-vous",
-      "dateLabel": "Date et Heure",
+    "qrModal": {
+      "title": "QR Code pour l'inscription :",
+      "scanMessage": "Scannez ce code pour vous inscrire dans ce cabinet."
+    },
+    "notAvailable": "N/D"
+  },
+  "manageAppointments": {
+    "title": "Gérer les Rendez-vous",
+    "filter": {
+      "pending": "En attente",
+      "accepted": "Accepté",
+      "dateLabel": "Date :",
+      "searchLabel": "Rechercher :",
+      "searchPlaceholder": "Rechercher par nom..."
+    },
+    "buttons": {
+      "addAppointment": "Ajouter un Rendez-vous",
+      "cancelAdd": "Annuler l'ajout",
+      "accept": "Accepter",
+      "refusePropose": "Refuser/Proposer",
+      "startConsultation": "Commencer Consultation"
+    },
+    "table": {
+      "header": {
+        "patient": "Patient",
+        "date": "Date et Heure",
+        "type": "Type",
+        "status": "Statut",
+        "action": "Action"
+      },
+      "noResultsSearch": "Aucun rendez-vous trouvé correspondant à votre recherche.",
+      "noResultsCriteria": "Aucun rendez-vous trouvé pour les critères sélectionnés."
+    },
+    "appointmentType": {
+      "nouvelleconsultation": "Nouvelle consultation",
+      "séancedecontrôle": "Séance de contrôle"
+    },
+    "appointmentState": {
+      "enattente": "En attente",
+      "accepté": "Accepté",
+      "refusé": "Refusé",
+      "réalisé": "Réalisé",
+      "annulé": "Annulé"
+    },
+    "addForm": {
+      "title": "Ajouter un Nouveau Rendez-vous (Interne)",
+      "firstNameLabel": "Prénom du Patient",
+      "lastNameLabel": "Nom du Patient",
+      "dateTimeLabel": "Date et Heure",
       "typeLabel": "Type de Rendez-vous",
-      "typeOptionNew": "Nouvelle consultation",
-      "typeOptionControl": "Séance de contrôle",
-      "fillFieldsError": "Veuillez remplir la date, l'heure et le type.",
-      "successMessage": "Rendez-vous demandé avec succès pour le {{dateTime}}! Statut: {{status}}",
-      "failureMessage": "Échec de la création du rendez-vous. Veuillez réessayer.",
-      "addingButton": "Demande en cours...",
-      "addButton": "Demander Rendez-vous",
-      "rescheduleButton": "Reprogrammer Rendez-vous"
+      "typeOptions": {
+        "newConsultation": "Nouvelle consultation",
+        "followUp": "Séance de contrôle"
+      },
+      "validationError": "⚠️ Veuillez remplir tous les champs requis.",
+      "patientNotFound": "❌ Patient non trouvé dans ce cabinet.",
+      "patientSearchError": "❌ Erreur lors de la recherche du patient : {{error}}",
+      "addSuccess": "✅ Rendez-vous ajouté avec succès !",
+      "addError": "❌ Erreur lors de l'ajout du rendez-vous : {{error}}",
+      "submitting": "Ajout en cours...",
+      "submitButton": "Ajouter le Rendez-vous"
+    },
+    "modal": {
+      "refuse": {
+        "title": "Refuser et Proposer une Nouvelle Date",
+        "appointmentIdLabel": "Rendez-vous ID : {{refusalTargetId}}",
+        "newDateTimeLabel": "Proposer une nouvelle date et heure :",
+        "validationError": "⚠️ Veuillez sélectionner une nouvelle date et heure.",
+        "success": "✅ Rendez-vous ID {{refusalTargetId}} refusé. Nouvelle date proposée.",
+        "failure": "❌ Échec du refus/proposition pour ID {{refusalTargetId}} : {{error}}",
+        "sending": "Envoi...",
+        "confirmButton": "Confirmer Refus & Proposition"
+      }
+    },
+    "action": {
+      "acceptSuccess": "✅ Rendez-vous ID {{appointmentId}} accepté.",
+      "acceptFailed": "❌ Échec de l'acceptation du RDV ID {{appointmentId}}. Erreur: {{error}}",
+      "markDoneSuccess": "✅ Rendez-vous ID {{appointmentId}} marqué comme réalisé.",
+      "markDoneFailed": "❌ Échec du marquage comme réalisé pour RDV ID {{appointmentId}}. Erreur: {{error}}"
+    },
+    "error": {
+      "missingCabinetId": "Erreur : ID du cabinet non trouvé dans les données utilisateur.",
+      "missingCabinetIdMessage": "Impossible de charger les rendez-vous. L'ID de votre cabinet n'est pas défini.",
+      "fetchFailed": "Échec du chargement des rendez-vous ({{filterState}}).",
+      "generic": "Une erreur s'est produite."
+    },
+    "loading": "Chargement des rendez-vous..."
+  },
+  "addAppointment": {
+    "title": "Demander un Rendez-vous",
+    "rescheduleTitle": "Reprogrammer un Rendez-vous",
+    "dateLabel": "Date et Heure",
+    "typeLabel": "Type de Rendez-vous",
+    "typeOptionNew": "Nouvelle consultation",
+    "typeOptionControl": "Séance de contrôle",
+    "fillFieldsError": "Veuillez remplir la date, l'heure et le type.",
+    "successMessage": "Rendez-vous demandé avec succès pour le {{dateTime}}! Statut: {{status}}",
+    "failureMessage": "Échec de la création du rendez-vous. Veuillez réessayer.",
+    "addingButton": "Demande en cours...",
+    "addButton": "Demander Rendez-vous",
+    "rescheduleButton": "Reprogrammer Rendez-vous"
+  },
+  "consultationDashboard": {
+    "loading": "Chargement du tableau de bord des consultations...",
+    "title": "Tableau de Bord des Consultations",
+    "errorPrefix": "Erreur",
+    "searchPlaceholder": "Rechercher par nom/prénom patient...",
+    "table": {
+      "patient": "Patient",
+      "date": "Date",
+      "type": "Type",
+      "actions": "Actions",
+      "notAvailable": "N/D",
+      "invalidDate": "Date invalide",
+      "defaultType": "Consultation Générale",
+      "noConsultations": "Aucune consultation trouvée."
+    },
+    "buttons": {
+      "viewDetails": "Afficher Détails"
+    },
+    "errors": {
+      "missingDoctorId": "Impossible de récupérer l'ID du médecin connecté.",
+      "fetchFailedFallback": "Échec de la récupération de vos consultations."
+    }
+  },
+  "common": {
+    "notAvailable": "N/D",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "invalidDate": "Date invalide",
+    "dateError": "Erreur Date",
+    "error": "Erreur",
+    "notAvailable": "N/D",
+    "invalidDate": "Date invalide",
+    "close": "Fermer"
+  },
+  "medicalExaminationForm": {
+    "loading": "Chargement du formulaire...",
+    "title": "Création d'une Demande d'Examen Médical",
+    "patientSectionTitle": "Patient",
+    "errorPrefix": "Erreur : ",
+    "labels": {
+      "examType": "🔽 Type d’examen :",
+      "centre": "🏥 Centre :",
+      "recommendation": "🗒️ Recommandation (facultatif) :"
+    },
+    "placeholders": {
+      "select": "-- Sélectionner --",
+      "selectCentre": "-- Sélectionner un centre --",
+      "specifyExamType": "Préciser le type d'examen"
+    },
+    "examTypes": {
+      "irm": "IRM",
+      "radio": "Radio",
+      "bloodTest": "Analyse sanguine",
+      "scanner": "Scanner",
+      "ultrasound": "Échographie",
+      "other": "Autre (préciser)"
+    },
+    "buttons": {
+      "save": "🔘 OK (Enregistrer)",
+      "print": "🖨️ Imprimer"
+    },
+    "status": {
+      "saving": "Enregistrement en cours...",
+      "saveSuccess": "Demande d'examen enregistrée avec succès !"
+    },
+    "errors": {
+      "missingPatientId": "ID Patient manquant dans l'URL.",
+      "loadFailedFallback": "Erreur lors du chargement des données.",
+      "selectExamType": "Veuillez sélectionner un type d'examen.",
+      "missingConsultationId": "ID de consultation manquant dans l'URL.",
+      "saveFailedFallback": "Erreur lors de l'enregistrement de la demande.",
+      "printPatientDataMissing": "Impossible d'imprimer : données patient non chargées.",
+      "printExecutionFailed": "Erreur lors de l'exécution de l'impression.",
+      "printSetupFailed": "Erreur lors de la préparation de l'impression."
+    },
+    "print": {
+      "otherCentre": "Autre",
+      "centreNotFound": "Centre ID: {{id}} (Nom non trouvé)",
+      "title": "Demande d'Examen Médical",
+      "doctorPrefix": "Dr. ",
+      "fallbackDoctorName": "[Nom Docteur]",
+      "fallbackCabinetAddress": "[Adresse Cabinet]",
+      "fallbackCabinetPhone": "[Tel Cabinet]",
+      "dateLabel": "Date:",
+      "patientSectionTitle": "Patient",
+      "lastNameLabel": "Nom:",
+      "firstNameLabel": "Prénom:",
+      "dobLabel": "Date de Naissance:",
+      "ageLabel": "Âge:",
+      "ageSuffix": " ans",
+      "examSectionTitle": "Examen Demandé",
+      "examTypeLabel": "Type d'examen:",
+      "fallbackExamType": "Non spécifié",
+      "centreLabel": "Centre:",
+      "recommendationLabel": "Recommandation:",
+      "fallbackRecommendation": "Aucune",
+      "signatureLabel": "Signature du Médecin:"
+    }
+  },
+  "consultation": {
+    "loading": "Chargement des détails de la consultation...",
+    "error": {
+      "patientDetailsNotFound": "Détails complets du patient non trouvés.",
+      "patientNotFoundById": "Patient avec ID {{id}} non trouvé via /Users/allid/.",
+      "fetchPatientDetailsFailed": "Échec de la récupération des détails pour le patient {{id}}.",
+      "patientIdMissing": "ID du patient manquant dans les données de consultation.",
+      "consultationNotFound": "Consultation avec ID {{id}} non trouvée.",
+      "fetchConsultationFailed": "Échec de la récupération des détails pour la consultation {{id}}.",
+      "patientDetailsNotFoundInAppointment": "Détails du patient non trouvés dans les données du rendez-vous.",
+      "appointmentNotFound": "Rendez-vous avec ID {{id}} non trouvé.",
+      "fetchAppointmentFailed": "Échec de la récupération des détails pour le rendez-vous {{id}}.",
+      "missingId": "ID de rendez-vous ou de consultation manquant dans l'URL.",
+      "cannotLoadPatient": "Impossible de charger les informations du patient pour cette consultation.",
+      "missingDoctorOrCabinetId": "Impossible de récupérer l'ID du médecin ou du cabinet actif. Veuillez vérifier votre session.",
+      "missingPatientIdForSave": "ID Patient manquant pour la sauvegarde.",
+      "updateFailed": "Échec de la mise à jour de la consultation.",
+      "createFailed": "Échec de la création de la consultation."
+    },
+    "status": {
+      "saving": "Sauvegarde en cours...",
+      "createSuccess": "Consultation créée avec succès !",
+      "updateSuccess": "Consultation mise à jour avec succès !"
+    },
+    "title": {
+      "edit": "Détails Consultation / Modification",
+      "new": "Nouvelle Consultation"
+    },
+    "patientInfo": {
+      "title": "Informations Patient",
+      "name": "Nom",
+      "dob": "Date de Naissance",
+      "age": "Age",
+      "years": "ans",
+      "email": "Email",
+      "loading": "Chargement des informations du patient..."
+    },
+    "history": {
+      "show": "Afficher l'Historique Consultations & Ordonnances",
+      "hide": "Masquer l'Historique Consultations & Ordonnances",
+      "title": "Historique",
+      "loading": "Chargement de l'historique...",
+      "fetchError": "Échec de la récupération de l'historique.",
+      "errorLabel": "Erreur historique",
+      "noneFound": "Aucun historique trouvé.",
+      "date": "Date",
+      "consultation": "Consultation",
+      "noText": "<i>Aucun texte</i>",
+      "prescription": "Ordonnance",
+      "noPrescription": "<i>Aucune ordonnance</i>"
+    },
+    "section": {
+      "consultation": "Consultation",
+      "prescription": "Ordonnance"
+    },
+    "button": {
+      "saving": "Sauvegarde...",
+      "update": "🔵 METTRE À JOUR",
+      "save": "🔵 ENREGISTRER",
+      "print": "🖨️ IMPRIMER",
+      "exam": "🔬 EXAM"
+    },
+    "print": {
+      "executionError": "Erreur lors de l'exécution de l'impression.",
+      "setupError": "Erreur lors de la préparation de l'impression.",
+      "missingDoctorName": "[Nom Docteur Manquant]",
+      "missingCabinetAddress": "[Adresse Cabinet Manquante]",
+      "missingCabinetTel": "[Tel Cabinet Manquant]",
+      "title": "Ordonnance Médicale",
+      "doctorInfo": "Informations Docteur",
+      "patientNameLabel": "Nom Patient",
+      "ageLabel": "Age",
+      "telLabel": "Tél",
+      "patientInfo": "Informations Patient",
+      "dobLabel": "Date de Naissance",
+      "yearsLabel": "ans",
+      "prescriptionLabel": "Prescription",
+      "noPrescription": "<i>Aucune prescription.</i>",
+      "dateLabel": "Date",
+      "signatureLabel": "Signature",
+      "loadingData": "Chargement des données d'impression...",
+      "fetchDataError": "Erreur lors de la récupération des données d'impression (ID : {{id}}). Impression avec les données actuelles."
+    }
+  },
+  "cabinetSettings": {
+    "title": "Paramètres du Cabinet",
+    "cabinetIdError": "Impossible de déterminer l'ID du cabinet. Veuillez vous reconnecter.",
+    "selectFileError": "Veuillez sélectionner un fichier image pour la signature.",
+    "authError": "Erreur d'authentification.",
+    "uploadSuccess": "Signature téléversée avec succès !",
+    "uploadFailed": "Échec du téléversement de la signature.",
+    "uploadTitle": "Téléverser la Signature Électronique",
+    "uploadDescription": "Sélectionnez une image (PNG, JPG) pour la signature qui apparaîtra sur les ordonnances.",
+    "selectFileLabel": "Sélectionner le fichier de signature :",
+    "uploading": "Téléversement...",
+    "saveButton": "Enregistrer la Signature",
+    "otherSettingsTitle": "Autres Paramètres"
+  },
+  "myConsultationsPage": {
+    "title": "Mes Consultations",
+    "loading": "Chargement de vos consultations...",
+    "errorPrefix": "Erreur",
+    "errors": {
+      "unidentifiedUser": "Utilisateur non identifié.",
+      "cabinetContextNotFound": "Contexte du cabinet non trouvé. Veuillez vous reconnecter.",
+      "fetchFailedFallback": "Échec de la récupération de vos consultations.",
+      "authErrorDownload": "Erreur d'authentification pour le téléchargement.",
+      "downloadInvalidResponse": "Impossible de télécharger l'ordonnance (réponse invalide).",
+      "prescriptionNotFound": "Aucune ordonnance trouvée pour cette consultation.",
+      "downloadFailedFallback": "Échec du téléchargement de l'ordonnance."
+    },
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "prescription": "Ordonnance",
+      "notAvailable": "N/D",
+      "invalidDate": "Date invalide",
+      "defaultType": "Consultation Générale",
+      "noConsultations": "Vous n'avez aucune consultation enregistrée."
+    },
+    "buttons": {
+      "download": "Télécharger"
+    }
+  },
+  "myExaminationsPage": {
+    "title": "Mes Demandes d'Examen",
+    "loading": "Chargement de vos demandes d'examen...",
+    "errorPrefix": "Erreur :",
+    "errors": {
+      "unidentifiedUser": "Utilisateur non identifié.",
+      "cabinetContextNotFound": "Contexte du cabinet non trouvé. Veuillez vous reconnecter.",
+      "authMissing": "Token d'authentification manquant.",
+      "authMissingLogin": "Token d'authentification manquant. Veuillez vous reconnecter.",
+      "fetchFailedFallback": "Échec de la récupération de vos demandes d'examen pour ce cabinet.",
+      "downloadFailed": "Échec du téléchargement de l'examen {{examId}}. L'endpoint backend est peut-être manquant."
+    },
+    "table": {
+      "dateRequested": "Date Demande",
+      "type": "Type",
+      "centre": "Centre",
+      "action": "Action"
+    },
+    "buttons": {
+      "download": "Télécharger"
     },
     "common": {
-      "notAvailable": "N/D",
-      "cancel": "Annuler",
-      "confirm": "Confirmer",
-      "invalidDate": "Date invalide",
-      "dateError": "Erreur Date"
-    }
+      "unspecified": "Non spécifié"
+    },
+    "noExaminations": "Vous n'avez aucune demande d'examen enregistrée."
+  },
+  "myAppointments": {
+    "title": "Mes Rendez-vous",
+    "errorFetchUser": "Impossible de récupérer les informations utilisateur. Veuillez vous reconnecter.",
+    "errorFetchAppointments": "Erreur lors de la récupération de vos rendez-vous.",
+    "confirmCancel": "Êtes-vous sûr de vouloir annuler ce rendez-vous ?",
+    "cancelSuccess": "Rendez-vous annulé avec succès.",
+    "cancelError": "Erreur lors de l'annulation : {{error}}",
+    "modifyFillFieldsError": "Veuillez remplir la date/heure et le type.",
+    "modifySuccess": "Rendez-vous modifié avec succès.",
+    "modifyError": "Erreur lors de la modification : {{error}}",
+    "loading": "Chargement de vos rendez-vous...",
+    "noAppointments": "Vous n'avez aucun rendez-vous pour le moment.",
+    "tableHeaderDate": "Date et Heure",
+    "tableHeaderType": "Type",
+    "tableHeaderStatus": "Statut",
+    "tableHeaderActions": "Actions",
+    "statusPending": "En attente",
+    "statusAccepted": "Accepté",
+    "statusRefused": "Refusé",
+    "statusCancelled": "Annulé",
+    "statusCompleted": "Réalisé",
+    "typeNewConsultation": "Nouvelle consultation",
+    "typeControlSession": "Séance de contrôle",
+    "buttonCancel": "Annuler",
+    "buttonModify": "Modifier",
+    "proposedDateLabel": "Date proposée :",
+    "buttonFixNew": "Planifier Nouveau",
+    "modalTitleModify": "Modifier le Rendez-vous",
+    "modalApptIdLabel": "ID Rendez-vous :",
+    "modalDateLabel": "Nouvelle Date et Heure :",
+    "modalTypeLabel": "Type de Rendez-vous :",
+    "modalSavingButton": "Enregistrement...",
+    "modalSaveButton": "Enregistrer les Modifications"
+  }
 }

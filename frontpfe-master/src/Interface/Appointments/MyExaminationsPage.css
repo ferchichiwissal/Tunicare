@@ -1,0 +1,89 @@
+/* Styles for MyExaminationsPage component */
+
+/* Use CSS variables if available globally, otherwise use fallback */
+:root {
+  --primary-color: #00c6a9; /* Default primary color (teal/green) */
+  --white: #ffffff;
+  --text-color: #0c0c0c; /* Default text color */
+}
+
+/* Style the title with the teal underline */
+.my-examinations-page-container h2 {
+  color: var(--text-color, #0c0c0c);
+  margin-bottom: 25px; /* Consistent margin */
+  border-bottom: 2px solid var(--primary-color, #00c6a9); /* Teal underline */
+  padding-bottom: 10px; /* Space between text and underline */
+  display: inline-block; /* Ensures border only spans the text width */
+}
+
+/* Style the table header */
+.my-examinations-page-container .custom-table thead th {
+  background-color: var(--primary-color, #00c6a9); /* Teal background */
+  color: var(--white, #ffffff); /* White text */
+  border-color: var(--primary-color, #00c6a9); /* Match border color */
+  text-transform: uppercase; /* Optional: Match styling */
+  font-size: 0.9rem; /* Optional: Match styling */
+  vertical-align: middle; /* Ensure vertical alignment */
+}
+
+/* Style the primary button (e.g., for download or view actions) within this component to be teal */
+.my-examinations-page-container .btn-primary {
+  background-color: var(--primary-color, #00c6a9);
+  border-color: var(--primary-color, #00c6a9);
+  color: var(--white, #ffffff) !important; /* Ensure white text */
+}
+
+.my-examinations-page-container .btn-primary:hover {
+  background-color: #00937d; /* Darker teal/green */
+  border-color: #008670;
+}
+
+/* Optional: Style the search input focus if a search bar is added */
+/*
+.my-examinations-page-container input[type="text"].form-control:focus {
+  border-color: var(--primary-color, #00c6a9);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 198, 169, 0.25);
+}
+*/
+
+/* Add specific styles for night mode if needed */
+.night-mode .my-examinations-page-container {
+  background-color: #333; /* Example dark background */
+  color: #f0f0f0; /* Example light text */
+}
+
+.night-mode .my-examinations-page-container h2 {
+  color: #f0f0f0; /* Light text for title in night mode */
+  border-bottom-color: #00a088; /* Slightly adjusted teal for night mode */
+}
+
+.night-mode .my-examinations-page-container .custom-table {
+  background-color: #444; /* Darker table background */
+  color: #f0f0f0; /* Light text for table */
+}
+
+.night-mode .my-examinations-page-container .custom-table thead th {
+  background-color: #008670; /* Darker teal for header in night mode */
+  color: #f0f0f0; /* Light text */
+  border-color: #00796b;
+}
+
+.night-mode .my-examinations-page-container .custom-table tbody tr {
+  border-top: 1px solid #555; /* Darker border for rows */
+}
+
+.night-mode .my-examinations-page-container .custom-table tbody tr:nth-child(even) {
+  background-color: #3a3a3a; /* Slightly different background for even rows */
+}
+
+.night-mode .my-examinations-page-container .btn-primary {
+  background-color: #00a088; /* Adjusted teal for buttons in night mode */
+  border-color: #008670;
+  color: #f0f0f0 !important; /* Ensure light text */
+}
+
+.night-mode .my-examinations-page-container .btn-primary:hover {
+  background-color: #00796b; /* Darker hover for night mode */
+  border-color: #006d5f;
+}

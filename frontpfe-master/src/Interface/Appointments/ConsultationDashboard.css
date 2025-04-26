@@ -1,0 +1,47 @@
+/* Styles for ConsultationDashboard component */
+
+/* Use CSS variables if available globally, otherwise use fallback */
+:root {
+  --primary-color: #00c6a9; /* Default primary color (teal/green) */
+  --white: #ffffff;
+  --text-color: #0c0c0c; /* Default text color */
+}
+
+/* Style the title with the teal underline */
+.consultation-dashboard-container h2 {
+  color: var(--text-color, #0c0c0c);
+  margin-bottom: 25px; /* Consistent margin */
+  border-bottom: 2px solid var(--primary-color, #00c6a9); /* Teal underline */
+  padding-bottom: 10px; /* Space between text and underline */
+  display: inline-block; /* Ensures border only spans the text width */
+}
+
+/* Style the table header */
+.consultation-dashboard-container .custom-table thead th {
+  background-color: var(--primary-color, #00c6a9); /* Teal background */
+  color: var(--white, #ffffff); /* White text */
+  border-color: var(--primary-color, #00c6a9); /* Match border color */
+  text-transform: uppercase; /* Optional: Match styling from UserManagement.css */
+  font-size: 0.9rem; /* Optional: Match styling */
+  vertical-align: middle; /* Ensure vertical alignment */
+}
+
+/* Style the primary button within this component to be teal */
+.consultation-dashboard-container .btn-primary {
+  background-color: var(--primary-color, #00c6a9);
+  border-color: var(--primary-color, #00c6a9);
+  color: var(--white, #ffffff) !important; /* Ensure white text */
+}
+
+/* Add hover effect for the teal button */
+.consultation-dashboard-container .btn-primary:hover {
+  background-color: #00937d; /* Darker teal/green */
+  border-color: #008670;
+}
+
+/* Optional: Style the search input focus like UserManagement */
+.consultation-dashboard-container input[type="text"].form-control:focus {
+  border-color: var(--primary-color, #00c6a9);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 198, 169, 0.25);
+}
