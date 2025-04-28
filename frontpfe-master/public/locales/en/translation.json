@@ -1269,5 +1269,12 @@
     "modalTypeLabel": "Appointment Type:",
     "modalSavingButton": "Saving...",
     "modalSaveButton": "Save Changes"
+  },
+  "chatbot": {
+    "open": "Open AI Chat",
+    "close": "Close Chat",
+    "send": "Send",
+    "placeholder": "Ask your question...",
+    "greeting": "Hello Doctor! How can I help you today?"
   }
 }

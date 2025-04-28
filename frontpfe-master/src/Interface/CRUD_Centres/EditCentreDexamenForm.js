@@ -23,7 +23,8 @@ const EditCentreDexamenForm = () => {
         const fetchCentreData = async () => {
             setLoading(true);
             try {
-                const response = await apiClient.get(`/api/doctor-centre-examen/${id}`);
+                // Corrected API endpoint for fetching centre details (plural 'centres')
+                const response = await apiClient.get(`/api/centres-examen/${id}`);
                 setCentreData({
                     name: response.data.name,
                     adress: response.data.adress,
@@ -61,7 +62,8 @@ const EditCentreDexamenForm = () => {
         }
 
         try {
-            await apiClient.put(`/api/doctor-centre-examen/${id}`, centreData);
+            // Corrected API endpoint for updating centre details (plural 'centres')
+            await apiClient.put(`/api/centres-examen/${id}`, centreData);
             setSuccess(t('success_centre_updated', { name: centreData.name }));
             // Redirect back to the list after a short delay
             setTimeout(() => {

@@ -1266,5 +1266,12 @@
     "modalTypeLabel": "Type de Rendez-vous :",
     "modalSavingButton": "Enregistrement...",
     "modalSaveButton": "Enregistrer les Modifications"
+  },
+  "chatbot": {
+    "open": "Ouvrir Chat IA",
+    "close": "Fermer Chat",
+    "send": "Envoyer",
+    "placeholder": "Posez votre question...",
+    "greeting": "Bonjour Docteur! Comment puis-je vous aider aujourd'hui?"
   }
 }

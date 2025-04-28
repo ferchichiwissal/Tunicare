@@ -5,6 +5,8 @@ import { Line, Bar } from 'react-chartjs-2';
 import { jwtDecode } from "jwt-decode";
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 import './dashboard.css';  // Make sure the styles are loaded
+import Chatbot from './Chatbot'; // Import the Chatbot component
+import './Chatbot.css'; // Import the Chatbot CSS
 
 // Register chart elements
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
@@ -251,6 +253,7 @@ const Dashboard = ({ onLogout }) => {
       <>
         <a href="#">{t('nav.dashboard')}</a>
         {/* Assistants/Doctors might not need 'Add an Account' directly, adjust if needed */}
+ 
          <a href="/add">{t('nav.addAccountAssistant')}</a>
         <a href="/Tovalidate">{t('nav.confirmation')}</a>
         <a href="/UserManagement">{t('nav.changeRole')}</a> {/* Consider filtering users by their cabinet */}
@@ -441,6 +444,9 @@ const Dashboard = ({ onLogout }) => {
               </section>
             </>
           )}
+          {/* Conditionally render the Chatbot for DOCTOR role */}
+          {user.role === 'DOCTOR' && <Chatbot />}
+
           {/* New Sidebar Toggle Button within Main Content */}
           <button
             className="sidebar-toggle-button-main"

@@ -1,0 +1,102 @@
+/* Basic styling for the chatbot container */
+.chatbot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000; /* Ensure it's above other elements */
+}
+
+/* Style for the toggle button */
+.chatbot-toggle-button {
+  background-color: #20c997; /* Teal color */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.chatbot-toggle-button:hover {
+  background-color: #1aa883; /* Darker teal on hover */
+}
+
+/* Styling for the chat window when open */
+.chatbot-window {
+  width: 300px;
+  height: 400px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevents content spill */
+  margin-top: 10px; /* Space between button and window */
+}
+
+/* Message area styling */
+.chatbot-messages {
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto; /* Enable scrolling for messages */
+  background-color: #f9f9f9; /* Light background for message area */
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Space between messages */
+}
+
+/* Individual message styling */
+.message {
+  padding: 8px 12px;
+  border-radius: 15px;
+  max-width: 80%;
+  word-wrap: break-word; /* Wrap long messages */
+}
+
+.message.user {
+  background-color: #d1e7ff; /* Light blue for user messages */
+  align-self: flex-end; /* Align user messages to the right */
+  margin-left: auto; /* Push to the right */
+}
+
+.message.bot {
+  background-color: #e2e3e5; /* Light grey for bot messages */
+  align-self: flex-start; /* Align bot messages to the left */
+  margin-right: auto; /* Push to the left */
+}
+
+/* Input area styling */
+.chatbot-input {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  background-color: #fff;
+}
+
+.chatbot-input input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.chatbot-input button {
+  padding: 8px 15px;
+  background-color: #20c997; /* Teal color */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.chatbot-input button:hover {
+  background-color: #1aa883; /* Darker teal on hover */
+}
+
+/* Hide window when closed (using container class logic) */
+.chatbot-container:not(.open) .chatbot-window {
+  display: none;
+}
