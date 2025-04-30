@@ -34,7 +34,7 @@ const EditCentreDexamenForm = () => {
                 setError('');
             } catch (err) {
                 console.error("Error fetching centre data:", err);
-                setError(t('error_fetching_centre_details'));
+                setError(t('editCentreDexamenForm.error_fetching_centre_details')); // Correction clé
             } finally {
                 setLoading(false);
             }
@@ -57,14 +57,14 @@ const EditCentreDexamenForm = () => {
         setSuccess('');
 
         if (!centreData.name || !centreData.adress || !centreData.tel) {
-            setError(t('error_all_fields_required'));
+            setError(t('editCentreDexamenForm.error_all_fields_required')); // Correction clé
             return;
         }
 
         try {
             // Corrected API endpoint for updating centre details (plural 'centres')
             await apiClient.put(`/api/centres-examen/${id}`, centreData);
-            setSuccess(t('success_centre_updated', { name: centreData.name }));
+            setSuccess(t('editCentreDexamenForm.success_update', { name: centreData.name })); // Correction clé
             // Redirect back to the list after a short delay
             setTimeout(() => {
                 navigate('/users'); // Redirect back to the main user/centre list
@@ -74,7 +74,7 @@ const EditCentreDexamenForm = () => {
             if (err.response && err.response.data && err.response.data.message) {
                 setError(err.response.data.message);
             } else {
-                setError(t('error_updating_centre'));
+                setError(t('editCentreDexamenForm.error_updating_centre')); // Correction clé
             }
         }
     };
@@ -92,7 +92,7 @@ const EditCentreDexamenForm = () => {
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     {/* Add 'required' class to label if needed by CSS */}
-                    <label htmlFor="name" className="form-label required">{t('centre_name')}</label>
+                    <label htmlFor="name" className="form-label required">{t('editCentreDexamenForm.labels.name')}</label>
                     <input
                         type="text"
                         className="form-control"
@@ -105,7 +105,7 @@ const EditCentreDexamenForm = () => {
                 </div>
                 <div className="mb-3">
                     {/* Add 'required' class to label if needed by CSS */}
-                    <label htmlFor="adress" className="form-label required">{t('address')}</label>
+                    <label htmlFor="adress" className="form-label required">{t('editCentreDexamenForm.labels.address')}</label>
                     <input
                         type="text"
                         className="form-control"
@@ -118,7 +118,7 @@ const EditCentreDexamenForm = () => {
                 </div>
                 <div className="mb-3">
                     {/* Add 'required' class to label if needed by CSS */}
-                    <label htmlFor="tel" className="form-label required">{t('phone')}</label>
+                    <label htmlFor="tel" className="form-label required">{t('editCentreDexamenForm.labels.telephone')}</label>
                     <input
                         type="text"
                         className="form-control"
@@ -130,8 +130,8 @@ const EditCentreDexamenForm = () => {
                     />
                 </div>
                 {/* Add other form fields if needed */}
-                <button type="submit" className="btn btn-primary">{t('update_centre')}</button>
-                <button type="button" className="btn btn-secondary ms-2" onClick={() => navigate('/manage-centres')}>{t('cancel')}</button>
+                <button type="submit" className="btn btn-primary">{t('editCentreDexamenForm.buttons.save')}</button>
+                <button type="button" className="btn btn-secondary ms-2" onClick={() => navigate('/manage-centres')}>{t('common.cancel')}</button>
             </form>
         </div>
     );

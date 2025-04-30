@@ -83,7 +83,7 @@ const AddCentreDexamenForm = () => {
 
         // Basic validation
         if (!centreData.name || !centreData.adress || !centreData.tel) {
-            setError(t('error_all_fields_required'));
+            setError(t('editCentreDexamenForm.error_all_fields_required')); // Corrected key
             return;
         }
 
@@ -101,7 +101,7 @@ const AddCentreDexamenForm = () => {
             if (err.response && err.response.data && err.response.data.message) {
                 setError(err.response.data.message);
             } else {
-                setError(t('error_adding_centre')); // Use translation
+                setError(t('addCentreDexamenForm.error_adding_centre')); // Corrected key
             }
         }
     };
@@ -109,7 +109,7 @@ const AddCentreDexamenForm = () => {
     return (
         // Use the class name from the CSS file
         <div className="add-cabinet-container">
-            <h2>{t('add_new_exam_centre')}</h2>
+            <h2>{t('nav.addExamCentre')}</h2> {/* Corrected key */}
             {/* Use the specific error class from CSS */}
             {error && <div className="error-message">{error}</div>}
             {success && <div className="alert alert-success">{success}</div>}
@@ -154,8 +154,8 @@ const AddCentreDexamenForm = () => {
                     />
                 </div>
                 {/* Add other form fields for CentreDexamen if needed */}
-                <button type="submit" className="btn btn-primary">{t('add_centre')}</button>
-                <button type="button" className="btn btn-secondary ms-2" onClick={() => navigate('/manage-centres')}>{t('cancel')}</button>
+                <button type="submit" className="btn btn-primary">{t('addCentreDexamenForm.buttons.add_centre')}</button> {/* Corrected key */}
+                <button type="button" className="btn btn-secondary ms-2" onClick={() => navigate('/manage-centres')}>{t('common.cancel')}</button> {/* Standardized key */}
             </form>
         </div>
     );

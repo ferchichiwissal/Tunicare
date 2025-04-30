@@ -189,8 +189,7 @@ const EditUserForm = () => {
         return;
     }
 
-    // Exclude email if it shouldn't be updatable
-    // delete fieldsToUpdate.email;
+    // Email is now updatable, so the delete line is removed.
 
     setIsSubmitting(true);
     setErrors({}); // Clear previous submit errors
@@ -274,11 +273,10 @@ const EditUserForm = () => {
                     id="edit-email"
                     name="email"
                     value={formData.email}
-                    className="form-control"
-                    readOnly // Make email read-only
-                    disabled // Visually indicate it's not editable
+                    onChange={handleInputChange} // Add onChange handler
+                    className={`form-control ${errors.email ? 'is-invalid' : ''}`} // Add validation class
                 />
-                 {/* No validation feedback needed for read-only field */}
+                <div className="invalid-feedback">{errors.email}</div> {/* Add validation feedback */}
             </div>
             <div className="col-md-6">
                 <label htmlFor="edit-birthDate" className="form-label required">{t('editUserForm.labels.birthDate')}</label>

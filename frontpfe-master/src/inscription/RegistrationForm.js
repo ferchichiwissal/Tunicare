@@ -399,7 +399,8 @@ function RegistrationForm() {
                     <button
                       type="submit"
                       disabled={isCheckingExistence || isSubmitting || !captchaVerified}
-                      className={`btn btn-primary btn-lg ${(isSubmitting || isCheckingExistence) ? "disabled" : ""}`}
+                      // Remove all btn classes, rely solely on submit-button
+                      className={`submit-button ${(isSubmitting || isCheckingExistence) ? "disabled" : ""}`}
                     >
                       {isCheckingExistence ? t('registration.checkingButton') : (isSubmitting ? t('registration.processingButton') : t('registration.registerButton'))}
                     </button>
@@ -416,10 +417,12 @@ function RegistrationForm() {
                 value={verificationCode}
                  onChange={(e) => setVerificationCode(e.target.value)}
                  className="form-control verification-input" // Use form-control
+                 placeholder={t('registration.verificationCodePlaceholder')} // Add placeholder
                />
               <button
                 onClick={handleVerificationSubmit}
-                className="btn btn-success verify-button" // Use Bootstrap button
+                // Remove all btn classes, rely solely on verify-button
+                className="verify-button"
               >
                 {t('registration.verifyButton')}
               </button>

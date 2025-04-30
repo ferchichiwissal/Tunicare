@@ -135,12 +135,13 @@ select.form-select:focus { /* Add focus style for select */
   color: var(--error-color, #e60f0f); /* Harmonized error color */
 }
 
-.submit-button,
-.verify-button { /* Style both buttons similarly */
+/* Increase specificity and add !important */
+.registration-form-container .submit-button,
+.registration-form-container .verify-button {
   padding: 12px 30px;
-  background-color: var(--primary-color, #00c6a9); /* Harmonized color */
-  color: var(--white, #ffffff);
-  border: none;
+  background-color: #00c6a9 !important; /* Explicitly set to vert d'eau and force override */
+  color: var(--white, #ffffff) !important;
+  border: none !important;
   border-radius: 5px;
   font-size: 1rem;
   font-weight: bold;
@@ -151,17 +152,20 @@ select.form-select:focus { /* Add focus style for select */
   margin-top: 10px; /* Add some space */
 }
 
-.submit-button:hover,
-.verify-button:hover {
-  background-color: #00937d; /* Darker shade */
+/* Increase specificity and add !important for hover */
+.registration-form-container .submit-button:hover,
+.registration-form-container .verify-button:hover {
+  background-color: #007a69 !important; /* Slightly darker shade for hover and force override */
   transform: translateY(-1px);
 }
 
-.submit-button.submitting,
-.verify-button:disabled { /* Style disabled state */
-  background-color: #ccc;
-  cursor: not-allowed;
-  opacity: 0.7;
+/* Increase specificity and add !important for disabled */
+.registration-form-container .submit-button.submitting,
+.registration-form-container .verify-button:disabled,
+.registration-form-container .submit-button:disabled { /* Also target general disabled state */
+  background-color: #ccc !important; /* Force override for disabled state */
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
 }
 
 /* Verification Styles */

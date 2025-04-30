@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next"; // Import useTranslation
 import axios from "axios";
 import { getToken, getRoles, clearUserData, isTokenExpired, getUserData } from "../../utils/auth";
-import './AddForm.css'; // Import the CSS file
+// import './AddForm.css'; // Import the CSS file - Commented out or removed
+import '../../inscription/registration.css'; // Import registration CSS instead
 
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes (consistent)
 
@@ -269,11 +270,13 @@ function AddForm() { // Renamed component for clarity
   };
 
   return (
-    // Use registration-form class for consistency if styles are shared, or create AddForm specific styles
-    <div className="add-form-container"> {/* Changed class name */}
-      <h2 className="form-title">
-        {userRole === "ADMIN" ? t('addForm.title.admin') : t('addForm.title.patient')}
-      </h2>
+    // Add the centering wrapper div from registration.css
+    <div className="wholeSection">
+      {/* Use registration-form-container class to match registration.css styles */}
+      <div className="registration-form-container"> {/* Updated class name */}
+        <h2 /* className="form-title" - Removed if registration.css doesn't style h2 this way directly inside */ >
+          {userRole === "ADMIN" ? t('addForm.title.admin') : t('addForm.title.patient')}
+        </h2>
       {errors.general && <div className="alert alert-danger">{errors.general}</div>}
 
       <form onSubmit={handleSubmit} className="needs-validation" noValidate>
@@ -436,7 +439,11 @@ function AddForm() { // Renamed component for clarity
                 <button
                   type="submit"
                   disabled={isCheckingExistence || isSubmitting}
-                  className={`btn btn-primary btn-lg ${(isSubmitting || isCheckingExistence) ? "disabled" : ""}`}
+                  // Use the class styled in registration.css instead of btn-primary
+                  className={`submit-button ${(isSubmitting || isCheckingExistence) ? "disabled" : ""}`}
+                  // Adding btn and btn-lg for potential Bootstrap structure/sizing if needed,
+                  // but the color comes from submit-button. Adjust if submit-button handles all styling.
+                  // className={`btn btn-lg submit-button ${(isSubmitting || isCheckingExistence) ? "disabled" : ""}`}
                 >
                   {isCheckingExistence ? t('addForm.buttons.checking') : (isSubmitting ? t('addForm.buttons.processing') : t('addForm.buttons.submit'))}
                 </button>
@@ -444,6 +451,7 @@ function AddForm() { // Renamed component for clarity
           </div>
       </form>
     </div>
+  </div> // Close the wholeSection div
   );
 }
 

@@ -71,7 +71,7 @@ const ManageAppointments = () => {
     // --- Logout Function ---
     const performLogout = useCallback(() => {
         clearUserData();
-        alert(t('manageAppointments.alerts.sessionExpired', 'Session expired. Please log in again.')); // Add translation key
+        alert(t('sessionExpiredAlert')); // Use correct root-level key
         navigate("/sign-in");
     }, [navigate, t]);
 

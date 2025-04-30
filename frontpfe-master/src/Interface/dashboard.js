@@ -460,16 +460,24 @@ const Dashboard = ({ onLogout }) => {
         {/* Conditionally apply class based on isSidebarOpen state */}
         <div className={`sidebar ${isSidebarOpen ? '' : 'sidebar-closed'}`}>
           <div className="sidebar-header">
-            {user.photoProfil && (
-              <div className="user-info-item">
-                <img 
-                  src={`data:image/jpeg;base64,${user.photoProfil}`} 
-                  alt="Profile" 
-                  style={{ width: '100px', height: '100px', borderRadius: '50%' }}
-                />
-              </div>
-            )}
-  
+            <div className="user-info-item">
+              <img
+                src={
+                  user.photoProfil
+                    ? `data:image/jpeg;base64,${user.photoProfil}`
+                    : user.gender // Check if gender exists first
+                      ? (user.gender.toLowerCase() === 'male' || user.gender.toLowerCase() === 'homme')
+                        ? '/images/avatar%20%20homme.jpg' // Correct path with double space encoded
+                        : (user.gender.toLowerCase() === 'female' || user.gender.toLowerCase() === 'femme')
+                          ? '/images/avatar%20%20femme.jpg' // Correct path with double space encoded
+                          : '/images/avatar%20%20femme.jpg' // Default to female if gender exists but isn't recognized male/female
+                      : '/images/avatar%20%20femme.jpg' // Default to female if gender doesn't exist
+                }
+                alt={t('dashboard.sidebar.profileAlt', 'Profile')} // Added translation for alt text
+                style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+              />
+            </div>
+
             <h3>{user.firstName} {user.lastName}</h3>
   
             <div className="user-info-item">

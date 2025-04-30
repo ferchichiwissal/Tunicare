@@ -32,6 +32,8 @@
   "news": "Actualités",
   "rightsReserved": "Tous droits réservés par",
   "contactUs": "Contactez-nous",
+  "edit_exam_centre": "Modifier le Centre d'Examen",
+  "register_exam_centre_doctor": "Inscrire un Médecin au Centre d'Examen",
   "hospitalDescription": "Lorsque vous regardez sa mise en page. L'intérêt d'utiliser Lorem Ipsum est qu'il a une distribution plus ou moins normale des lettres, par opposition à",
   "previous": "Précédent",
   "next": "Suivant",
@@ -143,11 +145,12 @@
       "phoneLabel": "Téléphone",
       "ageLabel": "Âge",
       "notProvided": "Non fourni",
-      "notAvailable": "N/D"
+      "notAvailable": "N/D",
+      "specialtyLabel": "Spécialité"
     }
   },
   "editUserForm": {
-    "title": "Modifier le profil utilisateur (ID : {{id}})",
+    "title": "Modifier le profil utilisateur",
     "loading": "Chargement des données utilisateur...",
     "labels": {
       "firstName": "Prénom",
@@ -177,7 +180,7 @@
         "missingId": "L'ID utilisateur est manquant.",
         "noToken": "Jeton d'authentification introuvable.",
         "permissionDenied": "Permission refusée ou session expirée.",
-        "notFound": "Utilisateur avec l'ID {{id}} introuvable.",
+        "notFound": "Utilisateur introuvable.",
         "generic": "Échec de la récupération des données utilisateur. Veuillez réessayer."
       },
       "validation": {
@@ -190,7 +193,7 @@
       "submit": {
         "authRequired": "Authentification requise. Veuillez vous reconnecter.",
         "permissionDenied": "Permission refusée ou session expirée.",
-        "notFound": "Utilisateur avec l'ID {{id}} introuvable.",
+        "notFound": "Utilisateur introuvable.",
         "generic": "Échec de la mise à jour de l'utilisateur. Veuillez réessayer.",
         "networkError": "Erreur réseau ou serveur indisponible. Veuillez réessayer."
       }
@@ -335,18 +338,18 @@
         "invalidViewOrPermission": "Impossible de basculer le statut : Type de vue invalide ou permissions insuffisantes."
       },
       "toggleSuccess": "Statut {{role}} basculé avec succès. Nouveau statut : {{status}}.",
-      "toggleSuccessDoctorCentre": "Statut du Médecin du Centre d'Examen (ID : {{userId}}) basculé avec succès. Nouveau statut : {{status}}."
+      "toggleSuccessDoctorCentre": "Statut du Médecin du Centre d'Examen basculé avec succès. Nouveau statut : {{status}}."
     },
     "confirmations": {
-      "deleteAdmin": "Êtes-vous sûr de vouloir supprimer définitivement l'utilisateur ID {{userId}} et tous ses enregistrements ?",
-      "deleteDoctorAssistant": "Êtes-vous sûr de vouloir supprimer l'enregistrement de l'utilisateur ID {{userId}} de votre cabinet (ID : {{cabinetId}}) ?",
-      "deleteDoctorCentre": "Êtes-vous sûr de vouloir supprimer définitivement le Médecin du Centre d'Examen ID {{userId}} ?",
-      "activatePatient": "Êtes-vous sûr de vouloir activer le patient ID {{userId}} dans le cabinet {{cabinetId}} ?",
-      "deactivatePatient": "Êtes-vous sûr de vouloir désactiver le patient ID {{userId}} dans le cabinet {{cabinetId}} ?",
-      "activateDoctorAssistant": "Êtes-vous sûr de vouloir activer {{role}} ID {{userId}} ?",
-      "deactivateDoctorAssistant": "Êtes-vous sûr de vouloir désactiver {{role}} ID {{userId}} ?",
-      "activateDoctorCentre": "Êtes-vous sûr de vouloir activer le Médecin du Centre d'Examen ID {{userId}} ?",
-      "deactivateDoctorCentre": "Êtes-vous sûr de vouloir désactiver le Médecin du Centre d'Examen ID {{userId}} ?"
+      "deleteAdmin": "Êtes-vous sûr de vouloir supprimer définitivement cet utilisateur et tous ses enregistrements ?",
+      "deleteDoctorAssistant": "Êtes-vous sûr de vouloir supprimer l'enregistrement de cet utilisateur de votre cabinet (ID : {{cabinetId}}) ?",
+      "deleteDoctorCentre": "Êtes-vous sûr de vouloir supprimer définitivement ce Médecin du Centre d'Examen ?",
+      "activatePatient": "Êtes-vous sûr de vouloir activer ce patient dans le cabinet {{cabinetId}} ?",
+      "deactivatePatient": "Êtes-vous sûr de vouloir désactiver ce patient dans le cabinet {{cabinetId}} ?",
+      "activateDoctorAssistant": "Êtes-vous sûr de vouloir activer ce {{role}} ?",
+      "deactivateDoctorAssistant": "Êtes-vous sûr de vouloir désactiver ce {{role}} ?",
+      "activateDoctorCentre": "Êtes-vous sûr de vouloir activer ce Médecin du Centre d'Examen ?",
+      "deactivateDoctorCentre": "Êtes-vous sûr de vouloir désactiver ce Médecin du Centre d'Examen ?"
     }
   },
   "editDoctorCentreForm": {
@@ -429,7 +432,8 @@
         "notFoundWithMessage": "Introuvable : {{message}}",
         "badRequestWithMessage": "Mauvaise requête : {{message}}",
         "genericWithMessage": "Échec de l'activation du patient : {{message}}",
-        "networkError": "Échec de l'activation du patient en raison d'une erreur réseau ou inattendue."
+        "networkError": "Échec de l'activation du patient en raison d'une erreur réseau ou inattendue.",
+        "genericSimple": "Échec de l'activation de l'utilisateur. Veuillez réessayer plus tard."
       },
       "activateSuccess": "Le patient a été activé avec succès.",
       "toggleFailed": {
@@ -447,9 +451,9 @@
       "toggleSuccess": "Statut {{role}} basculé avec succès. Nouveau statut : {{status}}."
     },
     "confirmations": {
-      "deleteRegistration": "Êtes-vous sûr de vouloir supprimer la demande d'enregistrement de l'utilisateur ID {{userId}} de votre cabinet (ID : {{cabinetId}}) ?",
-      "activatePatient": "Êtes-vous sûr de vouloir activer le patient ID {{patientId}} dans votre cabinet ({{cabinetId}}) ?",
-      "toggleDoctorAssistant": "Êtes-vous sûr de vouloir basculer le statut actif pour {{role}} ID {{userId}} ? (Cet utilisateur pourrait être retiré de cette liste s'il est activé)"
+      "deleteRegistration": "Êtes-vous sûr de vouloir supprimer la demande d'enregistrement de cet utilisateur de votre cabinet (ID : {{cabinetId}}) ?",
+      "activatePatient": "Êtes-vous sûr de vouloir activer ce patient dans votre cabinet ({{cabinetId}}) ?",
+      "toggleDoctorAssistant": "Êtes-vous sûr de vouloir basculer le statut actif pour ce {{role}} ? (Cet utilisateur pourrait être retiré de cette liste s'il est activé)"
     },
     "status": {
         "active": "Actif",
@@ -509,8 +513,8 @@
       "toggleSuccess": "Statut du médecin mis à jour avec succès. Nouveau statut : {{status}}."
     },
     "confirmations": {
-      "deleteDoctor": "Êtes-vous sûr de vouloir supprimer définitivement l'inscription du médecin ID {{doctorId}} ?",
-      "activateDoctor": "Êtes-vous sûr de vouloir activer le médecin ID {{doctorId}} ?"
+      "deleteDoctor": "Êtes-vous sûr de vouloir supprimer définitivement l'inscription de ce médecin ?",
+      "activateDoctor": "Êtes-vous sûr de vouloir activer ce médecin ?"
     }
   },
   "changeRole": {
@@ -537,7 +541,8 @@
       "cabinetId": "Cabinet ID : {{id}}"
     },
     "buttons": {
-      "changeToAssistant": "Changer en Assistant"
+      "changeToAssistant": "Changer en Assistant",
+      "changeToDoctor": "Changer en Médecin"
     },
     "tooltips": {
       "selectCabinetFirst": "Sélectionnez d'abord un cabinet cible",
@@ -549,7 +554,7 @@
         "permissionDeniedAction": "Vous n'avez pas la permission d'effectuer cette action.",
         "wrongCabinet": "Vous ne pouvez transférer des patients que dans votre propre cabinet."
       },
-      "transferSuccess": "Patient transféré avec succès vers le rôle {{role}}. Nouvel ID utilisateur : {{newUserId}}"
+      "transferSuccess": "Patient transféré avec succès vers le rôle {{role}}."
     },
     "errors": {
       "fetch": {
@@ -567,11 +572,7 @@
       }
     },
     "confirmations": {
-      "transfer": "Êtes-vous sûr de vouloir transférer le patient {{firstName}} {{lastName}} (ID : {{userId}}) vers le rôle {{role}} dans le cabinet ID {{cabinetId}} ?"
-    },
-    "buttons": {
-      "changeToDoctor": "Changer en Médecin",
-      "changeToAssistant": "Changer en Assistant"
+      "transfer": "Êtes-vous sûr de vouloir transférer le patient {{firstName}} {{lastName}} vers le rôle {{role}} dans le cabinet ID {{cabinetId}} ?"
     }
   },
   "changePassword": {
@@ -753,7 +754,10 @@
     "genderRequired": "Le genre est requis",
     "passwordRequired": "Le mot de passe est requis",
     "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
-    "captchaRequired": "Veuillez compléter le reCAPTCHA"
+    "captchaRequired": "Veuillez compléter le reCAPTCHA",
+    "specialityRequired": "La spécialité est requise",
+    "passwordWeak": "Le mot de passe est trop faible",
+    "doctorExistsInCentre": "Un médecin avec cet email existe déjà dans ce centre"
   },
   "confirmation": {
     "successTitle": "Inscription Réussie",
@@ -798,7 +802,7 @@
     }
   },
   "editCabinet": {
-    "title": "Modifier le Cabinet (ID : {{id}})",
+    "title": "Modifier le Cabinet",
     "loadingMessage": "Chargement des informations du cabinet...",
     "labels": {
       "name": "Nom du Cabinet",
@@ -826,7 +830,7 @@
       "authRequiredModify": "Authentification requise pour modifier.",
       "permissionDeniedView": "Permission refusée pour voir ce cabinet.",
       "permissionDeniedModify": "Permission refusée pour modifier ce cabinet.",
-      "notFound": "Cabinet avec l'ID {{id}} introuvable.",
+      "notFound": "Cabinet introuvable.",
       "notFoundMaybeDeleted": "Cabinet introuvable (peut-être supprimé ?).",
       "conflict": "Conflit : Un autre cabinet avec ce nom/adresse existe peut-être.",
       "validationError": "Erreur de validation : {{message}}",
@@ -855,7 +859,7 @@
     "qrPermissionDenied": "Permission refusée pour générer ce QR code.",
     "qrNotFound": "Cabinet non trouvé pour générer le QR code.",
     "printPopupError": "Impossible d'ouvrir la fenêtre d'impression. Vérifiez les paramètres de votre navigateur (bloqueur de pop-up).",
-    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer le cabinet ID {{id}} et tous ses utilisateurs associés ? Cette action est irréversible.",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce cabinet et tous ses utilisateurs associés ? Cette action est irréversible.",
     "deleteAuthRequired": "Authentification requise pour supprimer.",
     "deletePermissionDenied": "Permission refusée pour supprimer ce cabinet.",
     "deleteNotFound": "Cabinet non trouvé pour la suppression.",
@@ -942,20 +946,20 @@
     "modal": {
       "refuse": {
         "title": "Refuser et Proposer une Nouvelle Date",
-        "appointmentIdLabel": "Rendez-vous ID : {{refusalTargetId}}",
+        "appointmentIdLabel": "Rendez-vous concerné",
         "newDateTimeLabel": "Proposer une nouvelle date et heure :",
         "validationError": "⚠️ Veuillez sélectionner une nouvelle date et heure.",
-        "success": "✅ Rendez-vous ID {{refusalTargetId}} refusé. Nouvelle date proposée.",
-        "failure": "❌ Échec du refus/proposition pour ID {{refusalTargetId}} : {{error}}",
+        "success": "✅ Rendez-vous refusé. Nouvelle date proposée.",
+        "failure": "❌ Échec du refus/proposition pour le rendez-vous : {{error}}",
         "sending": "Envoi...",
         "confirmButton": "Confirmer Refus & Proposition"
       }
     },
     "action": {
-      "acceptSuccess": "✅ Rendez-vous ID {{appointmentId}} accepté.",
-      "acceptFailed": "❌ Échec de l'acceptation du RDV ID {{appointmentId}}. Erreur: {{error}}",
-      "markDoneSuccess": "✅ Rendez-vous ID {{appointmentId}} marqué comme réalisé.",
-      "markDoneFailed": "❌ Échec du marquage comme réalisé pour RDV ID {{appointmentId}}. Erreur: {{error}}"
+      "acceptSuccess": "✅ Rendez-vous accepté.",
+      "acceptFailed": "❌ Échec de l'acceptation du rendez-vous. Erreur: {{error}}",
+      "markDoneSuccess": "✅ Rendez-vous marqué comme réalisé.",
+      "markDoneFailed": "❌ Échec du marquage comme réalisé pour le rendez-vous. Erreur: {{error}}"
     },
     "error": {
       "missingCabinetId": "Erreur : ID du cabinet non trouvé dans les données utilisateur.",
@@ -977,7 +981,9 @@
     "failureMessage": "Échec de la création du rendez-vous. Veuillez réessayer.",
     "addingButton": "Demande en cours...",
     "addButton": "Demander Rendez-vous",
-    "rescheduleButton": "Reprogrammer Rendez-vous"
+    "rescheduleButton": "Reprogrammer Rendez-vous",
+    "pastDateError": "La date sélectionnée ne peut pas être dans le passé.",
+    "pastTimeError": "L'heure sélectionnée doit être ultérieure à l'heure actuelle pour aujourd'hui."
   },
   "consultationDashboard": {
     "loading": "Chargement du tableau de bord des consultations...",
@@ -1009,8 +1015,6 @@
     "invalidDate": "Date invalide",
     "dateError": "Erreur Date",
     "error": "Erreur",
-    "notAvailable": "N/D",
-    "invalidDate": "Date invalide",
     "close": "Fermer"
   },
   "medicalExaminationForm": {
@@ -1061,7 +1065,7 @@
     },
     "print": {
       "otherCentre": "Autre",
-      "centreNotFound": "Centre ID: {{id}} (Nom non trouvé)",
+      "centreNotFound": "Centre (Nom non trouvé)",
       "title": "Demande d'Examen Médical",
       "doctorPrefix": "Dr. ",
       "fallbackDoctorName": "[Nom Docteur]",
@@ -1087,14 +1091,14 @@
     "loading": "Chargement des détails de la consultation...",
     "error": {
       "patientDetailsNotFound": "Détails complets du patient non trouvés.",
-      "patientNotFoundById": "Patient avec ID {{id}} non trouvé via /Users/allid/.",
-      "fetchPatientDetailsFailed": "Échec de la récupération des détails pour le patient {{id}}.",
+      "patientNotFoundById": "Patient non trouvé.",
+      "fetchPatientDetailsFailed": "Échec de la récupération des détails du patient.",
       "patientIdMissing": "ID du patient manquant dans les données de consultation.",
-      "consultationNotFound": "Consultation avec ID {{id}} non trouvée.",
-      "fetchConsultationFailed": "Échec de la récupération des détails pour la consultation {{id}}.",
+      "consultationNotFound": "Consultation non trouvée.",
+      "fetchConsultationFailed": "Échec de la récupération des détails de la consultation.",
       "patientDetailsNotFoundInAppointment": "Détails du patient non trouvés dans les données du rendez-vous.",
-      "appointmentNotFound": "Rendez-vous avec ID {{id}} non trouvé.",
-      "fetchAppointmentFailed": "Échec de la récupération des détails pour le rendez-vous {{id}}.",
+      "appointmentNotFound": "Rendez-vous non trouvé.",
+      "fetchAppointmentFailed": "Échec de la récupération des détails du rendez-vous.",
       "missingId": "ID de rendez-vous ou de consultation manquant dans l'URL.",
       "cannotLoadPatient": "Impossible de charger les informations du patient pour cette consultation.",
       "missingDoctorOrCabinetId": "Impossible de récupérer l'ID du médecin ou du cabinet actif. Veuillez vérifier votre session.",
@@ -1164,7 +1168,7 @@
       "dateLabel": "Date",
       "signatureLabel": "Signature",
       "loadingData": "Chargement des données d'impression...",
-      "fetchDataError": "Erreur lors de la récupération des données d'impression (ID : {{id}}). Impression avec les données actuelles."
+      "fetchDataError": "Erreur lors de la récupération des données d'impression. Impression avec les données actuelles."
     }
   },
   "cabinetSettings": {
@@ -1217,7 +1221,7 @@
       "authMissing": "Token d'authentification manquant.",
       "authMissingLogin": "Token d'authentification manquant. Veuillez vous reconnecter.",
       "fetchFailedFallback": "Échec de la récupération de vos demandes d'examen pour ce cabinet.",
-      "downloadFailed": "Échec du téléchargement de l'examen {{examId}}. L'endpoint backend est peut-être manquant."
+      "downloadFailed": "Échec du téléchargement de l'examen. L'endpoint backend est peut-être manquant."
     },
     "table": {
       "dateRequested": "Date Demande",
@@ -1261,7 +1265,7 @@
     "proposedDateLabel": "Date proposée :",
     "buttonFixNew": "Planifier Nouveau",
     "modalTitleModify": "Modifier le Rendez-vous",
-    "modalApptIdLabel": "ID Rendez-vous :",
+    "modalApptIdLabel": "Rendez-vous :",
     "modalDateLabel": "Nouvelle Date et Heure :",
     "modalTypeLabel": "Type de Rendez-vous :",
     "modalSavingButton": "Enregistrement...",
@@ -1273,5 +1277,46 @@
     "send": "Envoyer",
     "placeholder": "Posez votre question...",
     "greeting": "Bonjour Docteur! Comment puis-je vous aider aujourd'hui?"
+  },
+  "editCentreDexamenForm": {
+    "error_fetching_centre_details": "Erreur lors de la récupération des détails du centre.",
+    "error_all_fields_required": "Veuillez remplir tous les champs obligatoires (Nom, Adresse, Téléphone).",
+    "error_updating_centre": "Erreur lors de la mise à jour du centre.",
+    "loading": "Chargement...",
+    "labels": {
+      "name": "Nom du Centre",
+      "address": "Adresse",
+      "telephone": "Téléphone"
+    },
+    "buttons": {
+      "save": "Enregistrer les modifications",
+      "saving": "Enregistrement...",
+      "cancel": "Annuler"
+    },
+    "success_update": "Centre d'examen mis à jour avec succès !"
+  },
+  "addCentreDexamenForm": {
+    "error_adding_centre": "Erreur lors de l'ajout du centre d'examen.",
+    "buttons": {
+       "add_centre": "Ajouter Centre"
+    }
+  },
+  "centreDexamenList": {
+    "confirm_delete_centre": "Êtes-vous sûr de vouloir supprimer ce centre d'examen et tous les médecins associés ? Cette action est irréversible.",
+    "success_centre_deleted": "Centre d'examen et médecins associés supprimés avec succès.",
+    "error_deleting_centre": "Erreur lors de la suppression du centre d'examen",
+    "print_qr_code": "Imprimer QR Code",
+    "no_centres_found": "Aucun centre d'examen trouvé."
+  },
+  "registerDoctorCentreForm": {
+    "error": {
+      "existenceCheckFailed": "Échec de la vérification de l'existence du médecin.",
+      "registrationFailed": "Échec de l'inscription du médecin.",
+      "verificationFailed": "Échec de la vérification de l'email."
+    }
+  },
+  "protectedLayout": {
+    "sessionExpired": "Session expirée ou invalide. Redirection vers la connexion.",
+    "unauthorizedAccess": "Accès non autorisé."
   }
 }

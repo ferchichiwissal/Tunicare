@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom"; // Récupérer les paramètres et navigation
 import axios from "axios";
+import { useTranslation } from 'react-i18next'; // Importer useTranslation
 
 const EditUserForm = () => {
     const { id } = useParams(); // Récupérer l'ID de l'utilisateur depuis l'URL
     const navigate = useNavigate(); // Pour rediriger après la modification
+    const { t } = useTranslation(); // Initialiser t
 
     const [formData, setFormData] = useState({
         first_name: "",
@@ -33,7 +35,7 @@ const EditUserForm = () => {
         e.preventDefault();
         axios.put(`http://localhost:8080/api/users/${id}`, formData)
             .then(() => {
-                alert("User updated successfully!");
+                alert(t('editUserForm.alerts.updateSuccess')); // Utiliser la clé de traduction
                 navigate("/users"); // Rediriger vers la liste des utilisateurs
             })
             .catch(error => console.error("Error during update:", error));

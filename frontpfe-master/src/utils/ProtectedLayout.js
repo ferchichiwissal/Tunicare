@@ -2,10 +2,12 @@ import React, { useEffect, useCallback } from "react"; // Import useCallback
 import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 import { clearUserData } from './auth'; // Import clearUserData
 
 
 const ProtectedLayout = ({ requiredRole, children  }) => {
+    const { t } = useTranslation(); // Initialize t function
     const navigate = useNavigate();
   const token =
     localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
@@ -15,10 +17,9 @@ const ProtectedLayout = ({ requiredRole, children  }) => {
   // --- Logout Function ---
   const performLogout = useCallback(() => {
       clearUserData();
-      // Removed t() function call as useTranslation is not used here
-      alert("Session expired or invalid. Redirecting to login.");
+      alert(t('protectedLayout.sessionExpired')); // Use translation key
       navigate("/sign-in");
-  }, [navigate]);
+  }, [navigate, t]); // Add t to dependencies
 
   useEffect(() => {
     // Handle logout if token becomes invalid after initial check (less likely but for completeness)
@@ -70,7 +71,7 @@ const ProtectedLayout = ({ requiredRole, children  }) => {
   }
   if (!hasRequiredRole) {
     // Redirect directly if unauthorized
-    alert("Unauthorized access"); // Keep the alert for user feedback
+    alert(t('protectedLayout.unauthorizedAccess')); // Use translation key
     return <Navigate to="/" />; // Use Navigate for direct redirect
   }
 

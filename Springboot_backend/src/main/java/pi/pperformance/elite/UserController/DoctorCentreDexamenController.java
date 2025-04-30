@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile; // Import MultipartFile
 import pi.pperformance.elite.UserRepository.CentreDexamenRepository;
 import pi.pperformance.elite.UserRepository.DoctorCentreDexamenRepository;
 import pi.pperformance.elite.UserServices.EmailService;
@@ -20,6 +21,8 @@ import pi.pperformance.elite.entities.Role;
 // import pi.pperformance.elite.entities.VerificationRequest; // Removed import
 import pi.pperformance.elite.exceptions.ResourceNotFoundException;
 
+import java.io.IOException; // Import IOException
+import java.nio.file.*; // Import for file operations
 import java.time.LocalDate;
 import java.util.List; // Added import
 import java.util.Map;
@@ -31,6 +34,9 @@ import java.util.Random;
 public class DoctorCentreDexamenController {
 
     private static final Logger log = LoggerFactory.getLogger(DoctorCentreDexamenController.class);
+
+    // Define the upload directory relative to the application root - NO LONGER NEEDED
+    // private static final String UPLOAD_DIR = "uploads/doctor_profiles/";
 
     @Autowired
     private VerificationService verificationService;
@@ -71,8 +77,8 @@ public class DoctorCentreDexamenController {
             @RequestParam String address,
             @RequestParam String gender, // Changed from 'gendre' for consistency
             @RequestParam String speciality, // Added speciality
+            @RequestParam(value = "photoProfil", required = false) MultipartFile photoProfil, // Accept optional photo
             @RequestParam("g-recaptcha-response") String captchaResponse // Assuming reCAPTCHA
-            // Add @RequestParam for photoProfil (MultipartFile) if needed
     ) {
         log.info("Initiating registration for doctor {} {} for centre ID: {}", firstName, lastName, centreId);
 
@@ -106,12 +112,27 @@ public class DoctorCentreDexamenController {
         // 5. Generate Verification Code
         String verificationCode = String.format("%06d", new Random().nextInt(999999));
 
-        // 6. Create and Store Verification Request
-        // Assuming no photo for now. Add photoProfilBytes if needed.
+        // 6. Read photo bytes if provided
+        byte[] photoBytes = null;
+        if (photoProfil != null && !photoProfil.isEmpty()) {
+            try {
+                photoBytes = photoProfil.getBytes();
+                log.info("Received photoProfil for email: {}, size: {} bytes", email, photoBytes.length);
+            } catch (IOException e) {
+                log.error("Failed to read bytes from photoProfil for email {}: {}", email, e.getMessage());
+                // Decide if this is a fatal error or continue without photo
+                // Continuing without photo for now, but could return badRequest
+            }
+        }
+
+        // 7. (Removed duplicate verification code generation)
+
+        // 8. Create and Store Verification Request
+        // Use the verificationCode generated in step 5
         DoctorCentreVerificationRequest doctorCentreVerificationRequest = new DoctorCentreVerificationRequest(
                 firstName, lastName, email, birthDate, password, tel, address, gender,
                 Role.DOCTOR_CENTRE_EXAMEN.name(), // Store role name
-                null, // photoProfilBytes
+                photoBytes, // Pass photo bytes (can be null)
                 verificationCode,
                 centreId, // Store centreId
                 speciality // Store speciality
@@ -120,7 +141,7 @@ public class DoctorCentreDexamenController {
         verificationService.storeVerificationRequest(email, doctorCentreVerificationRequest);
         log.info("Stored verification request for email: {}", email);
 
-        // 7. Send Verification Email
+        // 9. Send Verification Email
         try {
             emailService.sendVerificationEmail(email, verificationCode);
             log.info("Verification email sent successfully to: {}", email);
@@ -216,7 +237,17 @@ public class DoctorCentreDexamenController {
         newDoctor.setRole(Role.DOCTOR_CENTRE_EXAMEN); // Set role
         newDoctor.setActive(false); // Set as inactive initially
         newDoctor.setCentreDexamen(centre); // Associate with the centre
-        // Set photo if handled: newDoctor.setPhotoProfil(request.getPhotoProfil());
+
+        // 6.b Set Photo Profile directly from verification request bytes
+        byte[] photoBytes = request.getPhotoProfil();
+        if (photoBytes != null && photoBytes.length > 0) {
+            newDoctor.setPhotoProfil(photoBytes); // Set the byte array directly
+            log.info("Setting profile photo ({} bytes) for email: {}", photoBytes.length, email);
+        } else {
+            log.info("No profile photo provided for email: {}", email);
+            newDoctor.setPhotoProfil(null); // Ensure it's null if not provided
+        }
+
         newDoctor.setCreatedAt(LocalDate.now()); // Set timestamps
         newDoctor.setUpdatedAt(LocalDate.now());
 

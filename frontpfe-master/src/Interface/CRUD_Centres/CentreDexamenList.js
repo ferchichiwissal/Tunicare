@@ -145,7 +145,7 @@ const CentreDexamenList = () => {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm(t('confirm_delete_centre'))) { // Use specific key
+        if (window.confirm(t('centreDexamenList.confirm_delete_centre'))) { // Use specific key
             setError(''); // Clear previous errors
             const token = getToken(); // Use getToken()
             if (!token) {
@@ -159,7 +159,7 @@ const CentreDexamenList = () => {
                 });
                 // Refetch centres after deletion
                 fetchCentres();
-                alert(t('success_centre_deleted')); // Use specific key
+                alert(t('centreDexamenList.success_centre_deleted')); // Use specific key
             } catch (err) {
                 console.error("Error deleting centre:", err);
                  if (err.response) {
@@ -168,7 +168,7 @@ const CentreDexamenList = () => {
                      } else if (err.response.status === 404) {
                          setError(t('manageCabinets.deleteNotFound')); // Reuse key
                      } else {
-                        setError(t('error_deleting_centre') + `: ${err.response.data?.message || err.response.statusText}`); // Use specific key
+                        setError(t('centreDexamenList.error_deleting_centre') + `: ${err.response.data?.message || err.response.statusText}`); // Use specific key
                      }
                  } else {
                      setError(t('manageCabinets.deleteNetworkError')); // Reuse key
@@ -186,12 +186,12 @@ const CentreDexamenList = () => {
 
         const printWindow = window.open('', '_blank', 'height=600,width=800');
         if (printWindow) {
-            printWindow.document.write(`<html><head><title>${t('print_qr_code')}</title></head>`); // Specific key
+            printWindow.document.write(`<html><head><title>${t('centreDexamenList.print_qr_code')}</title></head>`); // Specific key
             printWindow.document.write('<style>body { font-family: sans-serif; padding: 20px; } h3 { border-bottom: 1px solid #ccc; padding-bottom: 5px; } img { max-width: 200px; display: block; margin: 15px 0; } p { margin: 5px 0; }</style></head><body>');
-            printWindow.document.write(`<h3>${t('centre_name')}: ${selectedCentreDetails.name}</h3>`); // Specific key
-            printWindow.document.write(`<p><strong>${t('address')}:</strong> ${selectedCentreDetails.adress}</p>`);
-            printWindow.document.write(`<p><strong>${t('phone')}:</strong> ${selectedCentreDetails.tel || t('manageCabinets.notAvailable')}</p>`); // Reuse key
-            printWindow.document.write(`<p><strong>${t('qr_code')} ${t('register_exam_centre_doctor')}:</strong></p>`); // Specific keys
+            printWindow.document.write(`<h3>${t('manageCabinets.tableHeaders.name')}: ${selectedCentreDetails.name}</h3>`); // Use consistent key
+            printWindow.document.write(`<p><strong>${t('manageCabinets.tableHeaders.address')}:</strong> ${selectedCentreDetails.adress}</p>`); // Use consistent key
+            printWindow.document.write(`<p><strong>${t('manageCabinets.tableHeaders.phone')}:</strong> ${selectedCentreDetails.tel || t('manageCabinets.notAvailable')}</p>`); // Use consistent key
+            printWindow.document.write(`<p><strong>${t('manageCabinets.tableHeaders.qrCode')} ${t('register_exam_centre_doctor')}:</strong></p>`); // Use consistent key
             printWindow.document.write(`<img src="${selectedCentreQr}" alt="QR Code Inscription ${selectedCentreDetails.name}" />`);
             printWindow.document.write('</body></html>');
             printWindow.document.close();
@@ -217,10 +217,10 @@ const CentreDexamenList = () => {
     return (
         // Use the class name from the CSS file to mimic CabinetList
         <div className="cabinet-list-container">
-            <h2>{t('manage_exam_centres')}</h2>
+            <h2>{t('nav.manageExamCentres')}</h2> {/* Use nav key */}
             {/* No "Add" button here */}
 
-            {centres.length === 0 && !error && <p>{t('no_centres_found')}</p>}
+            {centres.length === 0 && !error && <p>{t('centreDexamenList.no_centres_found')}</p>} {/* Use specific key */}
 
             {centres.length > 0 && (
                 <div className="table-responsive-wrapper"> {/* Optional wrapper */}

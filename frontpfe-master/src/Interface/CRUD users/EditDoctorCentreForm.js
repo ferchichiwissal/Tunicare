@@ -284,7 +284,7 @@ const EditDoctorCentreForm = () => {
                             {loading ? t('editDoctorCentreForm.buttons.updating') : t('editDoctorCentreForm.buttons.update')}
                         </button>
                         <button type="button" className="btn btn-secondary btn-lg" onClick={() => navigate('/users-management')} disabled={loading}>
-                            {t('editDoctorCentreForm.buttons.cancel')}
+                            {t('common.cancel')}
                         </button>
                     </div>
                 </div>

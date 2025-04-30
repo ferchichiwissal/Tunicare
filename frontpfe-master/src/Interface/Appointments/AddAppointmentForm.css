@@ -1,117 +1,117 @@
 /* Styles for AddAppointmentForm component - Harmonized with AddCabinetForm */
 
 .add-appointment-container {
-    max-width: 700px; /* Adjusted width */
-    margin: 40px auto; /* Adjusted margin */
-    padding: 30px; /* Adjusted padding */
-    background-color: var(--background-color, #ffffff); /* Use theme variable */
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Consistent shadow */
-    font-family: var(--font-family, 'Roboto', sans-serif); /* Use theme variable */
-    color: var(--text-color, #0c0c0c); /* Use theme variable for default text */
+  max-width: 700px; /* Adjusted width */
+  margin: 40px auto; /* Adjusted margin */
+  padding: 30px; /* Adjusted padding */
+  background-color: var(--background-color, #ffffff); /* Use theme variable */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Consistent shadow */
+  font-family: var(--font-family, 'Roboto', sans-serif); /* Use theme variable */
+  color: var(--text-color, #0c0c0c); /* Use theme variable for default text */
 }
 
 .add-appointment-container h2 {
-    color: var(--text-color, #0c0c0c); /* Use theme variable */
-    text-align: center;
-    margin-bottom: 25px; /* Adjusted margin */
-    border-bottom: 2px solid var(--primary-color, #00c6a9); /* Use theme variable */
-    padding-bottom: 10px; /* Adjusted padding */
-    display: inline-block; /* Match AddCabinetForm */
+  color: var(--text-color, #0c0c0c); /* Use theme variable */
+  text-align: center;
+  margin-bottom: 25px; /* Adjusted margin */
+  border-bottom: 2px solid var(--primary-color, #00c6a9); /* Use theme variable */
+  padding-bottom: 10px; /* Adjusted padding */
+  display: inline-block; /* Match AddCabinetForm */
 }
 
 .add-appointment-form .form-group {
-    margin-bottom: 20px; /* Adjusted margin */
+  margin-bottom: 20px; /* Adjusted margin */
 }
 
 .add-appointment-form label {
-    display: block;
-    margin-bottom: 8px; /* Adjusted margin */
-    font-weight: bold;
-    color: var(--text-color, #0c0c0c); /* Use theme variable */
+  display: block;
+  margin-bottom: 8px; /* Adjusted margin */
+  font-weight: bold;
+  color: var(--text-color, #0c0c0c); /* Use theme variable */
 }
 
 /* Style for required labels (if needed, add 'required' class in JS) */
 .add-appointment-form label.required::after {
-  content: '*';
-  color: var(--error-color, #e60f0f); /* Use theme variable */
-  margin-left: 4px;
-  font-weight: bold;
+content: '*';
+color: var(--error-color, #e60f0f); /* Use theme variable */
+margin-left: 4px;
+font-weight: bold;
 }
 
 .add-appointment-form .form-control {
-    width: 100%;
-    padding: 12px 15px; /* Adjusted padding */
-    border: 1px solid var(--input-border-color, #ccc); /* Use theme variable */
-    border-radius: 5px; /* Adjusted radius */
-    box-sizing: border-box;
-    font-size: 1rem; /* Consistent font size */
-    background-color: var(--input-bg-color, #ffffff); /* Use theme variable */
-    color: var(--input-text-color, #0c0c0c); /* Use theme variable */
-    transition: border-color 0.3s;
+  width: 100%;
+  padding: 12px 15px; /* Adjusted padding */
+  border: 1px solid var(--input-border-color, #ccc); /* Use theme variable */
+  border-radius: 5px; /* Adjusted radius */
+  box-sizing: border-box;
+  font-size: 1rem; /* Consistent font size */
+  background-color: var(--input-bg-color, #ffffff); /* Use theme variable */
+  color: var(--input-text-color, #0c0c0c); /* Use theme variable */
+  transition: border-color 0.3s;
 }
 
 .add-appointment-form .form-control:focus {
-  border-color: var(--primary-color, #00c6a9); /* Use theme variable */
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(0, 198, 169, 0.2); /* Consistent focus */
+border-color: var(--primary-color, #00c6a9); /* Use theme variable */
+outline: none;
+box-shadow: 0 0 0 2px rgba(0, 198, 169, 0.2); /* Consistent focus */
 }
 
 /* Explicit styling for select to ensure proper display */
 .add-appointment-form select.form-control {
-    appearance: auto; /* Use browser default appearance */
-    padding: 12px 15px; /* Ensure consistent padding */
-    height: calc(1.5em + 1.5rem + 2px); /* Explicit height to prevent text cutoff, adjust if needed */
-    line-height: 1.5; /* Ensure text is vertically centered */
+  appearance: auto; /* Use browser default appearance */
+  padding: 12px 15px; /* Ensure consistent padding */
+  height: calc(1.5em + 1.5rem + 2px); /* Explicit height to prevent text cutoff, adjust if needed */
+  line-height: 1.5; /* Ensure text is vertically centered */
 }
 
 
 .add-appointment-form .btn {
-    display: inline-block;
-    padding: 12px 30px; /* Adjusted padding */
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px; /* Adjusted radius */
-    transition: background-color 0.3s, transform 0.1s; /* Consistent transition */
-    background-color: var(--primary-color, #00c6a9); /* Use theme variable */
-    color: var(--button-text-color, #ffffff); /* Use theme variable */
-    text-transform: uppercase; /* Consistent text transform */
+  display: inline-block;
+  padding: 12px 30px; /* Adjusted padding */
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px; /* Adjusted radius */
+  transition: background-color 0.3s, transform 0.1s; /* Consistent transition */
+  background-color: var(--primary-color, #00c6a9); /* Use theme variable */
+  color: var(--button-text-color, #ffffff); /* Use theme variable */
+  text-transform: uppercase; /* Consistent text transform */
 }
 
 .add-appointment-form .btn:hover {
-  background-color: var(--primary-hover-color, #00937d); /* Use theme variable */
-  transform: translateY(-1px); /* Consistent hover effect */
+background-color: var(--primary-hover-color, #00937d); /* Use theme variable */
+transform: translateY(-1px); /* Consistent hover effect */
 }
 
 .add-appointment-form .btn:disabled {
-    background-color: var(--disabled-color, #ccc); /* Use theme variable */
-    cursor: not-allowed;
-    opacity: 0.65; /* Keep opacity */
+  background-color: var(--disabled-color, #ccc); /* Use theme variable */
+  cursor: not-allowed;
+  opacity: 0.65; /* Keep opacity */
 }
 
 /* Harmonized message styles */
 .success-message,
 .error-message {
-    font-size: 0.9rem; /* Consistent size */
-    font-weight: bold;
-    margin-top: 15px; /* Adjusted margin */
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
+  font-size: 0.9rem; /* Consistent size */
+  font-weight: bold;
+  margin-top: 15px; /* Adjusted margin */
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
 }
 
 .success-message {
-    color: var(--success-color, green); /* Use theme variable */
-    background-color: var(--success-bg-color, rgba(0, 128, 0, 0.1)); /* Use theme variable */
-    border: 1px solid var(--success-color, green); /* Use theme variable */
+  color: var(--success-color, green); /* Use theme variable */
+  background-color: var(--success-bg-color, rgba(0, 128, 0, 0.1)); /* Use theme variable */
+  border: 1px solid var(--success-color, green); /* Use theme variable */
 }
 
 .error-message {
-    color: var(--error-color, #e60f0f); /* Use theme variable */
-    background-color: var(--error-bg-color, rgba(230, 15, 15, 0.1)); /* Use theme variable */
-    border: 1px solid var(--error-color, #e60f0f); /* Use theme variable */
+  color: var(--error-color, #e60f0f); /* Use theme variable */
+  background-color: var(--error-bg-color, rgba(230, 15, 15, 0.1)); /* Use theme variable */
+  border: 1px solid var(--error-color, #e60f0f); /* Use theme variable */
 }

@@ -32,6 +32,8 @@
   "news": "News",
   "rightsReserved": "All Rights Reserved By",
   "contactUs": "Contact Us",
+  "edit_exam_centre": "Edit Exam Centre",
+  "register_exam_centre_doctor": "Register Doctor to Exam Centre",
   "hospitalDescription": "When looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to",
   "previous": "Previous",
   "next": "Next",
@@ -143,11 +145,12 @@
       "phoneLabel": "Phone",
       "ageLabel": "Age",
       "notProvided": "Not provided",
-      "notAvailable": "N/A"
+      "notAvailable": "N/A",
+      "specialtyLabel": "Specialty"
     }
   },
   "editUserForm": {
-    "title": "Edit User Profile (ID: {{id}})",
+    "title": "Edit User Profile",
     "loading": "Loading user data...",
     "labels": {
       "firstName": "First Name",
@@ -177,7 +180,7 @@
         "missingId": "User ID is missing.",
         "noToken": "Authentication token not found.",
         "permissionDenied": "Permission denied or session expired.",
-        "notFound": "User with ID {{id}} not found.",
+        "notFound": "User not found.",
         "generic": "Failed to fetch user data. Please try again."
       },
       "validation": {
@@ -190,7 +193,7 @@
       "submit": {
         "authRequired": "Authentication required. Please log in again.",
         "permissionDenied": "Permission denied or session expired.",
-        "notFound": "User with ID {{id}} not found.",
+        "notFound": "User not found.",
         "generic": "Failed to update the user. Please try again.",
         "networkError": "Network error or server unavailable. Please try again."
       }
@@ -335,18 +338,18 @@
         "invalidViewOrPermission": "Cannot toggle status: Invalid view type or insufficient permissions."
       },
       "toggleSuccess": "{{role}} status successfully toggled. New status: {{status}}.",
-      "toggleSuccessDoctorCentre": "Exam Centre Doctor (ID: {{userId}}) status successfully toggled. New status: {{status}}."
+      "toggleSuccessDoctorCentre": "Exam Centre Doctor status successfully toggled. New status: {{status}}."
     },
     "confirmations": {
-      "deleteAdmin": "Are you sure you want to permanently delete user ID {{userId}} and all their registrations?",
-      "deleteDoctorAssistant": "Are you sure you want to remove user ID {{userId}}'s registration from your cabinet (ID: {{cabinetId}})?",
-      "deleteDoctorCentre": "Are you sure you want to permanently delete Exam Centre Doctor ID {{userId}}?",
-      "activatePatient": "Are you sure you want to activate patient ID {{userId}} in cabinet {{cabinetId}}?",
-      "deactivatePatient": "Are you sure you want to deactivate patient ID {{userId}} in cabinet {{cabinetId}}?",
-      "activateDoctorAssistant": "Are you sure you want to activate {{role}} ID {{userId}}?",
-      "deactivateDoctorAssistant": "Are you sure you want to deactivate {{role}} ID {{userId}}?",
-      "activateDoctorCentre": "Are you sure you want to activate Exam Centre Doctor ID {{userId}}?",
-      "deactivateDoctorCentre": "Are you sure you want to deactivate Exam Centre Doctor ID {{userId}}?"
+      "deleteAdmin": "Are you sure you want to permanently delete this user and all their registrations?",
+      "deleteDoctorAssistant": "Are you sure you want to remove this user's registration from your cabinet (ID: {{cabinetId}})?",
+      "deleteDoctorCentre": "Are you sure you want to permanently delete this Exam Centre Doctor?",
+      "activatePatient": "Are you sure you want to activate this patient in cabinet {{cabinetId}}?",
+      "deactivatePatient": "Are you sure you want to deactivate this patient in cabinet {{cabinetId}}?",
+      "activateDoctorAssistant": "Are you sure you want to activate this {{role}}?",
+      "deactivateDoctorAssistant": "Are you sure you want to deactivate this {{role}}?",
+      "activateDoctorCentre": "Are you sure you want to activate this Exam Centre Doctor?",
+      "deactivateDoctorCentre": "Are you sure you want to deactivate this Exam Centre Doctor?"
     }
   },
   "editDoctorCentreForm": {
@@ -429,7 +432,8 @@
         "notFoundWithMessage": "Not Found: {{message}}",
         "badRequestWithMessage": "Bad Request: {{message}}",
         "genericWithMessage": "Failed to activate patient: {{message}}",
-        "networkError": "Failed to activate the patient due to a network or unexpected error."
+        "networkError": "Failed to activate the patient due to a network or unexpected error.",
+        "genericSimple": "Failed to activate the user. Please try again later."
       },
       "activateSuccess": "Patient has been successfully activated.",
       "toggleFailed": {
@@ -447,9 +451,9 @@
       "toggleSuccess": "{{role}} status successfully toggled. New status: {{status}}."
     },
     "confirmations": {
-      "deleteRegistration": "Are you sure you want to delete user ID {{userId}}'s registration request from your cabinet (ID: {{cabinetId}})?",
-      "activatePatient": "Are you sure you want to activate patient ID {{patientId}} in your cabinet ({{cabinetId}})?",
-      "toggleDoctorAssistant": "Are you sure you want to toggle the active status for {{role}} ID {{userId}}? (This user might be removed from this list if activated)"
+      "deleteRegistration": "Are you sure you want to delete this user's registration request from your cabinet (ID: {{cabinetId}})?",
+      "activatePatient": "Are you sure you want to activate this patient in your cabinet ({{cabinetId}})?",
+      "toggleDoctorAssistant": "Are you sure you want to toggle the active status for this {{role}}? (This user might be removed from this list if activated)"
     },
     "status": {
         "active": "Active",
@@ -509,8 +513,8 @@
       "toggleSuccess": "Doctor status updated successfully. New status: {{status}}."
     },
     "confirmations": {
-      "deleteDoctor": "Are you sure you want to permanently delete the registration for doctor ID {{doctorId}}?",
-      "activateDoctor": "Are you sure you want to activate doctor ID {{doctorId}}?"
+      "deleteDoctor": "Are you sure you want to permanently delete the registration for this doctor?",
+      "activateDoctor": "Are you sure you want to activate this doctor?"
     }
   },
   "changeRole": {
@@ -537,7 +541,8 @@
       "cabinetId": "Cabinet ID: {{id}}"
     },
     "buttons": {
-      "changeToAssistant": "Change to Assistant"
+      "changeToAssistant": "Change to Assistant",
+      "changeToDoctor": "Change to Doctor"
     },
     "tooltips": {
       "selectCabinetFirst": "Select a target cabinet first",
@@ -549,7 +554,7 @@
         "permissionDeniedAction": "You do not have permission to perform this action.",
         "wrongCabinet": "You can only transfer patients within your own cabinet."
       },
-      "transferSuccess": "Patient successfully transferred to {{role}}. New User ID: {{newUserId}}"
+      "transferSuccess": "Patient successfully transferred to {{role}}."
     },
     "errors": {
       "fetch": {
@@ -567,11 +572,7 @@
       }
     },
     "confirmations": {
-      "transfer": "Are you sure you want to transfer patient {{firstName}} {{lastName}} (ID: {{userId}}) to the {{role}} role in cabinet ID {{cabinetId}}?"
-    },
-    "buttons": {
-      "changeToDoctor": "Change to Doctor",
-      "changeToAssistant": "Change to Assistant"
+      "transfer": "Are you sure you want to transfer patient {{firstName}} {{lastName}} to the {{role}} role in cabinet ID {{cabinetId}}?"
     }
   },
   "changePassword": {
@@ -753,7 +754,10 @@
     "genderRequired": "Gender is required",
     "passwordRequired": "Password is required",
     "passwordsDoNotMatch": "Passwords do not match",
-    "captchaRequired": "Please complete the reCAPTCHA"
+    "captchaRequired": "Please complete the reCAPTCHA",
+    "specialityRequired": "Speciality is required",
+    "passwordWeak": "Password is too weak",
+    "doctorExistsInCentre": "A doctor with this email already exists in this centre"
   },
   "confirmation": {
     "successTitle": "Registration Successful",
@@ -798,7 +802,7 @@
     }
   },
   "editCabinet": {
-    "title": "Edit Cabinet (ID: {{id}})",
+    "title": "Edit Cabinet",
     "loadingMessage": "Loading cabinet information...",
     "labels": {
       "name": "Cabinet Name",
@@ -826,7 +830,7 @@
       "authRequiredModify": "Authentication required to modify.",
       "permissionDeniedView": "Permission denied to view this cabinet.",
       "permissionDeniedModify": "Permission denied to modify this cabinet.",
-      "notFound": "Cabinet with ID {{id}} not found.",
+      "notFound": "Cabinet not found.",
       "notFoundMaybeDeleted": "Cabinet not found (maybe deleted?).",
       "conflict": "Conflict: Another cabinet with this name/address might exist.",
       "validationError": "Validation Error: {{message}}",
@@ -855,7 +859,7 @@
     "qrPermissionDenied": "Permission denied to generate this QR code.",
     "qrNotFound": "Cabinet not found for QR code generation.",
     "printPopupError": "Could not open print window. Check your browser's popup blocker settings.",
-    "deleteConfirm": "Are you sure you want to delete cabinet ID {{id}} and all associated users? This action is irreversible.",
+    "deleteConfirm": "Are you sure you want to delete this cabinet and all associated users? This action is irreversible.",
     "deleteAuthRequired": "Authentication required to delete.",
     "deletePermissionDenied": "Permission denied to delete this cabinet.",
     "deleteNotFound": "Cabinet not found for deletion.",
@@ -942,20 +946,20 @@
     "modal": {
       "refuse": {
         "title": "Refuse and Propose New Date",
-        "appointmentIdLabel": "Appointment ID: {{refusalTargetId}}",
+        "appointmentIdLabel": "Appointment",
         "newDateTimeLabel": "Propose new date and time:",
         "validationError": "⚠️ Please select a new date and time.",
-        "success": "✅ Appointment ID {{refusalTargetId}} refused. New date proposed.",
-        "failure": "❌ Failed to refuse/propose for ID {{refusalTargetId}}: {{error}}",
+        "success": "✅ Appointment refused. New date proposed.",
+        "failure": "❌ Failed to refuse/propose for the appointment: {{error}}",
         "sending": "Sending...",
         "confirmButton": "Confirm Refusal & Proposal"
       }
     },
     "action": {
-      "acceptSuccess": "✅ Appointment ID {{appointmentId}} accepted.",
-      "acceptFailed": "❌ Failed to accept Appt ID {{appointmentId}}. Error: {{error}}",
-      "markDoneSuccess": "✅ Appointment ID {{appointmentId}} marked as done.",
-      "markDoneFailed": "❌ Failed to mark as done for Appt ID {{appointmentId}}. Error: {{error}}"
+      "acceptSuccess": "✅ Appointment accepted.",
+      "acceptFailed": "❌ Failed to accept the appointment. Error: {{error}}",
+      "markDoneSuccess": "✅ Appointment marked as done.",
+      "markDoneFailed": "❌ Failed to mark as done for the appointment. Error: {{error}}"
     },
     "error": {
       "missingCabinetId": "Error: Cabinet ID not found in user data.",
@@ -1011,9 +1015,6 @@
     "invalidDate": "Invalid Date",
     "dateError": "Date Error",
     "error": "Error",
-    "notAvailable": "N/A",
-    "invalidDate": "Invalid Date",
-    "dateError": "Date Error",
     "close": "Close"
   },
   "medicalExaminationForm": {
@@ -1064,7 +1065,7 @@
     },
     "print": {
       "otherCentre": "Other",
-      "centreNotFound": "Centre ID: {{id}} (Name not found)",
+      "centreNotFound": "Centre (Name not found)",
       "title": "Medical Exam Request",
       "doctorPrefix": "Dr. ",
       "fallbackDoctorName": "[Doctor Name]",
@@ -1090,14 +1091,14 @@
     "loading": "Loading consultation details...",
     "error": {
       "patientDetailsNotFound": "Full patient details not found.",
-      "patientNotFoundById": "Patient with ID {{id}} not found via /Users/allid/.",
-      "fetchPatientDetailsFailed": "Failed to fetch details for patient {{id}}.",
+      "patientNotFoundById": "Patient not found.",
+      "fetchPatientDetailsFailed": "Failed to fetch patient details.",
       "patientIdMissing": "Patient ID missing in consultation data.",
-      "consultationNotFound": "Consultation with ID {{id}} not found.",
-      "fetchConsultationFailed": "Failed to fetch details for consultation {{id}}.",
+      "consultationNotFound": "Consultation not found.",
+      "fetchConsultationFailed": "Failed to fetch consultation details.",
       "patientDetailsNotFoundInAppointment": "Patient details not found in appointment data.",
-      "appointmentNotFound": "Appointment with ID {{id}} not found.",
-      "fetchAppointmentFailed": "Failed to fetch details for appointment {{id}}.",
+      "appointmentNotFound": "Appointment not found.",
+      "fetchAppointmentFailed": "Failed to fetch appointment details.",
       "missingId": "Missing appointment or consultation ID in URL.",
       "cannotLoadPatient": "Cannot load patient information for this consultation.",
       "missingDoctorOrCabinetId": "Could not retrieve active doctor or cabinet ID. Please check your session.",
@@ -1167,7 +1168,7 @@
       "dateLabel": "Date",
       "signatureLabel": "Signature",
       "loadingData": "Loading print data...",
-      "fetchDataError": "Error fetching print data (ID: {{id}}). Printing with current data."
+      "fetchDataError": "Error fetching print data. Printing with current data."
     }
   },
   "cabinetSettings": {
@@ -1220,7 +1221,7 @@
       "authMissing": "Authentication token missing.",
       "authMissingLogin": "Authentication token missing. Please log in again.",
       "fetchFailedFallback": "Failed to retrieve your exam requests for this cabinet.",
-      "downloadFailed": "Failed to download exam {{examId}}. The backend endpoint might be missing."
+      "downloadFailed": "Failed to download exam. The backend endpoint might be missing."
     },
     "table": {
       "dateRequested": "Date Requested",
@@ -1264,7 +1265,7 @@
     "proposedDateLabel": "Proposed Date:",
     "buttonFixNew": "Schedule New",
     "modalTitleModify": "Modify Appointment",
-    "modalApptIdLabel": "Appointment ID:",
+    "modalApptIdLabel": "Appointment:",
     "modalDateLabel": "New Date and Time:",
     "modalTypeLabel": "Appointment Type:",
     "modalSavingButton": "Saving...",
@@ -1276,5 +1277,46 @@
     "send": "Send",
     "placeholder": "Ask your question...",
     "greeting": "Hello Doctor! How can I help you today?"
+  },
+  "editCentreDexamenForm": {
+    "error_fetching_centre_details": "Error fetching centre details.",
+    "error_all_fields_required": "Please fill in all required fields (Name, Address, Phone).",
+    "error_updating_centre": "Error updating the centre.",
+    "loading": "Loading...",
+    "labels": {
+      "name": "Centre Name",
+      "address": "Address",
+      "telephone": "Telephone"
+    },
+    "buttons": {
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "success_update": "Exam centre updated successfully!"
+  },
+  "addCentreDexamenForm": {
+    "error_adding_centre": "Error adding the exam centre.",
+    "buttons": {
+       "add_centre": "Add Centre"
+    }
+  },
+  "centreDexamenList": {
+    "confirm_delete_centre": "Are you sure you want to delete this exam centre and all associated doctors? This action is irreversible.",
+    "success_centre_deleted": "Exam centre and associated doctors deleted successfully.",
+    "error_deleting_centre": "Error deleting exam centre",
+    "print_qr_code": "Print QR Code",
+    "no_centres_found": "No exam centres found."
+  },
+  "registerDoctorCentreForm": {
+    "error": {
+      "existenceCheckFailed": "Failed to check doctor existence.",
+      "registrationFailed": "Failed to register doctor.",
+      "verificationFailed": "Failed email verification."
+    }
+  },
+  "protectedLayout": {
+    "sessionExpired": "Session expired or invalid. Redirecting to login.",
+    "unauthorizedAccess": "Unauthorized access."
   }
 }

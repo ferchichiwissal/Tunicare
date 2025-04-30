@@ -34,7 +34,7 @@ const RegisterDoctorCentreForm = () => {
         address: '',
         gender: '', // Use 'gender' consistently
         speciality: '', // Specific field for DoctorCentreDexamen
-        // photoProfil: null // Handle file upload if needed later
+        photoProfil: null // Add state for profile photo file
     });
 
     const [errors, setErrors] = useState({});
@@ -68,10 +68,17 @@ const RegisterDoctorCentreForm = () => {
         }
     };
 
-    // Add handleFileChange if photo upload is implemented later
-    // const handleFileChange = (e) => {
-    //     setFormData({ ...formData, photoProfil: e.target.files[0] });
-    // };
+    // Handle file input change
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFormData(prevState => ({ ...prevState, photoProfil: file }));
+            // Clear potential previous file error
+            if (errors.photoProfil) {
+                setErrors(prevErrors => ({ ...prevErrors, photoProfil: null }));
+            }
+        }
+    };
 
     const handleCaptcha = (value) => {
         setCaptchaVerified(!!value);
@@ -98,6 +105,10 @@ const RegisterDoctorCentreForm = () => {
         }
         if (!formData.gender) newErrors.gender = t('validation.genderRequired');
         if (!formData.speciality) newErrors.speciality = t('validation.specialityRequired'); // Add speciality validation
+        // Optional: Add validation for file type/size if needed
+        // if (formData.photoProfil && !['image/jpeg', 'image/png'].includes(formData.photoProfil.type)) {
+        //     newErrors.photoProfil = t('validation.photoInvalidType');
+        // }
         if (!formData.password) {
              newErrors.password = t('validation.passwordRequired');
         } else if (!checkPasswordStrength(formData.password)) {
@@ -138,7 +149,7 @@ const RegisterDoctorCentreForm = () => {
               } catch (error) {
                  // Only fail if it's not a 404 (meaning check endpoint exists but failed)
                  if (error.response && error.response.status !== 404) {
-                    setErrors({ general: t('error.existenceCheckFailed') }); // Use error key
+                    setErrors({ general: t('registerDoctorCentreForm.error.existenceCheckFailed') }); // Corrected key
                     console.error("Existence check error:", error);
                     setIsCheckingExistence(false);
                     recaptchaRef.current.reset(); // Reset captcha
@@ -165,10 +176,10 @@ const RegisterDoctorCentreForm = () => {
                 formDataToSend.append("address", formData.address);
                 formDataToSend.append("gender", formData.gender);
                 formDataToSend.append("speciality", formData.speciality);
-                // Append photo if handled:
-                // if (formData.photoProfil) {
-                //   formDataToSend.append("photoProfil", formData.photoProfil);
-                // }
+                // Append photo if selected
+                if (formData.photoProfil) {
+                  formDataToSend.append("photoProfil", formData.photoProfil);
+                }
                 formDataToSend.append("g-recaptcha-response", token);
                 // centreId is in the URL path, not form data
 
@@ -180,18 +191,18 @@ const RegisterDoctorCentreForm = () => {
 
                 // Check response message for success indication
                 if (response.data?.message === "Verification code sent to email.") {
-                  setIsVerifying(true); // Move to verification step
-                } else {
-                  // Handle unexpected success response
-                  setErrors({ general: response.data?.message || t('error.registrationFailed') });
-                  recaptchaRef.current.reset();
-                  setCaptchaVerified(false);
-                }
-            } catch (error) {
-                const errorMsg = error.response?.data?.message || t('error.registrationFailed');
-                if (error.response?.status === 409) { // Conflict (e.g., duplicate during registration attempt)
-                    setErrors({ general: errorMsg });
-                } else {
+                   setIsVerifying(true); // Move to verification step
+                 } else {
+                   // Handle unexpected success response
+                   setErrors({ general: response.data?.message || t('registerDoctorCentreForm.error.registrationFailed') }); // Corrected key
+                   recaptchaRef.current.reset();
+                   setCaptchaVerified(false);
+                 }
+             } catch (error) {
+                 const errorMsg = error.response?.data?.message || t('registerDoctorCentreForm.error.registrationFailed'); // Corrected key
+                 if (error.response?.status === 409) { // Conflict (e.g., duplicate during registration attempt)
+                     setErrors({ general: errorMsg });
+                 } else {
                     setErrors({ general: errorMsg });
                 }
                 console.error("Registration submission error:", error);
@@ -222,13 +233,13 @@ const RegisterDoctorCentreForm = () => {
               navigate("/confirmation"); // Redirect on successful verification
             } else {
               // Handle unexpected success response format
-              setErrors({ verification: response.data?.message || t('error.verificationFailed') });
-            }
-        } catch (error) {
-            const errorMsg = error.response?.data?.message || t('error.verificationFailed');
-             if (error.response?.status === 409) { // Conflict during verification
-                 setErrors({ verification: errorMsg });
-             } else {
+               setErrors({ verification: response.data?.message || t('registerDoctorCentreForm.error.verificationFailed') }); // Corrected key
+             }
+         } catch (error) {
+             const errorMsg = error.response?.data?.message || t('registerDoctorCentreForm.error.verificationFailed'); // Corrected key
+              if (error.response?.status === 409) { // Conflict during verification
+                  setErrors({ verification: errorMsg });
+              } else {
                  setErrors({ verification: errorMsg });
              }
             console.error("Verification error:", error);
@@ -333,7 +344,17 @@ const RegisterDoctorCentreForm = () => {
                             </div>
                         </div>
 
-                        {/* Row 5: Password, Confirm Password */}
+                        {/* Row 5: Photo de Profil */}
+                        <div className="row g-3 mb-3">
+                            <div className="col-12">
+                                <label htmlFor="reg-photoProfil" className="form-label">{t('registration.photoProfilLabel', 'Photo de Profil')}</label>
+                                <input type="file" id="reg-photoProfil" name="photoProfil" accept="image/png, image/jpeg" onChange={handleFileChange} className={`form-control ${errors.photoProfil ? 'is-invalid' : ''}`} />
+                                <div className="form-text">{t('registration.photoProfilHelp', 'Formats acceptés : JPG, PNG.')}</div>
+                                <div className="invalid-feedback">{errors.photoProfil}</div>
+                            </div>
+                        </div>
+
+                        {/* Row 6: Password, Confirm Password */}
                         <div className="row g-3 mb-3">
                             <div className="col-md-6">
                                 <label htmlFor="reg-password" className="form-label required">{t('registration.passwordLabel')}</label>
@@ -354,7 +375,7 @@ const RegisterDoctorCentreForm = () => {
                             </div>
                         </div>
 
-                        {/* Row 6: ReCAPTCHA */}
+                        {/* Row 7: ReCAPTCHA */}
                         <div className="row g-3 mb-3 justify-content-center">
                            <div className="col-auto">
                               <ReCAPTCHA
@@ -366,13 +387,15 @@ const RegisterDoctorCentreForm = () => {
                            </div>
                         </div>
 
-                        {/* Row 7: Submit Button */}
+                        {/* Row 8: Submit Button */}
                         <div className="row g-3">
                            <div className="col-12 text-center">
                               <button
                                 type="submit"
                                 disabled={isCheckingExistence || isSubmitting || !captchaVerified}
-                                className={`btn btn-primary btn-lg ${(isSubmitting || isCheckingExistence) ? "disabled" : ""}`}
+                                // Remove btn-primary, use submit-button for color
+                                // Keep btn and btn-lg for Bootstrap structure/sizing if desired
+                                className={`btn btn-lg submit-button ${(isSubmitting || isCheckingExistence) ? "disabled" : ""}`}
                               >
                                 {isCheckingExistence ? t('registration.checkingButton') : (isSubmitting ? t('registration.processingButton') : t('registration.registerButton'))}
                               </button>
@@ -389,10 +412,13 @@ const RegisterDoctorCentreForm = () => {
                 value={verificationCode}
                  onChange={(e) => setVerificationCode(e.target.value)}
                  className="form-control verification-input" // Use form-control
+                 placeholder={t('registration.verificationCodePlaceholder')} // Add placeholder
                />
               <button
                 onClick={handleVerificationSubmit}
-                className="btn btn-success verify-button" // Use Bootstrap button
+                // Remove btn-success, use verify-button for color
+                // Keep btn for Bootstrap structure/sizing if desired
+                className="btn verify-button"
               >
                 {t('registration.verifyButton')}
               </button>
