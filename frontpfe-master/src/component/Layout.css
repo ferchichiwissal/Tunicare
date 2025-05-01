@@ -1,0 +1,27 @@
+.app-layout {
+  display: flex; /* Use flexbox for layout */
+  min-height: 100vh; /* Ensure layout takes full viewport height */
+}
+
+.app-logo-container {
+  /* Styles for the logo container */
+  padding: 10px; /* Add some padding around the logo */
+  background-color: #f8f9fa; /* Optional: Add a background color */
+  border-right: 1px solid #dee2e6; /* Optional: Add a separator */
+  display: flex;
+  align-items: flex-start; /* Align logo to the top */
+  justify-content: center;
+}
+
+.app-logo-icon {
+  /* Styles for the logo image */
+  width: 80px; /* Increased size */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.app-content {
+  /* Styles for the main content area */
+  flex-grow: 1; /* Allow content to take remaining space */
+  padding: 20px; /* Add padding to the content area */
+  overflow-y: auto; /* Add scroll if content overflows */
+}

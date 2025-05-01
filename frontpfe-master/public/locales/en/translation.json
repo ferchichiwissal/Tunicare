@@ -742,7 +742,13 @@
     "emailVerificationMessage": "We've sent a verification code to {{email}}. Please check your inbox.",
     "verificationCodePlaceholder": "Enter 6-digit code",
     "verifyButton": "Verify Account",
-    "tryAgainButton": "Try again"
+    "tryAgainButton": "Try again",
+    "errorUserExists": "A user with this email, first name, and last name already exists in this cabinet.",
+    "errorExistenceCheckFailed": "Could not verify user existence. Please try again.",
+    "errorGeneralRegistration": "An error occurred during registration. Please try again.",
+    "errorInvalidVerificationCode": "Invalid verification code or verification failed. Please try again.",
+    "errorUserExistsVerification": "A user with this email and name already exists in this cabinet.",
+    "errorVerificationFailed": "Verification failed. Please try again or request a new code."
   },
   "validation": {
     "firstNameRequired": "First name is required",
@@ -983,7 +989,10 @@
     "addButton": "Request Appointment",
     "rescheduleButton": "Reschedule Appointment",
     "pastDateError": "The selected date cannot be in the past.",
-    "pastTimeError": "The selected time must be later than the current time for today."
+    "pastTimeError": "The selected time must be later than the current time for today.",
+    "alerts": {
+      "sessionExpired": "Session expired. Please log in again."
+    }
   },
   "consultationDashboard": {
     "loading": "Loading Consultation Dashboard...",
@@ -1006,6 +1015,9 @@
     "errors": {
       "missingDoctorId": "Could not retrieve the logged-in doctor's ID.",
       "fetchFailedFallback": "Failed to retrieve your consultations."
+    },
+    "alerts": {
+        "sessionExpired": "Session expired. Please log in again."
     }
   },
   "common": {
@@ -1183,7 +1195,10 @@
     "selectFileLabel": "Select signature file:",
     "uploading": "Uploading...",
     "saveButton": "Save Signature",
-    "otherSettingsTitle": "Other Settings"
+    "otherSettingsTitle": "Other Settings",
+    "alerts": {
+      "sessionExpired": "Session expired. Please log in again."
+    }
   },
   "myConsultationsPage": {
     "title": "My Consultations",
@@ -1196,7 +1211,11 @@
       "authErrorDownload": "Authentication error for download.",
       "downloadInvalidResponse": "Could not download prescription (invalid response).",
       "prescriptionNotFound": "No prescription found for this consultation.",
-      "downloadFailedFallback": "Failed to download the prescription."
+      "downloadFailedFallback": "Failed to download the prescription.",
+      "authError": "Authentication error. Please log in again."
+    },
+    "alerts": {
+      "sessionExpired": "Session expired. Please log in again."
     },
     "table": {
       "date": "Date",
@@ -1221,7 +1240,11 @@
       "authMissing": "Authentication token missing.",
       "authMissingLogin": "Authentication token missing. Please log in again.",
       "fetchFailedFallback": "Failed to retrieve your exam requests for this cabinet.",
-      "downloadFailed": "Failed to download exam. The backend endpoint might be missing."
+      "downloadFailed": "Failed to download exam. The backend endpoint might be missing.",
+      "authError": "Authentication error. Please log in again."
+    },
+    "alerts": {
+        "sessionExpired": "Session expired. Please log in again."
     },
     "table": {
       "dateRequested": "Date Requested",
@@ -1299,6 +1322,17 @@
     "error_adding_centre": "Error adding the exam centre.",
     "buttons": {
        "add_centre": "Add Centre"
+    },
+    "alerts": {
+        "sessionExpired": "Session expired. Please log in again.",
+        "success_centre_added": "Exam centre '{{name}}' added successfully!"
+    },
+    "validation": {
+        "all_fields_required": "Please fill in all required fields (Name, Address, Phone)."
+    },
+    "labels": {
+        "centre_name": "Centre Name",
+        "phone": "Phone"
     }
   },
   "centreDexamenList": {
@@ -1318,5 +1352,58 @@
   "protectedLayout": {
     "sessionExpired": "Session expired or invalid. Redirecting to login.",
     "unauthorizedAccess": "Unauthorized access."
+  },
+  "ordonnanceEditPage": {
+    "title": "Prescription Management",
+    "search": {
+      "label": "Search Patient (Last/First Name):",
+      "placeholder": "Enter at least 2 characters...",
+      "noPatients": "No patients found.",
+      "error": "Error searching for patients."
+    },
+    "selectedPatientPrefix": "Selected Patient:",
+    "prescriptionsTitle": "Prescriptions",
+    "loadingPrescriptions": "Loading prescriptions...",
+    "noPrescriptionsFound": "No prescriptions found for this patient.",
+    "consultationDateLabel": "Consultation Date:",
+    "fetchPrescriptions": {
+      "error": "Error fetching prescriptions."
+    },
+    "edit": {
+      "editorLabel": "Edit Prescription:",
+      "success": "Prescription updated successfully!",
+      "error": "Error updating prescription."
+    },
+    "emptyPrescription": "Empty prescription"
+  },
+  "resetPass": {
+    "invalidEmailError": "Please enter a valid email address.",
+    "successMessage": "A password reset link has been sent to your email.",
+    "sendFailErrorFallback": "Failed to send reset email. Please check the email address and try again.",
+    "genericError": "An error occurred. Please try again later.",
+    "title": "Reset Password",
+    "emailLabel": "Email address",
+    "sendingButton": "Sending...",
+    "sendButton": "Send Reset Link",
+    "backToLoginLink": "Back to Login"
+  },
+  "resetPasswordPage": {
+    "error": {
+      "invalidToken": "Invalid or missing password reset token.",
+      "passwordEmpty": "New password cannot be empty.",
+      "passwordTooShort": "New password must be at least 8 characters long.",
+      "passwordsMismatch": "Passwords do not match.",
+      "tokenMissingOrInvalid": "Token is missing or invalid.",
+      "resetFailedFallback": "Failed to reset password. The token might be invalid or expired.",
+      "networkError": "An error occurred. Please check your network connection and try again."
+    },
+    "successMessage": "Password reset successful! Redirecting to login...",
+    "title": "Reset Your Password",
+    "newPasswordLabel": "New Password",
+    "confirmPasswordLabel": "Confirm New Password",
+    "resettingButton": "Resetting...",
+    "resetButton": "Reset Password",
+    "loadingToken": "Loading token...",
+    "goToLoginLink": "Go to Login"
   }
 }

@@ -1,17 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react"; // Added useEffect, useCallback
+import React, { useState } from "react"; // Removed useEffect, useCallback as they weren't used after refactor
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 import './ResetPass.css'; // Import the dedicated CSS file
-// Removed unused styles import
 
 const ResetPass = () => {
+    const { t } = useTranslation(); // Initialize translation hook
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [error, setError] = useState(""); // Added error state
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate(); // Initialize navigate
-
-    // Optional: Add inactivity/token checks if this page requires authentication
-    // For a public password reset request, usually no auth is needed.
 
     const handleResetRequest = async () => {
         setLoading(true);
@@ -20,7 +18,7 @@ const ResetPass = () => {
 
         // Basic email validation
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            setError("Please enter a valid email address.");
+            setError(t('resetPass.invalidEmailError')); // Use translation key
             setLoading(false);
             return;
         }
@@ -34,15 +32,16 @@ const ResetPass = () => {
             });
 
             if (response.ok) {
-                setMessage("A password reset link has been sent to your email.");
+                setMessage(t('resetPass.successMessage')); // Use translation key
                 setEmail(""); // Clear email field on success
             } else {
                 const data = await response.json().catch(() => ({})); // Handle non-JSON error response
-                setError(data.message || "Failed to send reset email. Please check the email address and try again.");
+                // Note: data.message comes from the backend, ideally it should be a key itself or handled differently
+                setError(data.message || t('resetPass.sendFailErrorFallback')); // Use translation key for fallback
             }
         } catch (error) {
             console.error("Password reset request error:", error); // Log error
-            setError("An error occurred. Please try again later.");
+            setError(t('resetPass.genericError')); // Use translation key
         } finally {
             setLoading(false);
         }
@@ -52,13 +51,13 @@ const ResetPass = () => {
         // Use Bootstrap container and classes
         <div className="auth-wrapper"> {/* Keep wrapper class if defined in ResetPass.css */}
             <div className="auth-inner"> {/* Keep inner class */}
-                <h3 className="mb-3">Reset Password</h3> {/* Bootstrap margin */}
+                <h3 className="mb-3">{t('resetPass.title')}</h3> {/* Use translation key */}
                 {message && <div className="alert alert-success">{message}</div>}
                 {error && <div className="alert alert-danger">{error}</div>}
 
                 <form onSubmit={(e) => e.preventDefault()}>
                     <div className="mb-3"> {/* Bootstrap margin */}
-                        <label htmlFor="reset-email" className="form-label">Email address</label>
+                        <label htmlFor="reset-email" className="form-label">{t('resetPass.emailLabel')}</label> {/* Use translation key */}
                         <input
                             id="reset-email"
                             value={email}
@@ -77,11 +76,11 @@ const ResetPass = () => {
                             className="btn btn-primary btn-lg" // Bootstrap button classes
                             disabled={loading}
                         >
-                            {loading ? "Sending..." : "Send Reset Link"}
+                            {loading ? t('resetPass.sendingButton') : t('resetPass.sendButton')} {/* Use translation keys */}
                         </button>
                     </div>
                      <div className="text-center mt-3"> {/* Link back to login */}
-                        <a href="/sign-in">Back to Login</a>
+                        <a href="/sign-in">{t('resetPass.backToLoginLink')}</a> {/* Use translation key */}
                     </div>
                 </form>
             </div>

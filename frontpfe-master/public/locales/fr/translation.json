@@ -728,6 +728,8 @@
     "genderFemale": "Femme",
     "genderOther": "Autre",
     "specialityLabel": "Spécialité",
+    "photoProfilLabel": "Photo de profil (Facultatif)",
+    "photoProfilHelp": "Formats acceptés : JPG, PNG.",
     "passwordLabel": "Mot de passe",
     "passwordPlaceholder": "Entrez le mot de passe",
     "passwordStrengthLabel": "Force du mot de passe : {{strength}}",
@@ -742,7 +744,13 @@
     "emailVerificationMessage": "Nous avons envoyé un code de vérification à {{email}}. Veuillez vérifier votre boîte de réception.",
     "verificationCodePlaceholder": "Entrez le code à 6 chiffres",
     "verifyButton": "Vérifier le compte",
-    "tryAgainButton": "Réessayer"
+    "tryAgainButton": "Réessayer",
+    "errorUserExists": "Un utilisateur avec cet email, prénom et nom existe déjà dans ce cabinet.",
+    "errorExistenceCheckFailed": "Impossible de vérifier l'existence de l'utilisateur. Veuillez réessayer.",
+    "errorGeneralRegistration": "Une erreur s'est produite lors de l'inscription. Veuillez réessayer.",
+    "errorInvalidVerificationCode": "Code de vérification invalide ou la vérification a échoué. Veuillez réessayer.",
+    "errorUserExistsVerification": "Un utilisateur avec cet email et nom existe déjà dans ce cabinet.",
+    "errorVerificationFailed": "La vérification a échoué. Veuillez réessayer ou demander un nouveau code."
   },
   "validation": {
     "firstNameRequired": "Le prénom est requis",
@@ -983,7 +991,10 @@
     "addButton": "Demander Rendez-vous",
     "rescheduleButton": "Reprogrammer Rendez-vous",
     "pastDateError": "La date sélectionnée ne peut pas être dans le passé.",
-    "pastTimeError": "L'heure sélectionnée doit être ultérieure à l'heure actuelle pour aujourd'hui."
+    "pastTimeError": "L'heure sélectionnée doit être ultérieure à l'heure actuelle pour aujourd'hui.",
+    "alerts": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter."
+    }
   },
   "consultationDashboard": {
     "loading": "Chargement du tableau de bord des consultations...",
@@ -1006,6 +1017,9 @@
     "errors": {
       "missingDoctorId": "Impossible de récupérer l'ID du médecin connecté.",
       "fetchFailedFallback": "Échec de la récupération de vos consultations."
+    },
+    "alerts": {
+        "sessionExpired": "Session expirée. Veuillez vous reconnecter."
     }
   },
   "common": {
@@ -1183,7 +1197,10 @@
     "selectFileLabel": "Sélectionner le fichier de signature :",
     "uploading": "Téléversement...",
     "saveButton": "Enregistrer la Signature",
-    "otherSettingsTitle": "Autres Paramètres"
+    "otherSettingsTitle": "Autres Paramètres",
+    "alerts": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter."
+    }
   },
   "myConsultationsPage": {
     "title": "Mes Consultations",
@@ -1196,7 +1213,11 @@
       "authErrorDownload": "Erreur d'authentification pour le téléchargement.",
       "downloadInvalidResponse": "Impossible de télécharger l'ordonnance (réponse invalide).",
       "prescriptionNotFound": "Aucune ordonnance trouvée pour cette consultation.",
-      "downloadFailedFallback": "Échec du téléchargement de l'ordonnance."
+      "downloadFailedFallback": "Échec du téléchargement de l'ordonnance.",
+      "authError": "Erreur d'authentification. Veuillez vous reconnecter."
+    },
+    "alerts": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter."
     },
     "table": {
       "date": "Date",
@@ -1221,7 +1242,11 @@
       "authMissing": "Token d'authentification manquant.",
       "authMissingLogin": "Token d'authentification manquant. Veuillez vous reconnecter.",
       "fetchFailedFallback": "Échec de la récupération de vos demandes d'examen pour ce cabinet.",
-      "downloadFailed": "Échec du téléchargement de l'examen. L'endpoint backend est peut-être manquant."
+      "downloadFailed": "Échec du téléchargement de l'examen. L'endpoint backend est peut-être manquant.",
+      "authError": "Erreur d'authentification. Veuillez vous reconnecter."
+    },
+    "alerts": {
+        "sessionExpired": "Session expirée. Veuillez vous reconnecter."
     },
     "table": {
       "dateRequested": "Date Demande",
@@ -1269,7 +1294,10 @@
     "modalDateLabel": "Nouvelle Date et Heure :",
     "modalTypeLabel": "Type de Rendez-vous :",
     "modalSavingButton": "Enregistrement...",
-    "modalSaveButton": "Enregistrer les Modifications"
+    "modalSaveButton": "Enregistrer les Modifications",
+    "alerts": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter."
+    }
   },
   "chatbot": {
     "open": "Ouvrir Chat IA",
@@ -1318,5 +1346,58 @@
   "protectedLayout": {
     "sessionExpired": "Session expirée ou invalide. Redirection vers la connexion.",
     "unauthorizedAccess": "Accès non autorisé."
+  },
+  "ordonnanceEditPage": {
+    "title": "Gestion des Ordonnances",
+    "search": {
+      "label": "Rechercher un patient (Nom/Prénom) :",
+      "placeholder": "Entrez au moins 2 caractères...",
+      "noPatients": "Aucun patient trouvé.",
+      "error": "Erreur lors de la recherche des patients."
+    },
+    "selectedPatientPrefix": "Patient sélectionné :",
+    "prescriptionsTitle": "Ordonnances",
+    "loadingPrescriptions": "Chargement des ordonnances...",
+    "noPrescriptionsFound": "Aucune ordonnance trouvée pour ce patient.",
+    "consultationDateLabel": "Date Consultation :",
+    "fetchPrescriptions": {
+      "error": "Erreur lors de la récupération des ordonnances."
+    },
+    "edit": {
+      "editorLabel": "Modifier l'ordonnance :",
+      "success": "Ordonnance mise à jour avec succès !",
+      "error": "Erreur lors de la mise à jour."
+    },
+    "emptyPrescription": "Ordonnance vide"
+  },
+  "resetPass": {
+    "invalidEmailError": "Veuillez entrer une adresse e-mail valide.",
+    "successMessage": "Un lien de réinitialisation de mot de passe a été envoyé à votre adresse e-mail.",
+    "sendFailErrorFallback": "Échec de l'envoi de l'e-mail de réinitialisation. Veuillez vérifier l'adresse e-mail et réessayer.",
+    "genericError": "Une erreur s'est produite. Veuillez réessayer plus tard.",
+    "title": "Réinitialiser le mot de passe",
+    "emailLabel": "Adresse e-mail",
+    "sendingButton": "Envoi en cours...",
+    "sendButton": "Envoyer le lien de réinitialisation",
+    "backToLoginLink": "Retour à la connexion"
+  },
+  "resetPasswordPage": {
+    "error": {
+      "invalidToken": "Jeton de réinitialisation de mot de passe invalide ou manquant.",
+      "passwordEmpty": "Le nouveau mot de passe ne peut pas être vide.",
+      "passwordTooShort": "Le nouveau mot de passe doit comporter au moins 8 caractères.",
+      "passwordsMismatch": "Les mots de passe ne correspondent pas.",
+      "tokenMissingOrInvalid": "Le jeton est manquant ou invalide.",
+      "resetFailedFallback": "Échec de la réinitialisation du mot de passe. Le jeton est peut-être invalide ou expiré.",
+      "networkError": "Une erreur s'est produite. Veuillez vérifier votre connexion réseau et réessayer."
+    },
+    "successMessage": "Réinitialisation du mot de passe réussie ! Redirection vers la connexion...",
+    "title": "Réinitialisez votre mot de passe",
+    "newPasswordLabel": "Nouveau mot de passe",
+    "confirmPasswordLabel": "Confirmer le nouveau mot de passe",
+    "resettingButton": "Réinitialisation...",
+    "resetButton": "Réinitialiser le mot de passe",
+    "loadingToken": "Chargement du jeton...",
+    "goToLoginLink": "Aller à la connexion"
   }
 }

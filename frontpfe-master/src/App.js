@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react'; // Import Suspense
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Layout from './component/Layout'; // Import the new Layout component
 import RegistrationForm from "./inscription/RegistrationForm";
 import ConfirmationPage from "./inscription/ConfirmationPage";
 //import Homepage from "./home/HelloWorld";
@@ -61,163 +62,125 @@ function App() {
         {/* Wrap Routes with Suspense for i18next loading */}
         <Suspense fallback={<div>Loading translations...</div>}>
         <Routes>
-          <Route path="/sign-in" element={<Login />} />
-          <Route path="/Logout" element={<Logout />} />
+          {/* Public routes with Layout */}
+          <Route path="/sign-in" element={<Layout><Login /></Layout>} />
+          <Route path="/Logout" element={<Layout><Logout /></Layout>} /> {/* Assuming Logout might need layout */}
+          <Route path="/reset-password" element={<Layout><ResetPasswordPage/></Layout>} />
+          <Route path="/Registration" element={<Layout><RegistrationForm /></Layout>} />
+          <Route path="/confirmation" element={<Layout><ConfirmationPage /></Layout>} />
+          <Route path="/resetpassword" element={<Layout><ResetPass /></Layout>} />
+          <Route path="/register-doctor-centre" element={<Layout><RegisterDoctorCentreForm /></Layout>} /> {/* Public registration */}
 
+          {/* Root route without Layout */}
           <Route path="/" element={<Template />} />
-          <Route path="/reset-password" element={<ResetPasswordPage/>} />
 
-
-          <Route path="/Registration" element={<RegistrationForm />} />
-
-          <Route path="/confirmation" element={<ConfirmationPage />} />
-          <Route path="/resetpassword" element={<ResetPass />} />
-          <Route path='/dashboard' element={<Dashboard onLogout={onLogout}/>} />
-          <Route path="/add" element={<AddForm/>} />
-          <Route path="/bloque" element={<ComptenotValide/>}/>
-          <Route path="/Tovalidate" element={<CompteValide onLogout={onLogout} />}/>
-          <Route path="/UserManagement" element={<UserManagement onLogout={onLogout} />}/>
-
-          <Route path="/users" element={<UserList />} />
-          <Route path="/edit-user/:id" element={<EditUserForm />}/>
+          {/* Protected routes - Layout applied within ProtectedLayout */}
+          <Route path='/dashboard' element={<ProtectedLayout><Layout><Dashboard onLogout={onLogout}/></Layout></ProtectedLayout>} />
+          <Route path="/add" element={<ProtectedLayout><Layout><AddForm/></Layout></ProtectedLayout>} />
+          <Route path="/bloque" element={<ProtectedLayout><Layout><ComptenotValide/></Layout></ProtectedLayout>}/>
+          <Route path="/Tovalidate" element={<ProtectedLayout><Layout><CompteValide onLogout={onLogout} /></Layout></ProtectedLayout>}/>
+          <Route path="/UserManagement" element={<ProtectedLayout><Layout><UserManagement onLogout={onLogout} /></Layout></ProtectedLayout>}/>
+          <Route path="/users" element={<ProtectedLayout><Layout><UserList /></Layout></ProtectedLayout>} />
+          <Route path="/edit-user/:id" element={<ProtectedLayout><Layout><EditUserForm /></Layout></ProtectedLayout>}/>
           {/* Route for editing a DoctorCentreDexamen, protected for Admin */}
           <Route path="/edit-doctor-centre/:id" element={
             <ProtectedLayout requiredRole={["ROLE_ADMIN", "ROLE_DOCTOR_CENTRE_EXAMEN"]}> {/* Corrected role string */}
-              <EditDoctorCentreForm />
+              <Layout><EditDoctorCentreForm /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for adding a cabinet, protected */}
           <Route path="/add-cabinet" element={
             <ProtectedLayout>
-              <AddCabinetForm />
+              <Layout><AddCabinetForm /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for managing cabinets, protected */}
           <Route path="/manage-cabinets" element={
             <ProtectedLayout>
-              <CabinetList />
+              <Layout><CabinetList /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for editing a cabinet, protected */}
           <Route path="/edit-cabinet/:id" element={
             <ProtectedLayout>
-              <EditCabinetForm />
+              <Layout><EditCabinetForm /></Layout>
              </ProtectedLayout>
            } />
-
-          {/* Route for changing password, protected */}
           <Route path="/change-password" element={
             <ProtectedLayout>
-              <ChangePassword />
+              <Layout><ChangePassword /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* --- Centre d'examen Routes --- */}
-          {/* Public registration route */}
-          <Route path="/register-doctor-centre" element={<RegisterDoctorCentreForm />} />
-
-          {/* Protected routes for managing centres */}
           <Route path="/manage-centres" element={
             <ProtectedLayout>
-              <CentreDexamenList />
+              <Layout><CentreDexamenList /></Layout>
             </ProtectedLayout>
           } />
           <Route path="/add-centre" element={
             <ProtectedLayout>
-              <AddCentreDexamenForm />
+              <Layout><AddCentreDexamenForm /></Layout>
             </ProtectedLayout>
           } />
           <Route path="/edit-centre/:id" element={
             <ProtectedLayout>
-              <EditCentreDexamenForm />
+              <Layout><EditCentreDexamenForm /></Layout>
             </ProtectedLayout>
           } />
-          {/* --- End Centre d'examen Routes --- */}
-
-          {/* Route for Doctor Activation Management, protected for Admin */}
           <Route path="/activation" element={
             <ProtectedLayout requiredRole="ROLE_ADMIN">
-              <Activation />
+              <Layout><Activation /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for NEW Consultation Page (from appointment), protected for Doctor */}
           <Route path="/consultation/:appointmentId" element={
             <ProtectedLayout requiredRole="ROLE_DOCTOR">
-              <ConsultationPage />
+              <Layout><ConsultationPage /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for VIEW/EDIT Consultation Page (from dashboard), protected for Doctor */}
           <Route path="/consultation/details/:consultationId" element={
             <ProtectedLayout requiredRole="ROLE_DOCTOR">
-              <ConsultationPage />
+              <Layout><ConsultationPage /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for Medical Examination Form, protected for Doctor */}
           <Route path="/consultation/exam/new" element={
             <ProtectedLayout requiredRole="ROLE_DOCTOR">
-              <MedicalExaminationForm />
+              <Layout><MedicalExaminationForm /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for Consultation Dashboard, protected for Doctor/Assistant */}
           <Route path="/consultation/all" element={
             <ProtectedLayout requiredRole={["ROLE_DOCTOR", "ROLE_ASSISTANT"]}>
-              <ConsultationDashboard />
+              <Layout><ConsultationDashboard /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for Prescription Edit Page, protected for Doctor */}
           <Route path="/ordonnance/edit" element={
             <ProtectedLayout requiredRole="ROLE_DOCTOR">
-              <OrdonnanceEditPage />
+              <Layout><OrdonnanceEditPage /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for Patient's Consultations Page */}
           <Route path="/my-consultations" element={
             <ProtectedLayout requiredRole="ROLE_PATIENT">
-              <MyConsultationsPage />
+              <Layout><MyConsultationsPage /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for Patient's Examinations Page */}
           <Route path="/my-examinations" element={
             <ProtectedLayout requiredRole="ROLE_PATIENT">
-              <MyExaminationsPage />
+              <Layout><MyExaminationsPage /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for Adding Appointment, protected for Doctor/Assistant */}
           <Route path="/add-appointment" element={
             <ProtectedLayout requiredRole={["ROLE_DOCTOR", "ROLE_ASSISTANT", "ROLE_PATIENT"]}>
-              <AddAppointmentForm />
+              <Layout><AddAppointmentForm /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for Patient's Appointments Page */}
           <Route path="/my-appointments" element={
             <ProtectedLayout requiredRole="ROLE_PATIENT">
-              <MyAppointments />
+              <Layout><MyAppointments /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for Staff Appointment Management */}
           <Route path="/manage-appointments" element={
             <ProtectedLayout requiredRole={["ROLE_DOCTOR", "ROLE_ASSISTANT"]}>
-              <ManageAppointments />
+              <Layout><ManageAppointments /></Layout>
             </ProtectedLayout>
           } />
-
-          {/* Route for Cabinet Settings Page, protected for Doctor */}
           <Route path="/parametres-cabinet" element={
             <ProtectedLayout requiredRole="ROLE_DOCTOR">
-              <CabinetSettingsPage />
+              <Layout><CabinetSettingsPage /></Layout>
             </ProtectedLayout>
           } />
 

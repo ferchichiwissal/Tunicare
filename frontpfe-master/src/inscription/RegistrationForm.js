@@ -89,7 +89,8 @@ function RegistrationForm() {
     e.preventDefault();
     const token = recaptchaRef.current.getValue();
     if (!token) {
-      setErrors({ captcha: "Please complete the reCAPTCHA" });
+      // Use the same key as in validateForm for consistency
+      setErrors({ captcha: t('validation.captchaRequired') });
       return;
     }
 
@@ -107,13 +108,14 @@ function RegistrationForm() {
           }
         });
         if (checkResponse.data === true) {
-           setErrors({ general: "A user with this email, first name, and last name already exists in this cabinet." });
+           setErrors({ general: t('registration.errorUserExists') });
            setIsCheckingExistence(false);
            return;
         }
       } catch (error) {
+         // Handle non-404 errors during the existence check
          if (error.response && error.response.status !== 404) {
-            setErrors({ general: "Could not verify user existence. Please try again." });
+            setErrors({ general: t('registration.errorExistenceCheckFailed') });
             console.error("Existence check error:", error);
             setIsCheckingExistence(false);
             return;
@@ -148,12 +150,15 @@ function RegistrationForm() {
       } catch (error) {
         if (error.response?.data) {
            if (error.response.status === 409) {
-               setErrors({ general: error.response.data || "A user with this email, first name, and last name already exists in this cabinet." });
+               // Use translated fallback for existing user error
+               setErrors({ general: error.response.data || t('registration.errorUserExists') });
            } else {
-               setErrors({ general: error.response.data });
+               // Assume backend might provide translated error, otherwise show generic translated error
+               setErrors({ general: error.response.data || t('registration.errorGeneralRegistration') });
            }
         } else {
-          setErrors({ general: "An error occurred during registration. Please try again." });
+          // Generic translated error if no specific message from backend
+          setErrors({ general: t('registration.errorGeneralRegistration') });
         }
         console.error("Registration submission error:", error);
       } finally {
@@ -170,15 +175,19 @@ function RegistrationForm() {
       if (response.status === 200) {
         navigate("/confirmation");
       } else {
-        setErrors({ verification: response.data || "Invalid verification code or verification failed. Please try again." });
+        // Use translated fallback for invalid code error
+        setErrors({ verification: response.data || t('registration.errorInvalidVerificationCode') });
       }
     } catch (error) {
         if (error.response && error.response.status === 409) {
-             setErrors({ verification: error.response.data || "A user with this email and name already exists in this cabinet." });
+             // Use translated fallback for existing user during verification
+             setErrors({ verification: error.response.data || t('registration.errorUserExistsVerification') });
         } else if (error.response && error.response.data) {
-            setErrors({ verification: error.response.data });
+            // Assume backend might provide translated error, otherwise show generic translated error
+            setErrors({ verification: error.response.data || t('registration.errorVerificationFailed') });
         } else {
-            setErrors({ verification: "Verification failed. Please try again or request a new code." });
+            // Generic translated verification error
+            setErrors({ verification: t('registration.errorVerificationFailed') });
         }
         console.error("Verification error:", error);
     }
@@ -234,27 +243,27 @@ function RegistrationForm() {
                     name="first_name"
                     value={formData.first_name}
                      onChange={handleChange}
-                     className={`form-control ${errors.first_name ? 'is-invalid' : ''}`}
-                     required
-                   />
-                   <div className="invalid-feedback">{errors.first_name}</div> {/* TODO: Translate dynamic error */}
-                </div>
-                <div className="col-md-6">
-                  <label htmlFor="reg-last-name" className="form-label required">{t('registration.lastNameLabel')}</label>
+                      className={`form-control ${errors.first_name ? 'is-invalid' : ''}`}
+                      required
+                    />
+                    <div className="invalid-feedback">{errors.first_name}</div>
+                 </div>
+                 <div className="col-md-6">
+                   <label htmlFor="reg-last-name" className="form-label required">{t('registration.lastNameLabel')}</label>
                   <input
                     type="text"
                     id="reg-last-name"
                     name="last_name"
                     value={formData.last_name}
                      onChange={handleChange}
-                     className={`form-control ${errors.last_name ? 'is-invalid' : ''}`}
-                     required
-                   />
-                   <div className="invalid-feedback">{errors.last_name}</div> {/* TODO: Translate dynamic error */}
-                </div>
-              </div>
+                      className={`form-control ${errors.last_name ? 'is-invalid' : ''}`}
+                      required
+                    />
+                    <div className="invalid-feedback">{errors.last_name}</div>
+                 </div>
+               </div>
 
-              {/* Row 2: Email, Birth Date */}
+               {/* Row 2: Email, Birth Date */}
               <div className="row g-3 mb-3">
                 <div className="col-md-6">
                   <label htmlFor="reg-email" className="form-label required">{t('registration.emailLabel')}</label>
@@ -264,27 +273,27 @@ function RegistrationForm() {
                     name="email"
                     value={formData.email}
                      onChange={handleChange}
-                     className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                     required
-                   />
-                  <div className="invalid-feedback">{errors.email}</div> {/* TODO: Translate dynamic error */}
-                </div>
-                <div className="col-md-6">
-                  <label htmlFor="reg-birthDate" className="form-label required">{t('registration.birthDateLabel')}</label>
+                      className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                      required
+                    />
+                   <div className="invalid-feedback">{errors.email}</div>
+                 </div>
+                 <div className="col-md-6">
+                   <label htmlFor="reg-birthDate" className="form-label required">{t('registration.birthDateLabel')}</label>
                   <input
                     type="date"
                     id="reg-birthDate"
                     name="birthDate"
                     value={formData.birthDate}
                     onChange={handleChange}
-                    className={`form-control ${errors.birthDate ? 'is-invalid' : ''}`}
-                    required
-                  />
-                  <div className="invalid-feedback">{errors.birthDate}</div> {/* TODO: Translate dynamic error */}
-                </div>
-              </div>
+                     className={`form-control ${errors.birthDate ? 'is-invalid' : ''}`}
+                     required
+                   />
+                   <div className="invalid-feedback">{errors.birthDate}</div>
+                 </div>
+               </div>
 
-              {/* Row 3: Telephone, Address */}
+               {/* Row 3: Telephone, Address */}
               <div className="row g-3 mb-3">
                 <div className="col-md-6">
                   <label htmlFor="reg-tel" className="form-label">{t('registration.telephoneLabel')}</label>
@@ -293,13 +302,13 @@ function RegistrationForm() {
                     id="reg-tel"
                     name="tel"
                     value={formData.tel}
-                     onChange={handleChange}
-                     className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
-                   />
-                  <div className="invalid-feedback">{errors.tel}</div> {/* TODO: Translate dynamic error */}
-                </div>
-                <div className="col-md-6">
-                  <label htmlFor="reg-address" className="form-label">{t('registration.addressLabel')}</label>
+                      onChange={handleChange}
+                      className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
+                    />
+                   <div className="invalid-feedback">{errors.tel}</div>
+                 </div>
+                 <div className="col-md-6">
+                   <label htmlFor="reg-address" className="form-label">{t('registration.addressLabel')}</label>
                   <input
                     type="text"
                     id="reg-address"
@@ -338,13 +347,13 @@ function RegistrationForm() {
                     <option value="">{t('registration.selectGender')}</option>
                     <option value="Male">{t('registration.genderMale')}</option>
                     <option value="Female">{t('registration.genderFemale')}</option>
-                    <option value="Other">{t('registration.genderOther')}</option>
-                  </select>
-                  <div className="invalid-feedback">{errors.gendre}</div> {/* TODO: Translate dynamic error */}
-                </div>
-              </div>
+                     <option value="Other">{t('registration.genderOther')}</option>
+                   </select>
+                   <div className="invalid-feedback">{errors.gendre}</div>
+                 </div>
+               </div>
 
-              {/* Row 6: Password, Confirm Password */}
+               {/* Row 6: Password, Confirm Password */}
               <div className="row g-3 mb-3">
                 <div className="col-md-6">
                   <label htmlFor="reg-password" className="form-label required">{t('registration.passwordLabel')}</label>
@@ -354,13 +363,13 @@ function RegistrationForm() {
                     name="password"
                     value={formData.password}
                      onChange={handleChange}
-                     className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                     required
-                   />
-                  <div className="invalid-feedback">{errors.password}</div> {/* TODO: Translate dynamic error */}
-                  {passwordStrength && (
-                    <div className={`form-text password-strength-indicator ${passwordStrength.toLowerCase()}`}>
-                      {t('registration.passwordStrengthLabel', {
+                      className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                      required
+                    />
+                   <div className="invalid-feedback">{errors.password}</div>
+                   {passwordStrength && (
+                     <div className={`form-text password-strength-indicator ${passwordStrength.toLowerCase()}`}>
+                       {t('registration.passwordStrengthLabel', {
                         strength: t(passwordStrength === 'Strong' ? 'registration.passwordStrengthStrong' : 'registration.passwordStrengthWeak')
                       })}
                     </div>
@@ -374,26 +383,26 @@ function RegistrationForm() {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                      onChange={handleChange}
-                     className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
-                     required
-                   />
-                  <div className="invalid-feedback">{errors.confirmPassword}</div> {/* TODO: Translate dynamic error */}
-                </div>
-              </div>
+                      className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                      required
+                    />
+                   <div className="invalid-feedback">{errors.confirmPassword}</div>
+                 </div>
+               </div>
 
-              {/* Row 7: ReCAPTCHA */}
+               {/* Row 7: ReCAPTCHA */}
               <div className="row g-3 mb-3 justify-content-center">
                  <div className="col-auto">
                     <ReCAPTCHA
                       ref={recaptchaRef}
                       sitekey="6Lcjq9kqAAAAACubtDN_aCeAZkDR7rgT7VZB82C_" // Replace with your actual site key
-                      onChange={handleCaptcha}
-                    />
-                    {errors.captcha && <div className="text-danger mt-1" style={{fontSize: '0.875em'}}>{errors.captcha}</div>} {/* TODO: Translate dynamic error */}
-                 </div>
-              </div>
+                       onChange={handleCaptcha}
+                     />
+                     {errors.captcha && <div className="text-danger mt-1" style={{fontSize: '0.875em'}}>{errors.captcha}</div>}
+                  </div>
+               </div>
 
-              {/* Row 8: Submit Button */}
+               {/* Row 8: Submit Button */}
               <div className="row g-3">
                  <div className="col-12 text-center">
                     <button
@@ -427,12 +436,12 @@ function RegistrationForm() {
                 {t('registration.verifyButton')}
               </button>
             </div>
-            {errors.verification && (
-              <div className="verification-error alert alert-danger mt-3"> {/* Use Bootstrap alert */}
-                {errors.verification} {/* TODO: Translate dynamic error */}
-                <button
-                  className="btn btn-link resend-link" // Style as link
-                  onClick={() => setIsVerifying(false)}
+             {errors.verification && (
+               <div className="verification-error alert alert-danger mt-3"> {/* Use Bootstrap alert */}
+                 {errors.verification}
+                 <button
+                   className="btn btn-link resend-link" // Style as link
+                   onClick={() => setIsVerifying(false)}
                 >
                   {t('registration.tryAgainButton')}
                 </button>
