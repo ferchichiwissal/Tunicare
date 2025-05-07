@@ -1405,5 +1405,76 @@
     "resetButton": "Reset Password",
     "loadingToken": "Loading token...",
     "goToLoginLink": "Go to Login"
+  },
+  "certificate": {
+    "page": {
+      "title": "Generate Medical Certificate",
+      "error": {
+        "missingData": "Patient or doctor data missing. Cannot generate certificate."
+      }
+    },
+    "modal": {
+      "unknownDoctor": "Unknown Dr.",
+      "unknownPatient": "Unknown Patient",
+      "selectType": "Certificate Type:",
+      "daysLabel": "Number of Days:",
+      "daysPlaceholder": "Enter number of days",
+      "previewTitle": "Certificate Preview",
+      "printButton": "Print"
+    },
+    "type": {
+      "presence": "Certificate of Presence",
+      "repos": "Certificate of Rest",
+      "prolongation": "Certificate of Extension"
+    },
+    "presence": {
+      "text": "I, the undersigned, Dr. {{doctorName}}, certify that {{patientFullName}} presented at my medical office today."
+    },
+    "repos": {
+      "text1": "I, the undersigned, Dr. {{doctorName}}, certify that the health condition of {{patientFullName}} requires a work stoppage of",
+      "text2": "barring complications, starting today."
+    },
+    "prolongation": {
+      "text1": "I, the undersigned, Dr. {{doctorName}}, certify that the health condition of {{patientFullName}} requires an extension of their work stoppage by",
+      "text2": "starting today."
+    },
+    "common": {
+      "daysLabel": "days",
+      "doctorLabel": "Undersigned Doctor",
+      "patientLabel": "Patient",
+      "dateLabel": "Issued on",
+      "signatureLabel": "Doctor's Signature"
+    },
+    "print": {
+      "error": {
+        "noContent": "Error: Unable to generate content for printing.",
+        "generic": "Error during printing."
+      },
+      "title": "Medical Certificate"
+    },
+    "save": {
+      "error": {
+        "noConsultationId": "Missing consultation ID.",
+        "generic": "Error saving the certificate.",
+        "alreadyExists": "Certificate already saved!"
+      },
+      "success": "Certificate saved successfully!",
+      "loading": "Saving in progress...",
+      "button": "Save Certificate"
+    }
+  },
+  "common": {
+    "notAvailable": "N/A",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "invalidDate": "Invalid Date",
+    "dateError": "Date Error",
+    "error": "Error",
+    "close": "Close",
+    "back": "Back",
+    "locale": "en-US",
+    "unknownError": "An unknown error occurred.",
+    "saving": "Saving...",
+    "saved": "Saved"
   }
 }

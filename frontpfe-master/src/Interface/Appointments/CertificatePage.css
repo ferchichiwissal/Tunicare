@@ -1,0 +1,216 @@
+/* Refined styling for the Certificate Page - Second Pass */
+.certificate-page-container {
+    padding: 15px; /* Further reduced padding */
+    max-width: 800px; /* Further reduced max-width */
+    margin: 20px auto; /* Further reduced top/bottom margin */
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px; /* Slightly smaller radius */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Lighter shadow */
+}
+
+.certificate-page-container h1 {
+    text-align: center;
+    margin-bottom: 20px; /* Reduced margin */
+    color: #495057;
+    font-weight: 500; /* Less bold */
+    font-size: 1.6em; /* Further reduced main title size */
+}
+
+/* Section Styling */
+.info-section,
+.form-section,
+.preview-section,
+.actions-section {
+    margin-bottom: 20px; /* Reduced spacing */
+    padding: 15px; /* Consistent padding */
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 5px; /* Slightly smaller radius */
+}
+
+/* Info Section Specifics */
+.info-section p {
+    margin-bottom: 6px; /* Reduced spacing */
+    font-size: 0.95em; /* Slightly smaller font */
+    line-height: 1.5;
+}
+.info-section strong {
+    color: #555;
+}
+
+/* Form Section Specifics */
+.form-section h2,
+.preview-section h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.15em; /* Reduced section title size */
+    color: #20c997;
+    border-bottom: 1px solid #20c997; /* Thinner border */
+    padding-bottom: 5px;
+    font-weight: 500;
+}
+
+.radio-group {
+    margin-top: 5px;
+}
+
+.radio-group label {
+    display: block;
+    margin-bottom: 8px; /* Reduced spacing */
+    cursor: pointer;
+    font-size: 0.95em; /* Slightly smaller font */
+    padding: 3px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease-in-out;
+}
+.radio-group label:hover {
+    background-color: #f1f1f1;
+}
+
+.radio-group input[type="radio"] {
+    margin-right: 6px; /* Reduced spacing */
+    vertical-align: middle;
+}
+
+/* Days Input Section */
+.form-section label[for="daysInput"] {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #495057;
+    font-size: 0.95em; /* Match other labels */
+}
+
+.days-input {
+    padding: 6px 8px; /* Reduced padding */
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    width: 150px; /* Updated width */
+    font-size: 0.95em; /* Match other inputs */
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.days-input:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+
+/* Preview Area Styling */
+.preview-section {
+    background-color: #f8f9fa;
+}
+
+.certificate-preview {
+    border: 1px solid #ced4da;
+    padding: 15px; /* Reduced padding */
+    min-height: 300px; /* Reduced min-height */
+    background-color: #ffffff;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #212529;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05) inset; /* Lighter shadow */
+    margin-top: 10px;
+}
+
+/* Styles for content inside the preview */
+.certificate-preview .cert-header h2 {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bold;
+    margin-bottom: 1cm;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #000;
+}
+.certificate-preview .cert-header p {
+    margin-bottom: 0.4cm;
+    color: #000;
+}
+.certificate-preview .cert-body-text {
+    margin-top: 0.8cm;
+    margin-bottom: 0.8cm;
+    color: #000;
+}
+.certificate-preview .cert-body-text p {
+    margin-bottom: 0.4cm;
+    color: #000;
+}
+.certificate-preview .signature-block {
+    margin-top: 1.5cm;
+    text-align: right;
+    min-height: 30px; /* Reduced height */
+    color: #000;
+}
+.certificate-preview .signature-block p {
+     margin-bottom: 0.2cm;
+     color: #000;
+}
+.certificate-preview strong {
+    font-weight: bold;
+    color: #000;
+}
+.certificate-preview hr {
+    border: none;
+    border-top: 1px solid #aaa;
+    margin: 0.8cm 0;
+}
+
+
+/* Action Buttons */
+.actions-section {
+    text-align: center;
+    padding-top: 15px; /* Reduced padding */
+    margin-top: 5px;
+    border-top: 1px solid #e9ecef;
+    background-color: transparent;
+    border: none;
+}
+
+.actions-section .btn {
+    padding: 6px 16px; /* Reduced padding */
+    font-size: 0.95em; /* Slightly smaller font */
+    margin-left: 6px; /* Reduced spacing */
+    margin-right: 6px;
+}
+.actions-section .btn:first-child {
+    margin-left: 0;
+}
+
+/* Print Button Specific Color */
+.print-button {
+    background-color: #20c997; /* Teal/Aqua color */
+    border-color: #20c997;
+    color: #fff; /* White text for contrast */
+}
+
+.print-button:hover {
+    background-color: #1baa80; /* Darker shade on hover */
+    border-color: #199d77;
+    color: #fff;
+}
+
+.print-button:active {
+    background-color: #178f6f !important; /* Even darker shade when active */
+    border-color: #178f6f !important;
+    color: #fff !important;
+}
+
+.print-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.5); /* Focus ring matching the color */
+}
+
+
+/* Error Message Styling */
+.error-message {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px 12px; /* Reduced padding */
+    border-radius: 4px;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 0.9em; /* Smaller font */
+}

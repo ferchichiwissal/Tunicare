@@ -132,6 +132,33 @@
 			<version>1.3.30</version> <!-- Use a recent stable version -->
 		</dependency>
 
+		<!-- Lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional> <!-- Lombok is compile-time only -->
+		</dependency>
+
+		<!-- iText PDF Generation -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itext7-core</artifactId>
+			<version>7.2.5</version> <!-- Use a recent stable version -->
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>html2pdf</artifactId>
+			<version>4.0.5</version> <!-- Use a recent stable version compatible with core -->
+		</dependency>
+
+		<!-- Jsoup for HTML Parsing -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.17.2</version> <!-- Use a recent stable version -->
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -148,7 +175,13 @@
 				<configuration>
 					<source>${java.version}</source> <!-- Use property -->
 					<target>${java.version}</target> <!-- Use property -->
-					<!-- Lombok annotation processor removed -->
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<!-- Version is managed by Spring Boot parent POM -->
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 		</plugins>

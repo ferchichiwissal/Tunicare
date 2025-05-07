@@ -45,7 +45,8 @@ import AddAppointmentForm from './Interface/Appointments/AddAppointmentForm'; //
 import MyAppointments from './Interface/Appointments/MyAppointments'; // Import MyAppointments
 import ManageAppointments from './Interface/Appointments/ManageAppointments'; // Import ManageAppointments
 import CabinetSettingsPage from './Interface/CabinetSettingsPage'; // Import the new settings page
-
+import CertificatePage from './Interface/Appointments/CertificatePage'; // Import the new certificate page
+ 
 const onLogout = () => {
   // Clear tokens from localStorage and sessionStorage
   localStorage.removeItem("accessToken");
@@ -183,6 +184,12 @@ function App() {
               <Layout><CabinetSettingsPage /></Layout>
             </ProtectedLayout>
           } />
+         {/* Route for the new Certificate Page (receives data via state) */}
+         <Route path="/generate-certificate" element={
+           <ProtectedLayout requiredRole="ROLE_DOCTOR">
+             <Layout><CertificatePage /></Layout>
+           </ProtectedLayout>
+         } />
 
            </Routes>
         </Suspense>

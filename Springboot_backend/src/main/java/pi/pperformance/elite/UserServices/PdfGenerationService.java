@@ -145,4 +145,103 @@ public class PdfGenerationService {
 
     // Consider adding helper methods for header/footer using PdfPageEventHelper for better PDF structure
     // e.g., private static class HeaderFooter extends PdfPageEventHelper { ... }
+
+    // --- New method for generating Certificate PDF ---
+    public byte[] generateCertificatePdf(Consultation consultation, String certificateTitle, String certificateBodyText) throws DocumentException, IOException {
+        // Validate essential data
+        if (consultation == null || consultation.getPatient() == null || consultation.getCabinet() == null) {
+            throw new IllegalArgumentException("Les données de consultation, patient ou cabinet sont manquantes pour le certificat.");
+        }
+        if (certificateTitle == null || certificateTitle.trim().isEmpty() || certificateBodyText == null || certificateBodyText.trim().isEmpty()) {
+            throw new IllegalArgumentException("Le titre ou le corps du certificat est manquant.");
+        }
+
+        CabinetDr cabinet = consultation.getCabinet();
+        Patient patient = consultation.getPatient();
+        String signaturePath = cabinet.getSignatureImagePath();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4);
+        PdfWriter writer = PdfWriter.getInstance(document, baos);
+
+        document.open();
+
+        // --- Header (Same as prescription) ---
+        Paragraph header = new Paragraph("Dr. " + cabinet.getName()); // Assuming doctor name is from cabinet for now
+        header.setAlignment(Element.ALIGN_LEFT);
+        document.add(header);
+        // Add cabinet address, phone, etc. if available
+        document.add(Chunk.NEWLINE);
+
+        // --- Title ---
+        Paragraph title = new Paragraph(certificateTitle, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16));
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+        document.add(Chunk.NEWLINE);
+
+        // --- Patient Info (Same as prescription) ---
+        document.add(new Paragraph("Patient: " + patient.getFirstName() + " " + patient.getLastName()));
+        if (patient.getBirthDate() != null) {
+            document.add(new Paragraph("Âge: " + calculateAge(patient.getBirthDate()) + " ans"));
+        } else {
+            document.add(new Paragraph("Âge: Non spécifié"));
+        }
+        // Use current date for certificate "Fait le"
+        document.add(new Paragraph("Fait le: " + LocalDate.now().toString())); // Format as needed
+        document.add(Chunk.NEWLINE);
+
+        // --- Certificate Content ---
+        // Clean basic HTML tags if any might sneak in (though ideally body text is plain)
+        String cleanedBodyText = certificateBodyText
+                                    .replaceAll("(?i)<p>", "")
+                                    .replaceAll("(?i)</p>", "\n")
+                                    .replaceAll("(?i)<strong>", "") // Remove strong tags if present
+                                    .replaceAll("(?i)</strong>", "")
+                                    .trim();
+        Paragraph certificateContent = new Paragraph(cleanedBodyText);
+        certificateContent.setAlignment(Element.ALIGN_JUSTIFIED);
+        document.add(certificateContent);
+        document.add(Chunk.NEWLINE);
+        document.add(Chunk.NEWLINE);
+
+        // --- Signature (Same as prescription) ---
+        Paragraph signatureLabel = new Paragraph("Signature du Médecin");
+        signatureLabel.setAlignment(Element.ALIGN_RIGHT);
+        document.add(signatureLabel);
+        document.add(Chunk.NEWLINE);
+
+        if (signaturePath != null && !signaturePath.trim().isEmpty()) {
+            java.nio.file.Path path = Paths.get(signaturePath);
+            if (Files.exists(path) && Files.isReadable(path)) {
+                try {
+                    Image signatureImage = Image.getInstance(signaturePath);
+                    signatureImage.scaleToFit(150, 75);
+                    signatureImage.setAlignment(Element.ALIGN_RIGHT);
+                    document.add(signatureImage);
+                } catch (BadElementException | MalformedURLException e) {
+                    System.err.println("Erreur de chargement de l'image de signature: " + signaturePath + " - " + e.getMessage());
+                    document.add(new Paragraph("[Erreur: Image signature invalide]", FontFactory.getFont(FontFactory.HELVETICA, 8, Font.ITALIC)));
+                } catch (IOException e) {
+                    System.err.println("Erreur I/O lors du chargement de l'image de signature: " + signaturePath + " - " + e.getMessage());
+                    document.add(new Paragraph("[Erreur: Lecture image signature impossible]", FontFactory.getFont(FontFactory.HELVETICA, 8, Font.ITALIC)));
+                }
+            } else {
+                System.err.println("Fichier signature non trouvé ou illisible: " + signaturePath);
+                document.add(new Paragraph("[Erreur: Fichier signature non trouvé]", FontFactory.getFont(FontFactory.HELVETICA, 8, Font.ITALIC)));
+            }
+        } else {
+            document.add(new Paragraph("[Signature non configurée]", FontFactory.getFont(FontFactory.HELVETICA, 8, Font.ITALIC)));
+        }
+
+        // --- Footer (Same as prescription) ---
+        // Consider using PdfPageEventHelper for proper footer placement
+        // Paragraph footer = new Paragraph("Contact: Tel: " + cabinet.getTel() + " | Email: " + cabinet.getDoctor().getEmail());
+        // footer.setAlignment(Element.ALIGN_CENTER);
+        // document.add(footer);
+
+        document.close();
+        writer.close();
+
+        return baos.toByteArray();
+    }
 }

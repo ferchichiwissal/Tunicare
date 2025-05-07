@@ -1229,7 +1229,8 @@
       "noConsultations": "Vous n'avez aucune consultation enregistrée."
     },
     "buttons": {
-      "download": "Télécharger"
+      "download": "Télécharger",
+      "downloadedCertificate": "Télécharger"
     }
   },
   "myExaminationsPage": {
@@ -1396,8 +1397,79 @@
     "newPasswordLabel": "Nouveau mot de passe",
     "confirmPasswordLabel": "Confirmer le nouveau mot de passe",
     "resettingButton": "Réinitialisation...",
-    "resetButton": "Réinitialiser le mot de passe",
-    "loadingToken": "Chargement du jeton...",
-    "goToLoginLink": "Aller à la connexion"
+      "resetButton": "Réinitialiser le mot de passe",
+      "loadingToken": "Chargement du jeton...",
+      "goToLoginLink": "Aller à la connexion"
+    },
+    "certificate": {
+      "page": {
+        "title": "Générer un Certificat Médical",
+        "error": {
+          "missingData": "Données patient ou médecin manquantes. Impossible de générer le certificat."
+        }
+      },
+      "modal": {
+        "unknownDoctor": "Dr Inconnu",
+        "unknownPatient": "Patient Inconnu",
+        "selectType": "Type de Certificat:",
+        "daysLabel": "Nombre de Jours:",
+        "daysPlaceholder": "Entrez le nombre de jours",
+        "previewTitle": "Aperçu du Certificat",
+        "printButton": "Imprimer"
+      },
+      "type": {
+        "presence": "Certificat de Présence",
+        "repos": "Certificat de Repos",
+        "prolongation": "Certificat de Prolongation"
+      },
+      "presence": {
+        "text": "Je soussigné, Dr. {{doctorName}}, certifie que {{patientFullName}} s'est présenté(e) à mon cabinet médical ce jour."
+      },
+      "repos": {
+        "text1": "Je soussigné, Dr. {{doctorName}}, certifie que l'état de santé de {{patientFullName}} nécessite un arrêt de travail de",
+        "text2": "sauf complication, à compter de ce jour."
+      },
+      "prolongation": {
+        "text1": "Je soussigné, Dr. {{doctorName}}, certifie que l'état de santé de {{patientFullName}} nécessite une prolongation de son arrêt de travail de",
+        "text2": "à compter de ce jour."
+      },
+      "common": {
+        "daysLabel": "jours",
+        "doctorLabel": "Médecin Soussigné",
+        "patientLabel": "Patient",
+        "dateLabel": "Fait le",
+        "signatureLabel": "Signature du Médecin"
+      },
+      "print": {
+        "error": {
+          "noContent": "Erreur: Impossible de générer le contenu à imprimer.",
+          "generic": "Erreur lors de l'impression."
+        },
+        "title": "Certificat Médical"
+      },
+      "save": {
+        "error": {
+          "noConsultationId": "ID de consultation manquant.",
+          "generic": "Erreur lors de l'enregistrement du certificat.",
+          "alreadyExists": "Certificat déjà enregistré!"
+        },
+        "success": "Certificat enregistré avec succès!",
+        "loading": "Enregistrement en cours...",
+        "button": "Enregistrer Certificat"
+      }
+    },
+    "common": {
+      "notAvailable": "N/D",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "invalidDate": "Date invalide",
+      "dateError": "Erreur Date",
+      "error": "Erreur",
+      "close": "Fermer",
+      "back": "Retour",
+      "locale": "fr-FR",
+      "unknownError": "Une erreur inconnue est survenue.",
+      "saving": "Enregistrement...",
+      "saved": "Enregistré"
+    }
   }
-}

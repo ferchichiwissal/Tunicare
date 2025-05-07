@@ -48,6 +48,10 @@ public class Consultation implements Serializable {
     @JsonManagedReference // To handle circular reference during JSON serialization
     private PrescribedMedications prescribedMedications;
 
+    // Relationship: Consultation 'avoir' Certificate (1 to 0..1 - Inverse Side)
+    @OneToOne(mappedBy = "consultation", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private Certificate certificate;
+
     // Relationship: Doctor 'effectuer' Consultation (1 to *)
     @ManyToOne
     @JoinColumn(name = "id_doctor") // Name of the foreign key column in the consultation table
@@ -107,6 +111,10 @@ public class Consultation implements Serializable {
         return cabinet;
     }
 
+    public Certificate getCertificate() {
+        return certificate;
+    }
+
     // Setters (excluding idConsultation and text which are already defined)
     public void setDateConsultation(Date dateConsultation) {
         this.dateConsultation = dateConsultation;
@@ -137,6 +145,11 @@ public class Consultation implements Serializable {
     public void setCabinet(CabinetDr cabinet) { // Corrected parameter type
         this.cabinet = cabinet;
     }
+
+    public void setCertificate(Certificate certificate) {
+        this.certificate = certificate;
+    }
+
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();

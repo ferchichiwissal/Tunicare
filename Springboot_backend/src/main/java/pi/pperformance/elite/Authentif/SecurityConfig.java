@@ -86,6 +86,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/medical-examinations/*/download").authenticated() // Allow download for authenticated users (patient check in controller)
                 .requestMatchers("/api/medical-examinations/**").hasRole("DOCTOR") // This secures the rest
 
+                // Certificate endpoints
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/certificates/upload/**").hasRole("DOCTOR") // Upload only by Doctor
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/certificates/download/consultation/**").hasAnyRole("PATIENT", "DOCTOR") // Download by Patient or Doctor
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/certificates/details/consultation/**").hasAnyRole("PATIENT", "DOCTOR") // Details check by Patient or Doctor
+
                 // Chatbot endpoint - requires authentication
                 .requestMatchers("/api/chatbot/**").authenticated()
 

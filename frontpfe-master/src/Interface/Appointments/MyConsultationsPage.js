@@ -17,6 +17,8 @@ const MyConsultationsPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const navigate = useNavigate(); // Initialize useNavigate
+    const [certificateStatusMap, setCertificateStatusMap] = useState({}); // { consultationId: 'exists' | 'not_found' | 'loading' }
+    const [isCheckingCertificates, setIsCheckingCertificates] = useState(false); // Track certificate check loading state
 
     // Revert API_URL definition
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
@@ -91,7 +93,9 @@ const MyConsultationsPage = () => {
             }
 
             setIsLoading(true);
+            setIsCheckingCertificates(true); // Start checking certificates as well
             setError('');
+            let fetchedConsultations = []; // Temporary variable
             try {
                 const response = await axios.get(`${API_URL}/api/consultations/my-consultations/${userData.user.id}`, {
                      params: {
@@ -107,8 +111,10 @@ const MyConsultationsPage = () => {
                     return new Date(dateB) - new Date(dateA);
                 });
                 setConsultations(sortedConsultations);
+                fetchedConsultations = sortedConsultations; // Store fetched consultations
             } catch (err) {
                 console.error("Error fetching patient consultations:", err);
+                fetchedConsultations = []; // Ensure it's empty on error
                 // Use translation for error messages
                 if (err.response?.status === 403) {
                      // Assuming 403 might not have a specific key yet, use fallback or add one
@@ -118,7 +124,45 @@ const MyConsultationsPage = () => {
                 }
                 setConsultations([]);
             } finally {
-                setIsLoading(false);
+                setIsLoading(false); // Stop main loading here
+                // Don't stop certificate checking here
+            }
+            // --- Check for certificates after fetching consultations ---
+            if (fetchedConsultations.length > 0 && userData.accessToken) {
+                const initialStatusMap = fetchedConsultations.reduce((acc, consult) => {
+                    acc[consult.idConsultation] = 'loading';
+                    return acc;
+                }, {});
+                setCertificateStatusMap(initialStatusMap);
+
+                const checkPromises = fetchedConsultations.map(async (consult) => {
+                    try {
+                        // Use the details endpoint which is more lightweight
+                        await axios.get(`${API_URL}/api/certificates/details/consultation/${consult.idConsultation}`, {
+                            headers: { 'Authorization': `Bearer ${userData.accessToken}` }
+                        });
+                        return { id: consult.idConsultation, status: 'exists' };
+                    } catch (certErr) {
+                        if (certErr.response?.status === 404) {
+                            return { id: consult.idConsultation, status: 'not_found' };
+                        } else {
+                            console.error(`Error checking certificate for consultation ${consult.idConsultation}:`, certErr);
+                            return { id: consult.idConsultation, status: 'error' }; // Mark as error
+                        }
+                    }
+                });
+
+                const results = await Promise.all(checkPromises);
+                setCertificateStatusMap(prevMap => {
+                    const newMap = { ...prevMap };
+                    results.forEach(result => {
+                        newMap[result.id] = result.status;
+                    });
+                    return newMap;
+                });
+                 setIsCheckingCertificates(false); // Finish checking certificates
+            } else {
+                 setIsCheckingCertificates(false); // Also finish if no consultations or no token
             }
         };
 
@@ -133,8 +177,8 @@ const MyConsultationsPage = () => {
         }
 
         fetchMyConsultations();
-        // Revert dependencies, add t and performLogout
-    }, [API_URL, t, performLogout]);
+        // Add API_URL to dependencies
+    }, [API_URL, t, performLogout]); // Keep dependencies minimal, API_URL needed now
 
     // Keep formatDate function but use translation
     const formatDate = (dateString) => {
@@ -186,9 +230,85 @@ const MyConsultationsPage = () => {
             }
         }
     };
+ 
+    // --- Download Certificate Handler ---
+    const handleDownloadCertificate = async (consultationId) => {
+        const userData = getUserData();
+        if (!userData || !userData.accessToken) {
+            setError(t('myConsultationsPage.errors.authErrorDownload'));
+            performLogout();
+            return;
+        }
+        // Clear previous errors before attempting download
+        setError('');
 
+        try {
+            // Use the correct endpoint defined in CertificateController
+            const response = await axios.get(`${API_URL}/api/certificates/download/consultation/${consultationId}`, {
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken}`
+                },
+                responseType: 'blob' // Assuming backend sends PDF blob
+            });
+ 
+            // Assuming PDF response for now
+            if (response.data && response.data instanceof Blob && response.data.type === 'application/pdf') {
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                // Extract filename from content-disposition header if available, otherwise generate one
+                const contentDisposition = response.headers['content-disposition'];
+                let filename = `certificat_${consultationId}.pdf`; // Default
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+                    if (filenameMatch && filenameMatch.length > 1) {
+                        filename = filenameMatch[1];
+                    }
+                }
+                link.setAttribute('download', filename);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            } else if (response.data && response.data instanceof Blob && response.data.type.includes('html')) {
+                 // Handle HTML response - open in new tab
+                 const htmlBlob = new Blob([response.data], { type: 'text/html' });
+                 const url = window.URL.createObjectURL(htmlBlob);
+                 window.open(url, '_blank');
+                 // No revoke needed immediately for new tab
+            } else {
+                 // Handle cases where response is not a blob or not the expected type
+                 console.warn("Received unexpected response type for certificate download:", response.headers['content-type']);
+                 setError(t('myConsultationsPage.errors.downloadInvalidResponse'));
+            }
 
-    if (isLoading) {
+        } catch (err) {
+            console.error("Error downloading certificate:", err);
+             // Improved error handling: Check response status first
+             if (err.response?.status === 404) {
+                setError(t('myConsultationsPage.errors.certificateNotFound')); // Use translation
+            } else if (err.response && err.response.data instanceof Blob) {
+                 // Attempt to read error message from blob if it's not 404
+                 try {
+                     const errorText = await err.response.data.text();
+                     const errorJson = JSON.parse(errorText); // Assuming error is JSON within blob
+                     setError(errorJson.message || t('myConsultationsPage.errors.downloadFailedFallback'));
+                 } catch (parseError) {
+                     // Blob doesn't contain JSON error or parsing failed
+                     setError(t('myConsultationsPage.errors.downloadFailedFallback'));
+                 }
+             } else {
+                 // Handle other errors (network, non-blob responses)
+                 setError(err.response?.data?.message || err.message || t('myConsultationsPage.errors.downloadFailedFallback'));
+             }
+        }
+    };
+
+    // Combined loading state
+    const showLoading = isLoading || isCheckingCertificates;
+
+    if (showLoading) {
         // Keep Bootstrap spinner and use translation
         return <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>{t('myConsultationsPage.loading')}</div>;
     }
@@ -210,6 +330,7 @@ const MyConsultationsPage = () => {
                             <th>{t('myConsultationsPage.table.date')}</th>
                             <th>{t('myConsultationsPage.table.type')}</th>
                             <th>{t('myConsultationsPage.table.prescription')}</th>
+                            <th>{t('myConsultationsPage.table.certificate', 'Certificat')}</th> {/* New Header */}
                         </tr>
                     </thead>
                     <tbody>
@@ -227,12 +348,26 @@ const MyConsultationsPage = () => {
                                             {t('myConsultationsPage.buttons.download')} {/* Use translation */}
                                         </button>
                                     </td>
+                                    <td> {/* New Cell for Certificate Button */}
+                                        {certificateStatusMap[consult.idConsultation] === 'exists' ? (
+                                            <button
+                                                className="btn btn-sm btn-primary" // Changed to primary for teal color
+                                                onClick={() => handleDownloadCertificate(consult.idConsultation)}
+                                            >
+                                                {t('myConsultationsPage.buttons.downloadedCertificate', 'Téléchargé')} {/* Changed text */}
+                                            </button>
+                                        ) : certificateStatusMap[consult.idConsultation] === 'loading' ? (
+                                            <span className="text-muted small">{t('myConsultationsPage.checking', 'Vérification...')}</span>
+                                        ) : (
+                                            <span>-</span> // Display dash if not found or error during check
+                                        )}
+                                    </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                {/* Use translated no consultations message */}
-                                <td colSpan={3} className="text-center">
+                                {/* Use translated no consultations message, adjust colspan */}
+                                <td colSpan={4} className="text-center">
                                     {t('myConsultationsPage.table.noConsultations')}
                                 </td>
                             </tr>

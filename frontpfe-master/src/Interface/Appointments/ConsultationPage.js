@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useContext, useRef } from 'react'; // Import useContext AND useRef
-import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
-import { useTranslation } from 'react-i18next'; // Import useTranslation
-import apiClient from '../../utils/apiClient'; // Import apiClient instead of axios
-import ReactQuill from 'react-quill'; // Import ReactQuill
-// Assuming AuthContext exists and provides user details
-import AuthContext from '../../context/AuthContext'; // Corrected: Default import
-import 'react-quill/dist/quill.snow.css'; // Import Quill styles
-// Optional: Add CSS for styling
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import apiClient from '../../utils/apiClient';
+import ReactQuill from 'react-quill';
+import AuthContext from '../../context/AuthContext';
+import 'react-quill/dist/quill.snow.css';
+// Removed CertificateModal import
 // import './ConsultationPage.css';
-
+ 
 const ConsultationPage = () => {
     const { t, i18n } = useTranslation(); // Initialize useTranslation hook and get i18n instance
     // Get EITHER appointmentId OR consultationId from URL params
@@ -34,9 +33,10 @@ const ConsultationPage = () => {
     // General loading and error state
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
-    const [saveStatus, setSaveStatus] = useState(''); // To show save success/error messages
-    const isSavingRef = useRef(false); // Ref to track saving state synchronously
-
+    const [saveStatus, setSaveStatus] = useState('');
+    const isSavingRef = useRef(false);
+    // Removed showCertificateModal state
+ 
     // Get user details from AuthContext
     // Ensure AuthContext provides user object with name, languagePreference, activeCabinet { address, tel }
     const { user } = useContext(AuthContext); // Corrected: use 'user' instead of 'userDetails'
@@ -288,7 +288,19 @@ const ConsultationPage = () => {
             console.log(`[handleSave EXIT] isSavingRef reset to false.`);
         }
     };
-
+ 
+    // --- Navigate to Certificate Page Handler ---
+    const handleNavigateToCertificate = () => {
+        // Ensure we have a savedConsultationId before navigating
+        if (patient && user && savedConsultationId) {
+            navigate('/generate-certificate', { state: { patient: patient, doctor: user, consultationId: savedConsultationId } }); // Pass consultationId
+        } else {
+            console.error("Cannot navigate to certificate page: Patient, Doctor, or Consultation ID data missing.", { patient, user, savedConsultationId });
+            // Optionally show a more specific error message to the user
+            setError(t('consultation.error.cannotGenerateCertificate', 'Données patient, médecin ou consultation manquantes pour générer le certificat. Assurez-vous que la consultation est enregistrée.'));
+        }
+    };
+ 
     // Print function using a hidden iframe - Refined for stability and cleanup
     const printContent = (content) => {
         const iframeId = 'print-iframe';
@@ -606,7 +618,7 @@ const ConsultationPage = () => {
                     <div style={{ marginTop: '15px', padding: '15px', border: '1px solid #ddd', backgroundColor: '#f9f9f9' }}>
                         <h4>{t('consultation.history.title')}</h4>
                         {historyLoading && <p>{t('consultation.history.loading')}</p>}
-                        {historyError && <p style={{ color: 'red' }}>{t('consultation.history.errorLabel')}: {historyError}</p>}
+                        {historyError && <p style={{ color: 'red' }}>{t('consultation.history.errorLabel')}: {typeof historyError === 'string' ? historyError : t('common.unknownError', 'Une erreur inconnue est survenue.')}</p>}
                         {!historyLoading && !historyError && consultationHistory.length === 0 && <p>{t('consultation.history.noneFound')}</p>}
                         {!historyLoading && !historyError && consultationHistory.map((histConsult) => (
                             <div key={histConsult.idConsultation} style={{ marginBottom: '15px', padding: '10px', borderBottom: '1px solid #eee' }}>
@@ -649,7 +661,7 @@ const ConsultationPage = () => {
              {/* --- Action Buttons --- */}
             <div className="consultation-actions">
                  {saveStatus && <p style={{ color: saveStatus === t('common.error') ? 'red' : 'green', marginBottom: '10px' }}>{saveStatus}</p>}
-                 {error && !saveStatus.includes(t('common.error')) && <p style={{ color: 'red', marginBottom: '10px' }}>{t('common.error')}: {error}</p>} {/* Show general error only if saveStatus isn't already showing it */}
+                 {error && !saveStatus.includes(t('common.error')) && <p style={{ color: 'red', marginBottom: '10px' }}>{t('common.error')}: {typeof error === 'string' ? error : t('common.unknownError', 'Une erreur inconnue est survenue.')}</p>} {/* Show general error only if saveStatus isn't already showing it */}
                 <button
                     onClick={handleSave}
                     className="btn btn-primary"
@@ -664,11 +676,16 @@ const ConsultationPage = () => {
                     🖨️ {t('consultation.button.print')}
                 </button>
                 {/* Exam button is now always visible */}
-                <button onClick={handleExamRedirect} className="btn btn-warning">
+                <button onClick={handleExamRedirect} className="btn btn-warning" style={{ marginRight: '10px' }}>
                     🔬 {t('consultation.button.exam')}
                 </button>
-                {/* Removed duplicated button and closing tag */}
+                 {/* Navigate to Certificate Page Button */}
+                 <button onClick={handleNavigateToCertificate} className="btn btn-success">
+                    📄 {t('consultation.button.certificate', 'Certificat Médical')} {/* Add translation key */}
+                 </button>
             </div>
+ 
+            {/* Removed Certificate Modal Rendering */}
         </div>
     );
 };
