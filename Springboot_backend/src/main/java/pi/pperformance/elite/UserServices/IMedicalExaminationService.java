@@ -1,7 +1,12 @@
 package pi.pperformance.elite.UserServices;
 
 import pi.pperformance.elite.entities.MedicalExamination;
-import pi.pperformance.elite.dto.MedicalExaminationInputDTO; // Import DTO
+import pi.pperformance.elite.dto.MedicalExaminationInputDTO;
+import pi.pperformance.elite.dto.MedicalExaminationDTO;
+import org.springframework.web.multipart.MultipartFile; // Added import
+import pi.pperformance.elite.exceptions.ResourceNotFoundException; // Added import
+
+import java.io.IOException; // Added import
 import java.util.List;
 
 public interface IMedicalExaminationService {
@@ -47,4 +52,65 @@ public interface IMedicalExaminationService {
     MedicalExamination updateMedicalExamination(Long examId, MedicalExaminationInputDTO examInput);
 
     byte[] generateExaminationPdf(Long examId) throws com.lowagie.text.DocumentException, java.io.IOException; // Added for PDF generation
+
+    /**
+     * Retrieves a medical examination by its ID.
+     * @param examId The ID of the examination.
+      * @return The medical examination entity, or null if not found.
+      */
+     MedicalExamination getMedicalExaminationById(Long examId);
+
+    /**
+     * Deletes a medical examination by its ID.
+     * Should include checks for authorization and status ('en attente').
+     * @param examId The ID of the examination to delete.
+     */
+    void deleteMedicalExamination(Long examId);
+
+    /**
+     * Retrieves all medical examinations created by a specific doctor.
+     * @param doctorId The ID of the doctor.
+     * @return A list of medical examination DTOs.
+     */
+    List<MedicalExaminationDTO> getExaminationsByDoctor(Long doctorId);
+
+    /**
+     * Retrieves all medical examinations for a specific centre with a specific status.
+     * @param centreName The name of the examination centre.
+      * @param etat The status to filter by (e.g., "en attente").
+      * @return A list of matching medical examination DTOs.
+      */
+     List<MedicalExaminationDTO> getExaminationsByCentreAndStatus(String centreName, String etat);
+
+    /**
+     * Saves the report content and updates the status of a medical examination to 'terminé'.
+     * Should include authorization checks (e.g., only the assigned DOCTOR_CENTRE_EXAMEN).
+     * @param examId The ID of the examination to update.
+     * @param reportContent The content of the main text report (e.g., HTML).
+     * @param attachedFiles A list of attached files (PDFs, images, etc.).
+     * @return The updated medical examination entity.
+     * @throws ResourceNotFoundException if the examination is not found.
+     * @throws IllegalStateException if the user is not authorized or the exam is not in the correct state.
+     * @throws IOException if there is an error processing the attached files.
+     */
+    MedicalExamination saveReportAndUpdateStatus(Long examId, String reportContent, List<MultipartFile> attachedFiles) throws IOException;
+
+    /**
+     * Updates the status of a medical examination.
+     * @param examId The ID of the examination to update.
+     * @param newStatus The new status to set.
+     * @return The updated medical examination entity.
+     * @throws pi.pperformance.elite.exceptions.ResourceNotFoundException if the examination is not found.
+     */
+    MedicalExamination updateExaminationStatus(Long examId, String newStatus);
+
+    /**
+     * Generates a PDF representation of the final medical report.
+     * @param examId The ID of the examination whose report is to be generated.
+     * @return A byte array containing the generated PDF.
+     * @throws ResourceNotFoundException if the examination is not found.
+     * @throws com.lowagie.text.DocumentException if there is an error during PDF generation.
+     * @throws IOException if there is an I/O error.
+     */
+    byte[] generateReportPdf(Long examId) throws com.lowagie.text.DocumentException, IOException;
 }

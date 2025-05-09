@@ -71,6 +71,7 @@
     "addCabinet": "Ajouter un cabinet",
     "manageCabinets": "Gérer les cabinets & QR Codes",
     "manageExamCentres": "Gérer les centres d'examen",
+    "manageReportTemplates": "Gérer Modèles Rapports",
     "addExamCentre": "Ajouter un centre d'examen",
     "editMyAccount": "Modifier mon compte",
     "changePassword": "Changer le mot de passe",
@@ -84,7 +85,8 @@
     "myExaminations": "Mes Examens",
     "myAppointments": "Mes Rendez-vous",
     "addAppointment": "Prendre Rendez-vous",
-    "activationManagement": "Activation Médecin"
+    "activationManagement": "Activation Médecin",
+    "doctorExaminationsDashboard": "Tableau de Bord Examens"
   },
   "dashboard": {
     "title": "Tableau de bord de {{firstName}} {{lastName}}",
@@ -570,9 +572,42 @@
         "conflictWithMessage": "Conflit : {{message}}",
         "otherErrorWithMessage": "Erreur ({{status}}) : {{message}}"
       }
+    }
+  },
+  "manageReportTemplates": {
+    "title": "Gérer les Modèles de Rapport",
+    "loading": "Chargement des modèles...",
+    "noTemplates": "Aucun modèle de rapport trouvé.",
+    "addTitle": "Ajouter un Nouveau Modèle",
+    "editTitle": "Modifier le Modèle",
+    "buttons": {
+      "addTemplate": "Ajouter un Modèle"
     },
-    "confirmations": {
-      "transfer": "Êtes-vous sûr de vouloir transférer le patient {{firstName}} {{lastName}} vers le rôle {{role}} dans le cabinet ID {{cabinetId}} ?"
+    "form": {
+      "name": "Nom du Modèle",
+      "type": "Type de Modèle (ex: IRM, Scanner)",
+      "typePlaceholder": "Entrez le type (facultatif)",
+      "content": "Contenu du Modèle",
+      "previewImage": "Image de Prévisualisation",
+      "currentImage": "Image actuelle"
+    },
+    "tableHeaders": {
+      "id": "ID",
+      "name": "Nom",
+      "type": "Type",
+      "actions": "Actions"
+    },
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce modèle ?",
+    "success": {
+      "addSuccess": "Modèle ajouté avec succès !",
+      "updateSuccess": "Modèle mis à jour avec succès !",
+      "deleteSuccess": "Modèle supprimé avec succès."
+    },
+    "errors": {
+      "fetchFailed": "Échec du chargement des modèles.",
+      "addFailed": "Échec de l'ajout du modèle.",
+      "updateFailed": "Échec de la mise à jour du modèle.",
+      "deleteFailed": "Échec de la suppression du modèle."
     }
   },
   "changePassword": {
@@ -1465,11 +1500,108 @@
       "invalidDate": "Date invalide",
       "dateError": "Erreur Date",
       "error": "Erreur",
-      "close": "Fermer",
-      "back": "Retour",
-      "locale": "fr-FR",
-      "unknownError": "Une erreur inconnue est survenue.",
-      "saving": "Enregistrement...",
-      "saved": "Enregistré"
+    "close": "Fermer",
+    "back": "Retour",
+    "print": "Imprimer",
+    "locale": "fr-FR",
+    "unknownError": "Une erreur inconnue est survenue.",
+    "saving": "Enregistrement...",
+      "saved": "Enregistré",
+      "save": "Enregistrer",
+      "clearFilter": "Effacer Filtre",
+    "backToDashboard": "Retour au Tableau de Bord",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "errors": {
+      "unauthorized": "Accès non autorisé."
+    }
+  },
+    "doctorExaminationsDashboard": {
+      "title": "Tableau de Bord des Demandes d'Examen",
+      "loading": "Chargement des demandes d'examen...",
+      "searchPlaceholder": "Rechercher par nom de patient...",
+      "noExaminationsFound": "Aucune demande d'examen trouvée.",
+      "tableHeaders": {
+        "dateRequest": "Date Demande",
+        "patientName": "Patient",
+        "act": "Acte",
+        "recommendation": "Recommandation",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "buttons": {
+        "modify": "Modifier",
+        "viewResult": "Voir Résultat",
+        "delete": "Supprimer"
+      },
+      "alerts": {
+        "cannotModify": "Impossible de modifier un examen qui n'est pas 'en attente'.",
+        "reportContent": "Contenu du rapport",
+        "noReportYet": "Aucun rapport disponible pour cet examen.",
+        "cannotDelete": "Impossible de supprimer un examen qui n'est pas 'en attente'.",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette demande d'examen ?",
+        "deleteSuccess": "Demande d'examen supprimée avec succès."
+      },
+      "errors": {
+        "unauthorizedOrMissingInfo": "Non autorisé ou informations utilisateur manquantes.",
+        "fetchFailed": "Échec de la récupération des examens",
+        "fetchFailedFallback": "Échec de la récupération de vos demandes d'examen.",
+        "deleteFailed": "Échec de la suppression de l'examen",
+        "deleteFailedFallback": "Échec de la suppression de la demande d'examen.",
+        "reportNotAvailable": "Rapport non disponible (examen terminé mais pas de résultat enregistré).",
+        "reportWindowTitle": "Affichage du Rapport d'Examen"
+      }
+    },
+    "centreExaminationsDashboard": {
+      "title": "Examens à Réaliser",
+      "loading": "Chargement des examens...",
+      "filterByAct": "Filtrer par Acte :",
+      "searchPlaceholder": "Rechercher par nom de patient...",
+      "noExaminationsFound": "Aucun examen en attente trouvé.",
+      "tableHeaders": {
+        "dateRequest": "Date Demande",
+        "patientName": "Patient",
+        "act": "Acte",
+        "recommendation": "Recommandation",
+        "prescribingDoctor": "Médecin Prescripteur",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "buttons": {
+        "prescribeReport": "Prescrire Compte Rendu",
+        "viewReport": "Voir Compte Rendu"
+      },
+      "errors": {
+        "unauthorizedOrMissingInfo": "Non autorisé ou informations du centre/utilisateur manquantes.",
+        "fetchFailed": "Échec de la récupération des examens pour le centre.",
+        "fetchFailedFallback": "Échec de la récupération des examens pour votre centre. Veuillez réessayer.",
+        "popupBlocked": "Impossible d'ouvrir la fenêtre d'aperçu/impression. Veuillez vérifier votre bloqueur de pop-up."
+      }
+    },
+    "prescribeReportPage": {
+      "title": "Prescrire le Compte Rendu d'Examen",
+      "loadingTemplates": "Chargement des modèles...",
+      "patient": "Patient",
+      "act": "Acte",
+      "selectTemplateTitle": "Choisissez un modèle de rapport ou commencez avec un document vierge :",
+      "blankDocument": "Document Vierge",
+      "notSpecified": "Non spécifié",
+      "backToTemplates": "Retour à la Sélection des Modèles",
+      "saveReportButton": "Enregistrer le Rapport",
+      "updateReportButton": "Mettre à Jour le Rapport",
+      "errors": {
+        "cannotUpdateCompleted": "Impossible de mettre à jour un rapport terminé.",
+        "fetchExamFailed": "Échec de la récupération des détails de l'examen. Ceci n'est pas critique.",
+        "fetchTemplatesFailed": "Erreur lors de la récupération des modèles de rapport.",
+        "fetchTemplatesFailedFallback": "Impossible de charger les modèles de rapport. Veuillez réessayer.",
+        "missingExamId": "ID d'examen manquant.",
+        "saveReportFailed": "Erreur lors de l'enregistrement du rapport.",
+        "saveReportFailedFallback": "Échec de l'enregistrement du rapport. Veuillez réessayer.",
+        "printDataMissing": "Données nécessaires pour l'impression non chargées."
+      },
+      "success": {
+        "reportSaved": "Rapport enregistré et examen marqué comme terminé avec succès !",
+        "reportUpdated": "Rapport mis à jour avec succès !"
+      }
     }
   }

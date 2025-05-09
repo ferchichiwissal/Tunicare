@@ -71,6 +71,7 @@
     "addCabinet": "Add Cabinet",
     "manageCabinets": "Manage Cabinets & QR Codes",
     "manageExamCentres": "Manage Exam Centres",
+    "manageReportTemplates": "Manage Report Templates",
     "addExamCentre": "Add Exam Centre",
     "editMyAccount": "Edit My Account",
     "changePassword": "Change Password",
@@ -84,7 +85,8 @@
     "myExaminations": "My Examinations",
     "myAppointments": "My Appointments",
     "addAppointment": "Add Appointment",
-    "activationManagement": "Doctor Activation"
+    "activationManagement": "Doctor Activation",
+    "doctorExaminationsDashboard": "Examinations Dashboard"
   },
   "dashboard": {
     "title": "{{firstName}} {{lastName}} Dashboard",
@@ -1020,15 +1022,6 @@
         "sessionExpired": "Session expired. Please log in again."
     }
   },
-  "common": {
-    "notAvailable": "N/A",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "invalidDate": "Invalid Date",
-    "dateError": "Date Error",
-    "error": "Error",
-    "close": "Close"
-  },
   "medicalExaminationForm": {
     "loading": "Loading form...",
     "title": "Create Medical Exam Request",
@@ -1227,7 +1220,8 @@
       "noConsultations": "You have no recorded consultations."
     },
     "buttons": {
-      "download": "Download"
+      "download": "Download",
+      "downloadedCertificate": "Download"
     }
   },
   "myExaminationsPage": {
@@ -1292,7 +1286,10 @@
     "modalDateLabel": "New Date and Time:",
     "modalTypeLabel": "Appointment Type:",
     "modalSavingButton": "Saving...",
-    "modalSaveButton": "Save Changes"
+    "modalSaveButton": "Save Changes",
+    "alerts": {
+      "sessionExpired": "Session expired. Please log in again."
+    }
   },
   "chatbot": {
     "open": "Open AI Chat",
@@ -1476,5 +1473,133 @@
     "unknownError": "An unknown error occurred.",
     "saving": "Saving...",
     "saved": "Saved"
+  },
+  "doctorExaminationsDashboard": {
+    "title": "Exam Requests Dashboard",
+    "loading": "Loading exam requests...",
+    "searchPlaceholder": "Search by patient name...",
+    "noExaminationsFound": "No exam requests found.",
+    "tableHeaders": {
+      "dateRequest": "Date Requested",
+      "patientName": "Patient",
+      "act": "Act",
+      "recommendation": "Recommendation",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "buttons": {
+      "modify": "Modify",
+      "viewResult": "View Result",
+      "delete": "Delete"
+    },
+    "alerts": {
+      "cannotModify": "Cannot modify an exam that is not 'pending'.",
+      "reportContent": "Report Content",
+      "noReportYet": "No report available for this exam yet.",
+      "cannotDelete": "Cannot delete an exam that is not 'pending'.",
+      "confirmDelete": "Are you sure you want to delete this exam request?",
+      "deleteSuccess": "Exam request deleted successfully.",
+      "reportNotAvailable": "Report not available (exam completed but no result saved)."
+    },
+    "errors": {
+      "unauthorizedOrMissingInfo": "Unauthorized or missing user information.",
+      "fetchFailed": "Failed to fetch exams",
+      "fetchFailedFallback": "Failed to retrieve your exam requests.",
+      "deleteFailed": "Failed to delete exam",
+      "deleteFailedFallback": "Failed to delete the exam request.",
+      "reportWindowTitle": "View Exam Report"
+    }
+  },
+  "centreExaminationsDashboard": {
+    "title": "Examinations to Perform",
+    "loading": "Loading examinations...",
+    "centreNameLabel": "Centre:",
+    "filterByAct": "Filter by Act:",
+    "allActs": "All",
+    "noPendingExaminations": "No pending examinations found for this centre.",
+    "noExaminationsForAct": "No pending examinations found for act: {{act}}",
+    "tableHeaders": {
+      "patientName": "Patient",
+      "act": "Act",
+      "recommendation": "Recommendation",
+      "prescribingDoctor": "Prescribing Doctor",
+      "actions": "Actions"
+    },
+    "buttons": {
+      "prescribeReport": "Prescribe Report",
+      "printReport": "Print Report"
+    },
+    "errors": {
+      "unauthorizedOrMissingInfo": "Unauthorized or missing centre information.",
+      "fetchFailed": "Failed to fetch exams for the centre",
+      "fetchFailedFallback": "Failed to retrieve examinations for your centre.",
+      "noReportToPrint": "No report to print for this examination.",
+      "popupBlocked": "Could not open print window. Please check your pop-up blocker settings.",
+      "printTitle": "Print Exam Report"
+    }
+  },
+  "prescribeReportPage": {
+    "title": "Prescribe Exam Report",
+    "loading": "Loading exam details and templates...",
+    "examDetailsTitle": "Examination Details",
+    "patientLabel": "Patient:",
+    "actLabel": "Act:",
+    "statusLabel": "Status:",
+    "recommendationLabel": "Recommendation:",
+    "modelSelectLabel": "Choose a report template:",
+    "blankDocumentOption": "-- Blank Document --",
+    "reportContentLabel": "Report Content:",
+    "buttons": {
+      "saving": "Saving...",
+      "saveAndComplete": "Save & Mark as Completed"
+    },
+    "status": {
+      "saveSuccess": "Report saved and examination marked as completed successfully!"
+    },
+    "errors": {
+      "alreadyProcessed": "This examination has already been processed or is not pending.",
+      "fetchFailed": "Error loading data",
+      "fetchFailedFallback": "Could not load examination details or templates.",
+      "missingExamId": "Missing examination ID.",
+      "cannotSave": "Cannot save report for this examination (incorrect status).",
+      "saveFailed": "Error saving the report",
+      "saveFailedFallback": "Failed to save the report. Please try again."
+      }
+    },
+    "doctorExaminationsDashboard": {
+      "title": "Exam Requests Dashboard",
+      "loading": "Loading exam requests...",
+      "searchPlaceholder": "Search by patient name...",
+      "noExaminationsFound": "No exam requests found.",
+      "tableHeaders": {
+        "dateRequest": "Date Requested",
+        "patientName": "Patient",
+        "act": "Act",
+        "recommendation": "Recommendation",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "buttons": {
+        "modify": "Modify",
+        "viewResult": "View Result",
+        "delete": "Delete"
+      },
+      "alerts": {
+        "cannotModify": "Cannot modify an exam that is not 'pending'.",
+        "reportContent": "Report Content",
+        "noReportYet": "No report available for this exam yet.",
+        "cannotDelete": "Cannot delete an exam that is not 'pending'.",
+        "confirmDelete": "Are you sure you want to delete this exam request?",
+        "deleteSuccess": "Exam request deleted successfully.",
+        "reportNotAvailable": "Report not available (exam completed but no result saved)."
+      },
+      "errors": {
+        "unauthorizedOrMissingInfo": "Unauthorized or missing user information.",
+        "fetchFailed": "Failed to fetch exams",
+        "fetchFailedFallback": "Failed to retrieve your exam requests.",
+        "deleteFailed": "Failed to delete exam",
+        "deleteFailedFallback": "Failed to delete the exam request.",
+        "reportWindowTitle": "View Exam Report"
+      }
+    }
   }
-}

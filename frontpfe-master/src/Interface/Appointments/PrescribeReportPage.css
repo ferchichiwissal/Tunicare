@@ -1,0 +1,162 @@
+/* PrescribeReportPage.css */
+
+.prescribe-report-page {
+    /* Add general styles for the page container if needed */
+}
+
+.template-selection {
+    margin-bottom: 2rem;
+}
+
+.template-selection-header {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.template-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem; /* Spacing between cards */
+}
+
+.template-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    width: 150px; /* Adjust width as needed */
+    text-align: center;
+    background-color: #f9f9f9;
+}
+
+.template-card:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+}
+
+.template-card.active {
+    border-color: #0056b3;
+    box-shadow: 0 0 8px rgba(0, 86, 179, 0.4);
+    background-color: #e7f3ff;
+}
+
+.template-card-image {
+    max-width: 100%;
+    height: 80px; /* Fixed height for consistency */
+    object-fit: contain; /* Or 'cover' depending on desired image scaling */
+    margin-bottom: 0.5rem;
+    background-color: #eee; /* Placeholder background if image fails */
+    display: block; /* Ensure it behaves like a block */
+    margin-left: auto;
+    margin-right: auto;
+}
+.template-card-image-placeholder {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e9ecef;
+    color: #6c757d;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+
+.template-card-name {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.blank-document-card .template-card-image-placeholder {
+    font-size: 2.5rem; /* Make icon larger */
+}
+
+
+.report-editor-section {
+    /* Styles for the editor section */
+}
+
+.quill-editor-custom .ql-editor {
+    min-height: 300px; /* Ensure editor has a decent height */
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* --- Print Styles --- */
+@media print {
+    body * {
+        visibility: hidden; /* Hide everything by default */
+    }
+
+    .prescribe-report-page, .prescribe-report-page * {
+        /* Override if needed, but usually not necessary */
+    }
+
+    /* Make only the print sections visible */
+    .print-only, .print-only *,
+    .quill-editor-custom, .quill-editor-custom * /* Show editor content */
+     {
+        visibility: visible;
+    }
+    
+    /* Position the print sections */
+    .prescribe-report-page {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%; /* Ensure it takes full width for printing */
+        margin: 0; /* Reset margins for print */
+        padding: 0; /* Reset padding for print */
+    }
+
+    /* Hide elements marked with .no-print */
+    .no-print {
+        display: none !important; /* Use !important to override other styles */
+    }
+
+    /* Specific styles for print layout */
+    .print-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .print-header h1 { margin: 0; font-size: 1.5em; }
+    .print-header p { margin: 2px 0; font-size: 0.9em; }
+
+    .patient-info-print {
+        margin-top: 30px;
+    }
+    .patient-info-print p { margin: 5px 0; }
+    .patient-info-print hr { margin-top: 10px; margin-bottom: 10px; }
+
+    .quill-editor-custom {
+        border: none; /* Remove editor border for print */
+        margin-top: 15px;
+    }
+    .quill-editor-custom .ql-editor {
+        min-height: auto; /* Allow content to dictate height */
+        padding: 0; /* Remove editor padding */
+        font-size: 10pt; /* Adjust font size for print */
+        line-height: 1.4;
+    }
+    /* Hide Quill toolbar */
+    .ql-toolbar {
+        display: none !important;
+    }
+
+    .signature-section {
+        text-align: right;
+        margin-top: 40px;
+        page-break-inside: avoid; /* Try to keep signature block together */
+    }
+    .signature-section p { margin: 5px 0; font-size: 10pt; }
+    .signature-section img { max-height: 50px; display: block; margin-top: 10px; margin-left: auto; }
+
+}
+
+/* Hide print-only sections in screen view */
+.print-only {
+    display: none;
+}

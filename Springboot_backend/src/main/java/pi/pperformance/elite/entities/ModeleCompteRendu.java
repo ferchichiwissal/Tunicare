@@ -2,43 +2,70 @@ package pi.pperformance.elite.entities;
 
 import jakarta.persistence.*;
 
-import java.io.Serializable;
-import java.util.Set; // For OneToMany relationship
-
 @Entity
-public class ModeleCompteRendu implements Serializable {
-
-    // Explicit no-argument constructor
-    public ModeleCompteRendu() {
-    }
+@Table(name = "modele_compte_rendu") // Explicit table name as requested
+public class ModeleCompteRendu {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // Primary key from diagram
+    private Long id;
 
-    // No other fields shown in the diagram for ModeleCompteRendu itself
+    @Column(nullable = false, unique = true)
+    private String nomModele; // e.g., "IRM Cérébrale Standard", "Radio Thorax", "Scanner Abdominal"
 
-    // Relationship: CompteRendu 'orienter vers' ModeleCompteRendu (0..* to 0..1 - Inverse Side)
-    @OneToMany(mappedBy = "modeleCompteRendu", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<CompteRendu> compteRendus;
+    @Column(nullable = true) // Or false if type is mandatory
+    private String typeModele; // e.g., "IRM", "Scanner", "Echographie"
 
-    // Note: Timestamps (createdAt, updatedAt) are not shown in the diagram for this entity.
+    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String contenuModele; // The actual template content (HTML or plain text)
 
-    // Getters
+    @Lob
+    @Column(name = "preview_image", columnDefinition="LONGBLOB", nullable = true) // Use LONGBLOB for potentially larger images
+    private byte[] previewImage; // Store image data directly
+
+    // Default constructor
+    public ModeleCompteRendu() {
+    }
+
+    // Getters and Setters
     public Long getId() {
         return id;
     }
 
-    public Set<CompteRendu> getCompteRendus() {
-        return compteRendus;
-    }
-
-    // Setters
     public void setId(Long id) {
         this.id = id;
     }
 
-    public void setCompteRendus(Set<CompteRendu> compteRendus) {
-        this.compteRendus = compteRendus;
+    public String getNomModele() {
+        return nomModele;
+    }
+
+    public void setNomModele(String nomModele) {
+        this.nomModele = nomModele;
+    }
+
+    public String getContenuModele() {
+        return contenuModele;
+    }
+
+    public void setContenuModele(String contenuModele) {
+        this.contenuModele = contenuModele;
+    }
+
+    public String getTypeModele() {
+        return typeModele;
+    }
+
+    public void setTypeModele(String typeModele) {
+        this.typeModele = typeModele;
+    }
+
+    public byte[] getPreviewImage() {
+        return previewImage;
+    }
+
+    public void setPreviewImage(byte[] previewImage) {
+        this.previewImage = previewImage;
     }
 }

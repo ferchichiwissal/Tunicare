@@ -42,6 +42,8 @@ public class SecurityConfig {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource())) // Use explicit CORS config source
             .csrf(csrf -> csrf.disable()) // Updated csrf configuration
             .authorizeHttpRequests(authz -> authz // Use authorizeHttpRequests
+                // Allow CORS preflight requests globally
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() 
                 // Public endpoints FIRST
                 .requestMatchers("/auth/login", "/auth/refresh").permitAll()
                 .requestMatchers("/auth/request-password-reset", "/auth/reset-password").permitAll()
@@ -79,20 +81,39 @@ public class SecurityConfig {
                 // Other Consultation endpoints (Doctors/Assistants)
                 .requestMatchers("/api/consultations/**").hasAnyRole("DOCTOR", "ASSISTANT") // This rule now applies to remaining /api/consultations paths
 
-                // Specific endpoint for patients to view their own examinations in a cabinet
-                .requestMatchers("/api/medical-examinations/my-examinations/**").authenticated() // Allow any authenticated user, @PreAuthorize will check role/ID match
+                // --- Medical Examination Endpoints ---
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/medical-examinations").hasRole("DOCTOR") // Create exam request
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/medical-examinations/{examId}").hasRole("DOCTOR") // Update exam request
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/doctor/me").hasRole("DOCTOR") // Get exams for logged-in doctor
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/centre/pending").hasRole("DOCTOR_CENTRE_EXAMEN") // Get pending exams for centre doctor
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/medical-examinations/{examId}/save-report").hasRole("DOCTOR_CENTRE_EXAMEN") // Save report
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/my-examinations/{patientId}").authenticated() // Patient gets their exams (PreAuthorize checks ID)
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/{examId}/download").authenticated() // Download exam request PDF (PreAuthorize checks patient)
+                // Add rule for PUT status update
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/medical-examinations/{examId}/status").hasRole("DOCTOR_CENTRE_EXAMEN")
+                // Add rule for GET report PDF download
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/{examId}/report/download-pdf").hasAnyRole("DOCTOR_CENTRE_EXAMEN", "PATIENT")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/{examId}").authenticated() // Get specific exam details (Authenticated, PreAuthorize for finer control)
+                .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/medical-examinations/{examId}").hasRole("DOCTOR") // Delete exam request
 
-                // Other Medical Examination endpoints (e.g., creation by Doctor)
-                .requestMatchers("/api/medical-examinations/*/download").authenticated() // Allow download for authenticated users (patient check in controller)
-                .requestMatchers("/api/medical-examinations/**").hasRole("DOCTOR") // This secures the rest
+                // --- Report Model Endpoints ---
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/modeles-compte-rendu").hasAnyRole("DOCTOR_CENTRE_EXAMEN", "ADMIN") // List models
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/modeles-compte-rendu").hasRole("ADMIN") // Create model
+                // Add rule for PUT model update
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/modeles-compte-rendu/{id}").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/modeles-compte-rendu/{id}").hasAnyRole("DOCTOR_CENTRE_EXAMEN", "ADMIN") // Get specific model
+                .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/modeles-compte-rendu/{id}").hasRole("ADMIN") // Delete model
 
-                // Certificate endpoints
+                // --- Certificate Endpoints ---
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/certificates/upload/**").hasRole("DOCTOR") // Upload only by Doctor
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/certificates/download/consultation/**").hasAnyRole("PATIENT", "DOCTOR") // Download by Patient or Doctor
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/certificates/details/consultation/**").hasAnyRole("PATIENT", "DOCTOR") // Details check by Patient or Doctor
 
                 // Chatbot endpoint - requires authentication
                 .requestMatchers("/api/chatbot/**").authenticated()
+
+                // --- Allow public access to preview images ---
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/modeles-compte-rendu/*/preview-image").permitAll()
 
                 // Fallback: Authenticate any other request not explicitly permitted
                 .anyRequest().authenticated()

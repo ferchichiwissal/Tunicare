@@ -29,6 +29,20 @@ public interface MedicalExaminationRepository extends JpaRepository<MedicalExami
     @Query("SELECT me FROM MedicalExamination me JOIN me.rendezVous r WHERE r.patient.id = :patientId AND r.cabinet.idSite = :cabinetId")
     List<MedicalExamination> findExaminationsByPatientAndSite(@Param("patientId") Long patientId, @Param("cabinetId") Long cabinetId);
 
+    /**
+     * Finds medical examinations created by a specific doctor.
+     * @param doctorId The ID of the doctor.
+     * @return A list of medical examinations created by the doctor.
+     */
+    List<MedicalExamination> findByDoctorId(Long doctorId);
+
+    /**
+     * Finds medical examinations assigned to a specific centre name and having a specific status.
+     * @param centreName The name of the examination centre.
+     * @param etat The status of the examination (e.g., "en attente").
+     * @return A list of matching medical examinations.
+     */
+    List<MedicalExamination> findByCentreNameAndEtat(String centreName, String etat);
 
     // Add other custom query methods if needed later
 }

@@ -13,6 +13,7 @@ public class MedicalExaminationInputDTO {
     private Long centreId;       // Optional: ID of the selected CentreDexamen
     private String centreAutre;  // Optional: Name if "Autre" is selected (consider how to store this)
     private String recommandation; // Optional: Free text recommendations
+    private String etat; // Optional: Status of the examination, e.g., "en attente"
 
     // Note: We might need patientId as well, depending on how the frontend flow works
     // or fetch it via consultationId in the service.
@@ -42,6 +43,10 @@ public class MedicalExaminationInputDTO {
         return recommandation;
     }
 
+    public String getEtat() {
+        return etat;
+    }
+
     // Setters
     public void setConsultationId(Long consultationId) {
         this.consultationId = consultationId;
@@ -65,5 +70,9 @@ public class MedicalExaminationInputDTO {
 
     public void setRecommandation(String recommandation) {
         this.recommandation = recommandation;
+    }
+
+    public void setEtat(String etat) {
+        this.etat = etat;
     }
 }

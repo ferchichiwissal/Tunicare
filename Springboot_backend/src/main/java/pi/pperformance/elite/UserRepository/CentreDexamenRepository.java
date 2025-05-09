@@ -1,12 +1,18 @@
 package pi.pperformance.elite.UserRepository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import pi.pperformance.elite.entities.CentreDexamen;
+
+import java.util.Optional; // Import Optional
 
 @Repository
 public interface CentreDexamenRepository extends JpaRepository<CentreDexamen, Long> {
     // Basic CRUD methods are inherited from JpaRepository
+
+    // Find by name (assuming name is unique or we take the first match)
+    Optional<CentreDexamen> findByName(String name);
 
     /**
      * Checks if a CentreDexamen exists with the given name, address, and telephone number.

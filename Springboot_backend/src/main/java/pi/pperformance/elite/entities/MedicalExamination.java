@@ -7,6 +7,8 @@ import pi.pperformance.elite.entities.Doctor; // Import Doctor
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List; // Added import
+import java.util.ArrayList; // Added import for initialization
 
 @Entity
 public class MedicalExamination implements Serializable {
@@ -55,10 +57,23 @@ public class MedicalExamination implements Serializable {
     @JoinColumn(name = "doctor_id") // Name of the foreign key column in medical_examination table
     private Doctor doctor;
 
+    @Column(name = "etat")
+    private String etat;
+
+    @Lob
+    @Column(name = "resultat", columnDefinition = "TEXT")
+    private String resultat; // For the main rich text report content
+
+    @OneToMany(mappedBy = "medicalExamination", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<FichierAttacheRapport> fichiersAttaches = new ArrayList<>();
+
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();
         updatedAt = new Date();
+        if (this.etat == null) {
+            this.etat = "en attente"; // Default status
+        }
     }
 
     @PreUpdate
@@ -153,5 +168,48 @@ public class MedicalExamination implements Serializable {
 
     public void setDoctor(Doctor doctor) {
         this.doctor = doctor;
+    }
+
+    public String getEtat() {
+        return etat;
+    }
+
+    public void setEtat(String etat) {
+        this.etat = etat;
+    }
+
+    public String getResultat() {
+        return resultat;
+    }
+
+    public void setResultat(String resultat) {
+        this.resultat = resultat;
+    }
+
+    public List<FichierAttacheRapport> getFichiersAttaches() {
+        return fichiersAttaches;
+    }
+
+    public void setFichiersAttaches(List<FichierAttacheRapport> fichiersAttaches) {
+        this.fichiersAttaches = fichiersAttaches;
+    }
+
+    // Helper method to add a single attached file
+    public void addFichierAttache(FichierAttacheRapport fichier) {
+        if (fichier != null) {
+            if (this.fichiersAttaches == null) {
+                this.fichiersAttaches = new ArrayList<>();
+            }
+            this.fichiersAttaches.add(fichier);
+            fichier.setMedicalExamination(this);
+        }
+    }
+
+    // Helper method to remove a single attached file
+    public void removeFichierAttache(FichierAttacheRapport fichier) {
+        if (fichier != null && this.fichiersAttaches != null) {
+            this.fichiersAttaches.remove(fichier);
+            fichier.setMedicalExamination(null);
+        }
     }
 }

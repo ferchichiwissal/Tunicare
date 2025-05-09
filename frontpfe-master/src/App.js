@@ -46,6 +46,10 @@ import MyAppointments from './Interface/Appointments/MyAppointments'; // Import 
 import ManageAppointments from './Interface/Appointments/ManageAppointments'; // Import ManageAppointments
 import CabinetSettingsPage from './Interface/CabinetSettingsPage'; // Import the new settings page
 import CertificatePage from './Interface/Appointments/CertificatePage'; // Import the new certificate page
+import DoctorExaminationsDashboard from './Interface/Appointments/DoctorExaminationsDashboard'; // Import Doctor Examinations Dashboard
+import CentreExaminationsDashboard from './Interface/Appointments/CentreExaminationsDashboard'; // Import Centre Examinations Dashboard
+import PrescribeReportPage from './Interface/Appointments/PrescribeReportPage'; // Import Prescribe Report Page
+import ManageReportTemplates from './Interface/Admin/ManageReportTemplates'; // Import Manage Report Templates page
  
 const onLogout = () => {
   // Clear tokens from localStorage and sessionStorage
@@ -190,6 +194,30 @@ function App() {
              <Layout><CertificatePage /></Layout>
            </ProtectedLayout>
          } />
+         {/* Route for the Doctor Examinations Dashboard */}
+         <Route path="/doctor-examinations" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR">
+              <Layout><DoctorExaminationsDashboard /></Layout>
+            </ProtectedLayout>
+          } />
+         {/* Route for the Centre Examinations Dashboard */}
+         <Route path="/centre-examinations" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR_CENTRE_EXAMEN">
+              <Layout><CentreExaminationsDashboard /></Layout>
+            </ProtectedLayout>
+          } />
+         {/* Route for the Prescribe Report Page */}
+         <Route path="/centre/examination/:examId/prescribe-report" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR_CENTRE_EXAMEN">
+              <Layout><PrescribeReportPage /></Layout>
+            </ProtectedLayout>
+          } />
+          {/* Route for Admin to manage report templates */}
+          <Route path="/admin/manage-report-templates" element={
+            <ProtectedLayout requiredRole="ROLE_ADMIN">
+              <Layout><ManageReportTemplates /></Layout>
+            </ProtectedLayout>
+          } />
 
            </Routes>
         </Suspense>

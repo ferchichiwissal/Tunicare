@@ -216,6 +216,7 @@ const Dashboard = ({ onLogout }) => {
         <a href="/manage-cabinets">{t('nav.manageCabinets')}</a> {/* Link for Admin Cabinets */}
         <a href="/add-centre">{t('nav.addExamCentre')}</a> {/* Link for Admin Centres */}
         <a href="/manage-centres">{t('nav.manageExamCentres')}</a> {/* Link for Admin Centres */}
+        <a href="/admin/manage-report-templates">{t('nav.manageReportTemplates', 'Gérer Modèles Rapports')}</a> {/* Added Manage Report Templates Link */}
         <a href="/UserManagement">{t('nav.changeRole')}</a>
 
         <a href="/users">{t('nav.doctorsManagement')}</a>
@@ -237,7 +238,7 @@ const Dashboard = ({ onLogout }) => {
 
         <a href="/users">{t('nav.userManagement')}</a> {/* Consider filtering users by their cabinet */}
         <a href="/manage-appointments">{t('nav.manageAppointments')}</a> {/* Added Manage Appointments Link */}
-
+        <a href="/doctor-examinations">{t('nav.doctorExaminationsDashboard')}</a> {/* Added Doctor Examinations Dashboard Link */}
         {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a> {/* Consider filtering users by their cabinet */}
         <a href="/consultation/all">{t('nav.consultationDashboard')}</a> {/* Added Consultation Dashboard Link */}
         <a href="/parametres-cabinet">{t('nav.cabinetSettings')}</a> {/* Added Cabinet Settings Link */}
@@ -300,6 +301,7 @@ const Dashboard = ({ onLogout }) => {
     navigationLinks = (
       <>
         <a href="#">{t('nav.dashboard')}</a>
+        <a href="/centre-examinations">{t('nav.centreExaminationsDashboard')}</a> {/* Added Centre Examinations Dashboard Link */}
         <a href={`/edit-doctor-centre/${id}`}>{t('nav.editMyAccount')}</a> {/* Reverted to correct route path */}
         <a href="/change-password">{t('nav.changePassword')}</a>
         <a href="/Logout">{t('nav.logout')}</a>

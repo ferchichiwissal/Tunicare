@@ -1,23 +1,19 @@
 package pi.pperformance.elite.UserServices;
 
-// Removed Lombok import
-import org.springframework.beans.factory.annotation.Autowired; // Import Autowired
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pi.pperformance.elite.UserRepository.CentreDexamenRepository;
-import pi.pperformance.elite.UserRepository.UserRepository; // Added import
-// import pi.pperformance.elite.UserRepository.ConsultationRepository; // No longer needed here for saving
-import pi.pperformance.elite.UserRepository.MedicalExaminationRepository;
-import pi.pperformance.elite.UserRepository.RendezVousRepository; // Added import
-import pi.pperformance.elite.entities.*; // Import all entities for User, Doctor etc.
+import pi.pperformance.elite.UserRepository.*; // Import all repositories
+import pi.pperformance.elite.entities.*;
 import pi.pperformance.elite.exceptions.ResourceNotFoundException;
-// Removed import for non-existent UnauthorizedOperationException
-// import pi.pperformance.elite.exceptions.UnauthorizedOperationException; // For security checks
+import org.springframework.web.multipart.MultipartFile; // Added import
 
-// Imports for PDF Generation
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
 import java.io.ByteArrayOutputStream;
@@ -30,156 +26,108 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-
-import java.util.Collections; // For empty list
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional; // Added import for Optional
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import pi.pperformance.elite.dto.MedicalExaminationInputDTO; // Import DTO for update method
+import pi.pperformance.elite.dto.MedicalExaminationInputDTO;
+import pi.pperformance.elite.dto.MedicalExaminationDTO;
 
 @Service
-// Removed @AllArgsConstructor
 public class MedicalExaminationService implements IMedicalExaminationService {
 
-    private final MedicalExaminationRepository medicalExaminationRepository;
-    // private final ConsultationRepository consultationRepository; // Removed
-    private final CentreDexamenRepository centreDexamenRepository;
-    private final RendezVousRepository rendezVousRepository; // Added
-    private final UserRepository userRepository; // Added
-    private final PdfGenerationService pdfGenerationService; // Added for PDF generation
+    private static final Logger log = LoggerFactory.getLogger(MedicalExaminationService.class);
 
-    // Explicit constructor for dependency injection
+    private final MedicalExaminationRepository medicalExaminationRepository;
+    private final CentreDexamenRepository centreDexamenRepository;
+    private final RendezVousRepository rendezVousRepository;
+    private final UserRepository userRepository;
+    private final PdfGenerationService pdfGenerationService;
+    private final FichierAttacheRapportRepository fichierAttacheRapportRepository; // Added repository
+
     @Autowired
     public MedicalExaminationService(MedicalExaminationRepository medicalExaminationRepository,
-                                     // ConsultationRepository consultationRepository, // Removed
                                      CentreDexamenRepository centreDexamenRepository,
-                                     RendezVousRepository rendezVousRepository, // Added
-                                     UserRepository userRepository, // Added
-                                     PdfGenerationService pdfGenerationService) { // Added
+                                     RendezVousRepository rendezVousRepository,
+                                     UserRepository userRepository,
+                                     PdfGenerationService pdfGenerationService,
+                                     FichierAttacheRapportRepository fichierAttacheRapportRepository) { // Added repository
         this.medicalExaminationRepository = medicalExaminationRepository;
-        // this.consultationRepository = consultationRepository; // Removed
         this.centreDexamenRepository = centreDexamenRepository;
-        this.rendezVousRepository = rendezVousRepository; // Added
-        this.userRepository = userRepository; // Added
-        this.pdfGenerationService = pdfGenerationService; // Added
+        this.rendezVousRepository = rendezVousRepository;
+        this.userRepository = userRepository;
+        this.pdfGenerationService = pdfGenerationService;
+        this.fichierAttacheRapportRepository = fichierAttacheRapportRepository; // Initialize repository
     }
 
     @Override
     @Transactional
-    // Added consultationId parameter (can be null)
     public MedicalExamination saveMedicalExamination(MedicalExamination examination, Long appointmentId, Long centreId, Long consultationId) {
-        // 1. Find the associated RendezVous (Appointment)
-        RendezVous rendezVous = rendezVousRepository.findById(appointmentId) // Use RendezVousRepository
-                .orElseThrow(() -> new ResourceNotFoundException("RendezVous not found with id: " + appointmentId)); // Changed message
-        examination.setRendezVous(rendezVous); // Use the correct setter
+        RendezVous rendezVous = rendezVousRepository.findById(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("RendezVous not found with id: " + appointmentId));
+        examination.setRendezVous(rendezVous);
+        examination.setConsultationId(consultationId);
 
-        // Patient is accessible via rendezVous.getPatient() if needed elsewhere
-        // Removed setting patient directly on examination
-
-        // 2. Set the (potentially null) consultationId
-        examination.setConsultationId(consultationId); // Set the consultation ID (already correct)
-
-        // 3. Get the currently authenticated Doctor
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            // Use IllegalStateException instead of custom exception
             throw new IllegalStateException("User must be authenticated to create an examination.");
         }
         String username = ((UserDetails) authentication.getPrincipal()).getUsername();
-        // Fetch user by email, handle null case
         User currentUser = userRepository.findByEmail(username);
         if (currentUser == null) {
             throw new ResourceNotFoundException("Authenticated user not found: " + username);
         }
-
-        // Ensure the user is a Doctor
         if (!(currentUser instanceof Doctor)) {
-             // Use IllegalStateException instead of custom exception
             throw new IllegalStateException("User creating the examination must be a Doctor.");
         }
         Doctor currentDoctor = (Doctor) currentUser;
-        examination.setDoctor(currentDoctor); // Set the doctor who created the exam
+        examination.setDoctor(currentDoctor);
 
-        // 4. Find the associated CentreDexamen and set centreName
         if (centreId != null) {
             CentreDexamen centre = centreDexamenRepository.findById(centreId)
                     .orElseThrow(() -> new ResourceNotFoundException("Centre d'examen not found with id: " + centreId));
-            examination.setCentreName(centre.getName()); // Set the name from the found centre
+            examination.setCentreName(centre.getName());
         } else {
-            // Handle 'Autre' case if centreAutre name is provided in DTO (assuming DTO has centreAutre field)
-            // If DTO has centreAutre: examination.setCentreName(examInput.getCentreAutre());
-            // Otherwise, default to "Autre"
-            examination.setCentreName("Autre"); // Set name to "Autre" if no specific centre ID
+            examination.setCentreName("Autre");
         }
-
-        // 5. Save the examination
-        // Creation/update dates are handled by @PrePersist/@PreUpdate in the entity
         return medicalExaminationRepository.save(examination);
     }
 
-    // TODO: Refactor this method to fetch exams based on RendezVous or directly via Patient ID if needed
     @Override
     public List<MedicalExamination> getMedicalExaminationsByPatientId(Long patientId) {
-         // Find all consultations for the patient using the correct repository method name
-         // List<Consultation> consultations = consultationRepository.findByPatient_IdOrderByDateConsultationDesc(patientId); // Corrected method name
-         //
-         // if (consultations.isEmpty()) {
-         //     return Collections.emptyList();
-         // }
-         //
-         // // Extract all medical examinations from these consultations
-         // // This relies on the OneToMany relationship being fetched correctly (LAZY by default)
-         // // Consider EAGER fetch or a dedicated query if performance becomes an issue.
-         // return consultations.stream()
-         //         .flatMap(consultation -> consultation.getMedicalExaminations().stream()) // This needs update based on new relationship
-         //         .collect(Collectors.toList());
-         //
-         // // Alternative using a custom query in MedicalExaminationRepository (more efficient):
-         // // return medicalExaminationRepository.findByRendezVousPatientId(patientId); // Example
-         // // Requires defining this method in the repository interface.
-
-         // Returning empty list for now to avoid compilation errors until refactored
-         System.out.println("WARN: getMedicalExaminationsByPatientId needs refactoring due to entity changes.");
-         return Collections.emptyList();
+        System.out.println("WARN: getMedicalExaminationsByPatientId needs refactoring due to entity changes.");
+        return Collections.emptyList();
     }
 
     @Override
     public List<MedicalExamination> getPatientExaminationsByCabinet(Long patientId, Long cabinetId) {
-        // Delegate to the repository to find examinations linked to a patient via RendezVous
-        // and filtered by the site ID (cabinet ID) directly on the RendezVous.
-        // Use the method with the corrected @Query annotation
         return medicalExaminationRepository.findExaminationsByPatientAndSite(patientId, cabinetId);
     }
 
     @Override
-    @Transactional(readOnly = true) // Read-only transaction for fetching data
+    @Transactional(readOnly = true)
     public byte[] generateExaminationPdf(Long examId) throws DocumentException, IOException {
         MedicalExamination exam = medicalExaminationRepository.findById(examId)
                 .orElseThrow(() -> new ResourceNotFoundException("Medical Examination not found with id: " + examId));
-
-        // Fetch related data - Ensure relationships are loaded (consider EAGER fetch or join fetch query if needed)
         RendezVous rendezVous = exam.getRendezVous();
         if (rendezVous == null) {
             throw new IllegalStateException("Examination " + examId + " is not linked to an appointment (RendezVous).");
         }
         Patient patient = rendezVous.getPatient();
-        Doctor doctor = exam.getDoctor(); // Doctor who created the exam request
-        CabinetDr cabinet = rendezVous.getCabinet(); // Corrected: Use getCabinet()
+        Doctor doctor = exam.getDoctor();
+        CabinetDr cabinet = rendezVous.getCabinet();
 
         if (patient == null || doctor == null || cabinet == null) {
             throw new IllegalStateException("Missing Patient, Doctor, or Cabinet information for Examination ID: " + examId);
         }
 
-        // --- PDF Generation Logic (Adapted from PdfGenerationService) ---
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        // Explicitly qualify Document to avoid ambiguity
         com.lowagie.text.Document document = new com.lowagie.text.Document(PageSize.A4);
         PdfWriter writer = PdfWriter.getInstance(document, baos);
-
         document.open();
 
-        // --- Header ---
+        // Header
         Paragraph header = new Paragraph("Dr. " + doctor.getFirstName() + " " + doctor.getLastName());
         header.setAlignment(Element.ALIGN_LEFT);
         document.add(header);
@@ -187,13 +135,13 @@ public class MedicalExaminationService implements IMedicalExaminationService {
         document.add(new Paragraph("Tél: " + (cabinet.getTel() != null ? cabinet.getTel() : "N/A")));
         document.add(Chunk.NEWLINE);
 
-        // --- Title ---
+        // Title
         Paragraph title = new Paragraph("Demande d'Examen Médical", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16));
         title.setAlignment(Element.ALIGN_CENTER);
         document.add(title);
         document.add(Chunk.NEWLINE);
 
-        // --- Patient Info ---
+        // Patient Info
         document.add(new Paragraph("Patient: " + patient.getFirstName() + " " + patient.getLastName()));
         if (patient.getBirthDate() != null) {
             document.add(new Paragraph("Date de Naissance: " + patient.getBirthDate().format(DateTimeFormatter.ISO_DATE)));
@@ -202,7 +150,6 @@ public class MedicalExaminationService implements IMedicalExaminationService {
             document.add(new Paragraph("Date de Naissance: Non spécifiée"));
             document.add(new Paragraph("Âge: Non spécifié"));
         }
-        // Use exam creation date as the request date - Corrected Date to LocalDate conversion
         String createdAtFormatted = "N/A";
         if (exam.getCreatedAt() != null) {
             LocalDate createdAtLocalDate = exam.getCreatedAt().toInstant()
@@ -213,33 +160,29 @@ public class MedicalExaminationService implements IMedicalExaminationService {
         document.add(new Paragraph("Date de la demande: " + createdAtFormatted));
         document.add(Chunk.NEWLINE);
 
-        // --- Examination Details ---
+        // Examination Details
         document.add(new Paragraph("Examen demandé:", FontFactory.getFont(FontFactory.HELVETICA_BOLD)));
         document.add(new Paragraph(exam.getAct() != null ? exam.getAct() : "Non spécifié"));
         document.add(Chunk.NEWLINE);
-
         document.add(new Paragraph("Centre d'examen:", FontFactory.getFont(FontFactory.HELVETICA_BOLD)));
         document.add(new Paragraph(exam.getCentreName() != null ? exam.getCentreName() : "Non spécifié"));
         document.add(Chunk.NEWLINE);
-
         if (exam.getRecommandation() != null && !exam.getRecommandation().trim().isEmpty()) {
             document.add(new Paragraph("Recommandation:", FontFactory.getFont(FontFactory.HELVETICA_BOLD)));
-            // Clean HTML tags from recommendation
             String cleanedRecommandation = exam.getRecommandation()
-                                               .replaceAll("(?i)<p>", "") // Remove <p> tags (case-insensitive)
-                                               .replaceAll("(?i)</p>", "\n") // Replace </p> with newline (case-insensitive)
+                                               .replaceAll("(?i)<p>", "")
+                                               .replaceAll("(?i)</p>", "\n")
                                                .trim();
             document.add(new Paragraph(cleanedRecommandation));
             document.add(Chunk.NEWLINE);
         }
-        document.add(Chunk.NEWLINE); // Extra space before signature
+        document.add(Chunk.NEWLINE);
 
-        // --- Signature ---
+        // Signature
         Paragraph signatureLabel = new Paragraph("Signature du Médecin");
         signatureLabel.setAlignment(Element.ALIGN_RIGHT);
         document.add(signatureLabel);
         document.add(Chunk.NEWLINE);
-
         String signaturePath = cabinet.getSignatureImagePath();
         if (signaturePath != null && !signaturePath.trim().isEmpty()) {
             java.nio.file.Path path = Paths.get(signaturePath);
@@ -264,19 +207,11 @@ public class MedicalExaminationService implements IMedicalExaminationService {
             document.add(new Paragraph("[Signature non configurée]", FontFactory.getFont(FontFactory.HELVETICA, 8, Font.ITALIC)));
         }
 
-        // --- Footer ---
-        // Consider using PdfPageEventHelper for consistent footer placement
-        // Paragraph footer = new Paragraph("Contact: Tel: " + cabinet.getTel() + " | Email: " + doctor.getEmail());
-        // footer.setAlignment(Element.ALIGN_CENTER);
-        // document.add(footer); // This won't place it at the absolute bottom
-
         document.close();
         writer.close();
-
         return baos.toByteArray();
     }
 
-    // Helper method to calculate age (copied from PdfGenerationService)
     private int calculateAge(LocalDate birthLocalDate) {
         if (birthLocalDate == null) {
             return 0;
@@ -287,41 +222,367 @@ public class MedicalExaminationService implements IMedicalExaminationService {
     @Override
     @Transactional
     public MedicalExamination updateMedicalExamination(Long examId, MedicalExaminationInputDTO examInput) {
-        // 1. Find the existing examination
         MedicalExamination existingExam = medicalExaminationRepository.findById(examId)
                 .orElseThrow(() -> new ResourceNotFoundException("Medical Examination not found with id: " + examId));
-
-        // 2. Update fields from DTO
         existingExam.setAct(examInput.getTypeExamen());
         existingExam.setRecommandation(examInput.getRecommandation());
-
-        // 3. Update Centre information
         Long centreId = examInput.getCentreId();
         if (centreId != null) {
             CentreDexamen centre = centreDexamenRepository.findById(centreId)
                     .orElseThrow(() -> new ResourceNotFoundException("Centre d'examen not found with id: " + centreId));
-            existingExam.setCentreName(centre.getName()); // Update the name
+            existingExam.setCentreName(centre.getName());
         } else {
-            // Handle 'Autre' case - assuming 'Autre' means no specific centre is linked
             existingExam.setCentreName("Autre");
         }
-
-        // 4. Update associated RendezVous and Consultation if provided and different (Optional - depends on requirements)
-        // For now, we assume these don't change during an exam update.
-        // If appointmentId or consultationId in DTO are different, handle logic here.
-        // Example:
-        // if (examInput.getAppointmentId() != null && !examInput.getAppointmentId().equals(existingExam.getRendezVous().getId())) {
-        //     RendezVous newRendezVous = rendezVousRepository.findById(examInput.getAppointmentId())
-        //             .orElseThrow(() -> new ResourceNotFoundException("New RendezVous not found with id: " + examInput.getAppointmentId()));
-        //     existingExam.setRendezVous(newRendezVous);
-        // }
-        // if (examInput.getConsultationId() != null && !examInput.getConsultationId().equals(existingExam.getConsultationId())) {
-        //     existingExam.setConsultationId(examInput.getConsultationId());
-        // }
-
-
-        // 5. Save the updated examination
-        // The @PreUpdate annotation in the entity should handle the updatedAt timestamp automatically
+        if (examInput.getEtat() != null && !examInput.getEtat().trim().isEmpty()) {
+            existingExam.setEtat(examInput.getEtat());
+        }
         return medicalExaminationRepository.save(existingExam);
     }
-} // Added missing closing brace for the class
+
+    @Override
+    @Transactional(readOnly = true)
+    public MedicalExamination getMedicalExaminationById(Long examId) {
+        return medicalExaminationRepository.findById(examId)
+                .orElseThrow(() -> new ResourceNotFoundException("Medical Examination not found with id: " + examId));
+    }
+
+    @Override
+    @Transactional
+    public void deleteMedicalExamination(Long examId) {
+        MedicalExamination exam = getMedicalExaminationById(examId);
+        if (!"en attente".equalsIgnoreCase(exam.getEtat())) {
+            throw new IllegalStateException("Cannot delete examination with status: " + exam.getEtat());
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User must be authenticated to delete an examination.");
+        }
+        String username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        User currentUser = userRepository.findByEmail(username);
+        if (currentUser == null) {
+            throw new ResourceNotFoundException("Authenticated user not found: " + username);
+        }
+        if (!(currentUser instanceof Doctor)) {
+            throw new IllegalStateException("User deleting the examination must be a Doctor.");
+        }
+        Doctor currentDoctor = (Doctor) currentUser;
+        if (exam.getDoctor() == null || !exam.getDoctor().getId().equals(currentDoctor.getId())) {
+            throw new IllegalStateException("Doctor is not authorized to delete this examination request.");
+        }
+        medicalExaminationRepository.delete(exam);
+    }
+
+    private MedicalExaminationDTO mapToDTO(MedicalExamination exam) {
+        MedicalExaminationDTO dto = new MedicalExaminationDTO();
+        dto.setIdExam(exam.getIdExam());
+        dto.setAct(exam.getAct());
+        dto.setRecommandation(exam.getRecommandation());
+        dto.setCreatedAt(exam.getCreatedAt());
+        dto.setUpdatedAt(exam.getUpdatedAt());
+        dto.setEtat(exam.getEtat());
+        dto.setResultat(exam.getResultat());
+        dto.setConsultationId(exam.getConsultationId());
+        dto.setCentreName(exam.getCentreName());
+
+        if (exam.getRendezVous() != null) {
+            dto.setRendezVousId(exam.getRendezVous().getIdAppointment()); // Corrected getter
+            if (exam.getRendezVous().getPatient() != null) {
+                dto.setPatientId(exam.getRendezVous().getPatient().getId());
+                dto.setPatientFirstName(exam.getRendezVous().getPatient().getFirstName());
+                dto.setPatientLastName(exam.getRendezVous().getPatient().getLastName());
+            }
+        }
+
+        if (exam.getDoctor() != null) {
+            dto.setDoctorId(exam.getDoctor().getId());
+            dto.setDoctorFirstName(exam.getDoctor().getFirstName());
+            dto.setDoctorLastName(exam.getDoctor().getLastName());
+        }
+
+        return dto;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MedicalExaminationDTO> getExaminationsByDoctor(Long doctorId) {
+        log.info("Fetching examinations for doctorId: {}", doctorId);
+        List<MedicalExamination> exams = medicalExaminationRepository.findByDoctorId(doctorId);
+        log.info("Found {} examinations in repository for doctorId: {}", exams.size(), doctorId);
+
+        if (exams.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<MedicalExaminationDTO> dtos = exams.stream()
+                .map(exam -> {
+                    try {
+                        return mapToDTO(exam);
+                    } catch (Exception e) {
+                        log.error("Error mapping examination ID {} to DTO: {}", exam.getIdExam(), e.getMessage(), e);
+                        return null;
+                    }
+                })
+                .filter(dto -> dto != null)
+                .collect(Collectors.toList());
+
+        log.info("Successfully mapped {} examinations to DTOs for doctorId: {}", dtos.size(), doctorId);
+        if (!dtos.isEmpty()) {
+            log.debug("First mapped DTO details: {}", dtos.get(0));
+        }
+        return dtos;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MedicalExaminationDTO> getExaminationsByCentreAndStatus(String centreName, String etat) { // Return DTO list
+        log.info("Fetching examinations for centre: {} with status: {}", centreName, etat);
+        List<MedicalExamination> exams = medicalExaminationRepository.findByCentreNameAndEtat(centreName, etat);
+        log.info("Found {} examinations in repository for centre: {} with status: {}", exams.size(), centreName, etat);
+
+        if (exams.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<MedicalExaminationDTO> dtos = exams.stream()
+                .map(exam -> {
+                    try {
+                        return mapToDTO(exam); // Use the helper method
+                    } catch (Exception e) {
+                        log.error("Error mapping examination ID {} to DTO for centre {}: {}", exam.getIdExam(), centreName, e.getMessage(), e);
+                        return null; // Skip problematic mappings
+                    }
+                })
+                .filter(dto -> dto != null) // Filter out nulls
+                .collect(Collectors.toList());
+
+        log.info("Successfully mapped {} examinations to DTOs for centre: {} with status: {}", dtos.size(), centreName, etat);
+        return dtos;
+    }
+
+    @Override
+    @Transactional
+    public MedicalExamination saveReportAndUpdateStatus(Long examId, String reportContent, List<MultipartFile> attachedFiles) throws IOException {
+        MedicalExamination exam = getMedicalExaminationById(examId);
+
+        // Authorization check (already present, seems correct)
+        // Check status - allow saving report only if 'en attente' or maybe 'terminé' if re-saving?
+        // For now, let's stick to the original logic: only save if 'en attente'. // Commenting out this check to allow updates on 'terminé' status
+        // If you need to allow overwriting a 'terminé' report, adjust this logic.
+        /* // Removing the status check to allow updates even if 'terminé'
+        if (!"en attente".equalsIgnoreCase(exam.getEtat())) {
+             log.warn("Attempting to save report for examination {} which is not 'en attente'. Status: {}", examId, exam.getEtat());
+             // Depending on requirements, either throw an exception or allow overwriting.
+             // For now, let's throw:
+             throw new IllegalStateException("Cannot save report for examination that is not 'en attente'. Current status: " + exam.getEtat());
+        }
+        */
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User must be authenticated to save a report.");
+        }
+        String username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        User currentUser = userRepository.findByEmail(username);
+        if (currentUser == null) {
+            throw new ResourceNotFoundException("Authenticated user not found: " + username);
+        }
+        if (!(currentUser instanceof DoctorCentreDexamen)) {
+            throw new IllegalStateException("User saving the report must be a DOCTOR_CENTRE_EXAMEN.");
+        }
+        DoctorCentreDexamen currentCentreDoctor = (DoctorCentreDexamen) currentUser;
+        if (currentCentreDoctor.getCentreDexamen() == null ||
+            !currentCentreDoctor.getCentreDexamen().getName().equalsIgnoreCase(exam.getCentreName())) {
+            throw new IllegalStateException("User is not authorized to save reports for centre: " + exam.getCentreName());
+        }
+
+        // Save main report content
+        exam.setResultat(reportContent); // Save HTML/text content
+        
+        // Only update status to 'terminé' if it's not already 'terminé'
+        if (!"terminé".equalsIgnoreCase(exam.getEtat())) {
+            exam.setEtat("terminé"); 
+            log.info("Updating status of examination {} to 'terminé'", examId);
+        } else {
+             log.info("Examination {} status is already 'terminé', only updating report content.", examId);
+        }
+
+
+        // Process and save attached files (Handle updates: clear existing? Add new?)
+        // Current logic adds files. If updating, maybe clear existing first?
+        // For simplicity now, it just adds any new files provided.
+        if (attachedFiles != null && !attachedFiles.isEmpty()) {
+            for (MultipartFile file : attachedFiles) {
+                if (file != null && !file.isEmpty()) {
+                    String fileName = file.getOriginalFilename();
+                    String contentType = file.getContentType();
+                    byte[] fileContent = file.getBytes();
+
+                    FichierAttacheRapport fichierAttache = new FichierAttacheRapport(fileName, contentType, fileContent, exam);
+                    // Use the helper method to maintain bidirectional relationship
+                    exam.addFichierAttache(fichierAttache);
+                    log.info("Prepared attached file '{}' ({}) for examination {}", fileName, contentType, examId);
+                }
+            }
+        }
+
+        // Save the examination and its attached files (due to CascadeType.ALL)
+        return medicalExaminationRepository.save(exam);
+    }
+
+
+    @Override
+    @Transactional
+    public MedicalExamination updateExaminationStatus(Long examId, String newStatus) {
+        MedicalExamination exam = getMedicalExaminationById(examId);
+
+        // Authorization: Check if the current user is a DOCTOR_CENTRE_EXAMEN
+        // and is associated with the examination's centre.
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User must be authenticated to update examination status.");
+        }
+        String username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        User currentUser = userRepository.findByEmail(username);
+        if (currentUser == null) {
+            throw new ResourceNotFoundException("Authenticated user not found: " + username);
+        }
+
+        if (!(currentUser instanceof DoctorCentreDexamen)) {
+            throw new IllegalStateException("User updating the status must be a DOCTOR_CENTRE_EXAMEN.");
+        }
+        DoctorCentreDexamen currentCentreDoctor = (DoctorCentreDexamen) currentUser;
+
+        // Check if the doctor is associated with the examination's centre
+        // This assumes DoctorCentreDexamen has a getCentreDexamen() method
+        // and MedicalExamination has a getCentreName() method.
+        if (currentCentreDoctor.getCentreDexamen() == null ||
+            !currentCentreDoctor.getCentreDexamen().getName().equalsIgnoreCase(exam.getCentreName())) {
+            throw new IllegalStateException("User is not authorized to update status for examinations in centre: " + exam.getCentreName());
+        }
+
+        // Optionally, add logic to restrict which status transitions are allowed.
+        // For example, can only go from "en attente" to "terminé".
+        if (!"en attente".equalsIgnoreCase(exam.getEtat()) && "terminé".equalsIgnoreCase(newStatus)) {
+             // Allow setting to "terminé" even if not "en attente" for this specific flow,
+             // but generally, you might want more restrictions.
+             // For now, we allow setting to "terminé" as per the request.
+        } else if (!"en attente".equalsIgnoreCase(exam.getEtat())) {
+            log.warn("Attempting to change status from {} to {} for examId {}. This might be an unintended transition.", exam.getEtat(), newStatus, examId);
+            // throw new IllegalStateException("Examination status can only be changed from 'en attente'. Current status: " + exam.getEtat());
+        }
+
+
+        log.info("Updating status of examination {} from {} to {}", examId, exam.getEtat(), newStatus);
+        exam.setEtat(newStatus);
+        return medicalExaminationRepository.save(exam);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] generateReportPdf(Long examId) throws com.lowagie.text.DocumentException, IOException { // Specify DocumentException
+        MedicalExamination exam = medicalExaminationRepository.findById(examId)
+                .orElseThrow(() -> new ResourceNotFoundException("Medical Examination not found with id: " + examId));
+
+        if (!"terminé".equalsIgnoreCase(exam.getEtat())) {
+            throw new IllegalStateException("Cannot generate report PDF for examination that is not 'terminé'. Current status: " + exam.getEtat());
+        }
+        if (exam.getResultat() == null || exam.getResultat().trim().isEmpty()) {
+             log.warn("Attempting to generate PDF report for examination {} with empty 'resultat' field.", examId);
+             // Decide how to handle this: throw error or generate PDF with a note?
+             // For now, let's generate a PDF indicating the main content is missing.
+        }
+
+        RendezVous rendezVous = exam.getRendezVous();
+         if (rendezVous == null) {
+             throw new IllegalStateException("Examination " + examId + " is not linked to an appointment (RendezVous).");
+         }
+         Patient patient = rendezVous.getPatient();
+         // Find the DoctorCentreDexamen who likely created the report (needs logic to determine this, maybe store it?)
+         // For now, let's just use the centre name and patient info.
+         // DoctorCentreDexamen centreDoctor = findCentreDoctorForExam(exam); // Placeholder for finding the doctor
+
+         if (patient == null) {
+             throw new IllegalStateException("Missing Patient information for Examination ID: " + examId);
+         }
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // Use fully qualified name to resolve ambiguity
+        com.lowagie.text.Document document = new com.lowagie.text.Document(PageSize.A4);
+        PdfWriter writer = PdfWriter.getInstance(document, baos);
+        document.open();
+
+        // Header (Adapt based on available info - Centre Doctor?)
+        Paragraph header = new Paragraph("Centre d'Examen: " + (exam.getCentreName() != null ? exam.getCentreName() : "Non spécifié"));
+        header.setAlignment(Element.ALIGN_LEFT);
+        document.add(header);
+        // Add centre address/phone if available via CentreDexamen entity lookup?
+        document.add(Chunk.NEWLINE);
+
+        // Title
+        Paragraph title = new Paragraph("Compte Rendu Médical", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16));
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+        document.add(Chunk.NEWLINE);
+
+        // Patient Info
+        document.add(new Paragraph("Patient: " + patient.getFirstName() + " " + patient.getLastName()));
+         if (patient.getBirthDate() != null) {
+             document.add(new Paragraph("Date de Naissance: " + patient.getBirthDate().format(DateTimeFormatter.ISO_DATE)));
+             document.add(new Paragraph("Âge: " + calculateAge(patient.getBirthDate()) + " ans"));
+         } else {
+             document.add(new Paragraph("Date de Naissance: Non spécifiée"));
+             document.add(new Paragraph("Âge: Non spécifié"));
+         }
+        String updatedAtFormatted = "N/A";
+         if (exam.getUpdatedAt() != null) {
+             LocalDate updatedAtLocalDate = exam.getUpdatedAt().toInstant()
+                                                .atZone(ZoneId.systemDefault())
+                                                .toLocalDate();
+             updatedAtFormatted = updatedAtLocalDate.format(DateTimeFormatter.ISO_DATE);
+         }
+         document.add(new Paragraph("Date du rapport: " + updatedAtFormatted));
+         document.add(Chunk.NEWLINE);
+
+        // Report Content (Resultat)
+        document.add(new Paragraph("Rapport:", FontFactory.getFont(FontFactory.HELVETICA_BOLD)));
+        if (exam.getResultat() != null && !exam.getResultat().trim().isEmpty()) {
+            // Basic HTML to Text conversion (replace <p> with newline, strip other tags)
+            // For proper HTML rendering, a library like Flying Saucer would be needed.
+            String textContent = exam.getResultat()
+                                     .replaceAll("(?i)</p>\\s*<p>", "\n\n") // Paragraph breaks
+                                     .replaceAll("(?i)<br\\s*/?>", "\n")    // Line breaks
+                                     .replaceAll("<[^>]*>", "")             // Strip remaining tags
+                                     .trim();
+            document.add(new Paragraph(textContent));
+        } else {
+            document.add(new Paragraph("[Contenu principal du rapport non disponible]", FontFactory.getFont(FontFactory.HELVETICA, 10, Font.ITALIC)));
+        }
+        document.add(Chunk.NEWLINE);
+
+        // Attached Files List
+        // Ensure lazy loading is handled - fetch explicitly if needed or use JOIN FETCH in repository
+        List<FichierAttacheRapport> attaches = exam.getFichiersAttaches();
+        if (attaches != null && !attaches.isEmpty()) {
+            document.add(new Paragraph("Fichiers Attachés:", FontFactory.getFont(FontFactory.HELVETICA_BOLD)));
+            // Use fully qualified name
+            com.lowagie.text.List fileList = new com.lowagie.text.List(false, 10); // Unordered list
+            for (FichierAttacheRapport fichier : attaches) {
+                 // Use fully qualified name
+                fileList.add(new com.lowagie.text.ListItem(fichier.getNomFichier() + " (" + fichier.getTypeMime() + ")"));
+            }
+            document.add(fileList);
+            document.add(Chunk.NEWLINE);
+        }
+
+        // Signature (Placeholder - needs logic to get Centre Doctor signature if required)
+        // Paragraph signatureLabel = new Paragraph("Signature du Médecin Rapporteur");
+        // signatureLabel.setAlignment(Element.ALIGN_RIGHT);
+        // document.add(signatureLabel);
+
+        document.close();
+        writer.close();
+        return baos.toByteArray();
+    }
+}

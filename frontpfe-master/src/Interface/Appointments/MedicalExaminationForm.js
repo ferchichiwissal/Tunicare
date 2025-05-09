@@ -15,6 +15,7 @@ const MedicalExaminationForm = () => {
     const patientId = queryParams.get('patientId');
     const appointmentId = queryParams.get('appointmentId'); // Renamed for clarity
     const consultationId = queryParams.get('consultationId'); // Retrieve consultationId
+    const examIdToEdit = queryParams.get('examId'); // Get examId for editing
 
     const { user } = useContext(AuthContext); // Get user details from context
 
@@ -28,11 +29,12 @@ const MedicalExaminationForm = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [submitStatus, setSubmitStatus] = useState('');
-    const [createdExamId, setCreatedExamId] = useState(null); // State to store the ID of the created exam
+    const [currentExamIdInForm, setCurrentExamIdInForm] = useState(examIdToEdit ? examIdToEdit : null); // Renamed and initialized
+    const [currentExamStatus, setCurrentExamStatus] = useState(''); // To store the status of the exam being edited
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
 
-    // Fetch Patient Details and Centres
+    // Fetch Patient Details, Centres, and existing Exam Data if in edit mode
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
@@ -40,22 +42,44 @@ const MedicalExaminationForm = () => {
             try {
                 // Fetch Patient
                 if (patientId) {
-                    // Use apiClient which should handle headers automatically
-                    // Corrected endpoint path based on UserController.java
                     const patientRes = await apiClient.get(`/Users/allid/${patientId}`);
                     setPatient(patientRes.data);
                 } else {
-                    throw new Error(t('medicalExaminationForm.errors.missingPatientId')); // Use translation key
+                    throw new Error(t('medicalExaminationForm.errors.missingPatientId'));
                 }
 
-                // Fetch Centres d'examen (adjust endpoint if needed)
-                // Use apiClient which should handle headers automatically
+                // Fetch Centres d'examen
                 const centresRes = await apiClient.get(`/api/centres-examen`);
-                setCentres(centresRes.data || []);
+                const fetchedCentres = centresRes.data || [];
+                setCentres(fetchedCentres);
 
+                // If in edit mode, fetch the existing examination data
+                if (examIdToEdit) {
+                    const examRes = await apiClient.get(`/api/medical-examinations/${examIdToEdit}`);
+                    const examData = examRes.data;
+                    setExamenType(examData.act || '');
+                    setRecommandation(examData.recommandation || '');
+                    setCurrentExamStatus(examData.etat || '');
+                    setCurrentExamIdInForm(examData.idExam.toString()); // Ensure it's set for the submit logic
+
+                    // Pre-select centre
+                    if (examData.centreName === 'Autre') {
+                        setSelectedCentre('AUTRE');
+                    } else if (examData.centreName && fetchedCentres.length > 0) {
+                        const matchedCentre = fetchedCentres.find(c => c.name === examData.centreName);
+                        if (matchedCentre) {
+                            setSelectedCentre(matchedCentre.idCentre.toString());
+                        } else {
+                            // If centreName from examData doesn't match any known centre,
+                            // and it's not 'Autre', it's a bit of an edge case.
+                            // Default to 'AUTRE' or leave blank? For now, 'AUTRE'.
+                            setSelectedCentre('AUTRE');
+                             console.warn(`Centre name "${examData.centreName}" not found in fetched centres. Defaulting to 'AUTRE'.`);
+                        }
+                    }
+                }
             } catch (err) {
                 console.error("Error fetching initial data:", err);
-                // Use translation key for fallback message
                 setError(err.response?.data?.message || err.message || t('medicalExaminationForm.errors.loadFailedFallback'));
                 setPatient(null);
                 setCentres([]);
@@ -64,7 +88,7 @@ const MedicalExaminationForm = () => {
             }
         };
         fetchData();
-    }, [patientId, API_URL]);
+    }, [patientId, examIdToEdit, API_URL, t]); // Added examIdToEdit and t to dependencies
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -95,40 +119,46 @@ const MedicalExaminationForm = () => {
 
         try {
             let response;
-            if (createdExamId) {
+            // Determine if it's an update (edit mode) or create
+            const isUpdateMode = !!currentExamIdInForm;
+
+            if (isUpdateMode) {
                 // --- Update existing examination ---
-                setSubmitStatus(t('medicalExaminationForm.status.updating')); // Add translation key for updating status
-                response = await apiClient.put(`/api/medical-examinations/${createdExamId}`, payload);
+                // Ensure doctor can only update if status is 'en attente'
+                // This check should ideally happen before navigating here or handled by backend authorization
+                // For now, we assume if they are on this page in edit mode, they are allowed to try.
+                setSubmitStatus(t('medicalExaminationForm.status.updating'));
+                response = await apiClient.put(`/api/medical-examinations/${currentExamIdInForm}`, payload);
                 console.log("Exam request updated:", response.data);
-                setSubmitStatus(t('medicalExaminationForm.status.updateSuccess')); // Add translation key for update success
+                setSubmitStatus(t('medicalExaminationForm.status.updateSuccess'));
             } else {
                 // --- Create new examination ---
-                setSubmitStatus(t('medicalExaminationForm.status.saving')); // Use existing translation key
-                response = await apiClient.post(`/api/medical-examinations`, payload);
+                // Ensure 'etat' is not in payload for creation, backend will default it
+                const createPayload = { ...payload };
+                delete createPayload.etat; // Ensure etat is not sent for creation
+
+                setSubmitStatus(t('medicalExaminationForm.status.saving'));
+                response = await apiClient.post(`/api/medical-examinations`, createPayload);
                 console.log("Exam request saved:", response.data);
-                // Assuming the response contains the saved entity with its ID
-                // Corrected field name from 'id' to 'idExam' based on backend entity
-                if (response.data && response.data.idExam) { // Check if idExam exists in response
-                    setCreatedExamId(response.data.idExam); // Store the ID using the correct field name
-                    setSubmitStatus(t('medicalExaminationForm.status.saveSuccess')); // Use existing translation key
+                if (response.data && response.data.idExam) {
+                    setCurrentExamIdInForm(response.data.idExam.toString()); // Store the ID
+                    setSubmitStatus(t('medicalExaminationForm.status.saveSuccess'));
                 } else {
                      console.error("Exam created but ID (idExam) not found in response:", response.data);
-                     // Handle case where ID is missing - maybe show a specific error?
-                     setSubmitStatus(t('medicalExaminationForm.errors.saveSuccessIdMissing')); // Add translation key
+                     setSubmitStatus(t('medicalExaminationForm.errors.saveSuccessIdMissing'));
                 }
             }
 
             // Clear status message after a delay
             setTimeout(() => {
                 setSubmitStatus('');
-            }, 3000); // Increased delay slightly
+            }, 3000);
 
         } catch (err) {
-            const actionType = createdExamId ? 'updating' : 'saving';
+            const actionType = currentExamIdInForm ? 'updating' : 'saving';
             console.error(`Error ${actionType} examination request:`, err);
-            // Use translation keys for fallback messages
-            const fallbackKey = createdExamId ? 'medicalExaminationForm.errors.updateFailedFallback' : 'medicalExaminationForm.errors.saveFailedFallback';
-            setError(err.response?.data?.message || t(fallbackKey)); // Add update fallback key
+            const fallbackKey = currentExamIdInForm ? 'medicalExaminationForm.errors.updateFailedFallback' : 'medicalExaminationForm.errors.saveFailedFallback';
+            setError(err.response?.data?.message || t(fallbackKey));
             setSubmitStatus('');
         }
     };
@@ -304,28 +334,49 @@ const MedicalExaminationForm = () => {
     };
 
     if (isLoading) {
-        return <div style={{ padding: '20px' }}>{t('medicalExaminationForm.loading')}</div>; // Use translation key
+        return <div style={{ padding: '20px' }}>{t('medicalExaminationForm.loading')}</div>;
     }
 
-    if (error && !patient) { // Show main error only if patient couldn't load
-        return <div className="error-message" style={{ padding: '20px', color: 'red' }}>{t('medicalExaminationForm.errorPrefix')}{error}</div>; // Use translation key
+    // If in edit mode and the status is not 'en attente', perhaps show a message or disable form
+    // This logic might be better placed on the page that links here.
+    // For now, the form will load.
+    // if (examIdToEdit && currentExamStatus && currentExamStatus !== 'en attente') {
+    //     return (
+    //         <div style={{ padding: '20px' }}>
+    //             <p>{t('medicalExaminationForm.errors.cannotEditNotPending', { status: currentExamStatus })}</p>
+    //             <button onClick={() => navigate(-1)} className="btn btn-secondary">
+    //                 {t('common.back')}
+    //             </button>
+    //         </div>
+    //     );
+    // }
+
+
+    if (error && !patient && !examIdToEdit) { // Show main error only if patient couldn't load in create mode
+        return <div className="error-message" style={{ padding: '20px', color: 'red' }}>{t('medicalExaminationForm.errorPrefix')}{error}</div>;
     }
+
 
     return (
         <div className="medical-exam-form-container" style={{ padding: '20px' }}>
-            <h2>{t('medicalExaminationForm.title')}</h2> {/* Use translation key */}
+            <h2>{examIdToEdit ? t('medicalExaminationForm.titleEdit') : t('medicalExaminationForm.titleCreate')}</h2>
 
             {patient && (
                  <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #eee' }}>
-                    <h4>{t('medicalExaminationForm.patientSectionTitle')}</h4> {/* Use translation key */}
+                    <h4>{t('medicalExaminationForm.patientSectionTitle')}</h4>
                     <p>{patient.firstName} {patient.lastName} </p>
                     {/* Add more patient details if needed */}
                 </div>
             )}
 
-            {error && <p style={{ color: 'red', marginBottom: '10px' }}>{t('medicalExaminationForm.errorPrefix')}{error}</p>} {/* Use translation key */}
+            {error && <p style={{ color: 'red', marginBottom: '10px' }}>{t('medicalExaminationForm.errorPrefix')}{error}</p>}
 
             <form onSubmit={handleSubmit}>
+                {examIdToEdit && currentExamStatus && (
+                    <div className="alert alert-info" role="alert">
+                        {t('medicalExaminationForm.currentStatusLabel')} {currentExamStatus}
+                    </div>
+                )}
                 <div className="form-group" style={{ marginBottom: '15px' }}>
                     <label htmlFor="examenType">{t('medicalExaminationForm.labels.examType')}</label> {/* Use translation key */}
                     <select
@@ -390,14 +441,24 @@ const MedicalExaminationForm = () => {
                 {submitStatus && <p style={{ marginBottom: '10px' }}>{submitStatus}</p>}
 
                 <div className="form-actions">
-                    <button type="submit" className="btn btn-primary" style={{ marginRight: '10px' }}>
-                        {createdExamId
-                            ? t('medicalExaminationForm.buttons.update') // Use new translation key
-                            : t('medicalExaminationForm.buttons.save')   // Use existing translation key
+                    <button 
+                        type="submit" 
+                        className="btn btn-primary" 
+                        style={{ marginRight: '10px' }}
+                        disabled={examIdToEdit && currentExamStatus && currentExamStatus !== 'en attente'} // Disable if editing and not 'en attente'
+                    >
+                        {currentExamIdInForm || examIdToEdit
+                            ? t('medicalExaminationForm.buttons.update')
+                            : t('medicalExaminationForm.buttons.save')
                         }
                     </button>
-                    <button type="button" onClick={handlePrint} className="btn btn-info" disabled={!createdExamId}> {/* Disable print if not saved yet */}
-                        {t('medicalExaminationForm.buttons.print')} {/* Use translation key */}
+                    <button 
+                        type="button" 
+                        onClick={handlePrint} 
+                        className="btn btn-info" 
+                        disabled={!currentExamIdInForm && !examIdToEdit} // Disable print if no exam ID
+                    >
+                        {t('medicalExaminationForm.buttons.print')}
                     </button>
                      <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary" style={{ marginLeft: '10px' }}>
                         {t('common.cancel')} {/* Use translation key */}
