@@ -86,7 +86,10 @@
     "myAppointments": "Mes Rendez-vous",
     "addAppointment": "Prendre Rendez-vous",
     "activationManagement": "Activation Médecin",
-    "doctorExaminationsDashboard": "Tableau de Bord Examens"
+    "doctorExaminationsDashboard": "Tableau de Bord Examens",
+    "centreExaminationsDashboard": "Tableau de Bord Centre Examens",
+    "archivedExaminations": "Archive des Examens",
+    "manageMySignature": "Gérer ma Signature"
   },
   "dashboard": {
     "title": "Tableau de bord de {{firstName}} {{lastName}}",

@@ -86,6 +86,7 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/medical-examinations/{examId}").hasRole("DOCTOR") // Update exam request
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/doctor/me").hasRole("DOCTOR") // Get exams for logged-in doctor
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/centre/pending").hasRole("DOCTOR_CENTRE_EXAMEN") // Get pending exams for centre doctor
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/centre/archived").hasRole("DOCTOR_CENTRE_EXAMEN") // Get archived exams for centre doctor
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/medical-examinations/{examId}/save-report").hasRole("DOCTOR_CENTRE_EXAMEN") // Save report
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/my-examinations/{patientId}").authenticated() // Patient gets their exams (PreAuthorize checks ID)
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/{examId}/download").authenticated() // Download exam request PDF (PreAuthorize checks patient)
@@ -94,6 +95,8 @@ public class SecurityConfig {
                 // Add rule for GET report PDF download
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/{examId}/report/download-pdf").hasAnyRole("DOCTOR_CENTRE_EXAMEN", "PATIENT")
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/{examId}").authenticated() // Get specific exam details (Authenticated, PreAuthorize for finer control)
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/medical-examinations/{examId}/hide-for-doctor").hasRole("DOCTOR")
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/medical-examinations/{examId}/hide-for-centre-doctor").hasRole("DOCTOR_CENTRE_EXAMEN")
                 .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/medical-examinations/{examId}").hasRole("DOCTOR") // Delete exam request
 
                 // --- DoctorCentreDexamen Specific Endpoints ---

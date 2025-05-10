@@ -47,6 +47,7 @@ public class MedicalExaminationService implements IMedicalExaminationService {
     private final UserRepository userRepository;
     private final PdfGenerationService pdfGenerationService;
     private final FichierAttacheRapportRepository fichierAttacheRapportRepository; // Added repository
+    private final DoctorCentreDexamenRepository doctorCentreDexamenRepository; // Added repository
 
     @Autowired
     public MedicalExaminationService(MedicalExaminationRepository medicalExaminationRepository,
@@ -54,13 +55,15 @@ public class MedicalExaminationService implements IMedicalExaminationService {
                                      RendezVousRepository rendezVousRepository,
                                      UserRepository userRepository,
                                      PdfGenerationService pdfGenerationService,
-                                     FichierAttacheRapportRepository fichierAttacheRapportRepository) { // Added repository
+                                     FichierAttacheRapportRepository fichierAttacheRapportRepository, // Added repository
+                                     DoctorCentreDexamenRepository doctorCentreDexamenRepository) { // Added repository
         this.medicalExaminationRepository = medicalExaminationRepository;
         this.centreDexamenRepository = centreDexamenRepository;
         this.rendezVousRepository = rendezVousRepository;
         this.userRepository = userRepository;
         this.pdfGenerationService = pdfGenerationService;
         this.fichierAttacheRapportRepository = fichierAttacheRapportRepository; // Initialize repository
+        this.doctorCentreDexamenRepository = doctorCentreDexamenRepository; // Initialize repository
     }
 
     @Override
@@ -309,8 +312,9 @@ public class MedicalExaminationService implements IMedicalExaminationService {
     @Transactional(readOnly = true)
     public List<MedicalExaminationDTO> getExaminationsByDoctor(Long doctorId) {
         log.info("Fetching examinations for doctorId: {}", doctorId);
-        List<MedicalExamination> exams = medicalExaminationRepository.findByDoctorId(doctorId);
-        log.info("Found {} examinations in repository for doctorId: {}", exams.size(), doctorId);
+        // Utiliser la nouvelle méthode du repository qui filtre les examens cachés
+        List<MedicalExamination> exams = medicalExaminationRepository.findByDoctorIdAndHiddenForPrescribingDoctorIsFalse(doctorId);
+        log.info("Found {} examinations (not hidden for prescribing doctor) in repository for doctorId: {}", exams.size(), doctorId);
 
         if (exams.isEmpty()) {
             return Collections.emptyList();
@@ -564,46 +568,56 @@ public class MedicalExaminationService implements IMedicalExaminationService {
             throw new IllegalStateException("Patient not found for RendezVous ID: " + rendezVous.getIdAppointment());
         }
 
-        DoctorCentreDexamen doctorCentre = exam.getDoctorCentreDexamen();
-        CentreDexamen centreDexamen = null;
-        String doctorCentreExamenName = "N/A";
+        Doctor prescribingDoctor = exam.getDoctor();
+        DoctorCentreDexamen reportingDoctor = exam.getDoctorCentreDexamen();
+        
+        String presDoctorFirstName = null;
+        String presDoctorLastName = null;
+        if (prescribingDoctor != null) {
+            presDoctorFirstName = prescribingDoctor.getFirstName();
+            presDoctorLastName = prescribingDoctor.getLastName();
+        }
 
-        if (doctorCentre != null) {
-            doctorCentreExamenName = (doctorCentre.getFirstName() != null ? doctorCentre.getFirstName() : "") + " " + (doctorCentre.getLastName() != null ? doctorCentre.getLastName() : "");
-            doctorCentreExamenName = doctorCentreExamenName.trim();
-            if (doctorCentreExamenName.isEmpty()) doctorCentreExamenName = "N/A";
-            centreDexamen = doctorCentre.getCentreDexamen();
-            log.debug("Found DoctorCentreDexamen: {}, Centre: {}", doctorCentreExamenName, centreDexamen != null ? centreDexamen.getName() : "null");
+        String repDoctorFirstName = null;
+        String repDoctorLastName = null;
+        CentreDexamen centreDexamenEntity = null;
+
+        if (reportingDoctor != null) {
+            repDoctorFirstName = reportingDoctor.getFirstName();
+            repDoctorLastName = reportingDoctor.getLastName();
+            centreDexamenEntity = reportingDoctor.getCentreDexamen();
+            log.debug("Found Reporting Doctor: {} {}, Centre: {}", repDoctorFirstName, repDoctorLastName, centreDexamenEntity != null ? centreDexamenEntity.getName() : "null");
         } else if (exam.getCentreName() != null && !exam.getCentreName().equalsIgnoreCase("Autre")) {
-            log.debug("DoctorCentreDexamen not directly linked, attempting to find CentreDexamen by name: {}", exam.getCentreName());
+            log.debug("Reporting Doctor (DoctorCentreDexamen) not directly linked, attempting to find CentreDexamen by name: {}", exam.getCentreName());
             Optional<CentreDexamen> foundCentre = centreDexamenRepository.findByName(exam.getCentreName());
             if (foundCentre.isPresent()) {
-                centreDexamen = foundCentre.get();
-                log.debug("Found CentreDexamen by name: {}", centreDexamen.getName());
+                centreDexamenEntity = foundCentre.get();
+                log.debug("Found CentreDexamen by name: {}", centreDexamenEntity.getName());
             } else {
                  log.warn("CentreDexamen named '{}' not found for exam ID {}", exam.getCentreName(), examinationId);
             }
         }
-
-
-        String centreName = "N/A";
+ 
+        String finalCentreName = exam.getCentreName() != null ? exam.getCentreName() : "N/A";
         String centreAddress = "N/A";
         String centrePhone = "N/A";
-
-        if (centreDexamen != null) {
-            centreName = centreDexamen.getName();
-            centreAddress = centreDexamen.getAdress(); 
-            centrePhone = centreDexamen.getTel();
-        } else if (exam.getCentreName() != null && !exam.getCentreName().equalsIgnoreCase("Autre")) {
-            centreName = exam.getCentreName();
-        } else if (exam.getCentreName() != null && exam.getCentreName().equalsIgnoreCase("Autre") && exam.getDoctorCentreDexamen() == null) {
-            centreName = "Autre";
+ 
+        if (centreDexamenEntity != null) {
+            finalCentreName = centreDexamenEntity.getName() != null ? centreDexamenEntity.getName() : finalCentreName;
+            centreAddress = centreDexamenEntity.getAdress() != null ? centreDexamenEntity.getAdress() : "N/A";
+            centrePhone = centreDexamenEntity.getTel() != null ? centreDexamenEntity.getTel() : "N/A";
+        } else if (finalCentreName != null && !finalCentreName.equalsIgnoreCase("Autre") && !finalCentreName.equalsIgnoreCase("N/A")) {
+             Optional<CentreDexamen> centreOpt = centreDexamenRepository.findByName(finalCentreName);
+            if (centreOpt.isPresent()) {
+                CentreDexamen foundCentre = centreOpt.get();
+                centreAddress = foundCentre.getAdress() != null ? foundCentre.getAdress() : "N/A";
+                centrePhone = foundCentre.getTel() != null ? foundCentre.getTel() : "N/A";
+            }
         }
-        log.debug("Final Centre Details - Name: {}, Address: {}, Phone: {}", centreName, centreAddress, centrePhone);
-
-
+        log.debug("Final Centre Details - Name: {}, Address: {}, Phone: {}", finalCentreName, centreAddress, centrePhone);
+ 
         LocalDate examDate = null;
-        if (exam.getUpdatedAt() != null) { 
+        if (exam.getUpdatedAt() != null) {
             examDate = exam.getUpdatedAt().toInstant()
                                        .atZone(ZoneId.systemDefault())
                                        .toLocalDate();
@@ -613,19 +627,95 @@ public class MedicalExaminationService implements IMedicalExaminationService {
                                        .toLocalDate();
         }
         log.debug("Examination Date determined as: {}", examDate);
-
-
+ 
         ExaminationResultDTO resultDTO = new ExaminationResultDTO(
                 (patient.getFirstName() != null ? patient.getFirstName() : "") + " " + (patient.getLastName() != null ? patient.getLastName() : "").trim(),
-                doctorCentreExamenName,
-                centreName,
+                finalCentreName,
                 centreAddress,
                 centrePhone,
                 examDate,
-                exam.getAct(), 
-                exam.getResultat() 
+                exam.getAct(),
+                exam.getResultat(),
+                presDoctorFirstName,
+                presDoctorLastName,
+                repDoctorFirstName,
+                repDoctorLastName
         );
         log.info("Successfully created ExaminationResultDTO for exam ID: {}", examinationId);
         return resultDTO;
+    }
+ 
+    @Override
+    @Transactional(readOnly = true)
+    public List<MedicalExaminationDTO> getExaminationsByDoctorCentreAndStatus(Long doctorCentreDexamenId, String etat) {
+        log.info("Fetching examinations for doctorCentreDexamenId: {} with status: {}", doctorCentreDexamenId, etat);
+        DoctorCentreDexamen doctorCentre = doctorCentreDexamenRepository.findById(doctorCentreDexamenId)
+                .orElseThrow(() -> {
+                    log.error("DoctorCentreDexamen not found with id: {}", doctorCentreDexamenId);
+                    return new ResourceNotFoundException("DoctorCentreDexamen not found with id: " + doctorCentreDexamenId);
+                });
+
+        // Utiliser la nouvelle méthode du repository qui filtre les examens cachés
+        List<MedicalExamination> exams = medicalExaminationRepository.findByDoctorCentreDexamenAndEtatAndHiddenForReportingCentreDoctorIsFalse(doctorCentre, etat);
+        log.info("Found {} examinations (not hidden for reporting centre doctor) in repository for doctorCentreDexamenId: {} with status: {}", exams.size(), doctorCentreDexamenId, etat);
+
+        if (exams.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<MedicalExaminationDTO> dtos = exams.stream()
+                .map(exam -> {
+                    try {
+                        return mapToDTO(exam); // Use the existing helper method
+                    } catch (Exception e) {
+                        log.error("Error mapping examination ID {} to DTO for doctorCentreDexamenId {}: {}", exam.getIdExam(), doctorCentreDexamenId, e.getMessage(), e);
+                        return null; // Skip problematic mappings
+                    }
+                })
+                .filter(dto -> dto != null) // Filter out nulls
+                .collect(Collectors.toList());
+
+        log.info("Successfully mapped {} examinations to DTOs for doctorCentreDexamenId: {} with status: {}", dtos.size(), doctorCentreDexamenId, etat);
+        return dtos;
+    }
+
+    @Override
+    @Transactional
+    public void hideExaminationForPrescribingDoctor(Long examId, Long requestingDoctorId) {
+        MedicalExamination exam = medicalExaminationRepository.findById(examId)
+            .orElseThrow(() -> new ResourceNotFoundException("Medical Examination not found with id: " + examId));
+
+        if (exam.getDoctor() == null || !exam.getDoctor().getId().equals(requestingDoctorId)) {
+            throw new IllegalStateException("Doctor is not authorized to hide this examination.");
+        }
+        exam.setHiddenForPrescribingDoctor(true);
+        medicalExaminationRepository.save(exam);
+        log.info("Examination {} marked as hidden for prescribing doctor {}", examId, requestingDoctorId);
+    }
+
+    @Override
+    @Transactional
+    public void hideExaminationForReportingCentreDoctor(Long examId, Long requestingCentreDoctorId) {
+        MedicalExamination exam = medicalExaminationRepository.findById(examId)
+            .orElseThrow(() -> new ResourceNotFoundException("Medical Examination not found with id: " + examId));
+
+        if (exam.getDoctorCentreDexamen() == null || !exam.getDoctorCentreDexamen().getId().equals(requestingCentreDoctorId)) {
+            // Additional check: ensure the centre doctor is actually assigned to this exam's centre if not directly linked to the exam
+            User user = userRepository.findById(requestingCentreDoctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Requesting centre doctor not found with id: " + requestingCentreDoctorId));
+            if (user instanceof DoctorCentreDexamen) {
+                DoctorCentreDexamen centreDoctor = (DoctorCentreDexamen) user;
+                if (centreDoctor.getCentreDexamen() == null || !centreDoctor.getCentreDexamen().getName().equalsIgnoreCase(exam.getCentreName())) {
+                     throw new IllegalStateException("Centre Doctor is not authorized to hide this examination for centre: " + exam.getCentreName());
+                }
+            } else {
+                 throw new IllegalStateException("Requesting user is not a DoctorCentreDexamen.");
+            }
+            // If the exam.getDoctorCentreDexamen() was null, but the requestingCentreDoctorId is valid and belongs to the exam's centre,
+            // it implies they are acting on behalf of the centre.
+        }
+        exam.setHiddenForReportingCentreDoctor(true);
+        medicalExaminationRepository.save(exam);
+        log.info("Examination {} marked as hidden for reporting centre doctor {}", examId, requestingCentreDoctorId);
     }
 }

@@ -166,6 +166,31 @@ public class MedicalExaminationController {
         return ResponseEntity.ok(examDTOs); // Return the list of DTOs
     } // Added missing closing brace here
 
+    // Endpoint pour récupérer les examens "terminé" pour le DOCTOR_CENTRE_EXAMEN connecté
+    @GetMapping("/centre/archived")
+    @PreAuthorize("hasRole('DOCTOR_CENTRE_EXAMEN')")
+    public ResponseEntity<List<MedicalExaminationDTO>> getArchivedCentreExaminations() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
+
+        if (currentUser == null || !(currentUser instanceof DoctorCentreDexamen)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        DoctorCentreDexamen currentCentreDoctor = (DoctorCentreDexamen) currentUser;
+
+        if (currentCentreDoctor.getId() == null) {
+             System.err.println("Error: DOCTOR_CENTRE_EXAMEN " + currentUser.getEmail() + " has a null ID.");
+             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
+        List<MedicalExaminationDTO> examDTOs = medicalExaminationService.getExaminationsByDoctorCentreAndStatus(currentCentreDoctor.getId(), "terminé");
+        return ResponseEntity.ok(examDTOs);
+    }
+
 
     // Endpoint pour enregistrer le rapport (texte + fichiers) et marquer l'examen comme terminé (DOCTOR_CENTRE_EXAMEN)
     // Consumes multipart/form-data
@@ -383,7 +408,7 @@ public class MedicalExaminationController {
 
     // Endpoint pour récupérer le résultat d'un examen (Médecin)
     @GetMapping("/{examId}/result")
-    @PreAuthorize("hasRole('DOCTOR') or hasRole('PATIENT')") // Allow doctor or patient
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('PATIENT') or hasRole('DOCTOR_CENTRE_EXAMEN')") // Allow doctor, patient or doctor_centre_examen
     public ResponseEntity<ExaminationResultDTO> getExaminationResult(@PathVariable Long examId) {
         // TODO: Add more specific authorization if a patient is accessing:
         // Ensure the patient is associated with this examId.
@@ -399,6 +424,46 @@ public class MedicalExaminationController {
         } catch (Exception e) {
             System.err.println("Unexpected error fetching examination result for exam ID " + examId + ": " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/{examId}/hide-for-doctor")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<Void> hideExaminationForPrescribingDoctor(@PathVariable Long examId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
+
+        if (currentUser == null || !(currentUser instanceof Doctor)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        try {
+            medicalExaminationService.hideExaminationForPrescribingDoctor(examId, currentUser.getId());
+            return ResponseEntity.ok().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
+    @PutMapping("/{examId}/hide-for-centre-doctor")
+    @PreAuthorize("hasRole('DOCTOR_CENTRE_EXAMEN')")
+    public ResponseEntity<Void> hideExaminationForReportingCentreDoctor(@PathVariable Long examId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
+
+        if (currentUser == null || !(currentUser instanceof DoctorCentreDexamen)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        try {
+            medicalExaminationService.hideExaminationForReportingCentreDoctor(examId, currentUser.getId());
+            return ResponseEntity.ok().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 }

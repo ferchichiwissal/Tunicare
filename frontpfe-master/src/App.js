@@ -52,6 +52,7 @@ import PrescribeReportPage from './Interface/Appointments/PrescribeReportPage'; 
 import ManageReportTemplates from './Interface/Admin/ManageReportTemplates'; // Import Manage Report Templates page
 import ExaminationResultPage from './Interface/Appointments/ExaminationResultPage'; // Import Examination Result Page
 import UploadDoctorCentreSignaturePage from './Interface/Appointments/UploadDoctorCentreSignaturePage'; // Import Upload Signature Page
+import ArchivedExaminationsPage from './Interface/Appointments/ArchivedExaminationsPage'; // Import Archived Examinations Page
  
 const onLogout = () => {
   // Clear tokens from localStorage and sessionStorage
@@ -222,7 +223,7 @@ function App() {
           } />
           {/* Route for the Examination Result Page */}
           <Route path="/examination-result/:examinationId" element={
-            <ProtectedLayout requiredRole="ROLE_DOCTOR"> {/* Or potentially other roles like PATIENT if they can see this too */}
+            <ProtectedLayout requiredRole={["ROLE_DOCTOR", "ROLE_DOCTOR_CENTRE_EXAMEN", "ROLE_PATIENT"]}> {/* Added DOCTOR_CENTRE_EXAMEN and PATIENT */}
               <Layout><ExaminationResultPage /></Layout>
             </ProtectedLayout>
           } />
@@ -230,6 +231,12 @@ function App() {
           <Route path="/upload-doctor-centre-signature" element={
             <ProtectedLayout requiredRole="ROLE_DOCTOR_CENTRE_EXAMEN">
               <Layout><UploadDoctorCentreSignaturePage /></Layout>
+            </ProtectedLayout>
+          } />
+          {/* Route for Archived Examinations Page */}
+          <Route path="/archived-examinations" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR_CENTRE_EXAMEN">
+              <Layout><ArchivedExaminationsPage /></Layout>
             </ProtectedLayout>
           } />
 

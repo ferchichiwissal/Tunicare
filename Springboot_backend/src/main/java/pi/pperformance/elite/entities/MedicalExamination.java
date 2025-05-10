@@ -72,6 +72,12 @@ public class MedicalExamination implements Serializable {
     @JoinColumn(name = "doctor_centre_id")
     private DoctorCentreDexamen doctorCentreDexamen;
 
+    @Column(name = "hidden_for_prescribing_doctor", nullable = false)
+    private boolean hiddenForPrescribingDoctor = false;
+
+    @Column(name = "hidden_for_reporting_centre_doctor", nullable = false)
+    private boolean hiddenForReportingCentreDoctor = false;
+
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();
@@ -224,5 +230,21 @@ public class MedicalExamination implements Serializable {
 
     public void setDoctorCentreDexamen(DoctorCentreDexamen doctorCentreDexamen) {
         this.doctorCentreDexamen = doctorCentreDexamen;
+    }
+
+    public boolean isHiddenForPrescribingDoctor() {
+        return hiddenForPrescribingDoctor;
+    }
+
+    public void setHiddenForPrescribingDoctor(boolean hiddenForPrescribingDoctor) {
+        this.hiddenForPrescribingDoctor = hiddenForPrescribingDoctor;
+    }
+
+    public boolean isHiddenForReportingCentreDoctor() {
+        return hiddenForReportingCentreDoctor;
+    }
+
+    public void setHiddenForReportingCentreDoctor(boolean hiddenForReportingCentreDoctor) {
+        this.hiddenForReportingCentreDoctor = hiddenForReportingCentreDoctor;
     }
 }

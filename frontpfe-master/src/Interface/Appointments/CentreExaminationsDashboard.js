@@ -63,9 +63,8 @@ const CentreExaminationsDashboard = () => {
         // Filter by search term (patient name)
         if (searchTerm) {
             currentExaminations = currentExaminations.filter(exam => {
-                const patient = exam.rendezVous?.patient;
-                if (!patient) return false;
-                const patientName = `${patient.firstName || ''} ${patient.lastName || ''}`.toLowerCase();
+                // Utiliser directement les champs patientFirstName et patientLastName du DTO
+                const patientName = `${exam.patientFirstName || ''} ${exam.patientLastName || ''}`.toLowerCase();
                 return patientName.includes(searchTerm.toLowerCase());
             });
         }

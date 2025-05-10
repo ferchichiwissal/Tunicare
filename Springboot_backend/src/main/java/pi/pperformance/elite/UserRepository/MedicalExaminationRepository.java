@@ -8,6 +8,8 @@ import pi.pperformance.elite.entities.MedicalExamination;
 
 import java.util.List;
 
+import pi.pperformance.elite.entities.DoctorCentreDexamen;
+
 
 @Repository
 public interface MedicalExaminationRepository extends JpaRepository<MedicalExamination, Long> {
@@ -34,7 +36,7 @@ public interface MedicalExaminationRepository extends JpaRepository<MedicalExami
      * @param doctorId The ID of the doctor.
      * @return A list of medical examinations created by the doctor.
      */
-    List<MedicalExamination> findByDoctorId(Long doctorId);
+    List<MedicalExamination> findByDoctorIdAndHiddenForPrescribingDoctorIsFalse(Long doctorId);
 
     /**
      * Finds medical examinations assigned to a specific centre name and having a specific status.
@@ -43,6 +45,14 @@ public interface MedicalExaminationRepository extends JpaRepository<MedicalExami
      * @return A list of matching medical examinations.
      */
     List<MedicalExamination> findByCentreNameAndEtat(String centreName, String etat);
+
+    /**
+     * Finds medical examinations for a specific doctor centre and with a specific status.
+     * @param doctorCentreDexamen The doctor centre examen entity.
+     * @param etat The status of the examination.
+     * @return A list of matching medical examinations.
+     */
+    List<MedicalExamination> findByDoctorCentreDexamenAndEtatAndHiddenForReportingCentreDoctorIsFalse(DoctorCentreDexamen doctorCentreDexamen, String etat);
 
     // Add other custom query methods if needed later
 }

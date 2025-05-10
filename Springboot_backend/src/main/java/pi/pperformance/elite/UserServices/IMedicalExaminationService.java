@@ -122,4 +122,30 @@ public interface IMedicalExaminationService {
      * @throws pi.pperformance.elite.exceptions.ResourceNotFoundException if the examination is not found.
      */
     ExaminationResultDTO getExaminationResult(Long examinationId);
+
+    /**
+     * Retrieves all medical examinations for a specific doctor centre and status.
+     * @param doctorCentreDexamenId The ID of the doctor centre examen.
+     * @param etat The status to filter by (e.g., "terminé").
+     * @return A list of matching medical examination DTOs.
+     */
+    List<MedicalExaminationDTO> getExaminationsByDoctorCentreAndStatus(Long doctorCentreDexamenId, String etat);
+
+    /**
+     * Marks an examination as hidden for the prescribing doctor.
+     * @param examId The ID of the examination.
+     * @param requestingDoctorId The ID of the doctor requesting the hide action.
+     * @throws ResourceNotFoundException if the examination or doctor is not found.
+     * @throws IllegalStateException if the doctor is not authorized to hide this examination.
+     */
+    void hideExaminationForPrescribingDoctor(Long examId, Long requestingDoctorId);
+
+    /**
+     * Marks an examination as hidden for the reporting centre doctor.
+     * @param examId The ID of the examination.
+     * @param requestingCentreDoctorId The ID of the centre doctor requesting the hide action.
+     * @throws ResourceNotFoundException if the examination or centre doctor is not found.
+     * @throws IllegalStateException if the centre doctor is not authorized to hide this examination.
+     */
+    void hideExaminationForReportingCentreDoctor(Long examId, Long requestingCentreDoctorId);
 }

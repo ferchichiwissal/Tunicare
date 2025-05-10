@@ -12,6 +12,7 @@ const DoctorExaminationsDashboard = () => {
 
     const [examinations, setExaminations] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('en attente'); // 'tous', 'en attente', 'terminé'
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -81,10 +82,24 @@ const DoctorExaminationsDashboard = () => {
         }
     };
 
-    // Filter examinations based on search term using DTO fields
+    const handleHideExam = async (examIdToHide) => {
+        try {
+            await apiClient.put(`/api/medical-examinations/${examIdToHide}/hide-for-doctor`);
+            setExaminations(prevExams => prevExams.filter(exam => exam.idExam !== examIdToHide));
+            // Optionnel: afficher une notification de succès
+        } catch (err) {
+            console.error("Erreur lors du masquage de l'examen pour le docteur:", err);
+            setError(err.response?.data?.message || "Erreur lors de la tentative de masquage de l'examen.");
+            // Optionnel: afficher une notification d'erreur à l'utilisateur
+        }
+    };
+
+    // Filter examinations based on search term and status filter
     const filteredExaminations = examinations.filter(exam => {
-        const patientName = `${exam.patientFirstName || ''} ${exam.patientLastName || ''}`.toLowerCase();
-        return patientName.includes(searchTerm.toLowerCase());
+        const patientNameMatch = `${exam.patientFirstName || ''} ${exam.patientLastName || ''}`.toLowerCase().includes(searchTerm.toLowerCase());
+        // Le filtre 'tous' est retiré, donc on filtre directement sur le statut sélectionné
+        const statusMatch = exam.etat === statusFilter;
+        return patientNameMatch && statusMatch;
     });
 
     const formatDate = (dateString) => {
@@ -107,16 +122,46 @@ const DoctorExaminationsDashboard = () => {
     return (
         <div className="container mt-5">
             <h2>{t('doctorExaminationsDashboard.title')}</h2>
-            
-            <div className="mb-3">
-                <input
-                    type="text"
-                    className="form-control"
-                    placeholder={t('doctorExaminationsDashboard.searchPlaceholder')}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
+
+            <div className="row mb-3">
+                <div className="col-md-6">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder={t('doctorExaminationsDashboard.searchPlaceholder')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <div className="col-md-6">
+                    <div className="btn-group" role="group" aria-label="Status filter">
+                        {/* Bouton radio "Tous" retiré */}
+                        <input
+                            type="radio" className="btn-check" name="statusFilter" id="statusEnAttente"
+                            value="en attente" autoComplete="off" checked={statusFilter === 'en attente'}
+                            onChange={(e) => setStatusFilter(e.target.value)} />
+                        <label className="btn btn-outline-primary" htmlFor="statusEnAttente">
+                            {t('doctorExaminationsDashboard.statusFilters.pending', 'En attente')}
+                        </label>
+
+                        <input
+                            type="radio" className="btn-check" name="statusFilter" id="statusTermine"
+                            value="terminé" autoComplete="off" checked={statusFilter === 'terminé'}
+                            onChange={(e) => setStatusFilter(e.target.value)} />
+                        <label className="btn btn-outline-primary" htmlFor="statusTermine">
+                            {t('doctorExaminationsDashboard.statusFilters.completed', 'Terminé')}
+                        </label>
+                    </div>
+                </div>
             </div>
+            
+            {/* Les lignes suivantes (ancienne barre de recherche) doivent être supprimées */}
+            {/* className="form-control"
+            placeholder={t('doctorExaminationsDashboard.searchPlaceholder')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            </div> */}
 
             {filteredExaminations.length === 0 ? (
                 <p>{t('doctorExaminationsDashboard.noExaminationsFound')}</p>
@@ -144,27 +189,41 @@ const DoctorExaminationsDashboard = () => {
                                 </td>
                                 <td><span className={`badge bg-${exam.etat === 'en attente' ? 'warning' : 'success'}`}>{exam.etat}</span></td>
                                 <td>
-                                    <button 
-                                        className="btn btn-sm btn-primary me-1"
-                                        onClick={() => handleModifier(exam)}
-                                        disabled={exam.etat !== 'en attente'}
-                                    >
-                                        {t('doctorExaminationsDashboard.buttons.modify')}
-                                    </button>
-                                    <button 
-                                        className="btn btn-sm btn-info me-1"
-                                        onClick={() => handleVoirResultat(exam)}
-                                        disabled={!exam.resultat && exam.etat !== 'terminé'}
-                                    >
-                                        {t('doctorExaminationsDashboard.buttons.viewResult')}
-                                    </button>
-                                    <button 
-                                        className="btn btn-sm btn-danger"
-                                        onClick={() => handleSupprimer(exam.idExam)}
-                                        disabled={exam.etat !== 'en attente'}
-                                    >
-                                        {t('doctorExaminationsDashboard.buttons.delete')}
-                                    </button>
+                                    {statusFilter === 'en attente' && exam.etat === 'en attente' && (
+                                        <>
+                                            <button
+                                                className="btn btn-sm btn-primary me-1"
+                                                onClick={() => handleModifier(exam)}
+                                                // disabled={exam.etat !== 'en attente'} // Redondant si statusFilter est 'en attente'
+                                            >
+                                                {t('doctorExaminationsDashboard.buttons.modify')}
+                                            </button>
+                                            <button
+                                                className="btn btn-sm btn-danger"
+                                                onClick={() => handleSupprimer(exam.idExam)}
+                                                // disabled={exam.etat !== 'en attente'} // Redondant
+                                            >
+                                                {t('doctorExaminationsDashboard.buttons.delete')}
+                                            </button>
+                                        </>
+                                    )}
+                                    {statusFilter === 'terminé' && exam.etat === 'terminé' && (
+                                        <>
+                                            <button
+                                                className="btn btn-sm btn-info me-1"
+                                                onClick={() => handleVoirResultat(exam)}
+                                            >
+                                                {t('doctorExaminationsDashboard.buttons.viewResult')}
+                                            </button>
+                                            <button
+                                                onClick={() => handleHideExam(exam.idExam)}
+                                                className="btn btn-outline-secondary btn-sm"
+                                                title="Ne plus afficher cet examen dans cette liste"
+                                            >
+                                                Ne plus afficher
+                                            </button>
+                                        </>
+                                    )}
                                 </td>
                             </tr>
                         ))}
