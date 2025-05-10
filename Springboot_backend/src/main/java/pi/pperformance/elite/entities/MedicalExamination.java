@@ -67,6 +67,11 @@ public class MedicalExamination implements Serializable {
     @OneToMany(mappedBy = "medicalExamination", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<FichierAttacheRapport> fichiersAttaches = new ArrayList<>();
 
+    // Add relationship to DoctorCentreDexamen who might fill the result
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "doctor_centre_id")
+    private DoctorCentreDexamen doctorCentreDexamen;
+
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();
@@ -211,5 +216,13 @@ public class MedicalExamination implements Serializable {
             this.fichiersAttaches.remove(fichier);
             fichier.setMedicalExamination(null);
         }
+    }
+
+    public DoctorCentreDexamen getDoctorCentreDexamen() {
+        return doctorCentreDexamen;
+    }
+
+    public void setDoctorCentreDexamen(DoctorCentreDexamen doctorCentreDexamen) {
+        this.doctorCentreDexamen = doctorCentreDexamen;
     }
 }

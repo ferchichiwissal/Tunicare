@@ -96,6 +96,9 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/medical-examinations/{examId}").authenticated() // Get specific exam details (Authenticated, PreAuthorize for finer control)
                 .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/medical-examinations/{examId}").hasRole("DOCTOR") // Delete exam request
 
+                // --- DoctorCentreDexamen Specific Endpoints ---
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/doctor-centre-examen/signature").hasRole("DOCTOR_CENTRE_EXAMEN") // Upload signature
+
                 // --- Report Model Endpoints ---
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/modeles-compte-rendu").hasAnyRole("DOCTOR_CENTRE_EXAMEN", "ADMIN") // List models
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/modeles-compte-rendu").hasRole("ADMIN") // Create model

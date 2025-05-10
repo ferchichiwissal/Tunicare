@@ -16,6 +16,7 @@ import pi.pperformance.elite.dto.MedicalExaminationInputDTO;
 import pi.pperformance.elite.dto.SaveReportRequestDTO;
 import pi.pperformance.elite.dto.UpdateExaminationStatusRequestDTO; // Added import
 import pi.pperformance.elite.dto.MedicalExaminationDTO; // Import the DTO
+import pi.pperformance.elite.dto.ExaminationResultDTO; // Import new DTO
 import pi.pperformance.elite.exceptions.ResourceNotFoundException;
 import pi.pperformance.elite.UserRepository.UserRepository;
 import pi.pperformance.elite.UserRepository.CentreDexamenRepository; // Import CentreDexamenRepository
@@ -377,6 +378,27 @@ public class MedicalExaminationController {
         } catch (com.lowagie.text.DocumentException | IOException e) {
             System.err.println("Error generating PDF report for exam ID " + examId + ": " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // Endpoint pour récupérer le résultat d'un examen (Médecin)
+    @GetMapping("/{examId}/result")
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('PATIENT')") // Allow doctor or patient
+    public ResponseEntity<ExaminationResultDTO> getExaminationResult(@PathVariable Long examId) {
+        // TODO: Add more specific authorization if a patient is accessing:
+        // Ensure the patient is associated with this examId.
+        try {
+            ExaminationResultDTO resultDTO = medicalExaminationService.getExaminationResult(examId);
+            return ResponseEntity.ok(resultDTO);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            // This can happen if related entities (Patient, RendezVous) are missing
+            System.err.println("Error fetching examination result for exam ID " + examId + " due to inconsistent data: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // Or INTERNAL_SERVER_ERROR
+        } catch (Exception e) {
+            System.err.println("Unexpected error fetching examination result for exam ID " + examId + ": " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

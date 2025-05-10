@@ -24,6 +24,8 @@ public class DoctorCentreDexamen extends User implements Serializable {
     @Column(nullable = false) // Ensure it's not null
     private boolean isActive = false; // Add isActive field, default to false
 
+    private String signatureImagePath; // Path to the doctor's signature image
+
     // Relationship: DoctorCentreDexamen 'rédiger' Document (1 to * - Owning Side)
     @OneToMany(mappedBy = "doctorCentreDexamen", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Document> documents;
@@ -54,6 +56,10 @@ public class DoctorCentreDexamen extends User implements Serializable {
         return isActive;
     }
 
+    public String getSignatureImagePath() {
+        return signatureImagePath;
+    }
+
     public Set<Document> getDocuments() {
         return documents;
     }
@@ -69,6 +75,10 @@ public class DoctorCentreDexamen extends User implements Serializable {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public void setSignatureImagePath(String signatureImagePath) {
+        this.signatureImagePath = signatureImagePath;
     }
 
     public void setDocuments(Set<Document> documents) {

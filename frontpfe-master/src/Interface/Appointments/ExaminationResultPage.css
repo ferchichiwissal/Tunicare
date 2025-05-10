@@ -1,0 +1,104 @@
+.examination-result-container {
+    max-width: 800px; /* Or your preferred max width */
+    margin: auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.examination-result-container .card-header {
+    background-color: #e9ecef; /* Light grey background for header */
+    border-bottom: 1px solid #dee2e6;
+}
+
+.examination-result-container .card-header h4 {
+    margin-bottom: 0.25rem;
+    color: #333;
+}
+
+.examination-result-container .card-header p {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.examination-result-container .card-body {
+    padding: 2rem; /* More padding in the body */
+}
+
+.examination-result-container .card-body h3 {
+    color: #007bff; /* Theme color for title */
+    font-weight: bold;
+}
+
+.examination-result-container .patient-info p,
+.examination-result-container .doctor-centre-info p {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.examination-result-container .patient-info strong {
+    min-width: 100px; /* Adjust as needed for alignment */
+    display: inline-block;
+}
+
+.examination-result-container .result-content {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background-color: #fff;
+    min-height: 150px; /* Ensure some space for the result */
+}
+
+.examination-result-container .result-content div {
+    /* Styles for the dangerouslySetInnerHTML content if needed */
+    line-height: 1.6;
+}
+
+.examination-result-container .card-footer {
+    background-color: #f8f9fa; /* Light background for footer */
+    border-top: 1px solid #dee2e6;
+    padding: 1rem;
+}
+
+/* Print-specific styles */
+@media print {
+    body {
+        background-color: #fff; /* Ensure white background for printing */
+        margin: 0;
+        padding: 0;
+        font-size: 12pt; /* Adjust base font size for print */
+    }
+
+    .examination-result-container {
+        max-width: 100%;
+        width: 100%;
+        margin: 0;
+        box-shadow: none;
+        border: 1px solid #ccc; /* Optional border for print */
+    }
+
+    .examination-result-container .card {
+        border: none;
+        box-shadow: none;
+    }
+    
+    .examination-result-container .card-header,
+    .examination-result-container .card-body,
+    .examination-result-container .card-footer {
+        padding: 15px; /* Consistent padding for print */
+    }
+
+    .examination-result-container .card-footer .btn {
+        display: none; /* Hide buttons in print view */
+    }
+
+    .examination-result-container .text-muted {
+        color: #333 !important; /* Ensure text is dark enough for print */
+    }
+
+    hr {
+        border-top: 1px solid #bbb;
+    }
+}

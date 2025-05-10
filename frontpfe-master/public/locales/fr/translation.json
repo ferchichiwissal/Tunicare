@@ -1549,8 +1549,25 @@
         "deleteFailed": "Échec de la suppression de l'examen",
         "deleteFailedFallback": "Échec de la suppression de la demande d'examen.",
         "reportNotAvailable": "Rapport non disponible (examen terminé mais pas de résultat enregistré).",
-        "reportWindowTitle": "Affichage du Rapport d'Examen"
+        "reportWindowTitle": "Affichage du Rapport d'Examen",
+        "missingExamId": "Impossible de voir le rapport : ID d'examen manquant.",
+        "cannotViewReportError": "Une erreur s'est produite lors de la tentative d'affichage du rapport."
       }
+    },
+    "examinationResultPage": {
+      "errors": {
+        "unauthorized": "Non autorisé. Veuillez vous connecter pour voir cette page.",
+        "fetchFailed": "Échec de la récupération des détails de l'examen.",
+        "fetchFailedFallback": "Impossible de charger les détails de l'examen. Veuillez réessayer."
+      },
+      "loading": "Chargement des détails de l'examen...",
+      "noDetails": "Aucun détail trouvé pour cet examen.",
+      "unknownCentre": "Centre Inconnu",
+      "title": "Compte Rendu d'Examen",
+      "patientLabel": "Patient",
+      "dateLabel": "Date",
+      "examinationLabel": "Examen",
+      "reportByLabel": "Rapport par"
     },
     "centreExaminationsDashboard": {
       "title": "Examens à Réaliser",

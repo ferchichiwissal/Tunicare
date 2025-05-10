@@ -51,25 +51,14 @@ const DoctorExaminationsDashboard = () => {
     };
 
     const handleVoirResultat = (exam) => {
-        // Display the report content in an alert. A modal would be better for long content.
-        if (exam.resultat) {
-            // Open a new window to display the report content
-            const reportWindow = window.open('', '_blank', 'width=800,height=600');
-            if (reportWindow) {
-                reportWindow.document.write('<html><head><title>' + t('doctorExaminationsDashboard.reportWindowTitle') + '</title>'); // Add translation key
-                reportWindow.document.write('<style>body { font-family: sans-serif; padding: 15px; }</style>');
-                reportWindow.document.write('</head><body>');
-                reportWindow.document.write('<h3>' + t('doctorExaminationsDashboard.reportContent') + '</h3><hr/>');
-                reportWindow.document.write(exam.resultat); // Render HTML content
-                reportWindow.document.write('</body></html>');
-                reportWindow.document.close();
-            } else {
-                alert(t('centreExaminationsDashboard.errors.popupBlocked')); // Reuse translation
-            }
-        } else if (exam.etat === 'terminé') {
-             alert(t('doctorExaminationsDashboard.alerts.reportNotAvailable')); 
+        // Navigate to the new examination result page
+        // The button's disabled state already ensures that we only navigate if a result might be available.
+        // (exam.resultat is present OR exam.etat === 'terminé')
+        if (exam.idExam) {
+            navigate(`/examination-result/${exam.idExam}`);
         } else {
-            alert(t('doctorExaminationsDashboard.alerts.noReportYet'));
+            console.error(t('doctorExaminationsDashboard.errors.missingExamId'));
+            alert(t('doctorExaminationsDashboard.errors.cannotViewReportError'));
         }
     };
 

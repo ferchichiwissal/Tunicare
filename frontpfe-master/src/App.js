@@ -50,6 +50,8 @@ import DoctorExaminationsDashboard from './Interface/Appointments/DoctorExaminat
 import CentreExaminationsDashboard from './Interface/Appointments/CentreExaminationsDashboard'; // Import Centre Examinations Dashboard
 import PrescribeReportPage from './Interface/Appointments/PrescribeReportPage'; // Import Prescribe Report Page
 import ManageReportTemplates from './Interface/Admin/ManageReportTemplates'; // Import Manage Report Templates page
+import ExaminationResultPage from './Interface/Appointments/ExaminationResultPage'; // Import Examination Result Page
+import UploadDoctorCentreSignaturePage from './Interface/Appointments/UploadDoctorCentreSignaturePage'; // Import Upload Signature Page
  
 const onLogout = () => {
   // Clear tokens from localStorage and sessionStorage
@@ -216,6 +218,18 @@ function App() {
           <Route path="/admin/manage-report-templates" element={
             <ProtectedLayout requiredRole="ROLE_ADMIN">
               <Layout><ManageReportTemplates /></Layout>
+            </ProtectedLayout>
+          } />
+          {/* Route for the Examination Result Page */}
+          <Route path="/examination-result/:examinationId" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR"> {/* Or potentially other roles like PATIENT if they can see this too */}
+              <Layout><ExaminationResultPage /></Layout>
+            </ProtectedLayout>
+          } />
+          {/* Route for Doctor Centre to upload signature */}
+          <Route path="/upload-doctor-centre-signature" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR_CENTRE_EXAMEN">
+              <Layout><UploadDoctorCentreSignaturePage /></Layout>
             </ProtectedLayout>
           } />
 

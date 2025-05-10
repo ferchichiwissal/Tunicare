@@ -2,6 +2,7 @@ package pi.pperformance.elite.UserServices;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.hibernate.Hibernate; // Import Hibernate
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 
 import pi.pperformance.elite.dto.MedicalExaminationInputDTO;
 import pi.pperformance.elite.dto.MedicalExaminationDTO;
+import pi.pperformance.elite.dto.ExaminationResultDTO; // Import new DTO
 
 @Service
 public class MedicalExaminationService implements IMedicalExaminationService {
@@ -398,6 +400,7 @@ public class MedicalExaminationService implements IMedicalExaminationService {
 
         // Save main report content
         exam.setResultat(reportContent); // Save HTML/text content
+        exam.setDoctorCentreDexamen(currentCentreDoctor); // Explicitly link the doctor who saved the report
         
         // Only update status to 'terminé' if it's not already 'terminé'
         if (!"terminé".equalsIgnoreCase(exam.getEtat())) {
@@ -425,9 +428,18 @@ public class MedicalExaminationService implements IMedicalExaminationService {
                 }
             }
         }
+        log.info("Before saving report for exam ID {}: doctorCentreDexamen ID is {}, centreName on doctor is {}",
+            examId,
+            (exam.getDoctorCentreDexamen() != null ? exam.getDoctorCentreDexamen().getId() : "null"),
+            (exam.getDoctorCentreDexamen() != null && exam.getDoctorCentreDexamen().getCentreDexamen() != null ? exam.getDoctorCentreDexamen().getCentreDexamen().getName() : "null or centre not linked"));
 
         // Save the examination and its attached files (due to CascadeType.ALL)
-        return medicalExaminationRepository.save(exam);
+        MedicalExamination savedExam = medicalExaminationRepository.save(exam);
+        log.info("After saving report for exam ID {}: doctorCentreDexamen ID is {}, centreName on doctor is {}",
+            savedExam.getIdExam(),
+            (savedExam.getDoctorCentreDexamen() != null ? savedExam.getDoctorCentreDexamen().getId() : "null"),
+            (savedExam.getDoctorCentreDexamen() != null && savedExam.getDoctorCentreDexamen().getCentreDexamen() != null ? savedExam.getDoctorCentreDexamen().getCentreDexamen().getName() : "null or centre not linked"));
+        return savedExam;
     }
 
 
@@ -484,6 +496,24 @@ public class MedicalExaminationService implements IMedicalExaminationService {
         MedicalExamination exam = medicalExaminationRepository.findById(examId)
                 .orElseThrow(() -> new ResourceNotFoundException("Medical Examination not found with id: " + examId));
 
+        log.info("Generating report PDF for exam ID {}. Current state: Etat={}, Resultat Present={}",
+            examId, exam.getEtat(), (exam.getResultat() != null && !exam.getResultat().isEmpty()));
+        log.info("Exam ID {}: RendezVous ID is {}, Patient ID is {}, DoctorCentreDexamen ID is {}",
+            examId,
+            (exam.getRendezVous() != null ? exam.getRendezVous().getIdAppointment() : "null"),
+            (exam.getRendezVous() != null && exam.getRendezVous().getPatient() != null ? exam.getRendezVous().getPatient().getId() : "null"),
+            (exam.getDoctorCentreDexamen() != null ? exam.getDoctorCentreDexamen().getId() : "null"));
+
+        if (exam.getDoctorCentreDexamen() != null) {
+            log.info("Exam ID {}: DoctorCentreDexamen {} has Centre ID {}, Centre Name {}, Signature Path: {}",
+                examId,
+                exam.getDoctorCentreDexamen().getId(),
+                (exam.getDoctorCentreDexamen().getCentreDexamen() != null ? exam.getDoctorCentreDexamen().getCentreDexamen().getIdCentre() : "null"),
+                (exam.getDoctorCentreDexamen().getCentreDexamen() != null ? exam.getDoctorCentreDexamen().getCentreDexamen().getName() : "null"),
+                exam.getDoctorCentreDexamen().getSignatureImagePath());
+        }
+
+
         if (!"terminé".equalsIgnoreCase(exam.getEtat())) {
             throw new IllegalStateException("Cannot generate report PDF for examination that is not 'terminé'. Current status: " + exam.getEtat());
         }
@@ -493,96 +523,109 @@ public class MedicalExaminationService implements IMedicalExaminationService {
              // For now, let's generate a PDF indicating the main content is missing.
         }
 
-        RendezVous rendezVous = exam.getRendezVous();
-         if (rendezVous == null) {
-             throw new IllegalStateException("Examination " + examId + " is not linked to an appointment (RendezVous).");
-         }
-         Patient patient = rendezVous.getPatient();
-         // Find the DoctorCentreDexamen who likely created the report (needs logic to determine this, maybe store it?)
-         // For now, let's just use the centre name and patient info.
-         // DoctorCentreDexamen centreDoctor = findCentreDoctorForExam(exam); // Placeholder for finding the doctor
-
-         if (patient == null) {
-             throw new IllegalStateException("Missing Patient information for Examination ID: " + examId);
-         }
-
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        // Use fully qualified name to resolve ambiguity
-        com.lowagie.text.Document document = new com.lowagie.text.Document(PageSize.A4);
-        PdfWriter writer = PdfWriter.getInstance(document, baos);
-        document.open();
-
-        // Header (Adapt based on available info - Centre Doctor?)
-        Paragraph header = new Paragraph("Centre d'Examen: " + (exam.getCentreName() != null ? exam.getCentreName() : "Non spécifié"));
-        header.setAlignment(Element.ALIGN_LEFT);
-        document.add(header);
-        // Add centre address/phone if available via CentreDexamen entity lookup?
-        document.add(Chunk.NEWLINE);
-
-        // Title
-        Paragraph title = new Paragraph("Compte Rendu Médical", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16));
-        title.setAlignment(Element.ALIGN_CENTER);
-        document.add(title);
-        document.add(Chunk.NEWLINE);
-
-        // Patient Info
-        document.add(new Paragraph("Patient: " + patient.getFirstName() + " " + patient.getLastName()));
-         if (patient.getBirthDate() != null) {
-             document.add(new Paragraph("Date de Naissance: " + patient.getBirthDate().format(DateTimeFormatter.ISO_DATE)));
-             document.add(new Paragraph("Âge: " + calculateAge(patient.getBirthDate()) + " ans"));
-         } else {
-             document.add(new Paragraph("Date de Naissance: Non spécifiée"));
-             document.add(new Paragraph("Âge: Non spécifié"));
-         }
-        String updatedAtFormatted = "N/A";
-         if (exam.getUpdatedAt() != null) {
-             LocalDate updatedAtLocalDate = exam.getUpdatedAt().toInstant()
-                                                .atZone(ZoneId.systemDefault())
-                                                .toLocalDate();
-             updatedAtFormatted = updatedAtLocalDate.format(DateTimeFormatter.ISO_DATE);
-         }
-         document.add(new Paragraph("Date du rapport: " + updatedAtFormatted));
-         document.add(Chunk.NEWLINE);
-
-        // Report Content (Resultat)
-        document.add(new Paragraph("Rapport:", FontFactory.getFont(FontFactory.HELVETICA_BOLD)));
-        if (exam.getResultat() != null && !exam.getResultat().trim().isEmpty()) {
-            // Basic HTML to Text conversion (replace <p> with newline, strip other tags)
-            // For proper HTML rendering, a library like Flying Saucer would be needed.
-            String textContent = exam.getResultat()
-                                     .replaceAll("(?i)</p>\\s*<p>", "\n\n") // Paragraph breaks
-                                     .replaceAll("(?i)<br\\s*/?>", "\n")    // Line breaks
-                                     .replaceAll("<[^>]*>", "")             // Strip remaining tags
-                                     .trim();
-            document.add(new Paragraph(textContent));
-        } else {
-            document.add(new Paragraph("[Contenu principal du rapport non disponible]", FontFactory.getFont(FontFactory.HELVETICA, 10, Font.ITALIC)));
-        }
-        document.add(Chunk.NEWLINE);
-
-        // Attached Files List
-        // Ensure lazy loading is handled - fetch explicitly if needed or use JOIN FETCH in repository
-        List<FichierAttacheRapport> attaches = exam.getFichiersAttaches();
-        if (attaches != null && !attaches.isEmpty()) {
-            document.add(new Paragraph("Fichiers Attachés:", FontFactory.getFont(FontFactory.HELVETICA_BOLD)));
-            // Use fully qualified name
-            com.lowagie.text.List fileList = new com.lowagie.text.List(false, 10); // Unordered list
-            for (FichierAttacheRapport fichier : attaches) {
-                 // Use fully qualified name
-                fileList.add(new com.lowagie.text.ListItem(fichier.getNomFichier() + " (" + fichier.getTypeMime() + ")"));
+        // Ensure all necessary entities are loaded, especially DoctorCentreDexamen and its relations
+        // The MedicalExamination entity should have DoctorCentreDexamen eagerly fetched or fetched here.
+        // If DoctorCentreDexamen is lazy, you might need to initialize it:
+        if (exam.getRendezVous() != null) {
+            Hibernate.initialize(exam.getRendezVous());
+            if (exam.getRendezVous().getPatient() != null) {
+                Hibernate.initialize(exam.getRendezVous().getPatient());
             }
-            document.add(fileList);
-            document.add(Chunk.NEWLINE);
+        }
+        if (exam.getDoctorCentreDexamen() != null) {
+            Hibernate.initialize(exam.getDoctorCentreDexamen());
+            if (exam.getDoctorCentreDexamen().getCentreDexamen() != null) {
+                Hibernate.initialize(exam.getDoctorCentreDexamen().getCentreDexamen());
+            }
+        }
+        // Delegate to the PdfGenerationService's new method
+        return pdfGenerationService.generateExaminationResultPdf(exam);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ExaminationResultDTO getExaminationResult(Long examinationId) {
+        log.debug("Fetching examination result for ID: {}", examinationId);
+        MedicalExamination exam = medicalExaminationRepository.findById(examinationId)
+                .orElseThrow(() -> {
+                    log.warn("Medical Examination not found with id: {}", examinationId);
+                    return new ResourceNotFoundException("Medical Examination not found with id: " + examinationId);
+                });
+
+        RendezVous rendezVous = exam.getRendezVous();
+        if (rendezVous == null) {
+            log.error("Examination {} is not linked to an appointment (RendezVous).", examinationId);
+            throw new IllegalStateException("Examination " + examinationId + " is not linked to an appointment (RendezVous).");
         }
 
-        // Signature (Placeholder - needs logic to get Centre Doctor signature if required)
-        // Paragraph signatureLabel = new Paragraph("Signature du Médecin Rapporteur");
-        // signatureLabel.setAlignment(Element.ALIGN_RIGHT);
-        // document.add(signatureLabel);
+        Patient patient = rendezVous.getPatient();
+        if (patient == null) {
+            log.error("Patient not found for RendezVous ID: {}", rendezVous.getIdAppointment());
+            throw new IllegalStateException("Patient not found for RendezVous ID: " + rendezVous.getIdAppointment());
+        }
 
-        document.close();
-        writer.close();
-        return baos.toByteArray();
+        DoctorCentreDexamen doctorCentre = exam.getDoctorCentreDexamen();
+        CentreDexamen centreDexamen = null;
+        String doctorCentreExamenName = "N/A";
+
+        if (doctorCentre != null) {
+            doctorCentreExamenName = (doctorCentre.getFirstName() != null ? doctorCentre.getFirstName() : "") + " " + (doctorCentre.getLastName() != null ? doctorCentre.getLastName() : "");
+            doctorCentreExamenName = doctorCentreExamenName.trim();
+            if (doctorCentreExamenName.isEmpty()) doctorCentreExamenName = "N/A";
+            centreDexamen = doctorCentre.getCentreDexamen();
+            log.debug("Found DoctorCentreDexamen: {}, Centre: {}", doctorCentreExamenName, centreDexamen != null ? centreDexamen.getName() : "null");
+        } else if (exam.getCentreName() != null && !exam.getCentreName().equalsIgnoreCase("Autre")) {
+            log.debug("DoctorCentreDexamen not directly linked, attempting to find CentreDexamen by name: {}", exam.getCentreName());
+            Optional<CentreDexamen> foundCentre = centreDexamenRepository.findByName(exam.getCentreName());
+            if (foundCentre.isPresent()) {
+                centreDexamen = foundCentre.get();
+                log.debug("Found CentreDexamen by name: {}", centreDexamen.getName());
+            } else {
+                 log.warn("CentreDexamen named '{}' not found for exam ID {}", exam.getCentreName(), examinationId);
+            }
+        }
+
+
+        String centreName = "N/A";
+        String centreAddress = "N/A";
+        String centrePhone = "N/A";
+
+        if (centreDexamen != null) {
+            centreName = centreDexamen.getName();
+            centreAddress = centreDexamen.getAdress(); 
+            centrePhone = centreDexamen.getTel();
+        } else if (exam.getCentreName() != null && !exam.getCentreName().equalsIgnoreCase("Autre")) {
+            centreName = exam.getCentreName();
+        } else if (exam.getCentreName() != null && exam.getCentreName().equalsIgnoreCase("Autre") && exam.getDoctorCentreDexamen() == null) {
+            centreName = "Autre";
+        }
+        log.debug("Final Centre Details - Name: {}, Address: {}, Phone: {}", centreName, centreAddress, centrePhone);
+
+
+        LocalDate examDate = null;
+        if (exam.getUpdatedAt() != null) { 
+            examDate = exam.getUpdatedAt().toInstant()
+                                       .atZone(ZoneId.systemDefault())
+                                       .toLocalDate();
+        } else if (exam.getCreatedAt() != null) {
+             examDate = exam.getCreatedAt().toInstant()
+                                       .atZone(ZoneId.systemDefault())
+                                       .toLocalDate();
+        }
+        log.debug("Examination Date determined as: {}", examDate);
+
+
+        ExaminationResultDTO resultDTO = new ExaminationResultDTO(
+                (patient.getFirstName() != null ? patient.getFirstName() : "") + " " + (patient.getLastName() != null ? patient.getLastName() : "").trim(),
+                doctorCentreExamenName,
+                centreName,
+                centreAddress,
+                centrePhone,
+                examDate,
+                exam.getAct(), 
+                exam.getResultat() 
+        );
+        log.info("Successfully created ExaminationResultDTO for exam ID: {}", examinationId);
+        return resultDTO;
     }
 }

@@ -69,5 +69,16 @@ public class DoctorCentreDexamenService {
         return doctorCentreDexamenRepository.save(newDoctor);
     }
 
+    @Transactional
+    public DoctorCentreDexamen updateSignatureImagePath(Long doctorId, String signatureImagePath) {
+        DoctorCentreDexamen doctor = doctorCentreDexamenRepository.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("DoctorCentreDexamen not found with id: " + doctorId));
+        
+        doctor.setSignatureImagePath(signatureImagePath);
+        doctor.setUpdatedAt(LocalDate.now()); // Assuming you want to update this timestamp
+
+        return doctorCentreDexamenRepository.save(doctor);
+    }
+
     // Add other service methods if needed (e.g., find by email, update, etc.)
 }

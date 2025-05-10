@@ -69,60 +69,102 @@ const MyExaminationsPage = () => {
     }, [performLogout]);
 
 
-    // Function to handle the download click
-    const handleDownload = async (examId) => {
-        setDownloading(examId); // Indicate download start for this exam
-        setError(''); // Clear previous errors
+    // Function to handle the download click for examination request PDF
+    const handleDownloadRequest = async (examId) => {
+        setDownloading(`request_${examId}`);
+        setError('');
 
-        // --- BACKEND REQUIRED ---
-        // This part needs a backend endpoint like:
-        // GET /api/medical-examinations/{examId}/download
-        // which returns the PDF file content with appropriate headers.
-
-        console.log(`Attempting to download examination ID: ${examId}`);
-        // Removed the placeholder alert:
-        // alert(`La fonctionnalité de téléchargement pour l'examen ${examId} nécessite une mise à jour du backend.`);
-
-        // Example of how it *would* work with axios if the endpoint existed:
-        // UNCOMMENTED THE ACTUAL LOGIC:
-        const token = getToken(); // Use getToken
+        console.log(`Attempting to download examination request PDF for ID: ${examId}`);
+        
+        const token = getToken();
         if (!token) {
-            setError(t('myExaminationsPage.errors.authMissing')); // Use translation key
+            setError(t('myExaminationsPage.errors.authMissing'));
             setDownloading(null);
-            performLogout(); // Logout if no token
+            performLogout();
             return;
         }
 
         try {
             const response = await axios.get(`${API_URL}/api/medical-examinations/${examId}/download`, {
                 headers: { Authorization: `Bearer ${token}` },
-                responseType: 'blob', // Important for file download
+                responseType: 'blob',
             });
 
-            // Create a URL for the blob object
             const fileURL = window.URL.createObjectURL(new Blob([response.data]));
-            // Create a temporary link element
             const fileLink = document.createElement('a');
             fileLink.href = fileURL;
-            // Suggest a filename (backend might provide one via Content-Disposition header)
-            fileLink.setAttribute('download', `examen_${examId}.pdf`);
-            // Append to body, click, and remove
+            fileLink.setAttribute('download', `demande_examen_${examId}.pdf`);
             document.body.appendChild(fileLink);
             fileLink.click();
             fileLink.parentNode.removeChild(fileLink);
-            window.URL.revokeObjectURL(fileURL); // Clean up blob URL
+            window.URL.revokeObjectURL(fileURL);
 
         } catch (err) {
-            console.error("Error downloading examination PDF:", err);
-            // Use translation key with interpolation
-            setError(err.response?.data?.message || t('myExaminationsPage.errors.downloadFailed', { examId: examId }));
+            console.error("Error downloading examination request PDF:", err);
+            let errorMessage = t('myExaminationsPage.errors.downloadFailed', { examId: examId });
+            if (err.response) {
+                try {
+                    const errorBlob = err.response.data;
+                    const errorText = await errorBlob.text();
+                    const errorJson = JSON.parse(errorText);
+                    errorMessage = errorJson.message || errorText || errorMessage;
+                } catch (parseError) {
+                    console.error("Could not parse error response blob for request download:", parseError);
+                }
+            }
+            setError(errorMessage);
         } finally {
-            setDownloading(null); // Indicate download end/failure
+            setDownloading(null);
         }
-        // --- END BACKEND REQUIRED --- UNCOMMENTED MARKER REMOVED
+    };
 
-        // For now, just stop the loading indicator - REMOVED THIS SIMULATION
-        // setTimeout(() => setDownloading(null), 500);
+    // Function to handle the download click for examination result PDF
+    const handleDownloadResult = async (examId) => {
+        setDownloading(`result_${examId}`);
+        setError('');
+
+        console.log(`Attempting to download examination result PDF for ID: ${examId}`);
+        
+        const token = getToken();
+        if (!token) {
+            setError(t('myExaminationsPage.errors.authMissing'));
+            setDownloading(null);
+            performLogout();
+            return;
+        }
+
+        try {
+            const response = await axios.get(`${API_URL}/api/medical-examinations/${examId}/report/download-pdf`, {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: 'blob',
+            });
+
+            const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+            const fileLink = document.createElement('a');
+            fileLink.href = fileURL;
+            fileLink.setAttribute('download', `resultat_examen_${examId}.pdf`);
+            document.body.appendChild(fileLink);
+            fileLink.click();
+            fileLink.parentNode.removeChild(fileLink);
+            window.URL.revokeObjectURL(fileURL);
+
+        } catch (err) {
+            console.error("Error downloading examination result PDF:", err);
+            let errorMessage = t('myExaminationsPage.errors.downloadFailed', { examId: examId });
+            if (err.response) {
+                try {
+                    const errorBlob = err.response.data;
+                    const errorText = await errorBlob.text();
+                    const errorJson = JSON.parse(errorText);
+                    errorMessage = errorJson.message || errorText || errorMessage;
+                } catch (parseError) {
+                    console.error("Could not parse error response blob for result download:", parseError);
+                }
+            }
+            setError(errorMessage);
+        } finally {
+            setDownloading(null);
+        }
     };
 
 
@@ -249,6 +291,7 @@ const MyExaminationsPage = () => {
                             <th>{t('myExaminationsPage.table.dateRequested')}</th>
                             <th>{t('myExaminationsPage.table.type')}</th>
                             <th>{t('myExaminationsPage.table.centre')}</th>
+                            {/* <th>{t('myExaminationsPage.table.result', 'Résultat')}</th> {/* Suppressed Result Column Header */}
                             <th>{t('myExaminationsPage.table.action')}</th>
                         </tr>
                     </thead>
@@ -258,14 +301,23 @@ const MyExaminationsPage = () => {
                                 <td>{formatDate(exam.createdAt)}</td> {/* Using createdAt as request date */}
                                 <td>{exam.act || t('common.notAvailable')}</td> {/* Use translation key */}
                                 <td>{displayCentre(exam)}</td> {/* Needs logic based on backend */}
-                                <td> {/* Replaced recommendation with button */}
+                                {/* <td>{exam.resultat || t('common.notAvailable')}</td> {/* Suppressed Result Cell */}
+                                <td className="actions-cell">
+                                    <button
+                                        className="btn btn-info btn-sm me-2" // Bootstrap classes for margin
+                                        onClick={() => handleDownloadRequest(exam.idExam)}
+                                        disabled={downloading === `request_${exam.idExam}`}
+                                        title={t('myExaminationsPage.buttons.downloadRequest', 'Télécharger Demande')}
+                                    >
+                                        {downloading === `request_${exam.idExam}` ? t('loading') : t('myExaminationsPage.buttons.downloadRequest', 'Télécharger Demande')}
+                                    </button>
                                     <button
                                         className="btn btn-primary btn-sm"
-                                        onClick={() => handleDownload(exam.idExam)}
-                                        disabled={downloading === exam.idExam} // Disable while downloading this specific exam
+                                        onClick={() => handleDownloadResult(exam.idExam)}
+                                        disabled={downloading === `result_${exam.idExam}` || exam.etat !== 'terminé'}
+                                        title={exam.etat !== 'terminé' ? t('myExaminationsPage.tooltips.downloadNotReady', 'Le résultat n\'est pas encore disponible pour téléchargement.') : t('myExaminationsPage.buttons.downloadResult', 'Télécharger Résultat')}
                                     >
-                                        {/* Use translation keys for button text */}
-                                        {downloading === exam.idExam ? t('loading') : t('myExaminationsPage.buttons.download')}
+                                        {downloading === `result_${exam.idExam}` ? t('loading') : t('myExaminationsPage.buttons.downloadResult', 'Télécharger Résultat')}
                                     </button>
                                 </td>
                             </tr>

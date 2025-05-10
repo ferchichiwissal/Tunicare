@@ -302,6 +302,7 @@ const Dashboard = ({ onLogout }) => {
       <>
         <a href="#">{t('nav.dashboard')}</a>
         <a href="/centre-examinations">{t('nav.centreExaminationsDashboard')}</a> {/* Added Centre Examinations Dashboard Link */}
+        <a href="/upload-doctor-centre-signature">{t('nav.manageMySignature', 'Gérer ma Signature')}</a> {/* Added Manage Signature Link */}
         <a href={`/edit-doctor-centre/${id}`}>{t('nav.editMyAccount')}</a> {/* Reverted to correct route path */}
         <a href="/change-password">{t('nav.changePassword')}</a>
         <a href="/Logout">{t('nav.logout')}</a>

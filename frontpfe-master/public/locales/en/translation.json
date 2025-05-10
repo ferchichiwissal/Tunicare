@@ -1599,7 +1599,24 @@
         "fetchFailedFallback": "Failed to retrieve your exam requests.",
         "deleteFailed": "Failed to delete exam",
         "deleteFailedFallback": "Failed to delete the exam request.",
-        "reportWindowTitle": "View Exam Report"
+        "reportWindowTitle": "View Exam Report",
+        "missingExamId": "Cannot view report: Examination ID is missing.",
+        "cannotViewReportError": "An error occurred while trying to view the report."
       }
-    }
+    },
+  "examinationResultPage": {
+    "errors": {
+      "unauthorized": "Unauthorized. Please log in to view this page.",
+      "fetchFailed": "Failed to fetch examination details.",
+      "fetchFailedFallback": "Could not load examination details. Please try again."
+    },
+    "loading": "Loading examination details...",
+    "noDetails": "No details found for this examination.",
+    "unknownCentre": "Unknown Centre",
+    "title": "Examination Report",
+    "patientLabel": "Patient",
+    "dateLabel": "Date",
+    "examinationLabel": "Examination",
+    "reportByLabel": "Report by"
   }
+}

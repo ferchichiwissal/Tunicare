@@ -3,6 +3,7 @@ package pi.pperformance.elite.UserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value; // Import Value
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,6 +38,10 @@ public class DoctorCentreDexamenController {
 
     // Define the upload directory relative to the application root - NO LONGER NEEDED
     // private static final String UPLOAD_DIR = "uploads/doctor_profiles/";
+    // private static final String SIGNATURE_UPLOAD_DIR = "uploads/doctor_signatures/"; // Remplacé par la propriété injectée
+
+    @Value("${file.upload-dir.signatures}") // Injecter la propriété
+    private String signatureUploadDir;
 
     @Autowired
     private VerificationService verificationService;
@@ -431,4 +436,81 @@ public class DoctorCentreDexamenController {
                 });
     }
 
+    @PutMapping("/signature")
+    @PreAuthorize("hasRole('ROLE_DOCTOR_CENTRE_EXAMEN')")
+    public ResponseEntity<?> uploadSignature(
+            @RequestParam("signatureFile") MultipartFile signatureFile,
+            org.springframework.security.core.Authentication authentication) {
+
+        String email = authentication.getName();
+        log.info("Request to upload signature for doctor: {}", email);
+        log.info("Injected signatureUploadDir: {}", signatureUploadDir);
+
+        if (signatureUploadDir == null || signatureUploadDir.trim().isEmpty()) {
+            log.error("Signature upload directory is not configured. Please set 'file.upload-dir.signatures' in application.properties.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Map.of("message", "File upload path not configured on server."));
+        }
+
+        if (signatureFile.isEmpty()) {
+            log.warn("Signature file is empty for doctor: {}", email);
+            return ResponseEntity.badRequest().body(Map.of("message", "Signature file cannot be empty."));
+        }
+
+        Optional<DoctorCentreDexamen> doctorOptional = doctorCentreDexamenRepository.findByEmail(email);
+        if (doctorOptional.isEmpty()) {
+            log.warn("Doctor not found with email: {} during signature upload.", email);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Doctor not found."));
+        }
+
+        DoctorCentreDexamen doctor = doctorOptional.get();
+
+        try {
+            // Create the upload directory if it doesn't exist
+            Path uploadPath = Paths.get(signatureUploadDir); // Utiliser la propriété injectée
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+                log.info("Created signature upload directory for DoctorCentreDexamen: {}", uploadPath.toAbsolutePath());
+            }
+
+            // Generate a unique file name to prevent overwriting and include user context
+            String originalFileName = signatureFile.getOriginalFilename();
+            String fileExtension = "";
+            if (originalFileName != null && originalFileName.contains(".")) {
+                fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            }
+            // Utiliser une convention de nommage similaire à CabinetController pour la cohérence si souhaité,
+            // ou garder celle-ci qui est déjà unique.
+            String uniqueFileName = "signature_docteurcentre_" + doctor.getId() + "_" + System.currentTimeMillis() + fileExtension;
+            Path filePath = uploadPath.resolve(uniqueFileName);
+
+            // Save the file
+            Files.copy(signatureFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            log.info("Successfully uploaded signature for DoctorCentreDexamen {} to: {}", email, filePath.toString());
+
+            // Update the doctor's signature image path (store relative path)
+            // S'assurer que signatureUploadDir se termine par un / pour la concaténation.
+            String pathToStore = signatureUploadDir;
+            if (!pathToStore.endsWith("/")) {
+                pathToStore += "/";
+            }
+            doctor.setSignatureImagePath(pathToStore + uniqueFileName);
+            doctor.setUpdatedAt(LocalDate.now()); // Assurez-vous que l'entité User ou DoctorCentreDexamen gère bien setUpdatedAt avec LocalDate
+            doctorCentreDexamenRepository.save(doctor);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Signature uploaded successfully.",
+                    "filePath", pathToStore + uniqueFileName
+            ));
+
+        } catch (IOException e) {
+            log.error("IOException during signature upload for doctor {}: {}", email, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to save signature file due to an I/O error."));
+        } catch (Exception e) { // Catch-all pour autres exceptions non prévues
+            log.error("Unexpected error during signature upload for doctor {}: {}", email, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "An unexpected error occurred during signature upload."));
+        }
+    }
 }

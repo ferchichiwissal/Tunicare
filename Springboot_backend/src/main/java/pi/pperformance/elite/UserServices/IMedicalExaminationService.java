@@ -3,6 +3,7 @@ package pi.pperformance.elite.UserServices;
 import pi.pperformance.elite.entities.MedicalExamination;
 import pi.pperformance.elite.dto.MedicalExaminationInputDTO;
 import pi.pperformance.elite.dto.MedicalExaminationDTO;
+import pi.pperformance.elite.dto.ExaminationResultDTO; // Import new DTO
 import org.springframework.web.multipart.MultipartFile; // Added import
 import pi.pperformance.elite.exceptions.ResourceNotFoundException; // Added import
 
@@ -113,4 +114,12 @@ public interface IMedicalExaminationService {
      * @throws IOException if there is an I/O error.
      */
     byte[] generateReportPdf(Long examId) throws com.lowagie.text.DocumentException, IOException;
+
+    /**
+     * Retrieves the detailed result of a medical examination.
+     * @param examinationId The ID of the medical examination.
+     * @return An ExaminationResultDTO containing the details.
+     * @throws pi.pperformance.elite.exceptions.ResourceNotFoundException if the examination is not found.
+     */
+    ExaminationResultDTO getExaminationResult(Long examinationId);
 }
