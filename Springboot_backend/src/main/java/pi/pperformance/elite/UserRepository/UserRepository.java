@@ -21,7 +21,7 @@ import java.util.Optional; // Add import
 @Repository
 //please make sure to name the entity "User" so the code recognize it and most of the red underlined User will be gone
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findByEmail(String email);
+    User findByEmail(String email); // Restored to return User
     // List<User> findByIsActive(boolean is_active); // Removed: isActive is now per registration
     void delete(User user);
     List<User> findByRole(Role role);

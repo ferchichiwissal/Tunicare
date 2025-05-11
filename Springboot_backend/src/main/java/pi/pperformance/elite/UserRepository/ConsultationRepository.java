@@ -5,6 +5,10 @@ import org.springframework.data.jpa.repository.Query; // Import Query
 import org.springframework.data.repository.query.Param; // Import Param
 import org.springframework.stereotype.Repository;
 import pi.pperformance.elite.entities.Consultation;
+import pi.pperformance.elite.entities.Doctor; // Import Doctor
+import pi.pperformance.elite.entities.Patient; // Import Patient
+import pi.pperformance.elite.entities.CabinetDr; // Import CabinetDr
+import java.time.LocalDateTime; // Import LocalDateTime
 
 import java.util.List;
 import java.util.Optional; // Import Optional
@@ -34,5 +38,5 @@ List<Consultation> findByPatient_IdAndCabinet_IdSiteOrderByDateConsultationDesc(
            "LEFT JOIN FETCH cab.doctor " + // Also fetch doctor linked to cabinet if needed for footer info
            "LEFT JOIN FETCH c.prescribedMedications " +
            "WHERE c.idConsultation = :consultationId")
-    Optional<Consultation> findByIdWithDetails(@Param("consultationId") Long consultationId);
+   Optional<Consultation> findByIdWithDetails(@Param("consultationId") Long consultationId);
 }

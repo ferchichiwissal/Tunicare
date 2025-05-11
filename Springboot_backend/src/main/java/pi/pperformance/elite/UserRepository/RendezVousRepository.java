@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.Query; // Import Query
 import org.springframework.data.repository.query.Param; // Import Param
 import org.springframework.stereotype.Repository;
 import pi.pperformance.elite.entities.RendezVous;
+import pi.pperformance.elite.entities.Doctor; // Import Doctor
+import pi.pperformance.elite.entities.Patient; // Import Patient
+import pi.pperformance.elite.entities.CabinetDr; // Import CabinetDr
 
 import java.time.LocalDate; // Import LocalDate
 import java.time.LocalDateTime; // Import LocalDateTime

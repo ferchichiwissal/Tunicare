@@ -53,6 +53,8 @@ import ManageReportTemplates from './Interface/Admin/ManageReportTemplates'; // 
 import ExaminationResultPage from './Interface/Appointments/ExaminationResultPage'; // Import Examination Result Page
 import UploadDoctorCentreSignaturePage from './Interface/Appointments/UploadDoctorCentreSignaturePage'; // Import Upload Signature Page
 import ArchivedExaminationsPage from './Interface/Appointments/ArchivedExaminationsPage'; // Import Archived Examinations Page
+import DoctorStatistics from './Interface/Statistics/DoctorStatistics'; // Import DoctorStatistics
+import CenterStatistics from './Interface/Statistics/CenterStatistics'; // Import CenterStatistics
  
 const onLogout = () => {
   // Clear tokens from localStorage and sessionStorage
@@ -237,6 +239,18 @@ function App() {
           <Route path="/archived-examinations" element={
             <ProtectedLayout requiredRole="ROLE_DOCTOR_CENTRE_EXAMEN">
               <Layout><ArchivedExaminationsPage /></Layout>
+            </ProtectedLayout>
+          } />
+          {/* Route for Doctor Statistics */}
+          <Route path="/doctor-statistics" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR">
+              <Layout><DoctorStatistics /></Layout>
+            </ProtectedLayout>
+          } />
+          {/* Route for Center Statistics */}
+          <Route path="/center-statistics" element={
+            <ProtectedLayout requiredRole="ROLE_DOCTOR_CENTRE_EXAMEN">
+              <Layout><CenterStatistics /></Layout>
             </ProtectedLayout>
           } />
 

@@ -86,7 +86,11 @@
     "myAppointments": "My Appointments",
     "addAppointment": "Add Appointment",
     "activationManagement": "Doctor Activation",
-    "doctorExaminationsDashboard": "Examinations Dashboard"
+    "doctorExaminationsDashboard": "Examinations Dashboard",
+    "statistics": "Statistics",
+    "centreExaminationsDashboard": "Centre Examinations Dashboard",
+    "archivedExaminations": "Archived Examinations",
+    "manageMySignature": "Manage My Signature"
   },
   "dashboard": {
     "title": "{{firstName}} {{lastName}} Dashboard",

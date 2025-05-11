@@ -98,9 +98,13 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/medical-examinations/{examId}/hide-for-doctor").hasRole("DOCTOR")
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/medical-examinations/{examId}/hide-for-centre-doctor").hasRole("DOCTOR_CENTRE_EXAMEN")
                 .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/medical-examinations/{examId}").hasRole("DOCTOR") // Delete exam request
+                // Statistics for DOCTOR
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/doctor/exams-by-center").hasRole("DOCTOR")
 
                 // --- DoctorCentreDexamen Specific Endpoints ---
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/doctor-centre-examen/signature").hasRole("DOCTOR_CENTRE_EXAMEN") // Upload signature
+                // Statistics for DOCTOR_CENTRE_EXAMEN
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/center/exams-by-doctor").hasRole("DOCTOR_CENTRE_EXAMEN")
 
                 // --- Report Model Endpoints ---
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/modeles-compte-rendu").hasAnyRole("DOCTOR_CENTRE_EXAMEN", "ADMIN") // List models
@@ -117,10 +121,10 @@ public class SecurityConfig {
 
                 // Chatbot endpoint - requires authentication
                 .requestMatchers("/api/chatbot/**").authenticated()
-
+ 
                 // --- Allow public access to preview images ---
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/modeles-compte-rendu/*/preview-image").permitAll()
-
+ 
                 // Fallback: Authenticate any other request not explicitly permitted
                 .anyRequest().authenticated()
             )

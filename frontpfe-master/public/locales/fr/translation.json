@@ -89,7 +89,8 @@
     "doctorExaminationsDashboard": "Tableau de Bord Examens",
     "centreExaminationsDashboard": "Tableau de Bord Centre Examens",
     "archivedExaminations": "Archive des Examens",
-    "manageMySignature": "Gérer ma Signature"
+    "manageMySignature": "Gérer ma Signature",
+    "statistics": "Statistiques"
   },
   "dashboard": {
     "title": "Tableau de bord de {{firstName}} {{lastName}}",

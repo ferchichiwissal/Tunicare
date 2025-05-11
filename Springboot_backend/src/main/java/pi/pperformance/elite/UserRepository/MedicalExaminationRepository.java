@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pi.pperformance.elite.entities.MedicalExamination;
+import pi.pperformance.elite.entities.Patient; // Import Patient
 
 import java.util.List;
 

@@ -1,0 +1,94 @@
+.statistics-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+}
+
+.statistics-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.8em;
+}
+
+.statistics-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.statistics-table th,
+.statistics-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+    font-size: 1em;
+}
+
+.statistics-table th {
+    background-color: #007bff; /* Blue header */
+    color: white;
+    font-weight: bold;
+}
+
+.statistics-table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Light grey for even rows */
+}
+
+.statistics-table tr:hover {
+    background-color: #e9ecef; /* Lighter blue on hover */
+}
+
+.error-message p {
+    color: #D8000C; /* Red for error messages */
+    background-color: #FFD2D2; /* Light red background for errors */
+    border: 1px solid #D8000C;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.statistics-container p {
+    font-size: 1.1em;
+    color: #555;
+}
+
+.filters-container {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.filters-container label {
+    font-weight: bold;
+    color: #333;
+}
+
+.filters-container select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    min-width: 150px; /* Adjust as needed */
+}
+
+.center-stat-block { /* Style for each center's/referrer's block (used in older version of DoctorStatistics) */
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.center-stat-block h3 {
+    color: #0056b3;
+    margin-top: 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}

@@ -78,7 +78,8 @@ public class UserServiceImplmnt implements UserServiceInterface {
             throw new AccessDeniedException("User is not authenticated.");
         }
         String email = authentication.getName();
-        User user = findByEmail(email); // Use existing method that handles eager loading
+        // findByEmail now returns User or null, so this direct usage is fine if findByEmail handles the Optional
+        User user = findByEmail(email);
         if (user == null) {
             // This case should ideally not happen if authentication succeeded with a valid user
             log.error("Authenticated user '{}' not found in database.", email);
@@ -440,7 +441,7 @@ public class UserServiceImplmnt implements UserServiceInterface {
     @Override
     @Transactional // Add Transactional to keep the session open for lazy loading
     public User findByEmail(String email) {
-        User user = UsrRepo.findByEmail(email);
+        User user = UsrRepo.findByEmail(email); // UsrRepo.findByEmail() now returns User
         if (user != null) {
             // Explicitly trigger lazy loading within the transaction
             if (user instanceof Doctor) {
@@ -451,7 +452,7 @@ public class UserServiceImplmnt implements UserServiceInterface {
                 ((Assistant) user).getCabinet();
             }
         }
-        return user;
+        return user; // Can be null if not found
     }
 
 

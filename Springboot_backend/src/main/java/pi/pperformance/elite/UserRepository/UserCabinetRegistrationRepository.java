@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import pi.pperformance.elite.entities.User;
 import pi.pperformance.elite.entities.CabinetDr;
 import pi.pperformance.elite.entities.UserCabinetRegistration;
+import pi.pperformance.elite.entities.Role; // Import Role
 
 import java.util.List;
 import java.util.Optional;
