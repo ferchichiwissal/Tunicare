@@ -9,8 +9,9 @@ const CenterStatistics = () => {
     const [error, setError] = useState('');
     const { user } = useAuth();
     const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1; // getMonth() is 0-indexed
     const [selectedYear, setSelectedYear] = useState(currentYear);
-    const [selectedMonth, setSelectedMonth] = useState(''); // Empty means all months
+    const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 
     const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
     const months = [

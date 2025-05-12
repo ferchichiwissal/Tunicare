@@ -78,6 +78,8 @@ public class MedicalExamination implements Serializable {
     @Column(name = "hidden_for_reporting_centre_doctor", nullable = false)
     private boolean hiddenForReportingCentreDoctor = false;
 
+@Column(name = "hidden_for_patient", nullable = false)
+    private boolean hiddenForPatient = false;
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();
@@ -246,5 +248,13 @@ public class MedicalExamination implements Serializable {
 
     public void setHiddenForReportingCentreDoctor(boolean hiddenForReportingCentreDoctor) {
         this.hiddenForReportingCentreDoctor = hiddenForReportingCentreDoctor;
+    }
+
+    public boolean isHiddenForPatient() {
+        return hiddenForPatient;
+    }
+
+    public void setHiddenForPatient(boolean hiddenForPatient) {
+        this.hiddenForPatient = hiddenForPatient;
     }
 }

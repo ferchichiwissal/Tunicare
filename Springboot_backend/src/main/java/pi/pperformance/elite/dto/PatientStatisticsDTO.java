@@ -9,16 +9,25 @@ public class PatientStatisticsDTO {
     private long totalExams;
     private AppointmentReminderDTO nextAcceptedAppointment; // Can be null
     private List<RecentActivityDTO> recentActivity; // Optional
+    private long pendingAppointmentsCount; // Nouveau champ
+    private long availableCertificatesCount; // Nouveau champ
+    private AppointmentReminderDTO nextRefusedAppointmentWithProposal; // Nouveau champ pour RDV refusé avec proposition
 
     // Constructors
     public PatientStatisticsDTO() {
     }
 
-    public PatientStatisticsDTO(long totalConsultations, long totalExams, AppointmentReminderDTO nextAcceptedAppointment, List<RecentActivityDTO> recentActivity) {
+    public PatientStatisticsDTO(long totalConsultations, long totalExams,
+                                AppointmentReminderDTO nextAcceptedAppointment, List<RecentActivityDTO> recentActivity,
+                                long pendingAppointmentsCount, long availableCertificatesCount,
+                                AppointmentReminderDTO nextRefusedAppointmentWithProposal) {
         this.totalConsultations = totalConsultations;
         this.totalExams = totalExams;
         this.nextAcceptedAppointment = nextAcceptedAppointment;
         this.recentActivity = recentActivity;
+        this.pendingAppointmentsCount = pendingAppointmentsCount;
+        this.availableCertificatesCount = availableCertificatesCount;
+        this.nextRefusedAppointmentWithProposal = nextRefusedAppointmentWithProposal;
     }
 
     // Getters and Setters
@@ -52,5 +61,29 @@ public class PatientStatisticsDTO {
 
     public void setRecentActivity(List<RecentActivityDTO> recentActivity) {
         this.recentActivity = recentActivity;
+    }
+
+    public long getPendingAppointmentsCount() {
+        return pendingAppointmentsCount;
+    }
+
+    public void setPendingAppointmentsCount(long pendingAppointmentsCount) {
+        this.pendingAppointmentsCount = pendingAppointmentsCount;
+    }
+
+    public long getAvailableCertificatesCount() {
+        return availableCertificatesCount;
+    }
+
+    public void setAvailableCertificatesCount(long availableCertificatesCount) {
+        this.availableCertificatesCount = availableCertificatesCount;
+    }
+
+    public AppointmentReminderDTO getNextRefusedAppointmentWithProposal() {
+        return nextRefusedAppointmentWithProposal;
+    }
+
+    public void setNextRefusedAppointmentWithProposal(AppointmentReminderDTO nextRefusedAppointmentWithProposal) {
+        this.nextRefusedAppointmentWithProposal = nextRefusedAppointmentWithProposal;
     }
 }

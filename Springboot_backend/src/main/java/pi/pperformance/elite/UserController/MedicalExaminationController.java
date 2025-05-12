@@ -466,4 +466,34 @@ public class MedicalExaminationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
+// Endpoint pour masquer un examen pour le patient connecté
+    @PutMapping("/{examId}/hide-for-patient")
+    @PreAuthorize("hasRole('PATIENT')")
+    public ResponseEntity<Void> hideExaminationForPatient(@PathVariable Long examId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
+
+        // Vérifier si l'utilisateur est bien un patient
+        if (currentUser == null || !(currentUser instanceof Patient)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        try {
+            // Appeler la méthode du service pour masquer l'examen (isHidden = true)
+            // Le service vérifiera si le patient est bien le propriétaire de l'examen
+            medicalExaminationService.setExaminationVisibilityForPatient(examId, currentUser.getId(), true);
+            return ResponseEntity.ok().build(); // Succès, pas de contenu à retourner
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build(); // Examen non trouvé
+        } catch (SecurityException | IllegalStateException e) { // Catch SecurityException as well
+            // Gérer les erreurs d'autorisation (si le patient n'est pas le propriétaire)
+            // ou d'autres états invalides (ex: examen déjà masqué)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            // Gérer les erreurs inattendues
+            System.err.println("Error hiding examination " + examId + " for patient " + currentUser.getId() + ": " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

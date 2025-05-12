@@ -1,28 +1,54 @@
 package pi.pperformance.elite.dto;
 
-public class RecentActivityDTO {
-    private String type; // e.g., "consultation", "examen"
-    private String date; // e.g., "2024-05-10"
+import java.time.LocalDate;
 
-    public RecentActivityDTO(String type, String date) {
-        this.type = type;
-        this.date = date;
+public class RecentActivityDTO {
+    private String activityType;
+    private LocalDate activityDate;
+    private String description;
+    private Long relatedId; // ID de la consultation, examen, rdv etc.
+
+    // Constructeurs
+    public RecentActivityDTO() {
+    }
+
+    public RecentActivityDTO(String activityType, LocalDate activityDate, String description, Long relatedId) {
+        this.activityType = activityType;
+        this.activityDate = activityDate;
+        this.description = description;
+        this.relatedId = relatedId;
     }
 
     // Getters and Setters
-    public String getType() {
-        return type;
+    public String getActivityType() {
+        return activityType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setActivityType(String activityType) {
+        this.activityType = activityType;
     }
 
-    public String getDate() {
-        return date;
+    public LocalDate getActivityDate() {
+        return activityDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setActivityDate(LocalDate activityDate) {
+        this.activityDate = activityDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getRelatedId() {
+        return relatedId;
+    }
+
+    public void setRelatedId(Long relatedId) {
+        this.relatedId = relatedId;
     }
 }

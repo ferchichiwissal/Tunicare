@@ -5,9 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired; // Import Autowir
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication; // Import Authentication
+import org.springframework.security.core.userdetails.UserDetails; // To get principal details
 import org.springframework.web.bind.annotation.*;
 import pi.pperformance.elite.UserServices.IConsultationService;
+import pi.pperformance.elite.Authentif.CustomUserDetails; // Import CustomUserDetails
 import pi.pperformance.elite.entities.Consultation;
+import pi.pperformance.elite.entities.User; // Import User entity to cast principal
 import pi.pperformance.elite.dto.ConsultationDTO; // Import the output DTO
 import pi.pperformance.elite.dto.ConsultationInputDTO; // Assuming a DTO for input
 
@@ -115,4 +119,55 @@ public class ConsultationController {
     //     return ResponseEntity.ok(updated);
     // }
 
+    // Endpoint for PATIENT to set consultation visibility
+    @PutMapping("/{id}/visibility/patient")
+    @PreAuthorize("hasRole('PATIENT')")
+    public ResponseEntity<Void> setPatientConsultationVisibility(
+            @PathVariable Long id,
+            @RequestParam boolean hidden,
+            Authentication authentication) {
+
+        // Get patient ID from authenticated principal
+        // Assuming your UserDetails implementation or Principal stores the User entity or its ID
+        Long patientId = getUserIdFromAuthentication(authentication); // Helper method needed
+
+        consultationService.setConsultationVisibilityForPatient(id, patientId, hidden);
+        return ResponseEntity.ok().build();
+    }
+
+    // Endpoint for DOCTOR to set consultation visibility
+    @PutMapping("/{id}/visibility/doctor")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<Void> setDoctorConsultationVisibility(
+            @PathVariable Long id,
+            @RequestParam boolean hidden,
+            Authentication authentication) {
+
+        // Get doctor ID from authenticated principal
+        Long doctorId = getUserIdFromAuthentication(authentication); // Helper method needed
+
+        consultationService.setConsultationVisibilityForDoctor(id, doctorId, hidden);
+        return ResponseEntity.ok().build();
+    }
+
+    // Helper method to extract User ID from Authentication Principal
+    // Adjust this based on your actual Principal object structure
+    private Long getUserIdFromAuthentication(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new SecurityException("Authentication required.");
+        }
+        Object principal = authentication.getPrincipal();
+
+        // Check if the principal is an instance of CustomUserDetails
+        if (principal instanceof CustomUserDetails) {
+            return ((CustomUserDetails) principal).getId(); // Correctly cast and get ID
+        }
+        // Add checks for other potential principal types if necessary
+        // else if (principal instanceof AnotherType) { ... }
+        else {
+            // Log the actual type for debugging if needed
+            System.err.println("Unexpected principal type: " + principal.getClass().getName());
+            throw new SecurityException("Could not extract user ID from principal of type: " + principal.getClass().getName());
+        }
+    }
 }

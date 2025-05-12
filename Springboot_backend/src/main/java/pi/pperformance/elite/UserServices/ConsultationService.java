@@ -44,8 +44,8 @@ public class ConsultationService implements IConsultationService {
         if (!patientRepository.existsById(patientId)) {
              throw new ResourceNotFoundException("Patient not found with id: " + patientId);
         }
-        // Corrected repository method name
-        return consultationRepository.findByPatient_IdOrderByDateConsultationDesc(patientId);
+        // Use the correct repository method filtering by isHiddenForPatient
+        return consultationRepository.findByPatient_IdAndIsHiddenForPatientFalseOrderByDateConsultationDesc(patientId);
     }
 
     // Updated method signature to include doctorId and cabinetId
@@ -119,8 +119,8 @@ public class ConsultationService implements IConsultationService {
         if (!userRepository.existsById(doctorId)) {
             throw new ResourceNotFoundException("Doctor not found with id: " + doctorId);
         }
-        // Assuming ConsultationRepository has findByDoctor_IdOrderByDateConsultationDesc
-        return consultationRepository.findByDoctor_IdOrderByDateConsultationDesc(doctorId);
+        // Use the correct repository method filtering by isHiddenForDoctor
+        return consultationRepository.findByDoctor_IdAndIsHiddenForDoctorFalseOrderByDateConsultationDesc(doctorId);
     }
 
 
@@ -147,8 +147,8 @@ public class ConsultationService implements IConsultationService {
     @Override
     public List<Consultation> getAllConsultations() {
         // Basic implementation - returns all. Needs refinement for dashboard filtering (by cabinet, doctor, role etc.)
-        // This will likely require SecurityContextHolder to get current user/role and potentially custom queries.
-        return consultationRepository.findAll(); // Placeholder
+        // This should ideally depend on the user's role. Assuming it's for doctors/assistants for now.
+        return consultationRepository.findAllByIsHiddenForDoctorFalse();
     }
 
     @Override
@@ -174,8 +174,8 @@ public class ConsultationService implements IConsultationService {
             throw new ResourceNotFoundException("Cabinet not found with id: " + cabinetId);
         }
 
-        // Fetch consultations filtered by patient and cabinet (using IdSite)
-        List<Consultation> consultations = consultationRepository.findByPatient_IdAndCabinet_IdSiteOrderByDateConsultationDesc(patientId, cabinetId); // Corrected method name
+        // Fetch consultations filtered by patient, cabinet, and isHiddenForPatient
+        List<Consultation> consultations = consultationRepository.findByPatient_IdAndCabinet_IdSiteAndIsHiddenForPatientFalseOrderByDateConsultationDesc(patientId, cabinetId); // Corrected method name
 
         // Map List<Consultation> to List<ConsultationDTO>
         return consultations.stream()
@@ -200,5 +200,37 @@ public class ConsultationService implements IConsultationService {
         return consultationRepository.findByIdWithDetails(consultationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Consultation not found with id: " + consultationId + " or required details are missing."));
         // This ensures Patient, Cabinet, Doctor (via Cabinet), and Prescription are loaded if they exist.
+    }
+
+    @Override
+    @Transactional
+    public void setConsultationVisibilityForPatient(Long consultationId, Long patientId, boolean isHidden) {
+        Consultation consultation = consultationRepository.findById(consultationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Consultation not found with id: " + consultationId));
+
+        // Verify the patient ID matches the consultation's patient
+        if (consultation.getPatient() == null || !consultation.getPatient().getId().equals(patientId)) {
+            // Or throw an authorization exception
+            throw new SecurityException("Patient ID mismatch or consultation has no patient.");
+        }
+
+        consultation.setHiddenForPatient(isHidden);
+        consultationRepository.save(consultation);
+    }
+
+    @Override
+    @Transactional
+    public void setConsultationVisibilityForDoctor(Long consultationId, Long doctorId, boolean isHidden) {
+        Consultation consultation = consultationRepository.findById(consultationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Consultation not found with id: " + consultationId));
+
+        // Verify the doctor ID matches the consultation's doctor
+        if (consultation.getDoctor() == null || !consultation.getDoctor().getId().equals(doctorId)) {
+            // Or throw an authorization exception
+            throw new SecurityException("Doctor ID mismatch or consultation has no doctor.");
+        }
+
+        consultation.setHiddenForDoctor(isHidden);
+        consultationRepository.save(consultation);
     }
 }

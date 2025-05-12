@@ -565,9 +565,15 @@ const ConsultationPage = () => {
     };
 
     const handleExamRedirect = () => {
-        // Removed the check for savedConsultationId. It should be populated by the draft creation logic on load.
-        // If it's somehow still null, the exam form itself will show an error.
-        // Pass patientId, appointmentId, AND the (potentially draft) consultationId
+        // Check if in new mode and consultation hasn't been saved yet
+        if (!isEditMode && !savedConsultationId) {
+            setError(t('consultation.error.cannotGenerateExam', "Erreur: Données patient, médecin ou consultation manquantes pour générer l'examen. Assurez-vous que la consultation est enregistrée."));
+            console.error("Cannot navigate to exam page: Consultation not saved yet.", { patient, user, savedConsultationId });
+            return; // Stop execution
+        }
+
+        // If saved or in edit mode, proceed with navigation
+        // Pass patientId, appointmentId, AND the savedConsultationId
         // Corrected: Use patient?.id instead of patient?.idPatient
         navigate(`/consultation/exam/new?patientId=${patient?.id}&appointmentId=${appointmentId}&consultationId=${savedConsultationId}`);
     };
@@ -675,14 +681,19 @@ const ConsultationPage = () => {
                 <button onClick={handlePrint} className="btn btn-info" style={{ marginRight: '10px' }}>
                     🖨️ {t('consultation.button.print')}
                 </button>
-                {/* Exam button is now always visible */}
-                <button onClick={handleExamRedirect} className="btn btn-warning" style={{ marginRight: '10px' }}>
-                    🔬 {t('consultation.button.exam')}
-                </button>
-                 {/* Navigate to Certificate Page Button */}
-                 <button onClick={handleNavigateToCertificate} className="btn btn-success">
-                    📄 {t('consultation.button.certificate', 'Certificat Médical')} {/* Add translation key */}
-                 </button>
+                {/* Conditionally render Exam and Certificate buttons only if page was loaded for a NEW consultation */}
+                {!consultationId && ( // Use consultationId from useParams() here
+                    <>
+                        {/* Exam button */}
+                        <button onClick={handleExamRedirect} className="btn btn-warning" style={{ marginRight: '10px' }}>
+                            🔬 {t('consultation.button.exam')}
+                        </button>
+                        {/* Navigate to Certificate Page Button */}
+                        <button onClick={handleNavigateToCertificate} className="btn btn-success">
+                            📄 {t('consultation.button.certificate', 'Certificat Médical')}
+                        </button>
+                    </>
+                )}
             </div>
  
             {/* Removed Certificate Modal Rendering */}

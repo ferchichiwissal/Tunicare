@@ -34,6 +34,9 @@ public class Consultation implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
+    private boolean isHiddenForDoctor = false; // Field for doctor visibility
+    private boolean isHiddenForPatient = false; // Field for patient visibility
+
     // Relationship: Patient 'consulter' Consultation (1 to *)
     @ManyToOne
     @JoinColumn(name = "idPatient")
@@ -115,6 +118,14 @@ public class Consultation implements Serializable {
         return certificate;
     }
 
+    public boolean isHiddenForDoctor() { // Getter for doctor visibility
+        return isHiddenForDoctor;
+    }
+
+    public boolean isHiddenForPatient() { // Getter for patient visibility
+        return isHiddenForPatient;
+    }
+
     // Setters (excluding idConsultation and text which are already defined)
     public void setDateConsultation(Date dateConsultation) {
         this.dateConsultation = dateConsultation;
@@ -148,6 +159,14 @@ public class Consultation implements Serializable {
 
     public void setCertificate(Certificate certificate) {
         this.certificate = certificate;
+    }
+
+    public void setHiddenForDoctor(boolean hiddenForDoctor) { // Setter for doctor visibility
+        this.isHiddenForDoctor = hiddenForDoctor;
+    }
+
+    public void setHiddenForPatient(boolean hiddenForPatient) { // Setter for patient visibility
+        this.isHiddenForPatient = hiddenForPatient;
     }
 
     @PrePersist

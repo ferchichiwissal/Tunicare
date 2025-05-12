@@ -6,9 +6,11 @@ import org.springframework.data.repository.query.Param; // Import Param
 import org.springframework.stereotype.Repository;
 import pi.pperformance.elite.entities.Consultation;
 import pi.pperformance.elite.entities.Doctor; // Import Doctor
-import pi.pperformance.elite.entities.Patient; // Import Patient
-import pi.pperformance.elite.entities.CabinetDr; // Import CabinetDr
-import java.time.LocalDateTime; // Import LocalDateTime
+import pi.pperformance.elite.entities.Patient;
+import pi.pperformance.elite.entities.CabinetDr;
+import pi.pperformance.elite.dto.MonthlyStatDTO; // Ajout pour les graphiques
+import java.time.LocalDateTime;
+import java.util.Date; // Ajout pour les méthodes de statistiques
 
 import java.util.List;
 import java.util.Optional; // Import Optional
@@ -16,13 +18,17 @@ import java.util.Optional; // Import Optional
 @Repository
 public interface ConsultationRepository extends JpaRepository<Consultation, Long> {
 
-    // Find consultations by patient ID, ordered by date descending (for history)
-    List<Consultation> findByPatient_IdOrderByDateConsultationDesc(Long patientId);
+    // Find consultations by patient ID, ordered by date descending (for patient history view)
+    List<Consultation> findByPatient_IdAndIsHiddenForPatientFalseOrderByDateConsultationDesc(Long patientId);
 
-    // Find consultations by doctor ID, ordered by date descending
-    List<Consultation> findByDoctor_IdOrderByDateConsultationDesc(Long doctorId);
-// Find consultations by patient ID AND cabinet ID (using idSite), ordered by date descending (for patient's view)
-List<Consultation> findByPatient_IdAndCabinet_IdSiteOrderByDateConsultationDesc(Long patientId, Long cabinetId); // Corrected: Use IdSite
+    // Find consultations by doctor ID, ordered by date descending (for doctor dashboard view)
+    List<Consultation> findByDoctor_IdAndIsHiddenForDoctorFalseOrderByDateConsultationDesc(Long doctorId);
+
+    // Find consultations by patient ID AND cabinet ID, ordered by date descending (for patient's "My Consultations" view in a specific cabinet)
+    List<Consultation> findByPatient_IdAndCabinet_IdSiteAndIsHiddenForPatientFalseOrderByDateConsultationDesc(Long patientId, Long cabinetId);
+
+    // Find all consultations visible to doctors (e.g., for general doctor/assistant dashboard)
+    List<Consultation> findAllByIsHiddenForDoctorFalse();
 
     // Add other custom query methods if needed later
 
@@ -39,4 +45,19 @@ List<Consultation> findByPatient_IdAndCabinet_IdSiteOrderByDateConsultationDesc(
            "LEFT JOIN FETCH c.prescribedMedications " +
            "WHERE c.idConsultation = :consultationId")
    Optional<Consultation> findByIdWithDetails(@Param("consultationId") Long consultationId);
+
+    // Méthodes pour StatisticsService
+    long countByDoctorAndCabinetAndDateConsultationBetween(Doctor doctor, CabinetDr cabinet, Date startDate, Date endDate);
+    long countByPatientAndCabinet(Patient patient, CabinetDr cabinet);
+
+    // For Admin statistics: Count all consultations created within a specific period
+    long countByDateConsultationBetween(Date startDate, Date endDate);
+
+    // For Patient graph: Count consultations by month for the last 12 months
+    @Query("SELECT new pi.pperformance.elite.dto.MonthlyStatDTO(YEAR(c.dateConsultation), MONTH(c.dateConsultation), COUNT(c)) " +
+           "FROM Consultation c " +
+           "WHERE c.patient.id = :patientId AND c.cabinet.idSite = :cabinetId AND c.dateConsultation >= :startDate " +
+           "GROUP BY YEAR(c.dateConsultation), MONTH(c.dateConsultation) " +
+           "ORDER BY YEAR(c.dateConsultation) DESC, MONTH(c.dateConsultation) DESC")
+    List<MonthlyStatDTO> countConsultationsByMonthForPatientAndCabinet(@Param("patientId") Long patientId, @Param("cabinetId") Long cabinetId, @Param("startDate") Date startDate);
 }

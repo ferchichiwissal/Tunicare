@@ -1,5 +1,9 @@
 package pi.pperformance.elite.UserServices;
 
+import java.io.IOException; // Added import
+import org.springframework.web.multipart.MultipartFile; // Added import
+import pi.pperformance.elite.exceptions.ResourceNotFoundException; // Added import
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -285,18 +289,18 @@ public class UserServiceImplmnt implements UserServiceInterface {
     }
 
     // Updates a user's information using DTO; throws AccountNotFoundException if not found
-    @Override // Ensure Override annotation is present
-    @Transactional // Add Transactional to ensure changes are persisted within a transaction
-    public User updateUser(Long id, UserUpdateDTO userDetailsDTO) {
-        // Permission check (optional but recommended)
-        // User actor = getCurrentAuthenticatedUser(); // Get logged-in user
-        // User targetUser = UsrRepo.findById(id).orElseThrow(...); // Get target
-        // checkCabinetPermission(actor, targetUser); // Check if actor can update target
+    // @Override // This method signature will change, so @Override might not apply if not in interface
+    @Transactional
+    public User updateUserAndPhoto(Long id, UserUpdateDTO userDetailsDTO, MultipartFile photoProfilFile) throws IOException {
+        log.info("Attempting to update user ID: {} with DTO and potentially a profile picture.", id);
 
         User user = UsrRepo.findById(id)
-                .orElseThrow(() -> new AccountNotFoundException("User with ID " + id + " not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {} during update.", id);
+                    return new AccountNotFoundException("User with ID " + id + " not found");
+                });
 
-        // Update fields only if they are provided in the DTO (non-null)
+        // Update text fields from DTO
         if (userDetailsDTO.getFirstName() != null) {
             user.setFirstName(userDetailsDTO.getFirstName());
         }
@@ -312,21 +316,41 @@ public class UserServiceImplmnt implements UserServiceInterface {
         if (userDetailsDTO.getBirthDate() != null) {
             user.setBirthDate(userDetailsDTO.getBirthDate());
         }
-        if (userDetailsDTO.getGender() != null) {
-            user.setGender(userDetailsDTO.getGender());
-        }
+        // Gender is not in UserUpdateDTO based on EditUserForm.js
+        // if (userDetailsDTO.getGender() != null) {
+        //     user.setGender(userDetailsDTO.getGender());
+        // }
         if (userDetailsDTO.getEmail() != null) {
-            // Add validation here if email needs to be unique and is allowed to change
-            // Example: check if another user already has this email
+            // Consider uniqueness validation if email can be changed and must be unique
             user.setEmail(userDetailsDTO.getEmail());
         }
 
-        // Do NOT update password, role, or isActive status here.
-        // Use dedicated methods/endpoints for those sensitive operations.
+        // Process the new profile picture if provided
+        if (photoProfilFile != null && !photoProfilFile.isEmpty()) {
+            log.debug("Processing new profile picture for user ID: {}", id);
+            try {
+                // Basic validation (already done in controller, but good for service layer too)
+                if (!photoProfilFile.getContentType().startsWith("image/")) {
+                    log.warn("Invalid profile picture type for user ID {}: {}", id, photoProfilFile.getContentType());
+                    throw new IOException("Invalid file type. Only images are allowed.");
+                }
+                if (photoProfilFile.getSize() > 5 * 1024 * 1024) { // 5MB limit
+                    log.warn("Profile picture size {} exceeds limit for user ID {}", photoProfilFile.getSize(), id);
+                    throw new IOException("File size exceeds the limit of 5 MB.");
+                }
+                byte[] photoBytes = photoProfilFile.getBytes();
+                user.setPhotoProfil(photoBytes);
+                log.debug("New profile picture byte array set for user ID: {}", id);
+            } catch (IOException e) {
+                log.error("Failed to read bytes from profile picture file for user ID: {}", id, e);
+                throw e; // Re-throw to be handled by the controller
+            }
+        }
 
-        user.setUpdatedAt(LocalDate.now()); // Update the timestamp
-
-        return UsrRepo.save(user); // Save the updated user
+        user.setUpdatedAt(LocalDate.now());
+        User savedUser = UsrRepo.save(user);
+        log.info("Successfully updated user ID: {}", id);
+        return savedUser;
     }
 
 
@@ -1579,4 +1603,6 @@ private Patient addPatient(Patient patient, Long targetCabinetId, boolean passwo
         return patientOpt;
     }
     // --- End Implementation for findActivePatientByCabinetAndName ---
+// The updateUserProfilePicture method is now integrated into updateUserAndPhoto
+// and can be removed if no longer called directly.
 }

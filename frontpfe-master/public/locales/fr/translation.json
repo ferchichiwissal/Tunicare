@@ -136,6 +136,18 @@
         "label": "Appels téléphoniques effectués",
         "title": "Appels téléphoniques effectués par mois",
         "yAxisLabel": "Appels téléphoniques"
+      },
+      "patient": {
+        "charts": {
+          "consultationsPerMonth": {
+            "label": "Consultations par mois",
+            "title": "Évolution des consultations/mois"
+          },
+          "examsPerMonth": {
+            "label": "Examens par mois",
+            "title": "Évolution des examens/mois"
+          }
+        }
       }
     },
     "tooltips": {
@@ -153,6 +165,52 @@
       "notProvided": "Non fourni",
       "notAvailable": "N/D",
       "specialtyLabel": "Spécialité"
+    },
+    "patient": {
+      "pendingAppointments": "RDV en attente",
+      "availableCertificates": "Certificats disponibles",
+      "totalConsultations": "Total Consultations",
+      "totalExams": "Total Examens",
+      "nextAppointmentReminder": "Prochain RDV Accepté",
+      "appointmentDetails": "Le {{date}} à {{time}} avec Dr. {{doctor}} ({{cabinet}})"
+    },
+    "doctor": {
+      "pendingConfirmationAppointments": "RDV à confirmer",
+      "pendingExaminationRequests": "Demandes d'examen en attente",
+      "unreadExaminationResults": "Résultats d'examen non lus",
+      "appointmentCompletionRateWeek": "Taux RDV (Semaine)",
+      "appointmentCompletionRateMonth": "Taux RDV (Mois)",
+      "appointmentsToday": "RDV Acceptés Aujourd'hui",
+      "consultationsToday": "Consultations Réalisées Aujourd'hui",
+      "totalPatients": "Total Patients au Cabinet",
+      "upcomingAppointmentsTitle": "RDV à Venir Aujourd'hui",
+      "pendingPatientRegistrations": "Inscriptions de Patients en Attente"
+    },
+    "doctorCentre": {
+      "examsPerformedToday": "Examens Aujourd'hui",
+      "averageProcessingTime": "Délai Traitement Moyen",
+      "pendingExams": "Examens en Attente",
+      "upcomingExamsTitle": "Examens à Venir Aujourd'hui"
+    },
+    "admin": {
+      "totalUsers": "Total Utilisateurs",
+      "totalPatients": "Total Patients",
+      "totalDoctors": "Total Médecins",
+      "totalAssistants": "Total Assistants",
+      "totalDoctorCentres": "Total Médecins de Centre",
+      "totalCabinets": "Total Cabinets",
+      "totalExamCentres": "Total Centres d'Examen",
+      "newUsersThisWeek": "Nvx Utilisateurs (Semaine)",
+      "newUsersThisMonth": "Nvx Utilisateurs (Mois)",
+      "appointmentsToday": "RDV Créés (Aujourd'hui)",
+      "appointmentsThisWeek": "RDV Créés (Semaine)",
+      "appointmentsThisMonth": "RDV Créés (Mois)",
+      "consultationsToday": "Consultations (Aujourd'hui)",
+      "consultationsThisWeek": "Consultations (Semaine)",
+      "consultationsThisMonth": "Consultations (Mois)",
+      "examsToday": "Examens Demandés (Aujourd'hui)",
+      "examsThisWeek": "Examens Demandés (Semaine)",
+      "examsThisMonth": "Examens Demandés (Mois)"
     }
   },
   "editUserForm": {
@@ -164,7 +222,9 @@
       "email": "E-mail",
       "birthDate": "Date de naissance",
       "telephone": "Téléphone",
-      "address": "Adresse"
+      "address": "Adresse",
+      "profilePicture": "Photo de profil",
+      "changePicture": "Changer la photo"
     },
     "placeholders": {
       "firstName": "Entrez le prénom",
@@ -174,10 +234,13 @@
     },
     "buttons": {
       "updating": "Mise à jour...",
-      "updateUser": "Mettre à jour l'utilisateur"
+      "updateUser": "Mettre à jour l'utilisateur",
+      "uploadPicture": "Télécharger la photo",
+      "uploading": "Téléchargement..."
     },
     "alerts": {
       "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
+      "uploadSuccess": "Photo de profil mise à jour avec succès !",
       "noChanges": "Aucun changement détecté.",
       "updateSuccess": "Utilisateur mis à jour avec succès !"
     },
@@ -202,6 +265,12 @@
         "notFound": "Utilisateur introuvable.",
         "generic": "Échec de la mise à jour de l'utilisateur. Veuillez réessayer.",
         "networkError": "Erreur réseau ou serveur indisponible. Veuillez réessayer."
+      },
+      "upload": {
+        "invalidType": "Type de fichier invalide. Seules les images sont autorisées.",
+        "sizeLimit": "La taille du fichier dépasse la limite de 5 Mo.",
+        "noFileSelected": "Aucun fichier sélectionné.",
+        "generic": "Échec du téléchargement de l'image."
       }
     }
   },
@@ -368,7 +437,9 @@
         "tel": "Téléphone",
         "address": "Adresse",
         "gender": "Genre",
-        "speciality": "Spécialité"
+        "speciality": "Spécialité",
+        "profilePicture": "Photo de profil",
+        "changePicture": "Changer la photo"
       },
       "genderOptions": {
         "select": "Sélectionnez Genre...",
@@ -379,17 +450,27 @@
       "buttons": {
         "updating": "Mise à jour...",
         "update": "Mettre à jour Médecin",
-        "cancel": "Annuler"
+        "cancel": "Annuler",
+        "uploadPicture": "Télécharger la photo",
+        "uploading": "Téléchargement..."
       },
       "alerts": {
         "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
-        "updateSuccess": "Détails du médecin mis à jour avec succès !"
+        "uploadSuccess": "Photo de profil mise à jour avec succès !",
+        "updateSuccess": "Détails du médecin mis à jour avec succès !",
+        "noChanges": "Aucun changement détecté."
       },
       "errors": {
         "fetchFailed": "Échec du chargement des données du médecin.",
-        "updateFailed": "Échec de la mise à jour des détails du médecin"
+        "updateFailed": "Échec de la mise à jour des détails du médecin",
+        "upload": {
+          "invalidType": "Type de fichier invalide. Seules les images sont autorisées.",
+          "sizeLimit": "La taille du fichier dépasse la limite de 5 Mo.",
+          "noFileSelected": "Aucun fichier sélectionné.",
+          "generic": "Échec du téléchargement de l'image."
+        }
       }
-  },
+    },
   "tovalidate": {
     "title": "Utilisateurs en attente de validation",
     "searchPlaceholder": "Rechercher par prénom et nom (ex: Jean Dupont)",
@@ -1051,14 +1132,19 @@
       "noConsultations": "Aucune consultation trouvée."
     },
     "buttons": {
-      "viewDetails": "Afficher Détails"
+      "viewDetails": "Afficher Détails",
+      "hideConsultation": "Ne plus afficher"
     },
     "errors": {
       "missingDoctorId": "Impossible de récupérer l'ID du médecin connecté.",
-      "fetchFailedFallback": "Échec de la récupération de vos consultations."
+      "fetchFailedFallback": "Échec de la récupération de vos consultations.",
+      "hideFailedFallback": "Échec du masquage de la consultation."
     },
     "alerts": {
-        "sessionExpired": "Session expirée. Veuillez vous reconnecter."
+        "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+        "confirmHide": "Êtes-vous sûr de vouloir masquer cette consultation ? Elle ne sera plus visible dans cette liste.",
+        "hideSuccess": "Consultation masquée avec succès.",
+        "hideError": "Erreur lors du masquage de la consultation."
     }
   },
   "common": {
@@ -1253,24 +1339,33 @@
       "downloadInvalidResponse": "Impossible de télécharger l'ordonnance (réponse invalide).",
       "prescriptionNotFound": "Aucune ordonnance trouvée pour cette consultation.",
       "downloadFailedFallback": "Échec du téléchargement de l'ordonnance.",
-      "authError": "Erreur d'authentification. Veuillez vous reconnecter."
+      "authError": "Erreur d'authentification. Veuillez vous reconnecter.",
+      "certificateNotFound": "Certificat introuvable pour cette consultation.",
+      "hideFailedFallback": "Échec du masquage de la consultation."
     },
     "alerts": {
-      "sessionExpired": "Session expirée. Veuillez vous reconnecter."
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+      "confirmHide": "Êtes-vous sûr de vouloir masquer cette consultation ? Elle ne sera plus visible dans cette liste.",
+      "hideSuccess": "Consultation masquée avec succès.",
+      "hideError": "Échec du masquage de la consultation."
     },
     "table": {
       "date": "Date",
       "type": "Type",
       "prescription": "Ordonnance",
+      "certificate": "Certificat",
+      "actions": "Actions",
       "notAvailable": "N/D",
       "invalidDate": "Date invalide",
       "defaultType": "Consultation Générale",
       "noConsultations": "Vous n'avez aucune consultation enregistrée."
     },
     "buttons": {
-      "download": "Télécharger",
-      "downloadedCertificate": "Télécharger"
-    }
+      "download": "Télécharger Ordonnance",
+      "downloadedCertificate": "Télécharger Certificat",
+      "hideConsultation": "Ne plus afficher"
+    },
+    "checking": "Vérification..."
   },
   "myExaminationsPage": {
     "title": "Mes Demandes d'Examen",

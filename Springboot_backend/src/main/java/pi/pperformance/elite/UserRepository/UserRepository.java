@@ -16,6 +16,7 @@ import pi.pperformance.elite.entities.Doctor; // Add import
 import pi.pperformance.elite.entities.Assistant; // Add import
 import pi.pperformance.elite.entities.Admin; // Add import
 import java.util.Optional; // Add import
+import java.time.LocalDate; // Add import for LocalDate
 
 //the repository interface, it doesn't contain any function they're all comming from the interface "JPARepository" , we'll add others if we needed
 @Repository
@@ -105,4 +106,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT p FROM Patient p JOIN p.registrations r WHERE p.email = :email AND r.cabinet.idSite = :cabinetId")
     Optional<Patient> findPatientByEmailAndCabinetId(@Param("email") String email, @Param("cabinetId") Long cabinetId);
 
+    long countByRole(Role role); // Ajout pour les statistiques globales
+
+    // Find a Doctor by their associated CabinetDr
+    @Query("SELECT d FROM Doctor d WHERE d.cabinet = :cabinet")
+    Optional<Doctor> findDoctorByCabinet(@Param("cabinet") CabinetDr cabinet);
+
+    // Count new Assistants created today for a specific cabinet
+    @Query("SELECT COUNT(a) FROM Assistant a WHERE a.cabinet = :cabinet AND a.createdAt = :createdAt")
+    long countAssistantsByCabinetAndCreatedAt(@Param("cabinet") CabinetDr cabinet, @Param("createdAt") LocalDate createdAt);
+
+    // For Admin statistics: Count all users created within a specific period
+    long countByCreatedAtBetween(LocalDate startDateTime, LocalDate endDateTime);
 }

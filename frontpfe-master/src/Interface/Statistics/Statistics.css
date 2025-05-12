@@ -92,3 +92,16 @@
     border-bottom: 1px solid #eee;
     padding-bottom: 5px;
 }
+.total-exams-month {
+    margin-left: 20px; /* Add some space to the left */
+    padding: 8px 12px;
+    background-color: #d1ecf1; /* Light cyan background */
+    border: 1px solid #bee5eb; /* Cyan border */
+    border-radius: 4px;
+    color: #0c5460; /* Dark cyan text */
+    font-size: 0.95em;
+}
+
+.total-exams-month strong {
+    font-weight: 600; /* Slightly bolder than normal but not overly so */
+}

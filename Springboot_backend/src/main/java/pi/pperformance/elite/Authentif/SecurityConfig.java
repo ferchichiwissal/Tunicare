@@ -78,7 +78,10 @@ public class SecurityConfig {
 
                 // Specific endpoint for patients to view their own consultations in a cabinet
                 .requestMatchers("/api/consultations/my-consultations/**").authenticated() // Allow any authenticated user, @PreAuthorize will check role/ID match
-                // Other Consultation endpoints (Doctors/Assistants)
+                // NEW: Allow authenticated users to update visibility (PreAuthorize handles roles)
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/consultations/*/visibility/patient").authenticated()
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/consultations/*/visibility/doctor").authenticated()
+                // Other Consultation endpoints (Doctors/Assistants) - This should come AFTER more specific rules
                 .requestMatchers("/api/consultations/**").hasAnyRole("DOCTOR", "ASSISTANT") // This rule now applies to remaining /api/consultations paths
 
                 // --- Medical Examination Endpoints ---
@@ -105,6 +108,13 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/doctor-centre-examen/signature").hasRole("DOCTOR_CENTRE_EXAMEN") // Upload signature
                 // Statistics for DOCTOR_CENTRE_EXAMEN
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/center/exams-by-doctor").hasRole("DOCTOR_CENTRE_EXAMEN")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/dashboard/doctor-centre").hasRole("DOCTOR_CENTRE_EXAMEN") // Dashboard stats
+                // Statistics for ADMIN
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/dashboard/admin").hasRole("ADMIN") // Admin Dashboard stats
+                // Statistics for PATIENT graphs
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/patient/consultations-per-month").hasRole("PATIENT")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/patient/exams-per-month").hasRole("PATIENT")
+
 
                 // --- Report Model Endpoints ---
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/modeles-compte-rendu").hasAnyRole("DOCTOR_CENTRE_EXAMEN", "ADMIN") // List models

@@ -1,22 +1,22 @@
 package pi.pperformance.elite.dto;
 
 public class MonthlyStatDTO {
-    private String month; // e.g., "January", "February"
+    private int month; // Changed to int
     private int year;
     private Long count;
 
-    public MonthlyStatDTO(String month, int year, Long count) {
-        this.month = month;
+    public MonthlyStatDTO(int year, int month, Long count) { // Constructor updated
         this.year = year;
+        this.month = month;
         this.count = count;
     }
 
     // Getters and Setters
-    public String getMonth() {
+    public int getMonth() { // Getter updated
         return month;
     }
 
-    public void setMonth(String month) {
+    public void setMonth(int month) { // Setter updated
         this.month = month;
     }
 

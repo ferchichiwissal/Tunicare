@@ -1,24 +1,31 @@
- import React, { useEffect, useState } from "react";
+ import React, { useEffect, useState, useContext } from "react"; // Added useContext
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 import { Line, Bar } from 'react-chartjs-2';
 import { jwtDecode } from "jwt-decode";
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
-import './dashboard.css';  // Make sure the styles are loaded
-import Chatbot from './Chatbot'; // Import the Chatbot component
-import './Chatbot.css'; // Import the Chatbot CSS
- 
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineElement, PointElement } from 'chart.js'; // Added LineElement, PointElement
+import './dashboard.css';
+import Chatbot from './Chatbot';
+import './Chatbot.css';
+import { useAuth } from '../context/AuthContext'; // Import useAuth
+import apiClient from '../utils/apiClient'; // Import apiClient
+
 // Register chart elements
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
-const INACTIVITY_TIMEOUT = 30 * 1000; // 1 minute
- 
-const Dashboard = ({ onLogout }) => {
-  const [user, setUser] = useState(null);
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineElement, PointElement); // Added LineElement, PointElement
+const INACTIVITY_TIMEOUT = 1 * 60 * 1000; // 1 minute
+
+const Dashboard = ({ onLogout }) => { 
+  // const [user, setUser] = useState(null); // Will be replaced by useAuth()
+  const { user: authUser, token } = useAuth(); // Use user from AuthContext
   const [loading, setLoading] = useState(true);
   const [sessionExpired, setSessionExpired] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // State for sidebar visibility
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [dashboardStats, setDashboardStats] = useState(null); // State for statistics
+  const [statsLoading, setStatsLoading] = useState(true); // Loading state for statistics
+  // const [patientConsultationsChartData, setPatientConsultationsChartData] = useState(null); // Supprimé
+  // const [patientExamsChartData, setPatientExamsChartData] = useState(null); // Supprimé
   const navigate = useNavigate();
-  const { t } = useTranslation(); // Get translation function
+  const { t } = useTranslation();
 
   // Perform logout and redirect
   const performLogout = () => {
@@ -68,10 +75,14 @@ const Dashboard = ({ onLogout }) => {
     const resetInactivityTimer = () => {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
-        setSessionExpired(true);
-        onLogout();
-        alert(t('sessionExpiredAlert')); // Use translation key for alert
-        navigate("/sign-in");
+        setSessionExpired(true); // Mark the session as expired
+        if (onLogout && typeof onLogout === 'function') {
+            onLogout(); // Call the onLogout function passed as a prop
+        } else {
+            performLogout(); // Fallback if onLogout is not a valid function
+        }
+        alert(t('sessionExpiredAlert')); 
+        navigate("/sign-in"); // Redirect to the login page
       }, INACTIVITY_TIMEOUT);
     };
 
@@ -79,11 +90,11 @@ const Dashboard = ({ onLogout }) => {
     events.forEach((event) => window.addEventListener(event, resetInactivityTimer));
     resetInactivityTimer();
 
-    return () => {
+    return () => { // Cleanup on component unmount
       clearTimeout(inactivityTimer);
       events.forEach((event) => window.removeEventListener(event, resetInactivityTimer));
     };
-  }, [onLogout, navigate]);
+  }, [onLogout, navigate, t, INACTIVITY_TIMEOUT]); // Added t and INACTIVITY_TIMEOUT to dependencies
 
   // Toggle sidebar visibility
   const toggleSidebar = () => {
@@ -93,25 +104,72 @@ const Dashboard = ({ onLogout }) => {
   // Fetch user data on component mount
   useEffect(() => {
     const fetchUser = () => {
-      const storedUser = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user"));
-      if (storedUser) {
-        setUser(storedUser);
+      // Use authUser from context instead of reading directly from localStorage
+      if (authUser) {
+        // setUser(authUser); // No longer needed if using authUser directly
         setLoading(false);
-      } else {
+      } else if (!token && !loading) { // If no token and initial context loading is finished
         navigate("/sign-in");
       }
     };
     fetchUser();
-  }, [navigate]);
- 
+  }, [authUser, token, loading, navigate]);
+
+  // Fetch dashboard statistics based on user role
+  useEffect(() => {
+    if (authUser && authUser.role) {
+      setStatsLoading(true);
+      let statsEndpoint = "";
+      if (authUser.role === "DOCTOR") {
+        statsEndpoint = "/api/statistics/dashboard/doctor";
+      } else if (authUser.role === "PATIENT") {
+        statsEndpoint = "/api/statistics/dashboard/patient";
+      } else if (authUser.role === "DOCTOR_CENTRE_EXAMEN") {
+        statsEndpoint = "/api/statistics/dashboard/doctor-centre";
+      } else if (authUser.role === "ADMIN") {
+        statsEndpoint = "/api/statistics/dashboard/admin";
+      } else if (authUser.role === "ASSISTANT") {
+        statsEndpoint = "/api/statistics/dashboard/assistant";
+      }
+      // Could add other roles if necessary
+
+      if (statsEndpoint) {
+        apiClient.get(statsEndpoint)
+          .then(response => {
+            setDashboardStats(response.data);
+            setStatsLoading(false);
+          })
+          .catch(error => {
+            console.error("Error fetching dashboard statistics:", error);
+            setStatsLoading(false);
+            // Handle the error, maybe display a message
+          });
+      } else {
+        setStatsLoading(false); // No endpoint for this role
+      }
+    }
+
+    // La logique de fetch pour les graphiques patient a été supprimée ici.
+    // Les données pour la tuile nextAcceptedAppointment sont déjà dans dashboardStats.
+  }, [authUser, t]); // Depends on authUser and t to execute when the user is loaded and for translations
+  
   // ---------------------------------------------------- //
  
   // Redirect if session has expired
   if (sessionExpired) return null;
 
-  if (loading) {
-    return <div>{t('loading')}</div>; // Translate loading text
+  // Display loading if the context user or statistics are loading
+  if (loading || (authUser && statsLoading)) {
+    return <div>{t('loading')}</div>;
   }
+  
+  // If no authenticated user after loading, render nothing or redirect (already handled by useEffect)
+  if (!authUser) {
+    return null; 
+  }
+  
+  // Rename authUser to user for the rest of the component to minimize changes
+  const user = authUser;
 
   // Data for the first chart: Payments Over Time
   const paymentData = {
@@ -216,7 +274,7 @@ const Dashboard = ({ onLogout }) => {
         <a href="/manage-cabinets">{t('nav.manageCabinets')}</a> {/* Link for Admin Cabinets */}
         <a href="/add-centre">{t('nav.addExamCentre')}</a> {/* Link for Admin Centres */}
         <a href="/manage-centres">{t('nav.manageExamCentres')}</a> {/* Link for Admin Centres */}
-        <a href="/admin/manage-report-templates">{t('nav.manageReportTemplates', 'Gérer Modèles Rapports')}</a> {/* Added Manage Report Templates Link */}
+        <a href="/admin/manage-report-templates">{t('nav.manageReportTemplates')}</a> {/* Added Manage Report Templates Link */}
         <a href="/UserManagement">{t('nav.changeRole')}</a>
 
         <a href="/users">{t('nav.doctorsManagement')}</a>
@@ -238,10 +296,12 @@ const Dashboard = ({ onLogout }) => {
 
         <a href="/users">{t('nav.userManagement')}</a> {/* Consider filtering users by their cabinet */}
         <a href="/manage-appointments">{t('nav.manageAppointments')}</a> {/* Added Manage Appointments Link */}
+                <a href="/consultation/all">{t('nav.consultationDashboard')}</a> {/* Added Consultation Dashboard Link */}
+
         <a href="/doctor-examinations">{t('nav.doctorExaminationsDashboard')}</a> {/* Added Doctor Examinations Dashboard Link */}
-        <a href="/doctor-statistics">{t('nav.statistics', 'Statistics')}</a> {/* Added Doctor Statistics Link */}
         {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a> {/* Consider filtering users by their cabinet */}
-        <a href="/consultation/all">{t('nav.consultationDashboard')}</a> {/* Added Consultation Dashboard Link */}
+        <a href="/doctor-statistics">{t('nav.statistics')}</a> {/* Added Doctor Statistics Link */}
+
         <a href="/parametres-cabinet">{t('nav.cabinetSettings')}</a> {/* Added Cabinet Settings Link */}
         <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
         <a href="/change-password">{t('nav.changePassword')}</a>
@@ -303,9 +363,10 @@ const Dashboard = ({ onLogout }) => {
       <>
         <a href="#">{t('nav.dashboard')}</a>
         <a href="/centre-examinations">{t('nav.centreExaminationsDashboard')}</a> {/* Added Centre Examinations Dashboard Link */}
-        <a href="/archived-examinations">{t('nav.archivedExaminations', 'Archive des Examens')}</a> {/* Added Archived Examinations Link */}
-        <a href="/upload-doctor-centre-signature">{t('nav.manageMySignature', 'Gérer ma Signature')}</a> {/* Added Manage Signature Link */}
-        <a href="/center-statistics">{t('nav.statistics', 'Statistics')}</a> {/* Added Center Statistics Link */}
+                <a href="/center-statistics">{t('nav.statistics')}</a> {/* Added Center Statistics Link */}
+
+        <a href="/archived-examinations">{t('nav.archivedExaminations')}</a> {/* Added Archived Examinations Link */}
+        <a href="/upload-doctor-centre-signature">{t('nav.manageMySignature')}</a> {/* Added Manage Signature Link */}
         <a href={`/edit-doctor-centre/${id}`}>{t('nav.editMyAccount')}</a> {/* Reverted to correct route path */}
         <a href="/change-password">{t('nav.changePassword')}</a>
         <a href="/Logout">{t('nav.logout')}</a>
@@ -358,82 +419,503 @@ const Dashboard = ({ onLogout }) => {
   
         <div className="app-body-main-content">
           <section className="service-section">
-            <h2>{t('dashboard.title', { firstName: user.first_name, lastName: user.last_name })}</h2>
+            <h2>{t('dashboard.title', { firstName: user.firstName, lastName: user.lastName })}</h2>
             <div className="tiles">
-              <article className="tile">
-                <div className="tile-header">
-                  <i className="ph-lightning-light"></i>
-                  <h3>
-                    <span>{t('dashboard.tiles.performance.title')}</span>
-                    <span>{t('dashboard.tiles.performance.subtitle')}</span>
-                  </h3>
-                </div>
-                <a href="#">{t('dashboard.tiles.viewDetails')}</a>
-              </article>
-  
-              <article className="tile">
-                <div className="tile-header">
-                  <i className="ph-fire-simple-light"></i>
-                  <h3>
-                    <span>{t('dashboard.tiles.sales.title')}</span>
-                    <span>{t('dashboard.tiles.sales.subtitle', { percentage: 75 })}</span>
-                  </h3>
-                </div>
-                <a href="#">{t('dashboard.tiles.viewDetails')}</a>
-              </article>
-  
-              <article className="tile">
-                <div className="tile-header">
-                  <i className="ph-file-light"></i>
-                  <h3>
-                    <span>{t('dashboard.tiles.teamPerformance.title')}</span>
-                    <span>{t('dashboard.tiles.teamPerformance.subtitle', { team: 'A', percentage: 85 })}</span>
-                  </h3>
-                </div>
-                <a href="#">{t('dashboard.tiles.viewDetails')}</a>
-              </article>
+              {/* Dynamic tiles based on role and dashboardStats */}
+              {user.role === "DOCTOR" && dashboardStats && (
+                <>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-calendar-check-light"></i>
+                      <h3>
+                        <span>{t('dashboard.doctor.appointmentsToday')}</span>
+                        <span>{dashboardStats.todaysAcceptedAppointments}</span>
+                      </h3>
+                    </div>
+                    {/* <a href="#">{t('dashboard.tiles.viewDetails')}</a> */}
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-first-aid-kit-light"></i>
+                      <h3>
+                        <span>{t('dashboard.doctor.consultationsToday')}</span>
+                        <span>{dashboardStats.todaysConsultationsRealized}</span>
+                      </h3>
+                    </div>
+                    {/* <a href="#">{t('dashboard.tiles.viewDetails')}</a> */}
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-users-three-light"></i>
+                      <h3>
+                        <span>{t('dashboard.doctor.totalPatients')}</span>
+                        <span>{dashboardStats.totalPatientsInCabinet}</span>
+                      </h3>
+                    </div>
+                    {/* <a href="#">{t('dashboard.tiles.viewDetails')}</a> */}
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-clock-countdown-light"></i>
+                      <h3>
+                        <span>{t('dashboard.doctor.pendingConfirmationAppointments')}</span>
+                        <span>{dashboardStats.pendingConfirmationAppointmentsCount}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-file-search-light"></i>
+                      <h3>
+                        <span>{t('dashboard.doctor.pendingExaminationRequests')}</span>
+                        <span>{dashboardStats.pendingExaminationRequestsCount}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-envelope-open-light"></i>
+                      <h3>
+                        <span>{t('dashboard.doctor.unreadExaminationResults')}</span>
+                        <span>{dashboardStats.unreadExaminationResultsCount}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-calendar-dots-light"></i> {}
+                      <h3>
+                        <span>{t('dashboard.doctor.totalAppointmentsThisMonth', 'Nombre de RDV (Mois)')}</span>
+                        <span>{dashboardStats.totalAppointmentsThisMonthInCabinet}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-user-list-light"></i> {}
+                      <h3>
+                        <span>{t('dashboard.doctor.newPatientsThisMonth', 'Nouveaux Patients (Mois)')}</span>
+                        <span>{dashboardStats.newPatientsThisMonthInCabinet}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-user-plus-light"></i> {}
+                      <h3>
+                        <span>{t('dashboard.doctor.pendingPatientRegistrations')}</span>
+                        <span>{typeof dashboardStats.pendingPatientRegistrationsCount === 'number' ? dashboardStats.pendingPatientRegistrationsCount : 'N/A'}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  {dashboardStats.upcomingAppointmentsToday && dashboardStats.upcomingAppointmentsToday.length > 0 && (
+                    <article className="tile tile-upcoming-appointments">
+                      <div className="tile-header">
+                        <i className="ph-list-checks-light"></i>
+                        <h3>
+                          <span>{t('dashboard.doctor.upcomingAppointmentsTitle')}</span>
+                        </h3>
+                      </div>
+                      <ul className="upcoming-appointments-list">
+                        {dashboardStats.upcomingAppointmentsToday.map(appt => (
+                          <li key={appt.id}>
+                            {appt.time} - {appt.patientName}
+                          </li>
+                        ))}
+                      </ul>
+                    </article>
+                  )}
+                </>
+              )}
+              {user.role === "PATIENT" && dashboardStats && (
+                <>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-stethoscope-light"></i>
+                      <h3>
+                        <span>{t('dashboard.patient.totalConsultations')}</span>
+                        <span>{dashboardStats.totalConsultations}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-test-tube-light"></i>
+                      <h3>
+                        <span>{t('dashboard.patient.totalExams')}</span>
+                        <span>{dashboardStats.totalExams}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-clock-light"></i>
+                      <h3>
+                        <span>{t('dashboard.patient.pendingAppointments')}</span>
+                        <span>{dashboardStats.pendingAppointmentsCount}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-file-text-light"></i>
+                      <h3>
+                        <span>{t('dashboard.patient.availableCertificates')}</span>
+                        <span>{dashboardStats.availableCertificatesCount}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  {dashboardStats.nextAcceptedAppointment ? (
+                    <article className="tile tile-reminder">
+                      <div className="tile-header">
+                        <i className="ph-calendar-plus-light"></i>
+                        <h3>
+                          <span>{t('dashboard.patient.nextAppointmentReminder')}</span>
+                          <span>
+                            {`Le ${new Date(dashboardStats.nextAcceptedAppointment.appointmentDate).toLocaleDateString()} à ${dashboardStats.nextAcceptedAppointment.appointmentTime} avec Dr. ${dashboardStats.nextAcceptedAppointment.doctorName}`}
+                          </span>
+                        </h3>
+                      </div>
+                    </article>
+                  ) : (
+                    <article className="tile">
+                      <div className="tile-header">
+                        <i className="ph-calendar-x-light"></i> {}
+                        <h3>
+                          <span>Aucun RDV n'est trouvé</span>
+                        </h3>
+                      </div>
+                    </article>
+                  )}
+                  {dashboardStats.nextRefusedAppointmentWithProposal ? (
+                    <article className="tile tile-warning"> {}
+                      <div className="tile-header">
+                        <i className="ph-calendar-x-light"></i> {}
+                        <h3>
+                          <span>{t('dashboard.patient.refusedAppointmentWithProposal', 'RDV Refusé avec Proposition')}</span>
+                          <span>
+                            {`Date proposée: ${new Date(dashboardStats.nextRefusedAppointmentWithProposal.appointmentDate).toLocaleDateString()} à ${dashboardStats.nextRefusedAppointmentWithProposal.appointmentTime}`}
+                          </span>
+                        </h3>
+                      </div>
+                      {}
+                    </article>
+                  ) : (
+                    <article className="tile">
+                      <div className="tile-header">
+                        <i className="ph-smiley-sad-light"></i> {}
+                        <h3>
+                          <span>{t('dashboard.patient.noRefusedAppointmentWithProposal', 'Aucun RDV refusé avec proposition')}</span>
+                        </h3>
+                      </div>
+                    </article>
+                  )}
+                </>
+              )}
+              {user.role === "ASSISTANT" && dashboardStats && (
+                <>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-calendar-check-light"></i>
+                      <h3>
+                        <span>{t('dashboard.assistant.appointmentsToday', 'RDV Acceptés Aujourd\'hui')}</span>
+                        <span>{dashboardStats.todaysAcceptedAppointments}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-clock-countdown-light"></i>
+                      <h3>
+                        <span>{t('dashboard.assistant.pendingConfirmationAppointments', 'RDV à confirmer')}</span>
+                        <span>{dashboardStats.pendingConfirmationAppointmentsCount}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-user-plus-light"></i>
+                      <h3>
+                        <span>{t('dashboard.assistant.pendingPatientRegistrations', 'Inscriptions Patients en Attente')}</span>
+                        <span>{dashboardStats.pendingPatientRegistrationsCount}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-users-three-light"></i>
+                      <h3>
+                        <span>{t('dashboard.assistant.totalPatientsInCabinet', 'Total Patients Cabinet')}</span>
+                        <span>{dashboardStats.totalPatientsInCabinet}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-user-check-light"></i>
+                      <h3>
+                        <span>{t('dashboard.assistant.patientsActivatedToday', 'Patients Activés Aujourd\'hui')}</span>
+                        <span>{dashboardStats.patientsActivatedTodayInCabinet}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-users-light"></i>
+                      <h3>
+                        <span>{t('dashboard.assistant.newUsersToday', 'Nouveaux Utilisateurs Aujourd\'hui')}</span>
+                        <span>{dashboardStats.newUsersTodayInCabinet}</span>
+                      </h3>
+                    </div>
+                  </article>
+                </>
+              )}
+              {/* Les sections pour les graphiques patient ont été supprimées */}
+              {user.role === "DOCTOR_CENTRE_EXAMEN" && dashboardStats && (
+                <>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-clipboard-text-light"></i>
+                      <h3>
+                        <span>{t('dashboard.doctorCentre.examsPerformedToday')}</span>
+                        <span>{dashboardStats.examsPerformedTodayCount}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-hourglass-medium-light"></i>
+                      <h3>
+                        <span>{t('dashboard.doctorCentre.pendingExams')}</span>
+                        <span>{dashboardStats.pendingExamsCount}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  {/* Upcoming Exams Tile Removed based on user request */}
+                  {/* {dashboardStats.upcomingExamsToday && dashboardStats.upcomingExamsToday.length > 0 && (
+                    <article className="tile tile-upcoming-appointments">
+                      <div className="tile-header">
+                        <i className="ph-list-checks-light"></i>
+                        <h3>
+                          <span>{t('dashboard.doctorCentre.upcomingExamsTitle')}</span>
+                        </h3>
+                      </div>
+                      <ul className="upcoming-appointments-list">
+                        {dashboardStats.upcomingExamsToday.map(exam => (
+                          <li key={exam.id}>
+                            {exam.time} - {exam.patientName}
+                          </li>
+                        ))}
+                      </ul>
+                    </article>
+                  )} */}
+                </>
+              )}
+              {user.role === "ADMIN" && dashboardStats && (
+                <>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-users-four-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.totalUsers')}</span>
+                        <span>{dashboardStats.totalUsers}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-user-list-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.totalPatients')}</span>
+                        <span>{dashboardStats.totalPatients}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-first-aid-light"></i> {/* Icon for doctors */}
+                      <h3>
+                        <span>{t('dashboard.admin.totalDoctors')}</span>
+                        <span>{dashboardStats.totalDoctors}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-user-gear-light"></i> {/* Icon for assistants */}
+                      <h3>
+                        <span>{t('dashboard.admin.totalAssistants')}</span>
+                        <span>{dashboardStats.totalAssistants}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-hospital-light"></i> {/* Icon for doctor centres */}
+                      <h3>
+                        <span>{t('dashboard.admin.totalDoctorCentres')}</span>
+                        <span>{dashboardStats.totalDoctorCentres}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-buildings-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.totalCabinets')}</span>
+                        <span>{dashboardStats.totalCabinets}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-flask-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.totalExamCentres')}</span>
+                        <span>{dashboardStats.totalExamCentres}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  {/* <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-user-plus-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.newUsersThisWeek')}</span>
+                        <span>{dashboardStats.newUsersThisWeek}</span>
+                      </h3>
+                    </div>
+                  </article> */}
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-calendar-plus-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.newUsersThisMonth')}</span>
+                        <span>{dashboardStats.newUsersThisMonth}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  {/* <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-calendar-check-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.appointmentsToday')}</span>
+                        <span>{dashboardStats.appointmentsToday}</span>
+                      </h3>
+                    </div>
+                  </article> */}
+                  {/* <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-calendar-dots-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.appointmentsThisWeek')}</span>
+                        <span>{dashboardStats.appointmentsThisWeek}</span>
+                      </h3>
+                    </div>
+                  </article> */}
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-calendar-blank-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.appointmentsThisMonth')}</span>
+                        <span>{dashboardStats.appointmentsThisMonth}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  {/* <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-stethoscope-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.consultationsToday')}</span>
+                        <span>{dashboardStats.consultationsToday}</span>
+                      </h3>
+                    </div>
+                  </article> */}
+                  {/* <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-heartbeat-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.consultationsThisWeek')}</span>
+                        <span>{dashboardStats.consultationsThisWeek}</span>
+                      </h3>
+                    </div>
+                  </article> */}
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-activity-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.consultationsThisMonth')}</span>
+                        <span>{dashboardStats.consultationsThisMonth}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  {/* <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-test-tube-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.examsToday')}</span>
+                        <span>{dashboardStats.examsToday}</span>
+                      </h3>
+                    </div>
+                  </article> */}
+                  {/* <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-thermometer-cold-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.examsThisWeek')}</span>
+                        <span>{dashboardStats.examsThisWeek}</span>
+                      </h3>
+                    </div>
+                  </article> */}
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-microscope-light"></i>
+                      <h3>
+                        <span>{t('dashboard.admin.examsThisMonth')}</span>
+                        <span>{dashboardStats.examsThisMonth}</span>
+                      </h3>
+                    </div>
+                  </article>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-file-text-light"></i> {}
+                      <h3>
+                        <span>{t('dashboard.admin.medicalReportsGeneratedThisMonth', 'Rapports Médicaux Générés (Mois)')}</span>
+                        <span>{dashboardStats.medicalReportsGeneratedThisMonth}</span>
+                      </h3>
+                    </div>
+                  </article>
+                </>
+              )}
+              {/* Keep static tiles if no custom stats are loaded or for other roles */}
+              {(!dashboardStats && !statsLoading) && (
+                <>
+                  <article className="tile">
+                    <div className="tile-header">
+                      <i className="ph-lightning-light"></i>
+                      <h3>
+                        <span>{t('dashboard.tiles.performance.title')}</span>
+                        <span>{t('dashboard.tiles.performance.subtitle')}</span>
+                      </h3>
+                    </div>
+                    <a href="#">{t('dashboard.tiles.viewDetails')}</a>
+                  </article>
+                  {/* ... other static tiles ... */}
+                </>
+              )}
             </div>
           </section>
   
+          {/* The "Performance" section can also be conditional or customized */}
+          {/* 
           <section className="service-section">
             <h2>{t('dashboard.performanceSectionTitle')}</h2>
             <div className="tiles">
-              <article className="tile">
-                <div className="tile-header">
-                  <i className="ph-folder-light"></i>
-                  <h3>
-                    <span>{t('dashboard.tiles.projectTracking.title')}</span>
-                    <span>{t('dashboard.tiles.projectTracking.subtitle', { count: 5 })}</span>
-                  </h3>
-                </div>
-                <a href="#">{t('dashboard.tiles.viewDetails')}</a>
-              </article>
-  
-              <article className="tile">
-                <div className="tile-header">
-                  <i className="ph-users-light"></i>
-                  <h3>
-                    <span>{t('dashboard.tiles.teamObjectives.title')}</span>
-                    <span>{t('dashboard.tiles.teamObjectives.subtitle', { percentage: 80 })}</span>
-                  </h3>
-                </div>
-                <a href="#">{t('dashboard.tiles.analyzeProgress')}</a>
-              </article>
-  
-              <article className="tile">
-                <div className="tile-header">
-                  <i className="ph-bell-light"></i>
-                  <h3>
-                    <span>{t('dashboard.tiles.notifications.title')}</span>
-                    <span>{t('dashboard.tiles.notifications.subtitle', { count: 2 })}</span>
-                  </h3>
-                </div>
-                <a href="#">{t('dashboard.tiles.viewNotifications')}</a>
-              </article>
+              ...
             </div>
-          </section>
+          </section> 
+          */}
   
-          {/* Only display charts for EMPLOYEE */}
+          {/* Only display charts for specific roles if needed, or remove if not used */}
           {user.role === 'EMPLOYEE' && (
             <>
               <section className="charts-section">
@@ -479,7 +961,7 @@ const Dashboard = ({ onLogout }) => {
                           : '/images/avatar%20%20femme.jpg' // Default to female if gender exists but isn't recognized male/female
                       : '/images/avatar%20%20femme.jpg' // Default to female if gender doesn't exist
                 }
-                alt={t('dashboard.sidebar.profileAlt', 'Profile')} // Added translation for alt text
+                alt={t('dashboard.sidebar.profileAlt')} // Added translation for alt text
                 style={{ width: '100px', height: '100px', borderRadius: '50%' }}
               />
             </div>
@@ -520,7 +1002,7 @@ const Dashboard = ({ onLogout }) => {
           {/* Display specialty only for DOCTOR_CENTRE_EXAMEN */}
           {user.role === "DOCTOR_CENTRE_EXAMEN" && (
             <div className="user-info-item">
-              <p><strong>{t('dashboard.sidebar.specialtyLabel', 'Specialty')}:</strong> <span>{user.speciality ? user.speciality : t('dashboard.sidebar.notProvided')}</span></p> {/* Corrected field name */}
+              <p><strong>{t('dashboard.sidebar.specialtyLabel')}:</strong> <span>{user.speciality ? user.speciality : t('dashboard.sidebar.notProvided')}</span></p> {/* Corrected field name */}
             </div>
           )}
              

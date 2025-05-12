@@ -718,4 +718,36 @@ public class MedicalExaminationService implements IMedicalExaminationService {
         medicalExaminationRepository.save(exam);
         log.info("Examination {} marked as hidden for reporting centre doctor {}", examId, requestingCentreDoctorId);
     }
+@Override
+    @Transactional
+    public void setExaminationVisibilityForPatient(Long examId, Long patientId, boolean isHidden) {
+        log.info("Attempting to set hidden={} for examination {} by patient {}", isHidden, examId, patientId);
+
+        MedicalExamination exam = medicalExaminationRepository.findById(examId)
+                .orElseThrow(() -> {
+                    log.warn("setExaminationVisibilityForPatient failed: Examination not found with id: {}", examId);
+                    return new ResourceNotFoundException("Medical Examination not found with id: " + examId);
+                });
+
+        // Verify ownership: Check if the requesting patient is the patient associated with the exam
+        RendezVous rendezVous = exam.getRendezVous();
+        if (rendezVous == null || rendezVous.getPatient() == null) {
+            log.error("setExaminationVisibilityForPatient failed: Examination {} or its associated RendezVous/Patient is null.", examId);
+            // Throw IllegalStateException because the data integrity is compromised
+            throw new IllegalStateException("Examination data is incomplete (missing RendezVous or Patient link).");
+        }
+
+        Long actualPatientId = rendezVous.getPatient().getId();
+        if (!actualPatientId.equals(patientId)) {
+            log.warn("setExaminationVisibilityForPatient failed: Patient {} is not authorized to modify visibility for examination {}. Actual patient ID: {}",
+                     patientId, examId, actualPatientId);
+            // Use SecurityException or IllegalStateException for authorization failure
+            throw new SecurityException("Patient is not authorized to modify this examination's visibility.");
+        }
+
+        // Set the hidden status and save
+        exam.setHiddenForPatient(isHidden);
+        medicalExaminationRepository.save(exam);
+        log.info("Successfully set hidden={} for examination {} for patient {}", isHidden, examId, patientId);
+    }
 }

@@ -305,6 +305,40 @@ const MyConsultationsPage = () => {
         }
     };
 
+    const handleHideConsultation = async (consultationId) => {
+        const userData = getUserData();
+        if (!userData || !userData.accessToken) {
+            setError(t('myConsultationsPage.errors.authError'));
+            performLogout();
+            return;
+        }
+
+        if (!window.confirm(t('myConsultationsPage.alerts.confirmHide'))) {
+            return;
+        }
+
+        try {
+            // Call the new patient-specific endpoint with hidden=true
+            await axios.put(`${API_URL}/api/consultations/${consultationId}/visibility/patient`, null, { // Use PUT, null body
+                 params: {
+                     hidden: true // Set hidden parameter to true
+                 },
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken}`
+                }
+            });
+            // Update the local state to reflect the change
+            setConsultations(prevConsultations =>
+                prevConsultations.filter(c => c.idConsultation !== consultationId)
+            );
+            alert(t('myConsultationsPage.alerts.hideSuccess'));
+        } catch (err) {
+            console.error("Error hiding consultation:", err);
+            setError(err.response?.data?.message || t('myConsultationsPage.errors.hideFailedFallback'));
+            alert(t('myConsultationsPage.alerts.hideError'));
+        }
+    };
+
     // Combined loading state
     const showLoading = isLoading || isCheckingCertificates;
 
@@ -331,6 +365,7 @@ const MyConsultationsPage = () => {
                             <th>{t('myConsultationsPage.table.type')}</th>
                             <th>{t('myConsultationsPage.table.prescription')}</th>
                             <th>{t('myConsultationsPage.table.certificate', 'Certificat')}</th> {/* New Header */}
+                            <th>{t('myConsultationsPage.table.actions', 'Actions')}</th> {/* New Header for Actions */}
                         </tr>
                     </thead>
                     <tbody>
@@ -362,12 +397,20 @@ const MyConsultationsPage = () => {
                                             <span>-</span> // Display dash if not found or error during check
                                         )}
                                     </td>
+                                    <td> {/* New Cell for Hide Button */}
+                                        <button
+                                            className="btn btn-sm btn-warning"
+                                            onClick={() => handleHideConsultation(consult.idConsultation)}
+                                        >
+                                            {t('myConsultationsPage.buttons.hideConsultation')}
+                                        </button>
+                                    </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
                                 {/* Use translated no consultations message, adjust colspan */}
-                                <td colSpan={4} className="text-center">
+                                <td colSpan={5} className="text-center"> {/* Adjusted colspan to 5 */}
                                     {t('myConsultationsPage.table.noConsultations')}
                                 </td>
                             </tr>

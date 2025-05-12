@@ -148,4 +148,13 @@ public interface IMedicalExaminationService {
      * @throws IllegalStateException if the centre doctor is not authorized to hide this examination.
      */
     void hideExaminationForReportingCentreDoctor(Long examId, Long requestingCentreDoctorId);
+/**
+     * Sets the visibility of a medical examination for the patient.
+     * @param examId The ID of the examination.
+     * @param patientId The ID of the patient (for verification).
+     * @param isHidden True to hide, false to show.
+     * @throws ResourceNotFoundException if the examination is not found.
+     * @throws SecurityException if the patient is not authorized.
+     */
+    void setExaminationVisibilityForPatient(Long examId, Long patientId, boolean isHidden);
 }

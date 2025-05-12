@@ -460,9 +460,6 @@ const MedicalExaminationForm = () => {
                     >
                         {t('medicalExaminationForm.buttons.print')}
                     </button>
-                     <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary" style={{ marginLeft: '10px' }}>
-                        {t('common.cancel')} {/* Use translation key */}
-                    </button>
                 </div>
             </form>
         </div>

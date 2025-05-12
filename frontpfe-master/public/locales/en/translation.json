@@ -93,8 +93,64 @@
     "manageMySignature": "Manage My Signature"
   },
   "dashboard": {
-    "title": "{{firstName}} {{lastName}} Dashboard",
+    "title": "{{firstName}} {{lastName}}'s Dashboard",
     "performanceSectionTitle": "Performance Dashboard",
+    "doctor": {
+      "appointmentsToday": "Accepted Appointments Today",
+      "consultationsToday": "Consultations Realized Today",
+      "totalPatients": "Total Patients in Cabinet",
+      "upcomingAppointmentsTitle": "Upcoming Appointments Today",
+      "pendingConfirmationAppointments": "Appointments to Confirm",
+      "pendingExaminationRequests": "Pending Examination Requests",
+      "unreadExaminationResults": "Unread Examination Results",
+      "appointmentCompletionRateWeek": "Appt. Rate (Week)",
+      "appointmentCompletionRateMonth": "Appt. Rate (Month)",
+      "pendingPatientRegistrations": "Pending Patient Registrations"
+    },
+    "patient": {
+      "totalConsultations": "Total Consultations",
+      "totalExams": "Total Exams",
+      "nextAppointmentReminder": "Next Accepted Appointment",
+      "appointmentDetails": "On {{date}} at {{time}} with Dr. {{doctor}} ({{cabinet}})",
+      "pendingAppointments": "Pending Appointments",
+      "availableCertificates": "Available Certificates",
+      "charts": {
+        "consultationsPerMonth": {
+          "label": "Consultations per Month",
+          "title": "Consultations Trend/Month"
+        },
+        "examsPerMonth": {
+          "label": "Exams per Month",
+          "title": "Exams Trend/Month"
+        }
+      }
+    },
+    "doctorCentre": {
+      "examsPerformedToday": "Exams Performed Today",
+      "averageProcessingTime": "Avg. Processing Time",
+      "pendingExams": "Pending Exams",
+      "upcomingExamsTitle": "Upcoming Exams Today"
+    },
+    "admin": {
+      "totalUsers": "Total Users",
+      "totalPatients": "Total Patients",
+      "totalDoctors": "Total Doctors",
+      "totalAssistants": "Total Assistants",
+      "totalDoctorCentres": "Total Centre Doctors",
+      "totalCabinets": "Total Cabinets",
+      "totalExamCentres": "Total Exam Centres",
+      "newUsersThisWeek": "New Users (Week)",
+      "newUsersThisMonth": "New Users (Month)",
+      "appointmentsToday": "Appointments Created (Today)",
+      "appointmentsThisWeek": "Appointments Created (Week)",
+      "appointmentsThisMonth": "Appointments Created (Month)",
+      "consultationsToday": "Consultations (Today)",
+      "consultationsThisWeek": "Consultations (Week)",
+      "consultationsThisMonth": "Consultations (Month)",
+      "examsToday": "Exams Requested (Today)",
+      "examsThisWeek": "Exams Requested (Week)",
+      "examsThisMonth": "Exams Requested (Month)"
+    },
     "tiles": {
       "performance": {
         "title": "Performance Objectives",
@@ -1209,24 +1265,33 @@
       "downloadInvalidResponse": "Could not download prescription (invalid response).",
       "prescriptionNotFound": "No prescription found for this consultation.",
       "downloadFailedFallback": "Failed to download the prescription.",
-      "authError": "Authentication error. Please log in again."
+      "authError": "Authentication error. Please log in again.",
+      "certificateNotFound": "Certificate not found for this consultation.",
+      "hideFailedFallback": "Failed to hide the consultation."
     },
     "alerts": {
-      "sessionExpired": "Session expired. Please log in again."
+      "sessionExpired": "Session expired. Please log in again.",
+      "confirmHide": "Are you sure you want to hide this consultation? It will no longer be visible in this list.",
+      "hideSuccess": "Consultation hidden successfully.",
+      "hideError": "Failed to hide the consultation."
     },
     "table": {
       "date": "Date",
       "type": "Type",
       "prescription": "Prescription",
+      "certificate": "Certificate",
+      "actions": "Actions",
       "notAvailable": "N/A",
       "invalidDate": "Invalid Date",
       "defaultType": "General Consultation",
       "noConsultations": "You have no recorded consultations."
     },
     "buttons": {
-      "download": "Download",
-      "downloadedCertificate": "Download"
-    }
+      "download": "Download Prescription",
+      "downloadedCertificate": "Download Certificate",
+      "hideConsultation": "Hide Consultation"
+    },
+    "checking": "Checking..."
   },
   "myExaminationsPage": {
     "title": "My Exam Requests",

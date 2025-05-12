@@ -12,6 +12,7 @@ import pi.pperformance.elite.entities.Role; // Import Role
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate; // Import manquant
 
 @Repository
 public interface UserCabinetRegistrationRepository extends JpaRepository<UserCabinetRegistration, Long> {
@@ -73,4 +74,19 @@ public interface UserCabinetRegistrationRepository extends JpaRepository<UserCab
             @Param("firstName") String firstName,
             @Param("lastName") String lastName,
             @Param("cabinetId") Long cabinetId);
+
+    // Méthode pour StatisticsService
+    long countByCabinetAndIsActive(CabinetDr cabinet, boolean isActive);
+
+    // Compter les inscriptions de patients en attente de confirmation pour un cabinet donné
+    long countByCabinetAndIsActiveAndUser_Role(CabinetDr cabinet, boolean isActive, Role userRole);
+
+    // Compter les patients actifs enregistrés aujourd'hui dans le cabinet
+    long countByCabinetAndIsActiveTrueAndRegistrationDate(CabinetDr cabinet, LocalDate registrationDate);
+
+    // Compter les nouveaux patients (basé sur User.createdAt) enregistrés aujourd'hui dans le cabinet
+    long countByCabinetAndUser_CreatedAt(CabinetDr cabinet, LocalDate createdAt);
+
+    // Compter les inscriptions au cabinet pour un rôle utilisateur spécifique et dans une plage de dates d'inscription
+    long countByCabinetAndUser_RoleAndRegistrationDateBetween(CabinetDr cabinet, Role userRole, LocalDate startDate, LocalDate endDate);
 }

@@ -129,8 +129,32 @@ const ConsultationDashboard = () => {
          // We'll use a different route or parameter to indicate "view/edit" mode vs "new" mode
          navigate(`/consultation/details/${consultationId}`);
      };
-
-    // Helper function to format date - Keep this as is, it's formatting, not UI text
+ 
+     const handleHideConsultation = async (consultationId) => {
+         if (!window.confirm(t('consultationDashboard.alerts.confirmHide'))) {
+             return;
+         }
+         try {
+             // Call the new doctor-specific endpoint with hidden=true
+             await apiClient.put(`/api/consultations/${consultationId}/visibility/doctor`, null, { // Use PUT, null body
+                 params: {
+                     hidden: true // Set hidden parameter to true
+                 }
+                 // apiClient should automatically include the Authorization header
+             });
+             // Update the local state to reflect the change
+             setConsultations(prevConsultations =>
+                 prevConsultations.filter(c => c.idConsultation !== consultationId)
+             );
+             alert(t('consultationDashboard.alerts.hideSuccess'));
+         } catch (err) {
+             console.error("Error hiding consultation:", err);
+             setError(err.response?.data?.message || t('consultationDashboard.errors.hideFailedFallback'));
+             alert(t('consultationDashboard.alerts.hideError'));
+         }
+     };
+ 
+     // Helper function to format date - Keep this as is, it's formatting, not UI text
      const formatDate = (dateString) => {
         if (!dateString) return t('consultationDashboard.table.notAvailable'); // Use translation for N/A
         try {
@@ -194,9 +218,15 @@ const ConsultationDashboard = () => {
                                              >
                                                  {t('consultationDashboard.buttons.viewDetails')}
                                              </button>
+                                             <button
+                                                 className="btn btn-sm btn-warning ms-2" // Added margin for spacing
+                                                 onClick={() => handleHideConsultation(consult.idConsultation)}
+                                             >
+                                                 {t('consultationDashboard.buttons.hideConsultation')}
+                                             </button>
                                          </td>
-                                    )}
-                                </tr>
+                                     )}
+                                 </tr>
                             ))
                         ) : (
                             <tr>

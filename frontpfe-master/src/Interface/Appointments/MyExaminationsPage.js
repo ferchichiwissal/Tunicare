@@ -17,6 +17,7 @@ const MyExaminationsPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [downloading, setDownloading] = useState(null); // Track which exam is downloading
+    const [hidingExamId, setHidingExamId] = useState(null); // Track which exam is being hidden
     const navigate = useNavigate(); // Initialize useNavigate
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
@@ -167,6 +168,59 @@ const MyExaminationsPage = () => {
         }
     };
 
+    // --- Function to Hide Examination ---
+    const handleHideExamination = useCallback(async (examId) => {
+        // Add confirmation dialog
+        const confirmHide = window.confirm(t('myExaminationsPage.alerts.confirmHide', 'Êtes-vous sûr de vouloir masquer cet examen ? Cette action est irréversible depuis cette interface.'));
+        if (!confirmHide) {
+            return; // Stop if user cancels
+        }
+
+        setHidingExamId(examId);
+        setError('');
+        const token = getToken();
+
+        if (!token) {
+            setError(t('myExaminationsPage.errors.authMissing'));
+            setHidingExamId(null);
+            performLogout();
+            return;
+        }
+
+        console.log(`Attempting to hide examination ID: ${examId}`);
+
+        try {
+            await axios.put(`${API_URL}/api/medical-examinations/${examId}/hide-for-patient`, {}, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            // Remove the examination from the list locally
+            setExaminations(prevExams => prevExams.filter(exam => exam.idExam !== examId));
+            // Optionally show a success message (e.g., using a toast notification library)
+            console.log(`Successfully hid examination ID: ${examId}`);
+
+        } catch (err) {
+            console.error("Error hiding examination:", err);
+            let errorMessage = t('myExaminationsPage.errors.hideFailed', { examId: examId });
+            if (err.response) {
+                // Try to parse backend error message if available
+                try {
+                    const errorData = err.response.data;
+                    if (typeof errorData === 'string') {
+                         errorMessage = errorData || errorMessage;
+                    } else if (errorData && errorData.message) {
+                         errorMessage = errorData.message;
+                    }
+                } catch (parseError) {
+                     console.error("Could not parse error response for hiding:", parseError);
+                }
+            }
+             setError(errorMessage);
+        } finally {
+            setHidingExamId(null);
+        }
+    }, [API_URL, t, performLogout]); // Added dependencies
+
 
     useEffect(() => {
         // Fetch user data and cabinet ID using the same approach as MyConsultationsPage
@@ -246,7 +300,7 @@ const MyExaminationsPage = () => {
         }
 
         fetchMyExaminations();
-    }, [API_URL, t, performLogout]); // Added t and performLogout dependencies
+    }, [API_URL, t, performLogout, handleHideExamination]); // Added handleHideExamination dependency
 
     // Helper function to format date
     const formatDate = (dateString) => {
@@ -318,6 +372,16 @@ const MyExaminationsPage = () => {
                                         title={exam.etat !== 'terminé' ? t('myExaminationsPage.tooltips.downloadNotReady', 'Le résultat n\'est pas encore disponible pour téléchargement.') : t('myExaminationsPage.buttons.downloadResult', 'Télécharger Résultat')}
                                     >
                                         {downloading === `result_${exam.idExam}` ? t('loading') : t('myExaminationsPage.buttons.downloadResult', 'Télécharger Résultat')}
+                                    </button>
+                                    {/* --- Hide Button --- */}
+                                    <button
+                                        className="btn btn-danger btn-sm ms-2" // Added margin-start
+                                        onClick={() => handleHideExamination(exam.idExam)}
+                                        disabled={hidingExamId === exam.idExam}
+                                        title={t('myExaminationsPage.buttons.hide', 'Ne plus afficher')}
+                                    >
+                                        {/* Replace icon with text */}
+                                        {hidingExamId === exam.idExam ? t('loading') : t('myExaminationsPage.buttons.hide', 'Masquer')}
                                     </button>
                                 </td>
                             </tr>

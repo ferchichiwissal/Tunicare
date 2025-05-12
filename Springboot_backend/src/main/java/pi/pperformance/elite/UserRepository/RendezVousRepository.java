@@ -6,11 +6,12 @@ import org.springframework.data.jpa.repository.Query; // Import Query
 import org.springframework.data.repository.query.Param; // Import Param
 import org.springframework.stereotype.Repository;
 import pi.pperformance.elite.entities.RendezVous;
-import pi.pperformance.elite.entities.Doctor; // Import Doctor
-import pi.pperformance.elite.entities.Patient; // Import Patient
-import pi.pperformance.elite.entities.CabinetDr; // Import CabinetDr
+import pi.pperformance.elite.entities.Doctor;
+import pi.pperformance.elite.entities.Patient;
+import pi.pperformance.elite.entities.CabinetDr;
+import pi.pperformance.elite.enums.RendezVousStatus; // Import de l'enum
 
-import java.time.LocalDate; // Import LocalDate
+import java.time.LocalDate;
 import java.time.LocalDateTime; // Import LocalDateTime
 import java.util.List;
 import java.util.Optional; // Import Optional
@@ -62,4 +63,35 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
      @EntityGraph(attributePaths = {"patient"})
      Optional<RendezVous> findById(Long id);
 
+    // Méthodes pour StatisticsService
+    long countByDoctorAndCabinetAndApptDateTimeBetweenAndApptState(Doctor doctor, CabinetDr cabinet, LocalDateTime startDateTime, LocalDateTime endDateTime, String apptState);
+
+    List<RendezVous> findByDoctorAndCabinetAndApptDateTimeBetweenAndApptStateOrderByApptDateTimeAsc(Doctor doctor, CabinetDr cabinet, LocalDateTime startDateTime, LocalDateTime endDateTime, String apptState);
+
+    @EntityGraph(attributePaths = {"doctor", "cabinet"})
+    Optional<RendezVous> findFirstByPatientAndCabinetAndApptDateTimeGreaterThanEqualAndApptStateOrderByApptDateTimeAsc(Patient patient, CabinetDr cabinet, LocalDateTime startDateTime, String apptState);
+
+    // Find next accepted appointment for a patient across all cabinets
+    @EntityGraph(attributePaths = {"doctor", "cabinet"})
+    Optional<RendezVous> findFirstByPatientAndApptDateTimeGreaterThanEqualAndApptStateOrderByApptDateTimeAsc(Patient patient, LocalDateTime startDateTime, String apptState);
+
+    // Find next refused appointment with a proposed date for a patient in a specific cabinet
+    @EntityGraph(attributePaths = {"doctor", "cabinet"})
+    Optional<RendezVous> findFirstByPatientAndCabinetAndApptStateAndApptProposedDateTimeNotNullOrderByApptProposedDateTimeAsc(Patient patient, CabinetDr cabinet, String apptState);
+
+    long countByPatientAndCabinetAndApptState(Patient patient, CabinetDr cabinet, String apptState);
+
+    long countByDoctorAndCabinetAndApptState(Doctor doctor, CabinetDr cabinet, String apptState);
+
+    // Count appointments by Cabinet, DateTime range, and State
+    long countByCabinetAndApptDateTimeBetweenAndApptState(CabinetDr cabinet, LocalDateTime startDateTime, LocalDateTime endDateTime, String apptState);
+
+    // Count appointments by Cabinet ID and State (for Assistant dashboard)
+    long countByCabinet_IdSiteAndApptState(Long cabinetId, String apptState);
+
+    // Method needed for weekly/monthly completion rate in StatisticsService
+    long countByDoctorAndCabinetAndApptStateAndApptDateTimeBetween(Doctor doctor, CabinetDr cabinet, String apptState, LocalDateTime startDateTime, LocalDateTime endDateTime);
+
+    // For Admin statistics: Count all appointments created within a specific period
+    long countByCreatedAtBetween(LocalDateTime startDateTime, LocalDateTime endDateTime);
 }

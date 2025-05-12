@@ -70,5 +70,21 @@ public interface IConsultationService {
      */
     Consultation getConsultationEntityById(Long consultationId);
 
+    /**
+     * Sets the visibility of a consultation for the patient.
+     * @param consultationId The ID of the consultation.
+     * @param patientId The ID of the patient (for verification).
+     * @param isHidden True to hide, false to show.
+     */
+    void setConsultationVisibilityForPatient(Long consultationId, Long patientId, boolean isHidden);
+
+    /**
+     * Sets the visibility of a consultation for the doctor.
+     * @param consultationId The ID of the consultation.
+     * @param doctorId The ID of the doctor (for verification).
+     * @param isHidden True to hide, false to show.
+     */
+    void setConsultationVisibilityForDoctor(Long consultationId, Long doctorId, boolean isHidden);
+
     // Add other methods as needed
 }

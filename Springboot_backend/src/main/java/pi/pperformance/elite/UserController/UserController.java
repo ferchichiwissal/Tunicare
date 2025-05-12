@@ -27,7 +27,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import pi.pperformance.elite.Authentif.JwtUtils;
 import pi.pperformance.elite.UserServices.EmailService;
 import pi.pperformance.elite.UserServices.RecaptchaService;
-import pi.pperformance.elite.UserServices.UserServiceInterface;
+// import pi.pperformance.elite.UserServices.UserServiceInterface; // Changed to implementation
+import pi.pperformance.elite.UserServices.UserServiceImplmnt; // Added import for implementation
 import pi.pperformance.elite.UserServices.VerificationService;
 import pi.pperformance.elite.entities.Admin;
 import pi.pperformance.elite.entities.Assistant;
@@ -38,6 +39,7 @@ import pi.pperformance.elite.entities.User;
 import pi.pperformance.elite.entities.PatientVerificationRequest; // Added import
 // import pi.pperformance.elite.entities.VerificationRequest; // Removed original import
 import pi.pperformance.elite.exceptions.AccountNotFoundException;
+import pi.pperformance.elite.exceptions.ResourceNotFoundException; // Added import
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -66,7 +68,7 @@ public class UserController {
     @Autowired
     private JwtUtils jwtUtils;
     @Autowired
-    private UserServiceInterface usrService;
+    private UserServiceImplmnt usrService; // Changed type to implementation class
     @Autowired
     private EmailService emailService;
     @Autowired
@@ -711,17 +713,102 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO userDetailsDTO) {
+    // @PreAuthorize("#id == authentication.principal.id or hasRole('ADMIN')") // Kept original authorization for now
+    public ResponseEntity<User> updateUser(
+            @PathVariable Long id,
+            @RequestParam(value = "firstName", required = false) String firstName,
+            @RequestParam(value = "lastName", required = false) String lastName,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "birthDate", required = false) String birthDateString, // Renamed to avoid conflict
+            @RequestParam(value = "tel", required = false) String tel,
+            @RequestParam(value = "photoProfilFile", required = false) MultipartFile photoProfilFile) {
+        
+        log.info("Updating user with ID: {}", id);
+
+        UserUpdateDTO userDetailsDTO = new UserUpdateDTO();
+        if (firstName != null) userDetailsDTO.setFirstName(firstName);
+        if (lastName != null) userDetailsDTO.setLastName(lastName);
+        if (email != null) userDetailsDTO.setEmail(email);
+        if (address != null) userDetailsDTO.setAddress(address);
+        if (tel != null) userDetailsDTO.setTel(tel);
+        
+        if (birthDateString != null && !birthDateString.isEmpty()) {
+            try {
+                userDetailsDTO.setBirthDate(LocalDate.parse(birthDateString));
+            } catch (Exception e) {
+                log.warn("Invalid birthDate format for user ID {}: {}", id, birthDateString);
+                // Consider how to signal this error. For now, might proceed without birthDate.
+                // Or return ResponseEntity.badRequest().body("Invalid birth date format.");
+            }
+        }
+        // Note: Gender is not part of UserUpdateDTO or the form from EditUserForm.js
+
         try {
-            User updatedUser = usrService.updateUser(id, userDetailsDTO);
+            // The service method updateUser needs to be adapted to handle the MultipartFile
+            User updatedUser = usrService.updateUserAndPhoto(id, userDetailsDTO, photoProfilFile);
             return ResponseEntity.ok(updatedUser);
         } catch (AccountNotFoundException e) {
+            log.warn("Update failed: User not found with ID: {}", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (IOException e) {
+            log.error("Error processing profile picture for user ID {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         } catch (Exception e) {
             log.error("Error updating user with ID {}: {}", id, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+// L'endpoint dédié à la photo de profil peut être supprimé ou commenté si non désiré
+// @PutMapping("/{id}/profile-picture")
+// @PreAuthorize("#id == authentication.principal.id") // Allow only the user to update their own picture
+// public ResponseEntity<?> updateUserProfilePicture(
+//         @PathVariable Long id,
+//         @RequestParam("photoProfil") MultipartFile photoProfil) {
+    
+//     log.info("Received request to update profile picture for user ID: {}", id);
+
+//     // Basic file validation (can be enhanced in service)
+//     if (photoProfil == null || photoProfil.isEmpty()) {
+//         log.warn("Profile picture update failed for user ID {}: No file provided.", id);
+//         return ResponseEntity.badRequest().body(Map.of("message", "No profile picture file provided."));
+//     }
+
+//     if (!photoProfil.getContentType().startsWith("image/")) {
+//          log.warn("Profile picture update failed for user ID {}: Invalid file type '{}'.", id, photoProfil.getContentType());
+//         return ResponseEntity.badRequest().body(Map.of("message", "Invalid file type. Only images are allowed."));
+//     }
+
+//     if (photoProfil.getSize() > 5 * 1024 * 1024) { // 5MB limit
+//          log.warn("Profile picture update failed for user ID {}: File size {} exceeds limit.", id, photoProfil.getSize());
+//         return ResponseEntity.badRequest().body(Map.of("message", "File size exceeds the limit of 5 MB."));
+//     }
+
+//     try {
+//         // Call the service layer to handle the update
+//         User updatedUser = usrService.updateUserProfilePicture(id, photoProfil);
+//         log.info("Successfully updated profile picture for user ID: {}", id);
+//         // Optionally return the updated user or just a success message
+//         return ResponseEntity.ok(Map.of(
+//             "message", "Profile picture updated successfully.",
+//             "userId", updatedUser.getId()
+//             // Avoid returning the full user object unless necessary
+//         ));
+//     } catch (ResourceNotFoundException e) {
+//         log.error("Profile picture update failed: User not found with ID: {}", id, e);
+//         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+//     } catch (IOException e) {
+//          log.error("Profile picture update failed for user ID {}: Error processing file.", id, e);
+//         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to process profile image."));
+//     } catch (AccessDeniedException e) {
+//          log.warn("Profile picture update denied for user ID {}: {}", id, e.getMessage());
+//          return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "You do not have permission to update this profile picture."));
+//     } catch (Exception e) {
+//         log.error("An unexpected error occurred during profile picture update for user ID: {}", id, e);
+//         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An unexpected error occurred."));
+//     }
+// }
 
     @PreAuthorize("hasRole('ADMIN')") // Restrict global delete to Admins
     @DeleteMapping("/delete/{id}")

@@ -370,50 +370,75 @@ public class DoctorCentreDexamenController {
     @PutMapping("/{id}")
     // Allow ADMIN or DOCTOR_CENTRE_EXAMEN roles - ownership check done inside method
     @PreAuthorize("hasAnyRole('ADMIN', 'ROLE_DOCTOR_CENTRE_EXAMEN')")
-    public ResponseEntity<?> updateDoctor(@PathVariable Long id, @RequestBody DoctorCentreDexamen updatedDoctorData, org.springframework.security.core.Authentication authentication) { // Inject Authentication
-        log.info("Request to update DoctorCentreDexamen ID: {} for principal: {}", id, authentication.getName()); // Use authentication.getName()
+    public ResponseEntity<?> updateDoctor(
+            @PathVariable Long id,
+            @RequestParam(value = "firstName", required = false) String firstName,
+            @RequestParam(value = "lastName", required = false) String lastName,
+            @RequestParam(value = "birthDate", required = false) String birthDateString,
+            @RequestParam(value = "tel", required = false) String tel,
+            @RequestParam(value = "address", required = false) String address,
+            // Gendre n'est pas dans le formulaire EditDoctorCentreForm.js, mais est dans l'entité. À clarifier si besoin.
+            // @RequestParam(value = "gender", required = false) String gender,
+            @RequestParam(value = "speciality", required = false) String speciality,
+            @RequestParam(value = "photoProfilFile", required = false) MultipartFile photoProfilFile,
+            org.springframework.security.core.Authentication authentication) {
+
+        log.info("Request to update DoctorCentreDexamen ID: {} for principal: {}", id, authentication.getName());
         Optional<DoctorCentreDexamen> doctorOptional = doctorCentreDexamenRepository.findById(id);
 
         if (doctorOptional.isPresent()) {
             DoctorCentreDexamen doctor = doctorOptional.get();
 
-            // Ownership check for DOCTOR_CENTRE_EXAMEN role
+            // Ownership check
             boolean isAdmin = authentication.getAuthorities().stream()
                                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+            if (!isAdmin && !doctor.getEmail().equals(authentication.getName())) {
+                log.warn("Forbidden update attempt: User {} tried to update DoctorCentreDexamen ID {}", authentication.getName(), id);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "You do not have permission to update this resource."));
+            }
 
-            if (!isAdmin && authentication.getAuthorities().stream()
-                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_DOCTOR_CENTRE_EXAMEN"))) {
-                // It's a doctor, check if the requested ID's email matches their username
-                if (!doctor.getEmail().equals(authentication.getName())) {
-                    log.warn("Forbidden update attempt: User {} tried to update DoctorCentreDexamen ID {}", authentication.getName(), id);
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                            .body(Map.of("message", "You do not have permission to update this resource."));
+            // Update fields
+            if (firstName != null) doctor.setFirstName(firstName);
+            if (lastName != null) doctor.setLastName(lastName);
+            if (tel != null) doctor.setTel(tel);
+            if (address != null) doctor.setAddress(address);
+            if (speciality != null) doctor.setSpeciality(speciality);
+            // if (gender != null) doctor.setGender(gender); // Si le genre est ajouté au formulaire
+
+            if (birthDateString != null && !birthDateString.isEmpty()) {
+                try {
+                    doctor.setBirthDate(LocalDate.parse(birthDateString));
+                } catch (Exception e) {
+                    log.warn("Invalid birthDate format for doctor ID {}: {}", id, birthDateString);
+                    // Retourner une erreur ou ignorer la mise à jour de la date
                 }
             }
 
-            // If admin or owner, proceed with update
-            // Update only allowed fields
-            doctor.setFirstName(updatedDoctorData.getFirstName());
-            doctor.setLastName(updatedDoctorData.getLastName());
-            // Consider adding validation for birthDate format if updated
-            if (updatedDoctorData.getBirthDate() != null) {
-                 // Basic check, add proper parsing/validation if needed
-                 doctor.setBirthDate(updatedDoctorData.getBirthDate());
+            // Process photo
+            if (photoProfilFile != null && !photoProfilFile.isEmpty()) {
+                try {
+                    if (!photoProfilFile.getContentType().startsWith("image/")) {
+                        return ResponseEntity.badRequest().body(Map.of("message", "Invalid file type. Only images are allowed."));
+                    }
+                    if (photoProfilFile.getSize() > 5 * 1024 * 1024) { // 5MB limit
+                        return ResponseEntity.badRequest().body(Map.of("message", "File size exceeds the limit of 5 MB."));
+                    }
+                    doctor.setPhotoProfil(photoProfilFile.getBytes());
+                } catch (IOException e) {
+                    log.error("Error processing profile picture for doctor ID {}: {}", id, e.getMessage(), e);
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to process profile image."));
+                }
             }
-            doctor.setTel(updatedDoctorData.getTel());
-            doctor.setAddress(updatedDoctorData.getAddress());
-            doctor.setGender(updatedDoctorData.getGender());
-            doctor.setSpeciality(updatedDoctorData.getSpeciality());
-            // Do NOT update: email, password, role, centre, active status, createdAt
-            doctor.setUpdatedAt(LocalDate.now()); // Update timestamp
 
+            doctor.setUpdatedAt(LocalDate.now());
             DoctorCentreDexamen savedDoctor = doctorCentreDexamenRepository.save(doctor);
             log.info("Successfully updated DoctorCentreDexamen ID: {}", id);
-            return ResponseEntity.ok(savedDoctor); // Return ResponseEntity<DoctorCentreDexamen>
+            return ResponseEntity.ok(savedDoctor);
         } else {
-            log.warn("Admin attempt to update non-existent DoctorCentreDexamen ID: {}", id);
+            log.warn("Attempt to update non-existent DoctorCentreDexamen ID: {}", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "Doctor not found with ID: " + id)); // Return ResponseEntity<Map<String, String>>
+                    .body(Map.of("message", "Doctor not found with ID: " + id));
         }
     }
 
