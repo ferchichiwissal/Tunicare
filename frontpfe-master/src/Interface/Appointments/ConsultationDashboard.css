@@ -45,3 +45,16 @@
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 198, 169, 0.25);
 }
+
+/* Style the warning button within this component to be teal */
+.consultation-dashboard-container .btn-warning {
+  background-color: var(--primary-color, #00c6a9);
+  border-color: var(--primary-color, #00c6a9);
+  color: var(--white, #ffffff) !important; /* Ensure white text */
+}
+
+/* Add hover effect for the warning button */
+.consultation-dashboard-container .btn-warning:hover {
+  background-color: #00937d; /* Darker teal/green */
+  border-color: #008670;
+}

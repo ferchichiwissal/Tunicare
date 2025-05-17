@@ -102,3 +102,45 @@
         border-top: 1px solid #bbb;
     }
 }
+
+/* Styles personnalisés pour les boutons et le texte en vert d'eau */
+.examination-result-container .btn-primary,
+.examination-result-container .btn-secondary {
+    background-color: #00c6a9 !important; /* Vert d'eau */
+    border-color: #00c6a9 !important; /* Vert d'eau */
+    color: #fff !important; /* Texte blanc */
+}
+
+.examination-result-container .btn-primary:hover,
+.examination-result-container .btn-secondary:hover {
+    background-color: #00a38a !important; /* Nuance de vert d'eau au survol */
+    border-color: #00a38a !important;
+}
+
+.examination-result-container .btn-primary:active,
+.examination-result-container .btn-secondary:active {
+    background-color: #00806b !important; /* Nuance de vert d'eau à l'état actif */
+    border-color: #00806b !important;
+}
+
+/* Styles personnalisés pour le titre en vert d'eau */
+.examination-result-container .card-body h3.text-center.mb-4 {
+    color: #333 !important; /* Vert d'eau pour le titre */
+}
+
+/* Assurer que le reste du texte est noir */
+.examination-result-container h4,
+.examination-result-container p,
+.examination-result-container strong {
+    color: #333 !important; /* Noir pour le texte par défaut */
+}
+
+/* Assurer que le texte dans le contenu du résultat reste lisible */
+.examination-result-container .result-content div {
+    color: #333 !important; /* Couleur de texte par défaut pour le contenu HTML */
+}
+
+/* Assurer que le texte muted reste lisible */
+.examination-result-container .text-muted {
+    color: #555 !important; /* Couleur de texte par défaut pour le texte muted */
+}

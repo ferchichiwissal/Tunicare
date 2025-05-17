@@ -399,7 +399,7 @@ const MyConsultationsPage = () => {
                                     </td>
                                     <td> {/* New Cell for Hide Button */}
                                         <button
-                                            className="btn btn-sm btn-warning"
+                                            className="btn btn-sm btn-primary"
                                             onClick={() => handleHideConsultation(consult.idConsultation)}
                                         >
                                             {t('myConsultationsPage.buttons.hideConsultation')}

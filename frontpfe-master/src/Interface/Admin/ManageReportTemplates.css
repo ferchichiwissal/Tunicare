@@ -1,0 +1,19 @@
+/* Styles for ManageReportTemplates component */
+
+/* Target all buttons within the component */
+.container.mt-5 .btn {
+    background-color: #00c6a9 !important; /* Vert d'eau basé sur dashboard.css */
+    border-color: #00c6a9 !important; /* Vert d'eau basé sur dashboard.css */
+    color: #fff !important; /* Texte blanc pour la lisibilité */
+}
+
+/* Optional: Hover and active states */
+.container.mt-5 .btn:hover {
+    background-color: #00a38a !important; /* Une nuance légèrement différente au survol */
+    border-color: #00a38a !important;
+}
+
+.container.mt-5 .btn:active {
+    background-color: #00806b !important; /* Une autre nuance pour l'état actif */
+    border-color: #00806b !important;
+}

@@ -1061,3 +1061,21 @@ a:focus {
 
 
 // end footer section
+// Override Bootstrap button colors with $primary1 (vert d'eau)
+.btn-primary,
+.btn-danger,
+.btn-warning {
+    background-color: $primary1 !important;
+    border-color: $primary1 !important;
+    color: $white !important;
+
+    &:hover {
+        background-color: darken($primary1, 10%) !important;
+        border-color: darken($primary1, 10%) !important;
+    }
+
+    &:active {
+        background-color: darken($primary1, 15%) !important;
+        border-color: darken($primary1, 15%) !important;
+    }
+}

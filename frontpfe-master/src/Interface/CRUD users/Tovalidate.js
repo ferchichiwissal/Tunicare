@@ -408,7 +408,6 @@ const CompteValide = () => {
             <th>{t('tovalidate.tableHeaders.lastName')}</th>
             <th>{t('tovalidate.tableHeaders.email')}</th>
             <th>{t('tovalidate.tableHeaders.role')}</th>
-            <th>{t('tovalidate.tableHeaders.status')}</th> {/* Changed header */}
             <th>{t('tovalidate.tableHeaders.actions')}</th>
           </tr>
         </thead>
@@ -425,7 +424,6 @@ const CompteValide = () => {
                 <td>{user.lastName}</td>
                 <td>{user.email}</td>
                 <td>{user.role}</td>
-                <td>{user.displayStatus ? <span className="badge bg-success">{t('tovalidate.status.active')}</span> : <span className="badge bg-secondary">{t('tovalidate.status.inactivePending')}</span>}</td> {/* Use Bootstrap badges */}
                 <td>
                   {/* Use Bootstrap button classes */}
                   <button onClick={() => handleToggleStatus(user)} className="btn btn-sm btn-success me-1" disabled={loading}> {/* Activate button */}

@@ -203,8 +203,10 @@ const ConsultationDashboard = () => {
                     </thead>
                     <tbody>
                         {filteredConsultations.length > 0 ? (
-                            filteredConsultations.map(consult => (
-                                <tr key={consult.idConsultation}>
+                            filteredConsultations.map(consult => { // Added curly braces to use block body
+                                const consultationId = consult.idConsultation; // Explicitly define consultationId
+                                return ( // Added return statement
+                                <tr key={consultationId}> {/* Use defined consultationId */}
                                     <td>{consult.patient ? `${consult.patient.firstName} ${consult.patient.lastName}` : t('consultationDashboard.table.notAvailable')}</td>
                                     <td>{formatDate(consult.dateConsultation)}</td>
                                     <td>{consult.type || t('consultationDashboard.table.defaultType')}</td> {/* Use translation for default */}
@@ -214,33 +216,34 @@ const ConsultationDashboard = () => {
                                              {/* Changed button text and handler, use btn-primary for specific teal styling */}
                                              <button
                                                  className="btn btn-sm btn-primary" // Using btn-primary for custom teal style
-                                                 onClick={() => handleViewDetails(consult.idConsultation)}
+                                                 onClick={() => handleViewDetails(consultationId)} // Use defined consultationId
                                              >
                                                  {t('consultationDashboard.buttons.viewDetails')}
                                              </button>
                                              <button
-                                                 className="btn btn-sm btn-warning ms-2" // Added margin for spacing
-                                                 onClick={() => handleHideConsultation(consult.idConsultation)}
-                                             >
-                                                 {t('consultationDashboard.buttons.hideConsultation')}
-                                             </button>
-                                         </td>
-                                     )}
-                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                {/* Corrected role check for colSpan, remove inline style */}
-                                <td colSpan={user?.role === 'DOCTOR' ? 4 : 3} className="text-center">
-                                    {t('consultationDashboard.table.noConsultations')}
-                                </td>
-                            </tr>
-                        )}
-                </tbody>
-            </table>
-            </div> {/* Close table-responsive wrapper */}
-        </div>
-    );
+                                              className="btn btn-sm btn-primary ms-2" // Changed to btn-primary and added margin for spacing
+                                              onClick={() => handleHideConsultation(consultationId)} // Use defined consultationId
+                                          >
+                                              {t('consultationDashboard.buttons.hideConsultation')}
+                                          </button>
+                                       </td>
+                                   )}
+                               </tr>
+                            ); // Added closing parenthesis and semicolon
+                          }) // Added closing curly brace and parenthesis
+                      ) : (
+                          <tr>
+                              {/* Corrected role check for colSpan, remove inline style */}
+                              <td colSpan={user?.role === 'DOCTOR' ? 4 : 3} className="text-center">
+                                  {t('consultationDashboard.table.noConsultations')}
+                              </td>
+                          </tr>
+                      )}
+              </tbody>
+          </table>
+          </div> {/* Close table-responsive wrapper */}
+      </div>
+  );
 };
 
 export default ConsultationDashboard;

@@ -117,7 +117,7 @@ const PrescribeReportPage = () => {
             const updatedExamDetails = await apiClient.get(`/api/medical-examinations/${examId}`);
             setExamination(updatedExamDetails.data);
             // Set success message instead of alert
-            setSuccessMessage(wasUpdating ? t('prescribeReportPage.success.reportUpdated', { defaultValue: "Rapport mis à jour avec succès !" }) : t('prescribeReportPage.success.reportSaved'));
+            setSuccessMessage(wasUpdating ? t('prescribeReportPage.success.reportUpdated') : t('prescribeReportPage.success.reportSaved'));
             console.log(wasUpdating ? "Rapport mis à jour." : "Rapport enregistré.");
         } catch (err) {
             console.error(t('prescribeReportPage.errors.saveReportFailed'), err);
@@ -206,12 +206,12 @@ const PrescribeReportPage = () => {
 
         const printData = {
             doctorName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-            patientName: `${examination?.patientFirstName || t('common.notFound', { defaultValue: 'Non Trouvé'})} ${examination?.patientLastName || ''}`.trim(),
-            centreName: examination?.centreName || t('common.unspecified', { defaultValue: 'Non Spécifié'}),
+            patientName: `${examination?.patientFirstName || t('common.notFound')} ${examination?.patientLastName || ''}`.trim(),
+            centreName: examination?.centreName || t('common.unspecified'),
             centreAddress: examination?.centreAddress || '',
             centrePhone: examination?.centrePhone || '',
             reportDate: new Date().toLocaleDateString(t('common.locale', { ns: 'common', defaultValue: 'fr-FR' })),
-            examAct: examination?.act || t('common.unspecified', { defaultValue: 'Non spécifié'}),
+            examAct: examination?.act || t('common.unspecified'),
             signatureUrl: null
         };
 

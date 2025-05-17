@@ -6,7 +6,7 @@ import ReactQuill from 'react-quill';
 import AuthContext from '../../context/AuthContext';
 import 'react-quill/dist/quill.snow.css';
 // Removed CertificateModal import
-// import './ConsultationPage.css';
+import './ConsultationPage.css';
  
 const ConsultationPage = () => {
     const { t, i18n } = useTranslation(); // Initialize useTranslation hook and get i18n instance

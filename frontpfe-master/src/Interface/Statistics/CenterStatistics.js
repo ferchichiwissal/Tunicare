@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'; // Added useMemo
 import apiClient from '../../utils/apiClient';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 import './Statistics.css';
 
 const CenterStatistics = () => {
+    const { t } = useTranslation(); // Initialize useTranslation
     const [stats, setStats] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -14,13 +16,19 @@ const CenterStatistics = () => {
     const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 
     const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
-    const months = [
-        { value: '', label: 'All Months' },
-        { value: 1, label: 'January' }, { value: 2, label: 'February' }, { value: 3, label: 'March' },
-        { value: 4, label: 'April' }, { value: 5, label: 'May' }, { value: 6, label: 'June' },
-        { value: 7, label: 'July' }, { value: 8, label: 'August' }, { value: 9, label: 'September' },
-        { value: 10, label: 'October' }, { value: 11, label: 'November' }, { value: 12, label: 'December' }
-    ];
+
+    // Month options using t() for labels
+    const monthOptions = useMemo(() => {
+        const months = [];
+        for (let i = 1; i <= 12; i++) {
+            months.push({ value: i, label: t(`centerStatistics.months.${i}`) });
+        }
+        return [
+            { value: '', label: t('centerStatistics.allMonths') },
+            ...months
+        ];
+    }, [t]); // Recreate monthOptions when t changes (language changes)
+
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -36,23 +44,23 @@ const CenterStatistics = () => {
                     setError('');
                 } catch (err) {
                     console.error("Error fetching center statistics:", err);
-                    setError('Failed to load statistics. ' + (err.response?.data?.message || err.message));
+                    setError(t('centerStatistics.errors.failedToLoadPrefix') + (err.response?.data?.message || err.message));
                     setStats([]);
                 } finally {
                     setLoading(false);
                 }
             } else {
-                setError('Access denied. You must be a DOCTOR_CENTRE_EXAMEN to view these statistics.');
+                setError(t('centerStatistics.errors.accessDenied'));
                 setLoading(false);
                 setStats([]);
             }
         };
 
         fetchStats();
-    }, [user, selectedYear, selectedMonth]);
+    }, [user, selectedYear, selectedMonth, t]); // Added t to dependency array
 
     if (loading) {
-        return <div className="statistics-container"><p>Loading statistics...</p></div>;
+        return <div className="statistics-container"><p>{t('centerStatistics.loading')}</p></div>;
     }
 
     if (error) {
@@ -61,35 +69,36 @@ const CenterStatistics = () => {
 
     return (
         <div className="statistics-container">
-            <h2>Completed Examinations by Referring Doctor</h2>
+            <h2>{t('centerStatistics.title')}</h2>
             <div className="filters-container">
-                <label htmlFor="year-select-center">Year: </label>
+                <label htmlFor="year-select-center">{t('centerStatistics.yearLabel')}</label>
                 <select id="year-select-center" value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))}>
                     {years.map(year => <option key={year} value={year}>{year}</option>)}
                 </select>
 
-                <label htmlFor="month-select-center">Month: </label>
+                <label htmlFor="month-select-center">{t('centerStatistics.monthLabel')}</label>
                 <select id="month-select-center" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value ? parseInt(e.target.value) : '')}>
-                    {months.map(month => <option key={month.value} value={month.value}>{month.label}</option>)}
+                    {/* Use the memoized monthOptions */}
+                    {monthOptions.map(month => <option key={month.value} value={month.value}>{month.label}</option>)}
                 </select>
             </div>
 
             {stats.length === 0 ? (
-                <p>No completed examinations found for the selected period.</p>
+                <p>{t('centerStatistics.noStats')}</p>
             ) : (
                 <table className="statistics-table">
                     <thead>
                         <tr>
-                            <th>Prescribing Doctor</th>
-                            <th>Cabinet Name</th>
-                            <th>Number of Examinations</th>
+                            <th>{t('centerStatistics.tableHeaders.prescribingDoctor')}</th>
+                            <th>{t('centerStatistics.tableHeaders.cabinetName')}</th>
+                            <th>{t('centerStatistics.tableHeaders.numberOfExaminations')}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {stats.map((stat, index) => (
                             <tr key={index}>
                                 <td>{stat.prescribingDoctorName}</td>
-                                <td>{stat.prescribingDoctorCabinetName || 'N/A'}</td>
+                                <td>{stat.prescribingDoctorCabinetName || t('common.notAvailable')}</td>
                                 <td>{stat.examCount}</td>
                             </tr>
                         ))}

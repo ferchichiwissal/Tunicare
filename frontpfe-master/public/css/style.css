@@ -1,3 +1,12 @@
+:root {
+  --blue: #66cdaa; /* Vert d'eau pour remplacer le bleu primaire */
+  --primary: #66cdaa; /* Vert d'eau pour remplacer la couleur primaire */
+  --yellow: #66cdaa; /* Vert d'eau pour remplacer le jaune */
+  --warning: #66cdaa; /* Vert d'eau pour remplacer la couleur d'avertissement */
+  --danger: #66cdaa; /* Vert d'eau pour remplacer le rouge danger */
+  --success: #66cdaa; /* Vert d'eau pour la couleur de succès */
+}
+
 body {
   font-family: 'Roboto', sans-serif;
   color: #0c0c0c;

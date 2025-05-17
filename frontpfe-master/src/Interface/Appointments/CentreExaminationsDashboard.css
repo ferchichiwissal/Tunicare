@@ -36,7 +36,7 @@
 .user-table-container input[type="text"]:focus {
   border-color: var(--primary-color, #00c6a9);
   outline: none;
-  box-shadow: 0 0 0 3px 00c6a9(0, 198, 169, 0.25); /* Slightly larger focus shadow */
+  box-shadow: 0 0 0 3px rgba(0, 198, 169, 0.25); /* Slightly larger focus shadow */
 }
 
 /* Optional: Style for a search icon container if added */
@@ -77,6 +77,13 @@
   font-size: 0.9rem;
 }
 
+/* Add green header style for custom-table */
+.custom-table thead th {
+  background-color: var(--primary-color, #00c6a9); /* Teal background */
+  color: var(--white, #ffffff); /* White text for better contrast */
+}
+
+
 .user-table-container tbody tr:nth-child(even) {
   background-color: var(--light-background, #f7f7f7);
 }
@@ -89,96 +96,67 @@
 .user-table-container td button {
   padding: 6px 12px;
   margin-right: 5px;
-  /* Appliquer la couleur vert d'eau directement avec une spécificité élevée */
-  background-color: #00c6a9 !important; /* Vert d'eau */
-  border-color: #00c6a9 !important; /* Vert d'eau */
-  color: var(--white, #ffffff); /* Texte blanc */
+  background-color: var(--primary-color, #00c6a9);
+  color: var(--white, #ffffff);
+  border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: bold;
   transition: background-color 0.3s, transform 0.1s;
-  text-align: center; /* Centrer le texte dans le bouton */
-  box-sizing: border-box; /* Inclure padding et border dans la largeur */
-  flex-shrink: 0; /* Prevent shrinking */
-  flex-grow: 0; /* Prevent growing */
-  width: 100%; /* Make button take full width of container */
-}
-
-/* Container for action buttons to control alignment and width */
-.user-table-container td .action-buttons-container {
-  display: flex;
-  justify-content: center; /* Centrer les boutons horizontalement */
-  align-items: center; /* Centrer les boutons verticalement */
-  gap: 5px; /* Ajouter un espacement entre les boutons */
-  width: 150px; /* Fixed width for the container */
-  padding: 0; /* S'assurer qu'il n'y a pas de padding sur le conteneur */
 }
 
 .user-table-container td button:hover {
-  background-color: #00b39a !important; /* Nuance de vert d'eau au survol */
-  border-color: #00b39a !important;
+  background-color: #00937d;
   transform: translateY(-1px);
 }
 
-.user-table-container td button:active {
-    background-color: #00a08b !important; /* Nuance de vert d'eau à l'état actif */
-    border-color: #00a08b !important;
-}
-
 .user-table-container td button:disabled {
-  background-color: #ccc !important;
-  border-color: #ccc !important;
+  background-color: #ccc;
   cursor: not-allowed;
 }
 
-/* Override Bootstrap button colors with the desired green using custom classes */
-/* Override Bootstrap button colors with the desired green using custom classes and increased specificity */
-.user-table-container table td .btn-primary,
-.user-table-container table td .btn-danger,
-.user-table-container table td .btn-warning,
-.user-table-container table td .btn-edit-custom,
-.user-table-container table td .btn-toggle-status-custom {
-    background-color: var(--primary-color, #00c6a9) !important; /* Vert d'eau */
-    border-color: var(--primary-color, #00c6a9) !important; /* Vert d'eau */
-    color: var(--white, #ffffff) !important; /* Texte blanc */
+/* Style for the clear filter button */
+.user-table-container .clear-filter-button {
+  padding: 6px 12px;
+  background-color: var(--primary-color, #00c6a9); /* Vert d'eau */
+  color: var(--white, #ffffff);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.1s;
 }
 
-/* Target custom-teal class for the desired color with increased specificity */
-.user-table-container table td .btn-custom-teal {
-    background-color: var(--primary-color, #00c6a9) !important; /* Vert d'eau */
-    border-color: var(--primary-color, #00c6a9) !important; /* Vert d'eau */
-    color: var(--white, #ffffff) !important; /* Texte blanc */
+.user-table-container .clear-filter-button:hover {
+  background-color: #00937d; /* Darker shade on hover */
+  transform: translateY(-1px);
 }
 
-.user-table-container table td .btn-primary:hover,
-.user-table-container table td .btn-danger:hover,
-.user-table-container table td .btn-warning:hover,
-.user-table-container table td .btn-edit-custom:hover,
-.user-table-container table td .btn-toggle-status-custom:hover,
-.user-table-container table td .btn-custom-teal:hover { /* Add btn-custom-teal hover */
-    background-color: #00b39a !important; /* Nuance de vert d'eau au survol */
-    border-color: #00b39a !important;
-    color: var(--white, #ffffff) !important;
-}
 
-.user-table-container table td .btn-primary:active,
-.user-table-container table td .btn-danger:active,
-.user-table-container table td .btn-warning:active,
-.user-table-container table td .btn-edit-custom:active,
-.user-table-container table td .btn-toggle-status-custom:active,
-.user-table-container table td .btn-custom-teal:active { /* Add btn-custom-teal active */
-    background-color: #00a08b !important; /* Nuance de vert d'eau à l'état actif */
-    border-color: #00a08b !important;
-    color: var(--white, #ffffff) !important;
+/* Specific styles for different action buttons if needed */
+.user-table-container .edit-button {
+  /* background-color: blue; */
 }
-
+.user-table-container .delete-button {
+  background-color: var(--error-color, #dc3545);
+}
+.user-table-container .delete-button:hover {
+  background-color: #c82333; /* Darker red */
+}
+.user-table-container .toggle-status-button {
+  background-color: #ffc107; /* Example: Yellow for toggle */
+  color: #212529; /* Dark text on yellow */
+}
+.user-table-container .toggle-status-button:hover {
+  background-color: #e0a800;
+}
 
 /* Ensure text color is white for success badges */
 .user-table-container .badge.bg-success {
   color: #ffffff !important; /* White text for green badge */
 }
-
 
 
 /* Message for no users */
@@ -222,5 +200,6 @@
   .user-table-container td button {
     padding: 6px 10px; /* Smaller buttons */
     font-size: 0.8rem;
+    margin-right: 3px; /* Reduce space */
   }
 }

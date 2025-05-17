@@ -1,0 +1,15 @@
+/* Styles for MedicalExaminationForm.js */
+
+.medical-exam-form-container .btn-primary,
+.medical-exam-form-container .btn-info {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: var(--white) !important; /* Ensure text is white */
+}
+
+.medical-exam-form-container .btn-primary:hover,
+.medical-exam-form-container .btn-info:hover {
+  background-color: #00937d !important; /* Darker shade of teal on hover */
+  border-color: #00937d !important;
+  color: var(--white) !important;
+}

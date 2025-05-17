@@ -172,19 +172,23 @@
       "totalConsultations": "Total Consultations",
       "totalExams": "Total Examens",
       "nextAppointmentReminder": "Prochain RDV Accepté",
-      "appointmentDetails": "Le {{date}} à {{time}} avec Dr. {{doctor}} ({{cabinet}})"
+      "appointmentDetails": "Le {{date}} à {{time}} avec Dr. {{doctor}} ({{cabinet}})",
+      "refusedAppointmentWithProposal": "Prochain RDV Refusé",
+      "proposedDate": "Date proposée : {{date}} à {{time}}"
     },
     "doctor": {
       "pendingConfirmationAppointments": "RDV à confirmer",
       "pendingExaminationRequests": "Demandes d'examen en attente",
       "unreadExaminationResults": "Résultats d'examen non lus",
-      "appointmentCompletionRateWeek": "Taux RDV (Semaine)",
-      "appointmentCompletionRateMonth": "Taux RDV (Mois)",
+      "appointmentCompletionRateWeek": "Taux RDV(Semaine en cours)",
+      "appointmentCompletionRateMonth": "Taux RDV(Mois en cours)",
       "appointmentsToday": "RDV Acceptés Aujourd'hui",
       "consultationsToday": "Consultations Réalisées Aujourd'hui",
       "totalPatients": "Total Patients au Cabinet",
       "upcomingAppointmentsTitle": "RDV à Venir Aujourd'hui",
-      "pendingPatientRegistrations": "Inscriptions de Patients en Attente"
+      "pendingPatientRegistrations": "Inscriptions de Patients en Attente",
+      "totalAppointmentsThisMonth": "Nombre de RDV(Mois en cours)",
+      "newPatientsThisMonth": "Nouveaux Patients(Mois en cours)"
     },
     "doctorCentre": {
       "examsPerformedToday": "Examens Aujourd'hui",
@@ -200,17 +204,27 @@
       "totalDoctorCentres": "Total Médecins de Centre",
       "totalCabinets": "Total Cabinets",
       "totalExamCentres": "Total Centres d'Examen",
-      "newUsersThisWeek": "Nvx Utilisateurs (Semaine)",
-      "newUsersThisMonth": "Nvx Utilisateurs (Mois)",
-      "appointmentsToday": "RDV Créés (Aujourd'hui)",
+      "newUsersThisWeek": "Nvx Utilisateurs(Semaine en cours)",
+      "newUsersThisMonth": "Nvx Utilisateurs(Mois en cours)",
+      "appointmentsToday": "RDV Créés(Aujourd'hui)",
       "appointmentsThisWeek": "RDV Créés (Semaine)",
-      "appointmentsThisMonth": "RDV Créés (Mois)",
-      "consultationsToday": "Consultations (Aujourd'hui)",
-      "consultationsThisWeek": "Consultations (Semaine)",
-      "consultationsThisMonth": "Consultations (Mois)",
-      "examsToday": "Examens Demandés (Aujourd'hui)",
-      "examsThisWeek": "Examens Demandés (Semaine)",
-      "examsThisMonth": "Examens Demandés (Mois)"
+      "appointmentsThisMonth": "RDV Créés(Mois en cours)",
+      "consultationsToday": "Consultations(Aujourd'hui)",
+      "consultationsThisWeek": "Consultations(Semaine en cours)",
+      "consultationsThisMonth": "Consultations(Mois en cours)",
+      "examsToday": "Examens Demandés(Aujourd'hui)",
+      "examsThisWeek": "Examens Demandés(Semaine en cours)",
+      "examsThisMonth": "Examens Demandés(Mois en cours)",
+      "generatedMedicalReportsMonth":"rapports médicaux générés(Mois en cours)"
+    },
+    "assistant": {
+      "appointmentsToday": "Rendez-vous Aujourd'hui",
+      "pendingConfirmation": "En attente de confirmation",
+      "pendingPatientRegistrations": "Inscriptions Patients en Attente",
+      "totalPatientsInCabinet": "Total Patients au Cabinet",
+      "patientsActivatedToday": "Patients Activés Aujourd'hui",
+      "newUsersToday": "Nouveaux Utilisateurs Aujourd'hui",
+      "pendingConfirmationAppointments": "Rendez-vous en attente de confirmation"
     }
   },
   "editUserForm": {
@@ -374,8 +388,8 @@
     "buttons": {
       "edit": "Modifier",
       "delete": "Supprimer",
-      "activate": "Activer",
-      "deactivate": "Désactiver"
+      "activate":   "  Activer  ",
+      "deactivate": "Désactiver "
     },
     "alerts": {
       "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
@@ -487,7 +501,7 @@
     "noUsersFound": "Aucun utilisateur en attente de validation trouvé",
     "status": {
       "active": "Actif",
-      "inactivePending": "Inactif/En attente"
+       "pending": "En attente"
     },
     "buttons": {
       "activate": "Activer",
@@ -1203,7 +1217,7 @@
       "printSetupFailed": "Erreur lors de la préparation de l'impression."
     },
     "print": {
-      "otherCentre": "Autre",
+      "otherCentre": "un centre au choix de patient",
       "centreNotFound": "Centre (Nom non trouvé)",
       "title": "Demande d'Examen Médical",
       "doctorPrefix": "Dr. ",
@@ -1653,21 +1667,7 @@
         "cannotViewReportError": "Une erreur s'est produite lors de la tentative d'affichage du rapport."
       }
     },
-    "examinationResultPage": {
-      "errors": {
-        "unauthorized": "Non autorisé. Veuillez vous connecter pour voir cette page.",
-        "fetchFailed": "Échec de la récupération des détails de l'examen.",
-        "fetchFailedFallback": "Impossible de charger les détails de l'examen. Veuillez réessayer."
-      },
-      "loading": "Chargement des détails de l'examen...",
-      "noDetails": "Aucun détail trouvé pour cet examen.",
-      "unknownCentre": "Centre Inconnu",
-      "title": "Compte Rendu d'Examen",
-      "patientLabel": "Patient",
-      "dateLabel": "Date",
-      "examinationLabel": "Examen",
-      "reportByLabel": "Rapport par"
-    },
+    
     "centreExaminationsDashboard": {
       "title": "Examens à Réaliser",
       "loading": "Chargement des examens...",
@@ -1719,5 +1719,751 @@
         "reportSaved": "Rapport enregistré et examen marqué comme terminé avec succès !",
         "reportUpdated": "Rapport mis à jour avec succès !"
       }
+    },
+"editCentreForm": {
+    "title": "Modifier le Centre",
+    "labels": {
+      "nom": "Nom",
+      "telephone": "Téléphone",
+      "address": "Adresse"
+    },
+    "buttons": {
+      "updating": "Mise à jour...",
+      "updateCentre": "Mettre à jour le Centre"
     }
+  },
+"loading": "Chargement",
+  "common": {
+    "cancel": "Annuler"
+  },
+  "editCentreForm": {
+    "title": "Modifier le Centre",
+    "labels": {
+      "nom": "Nom",
+      "telephone": "Téléphone",
+      "address": "Adresse"
+    },
+    "buttons": {
+      "updating": "Mise à jour...",
+      "updateCentre": "Mettre à jour le Centre"
+    },
+    "errors": {
+      "fetch": {
+        "permissionDenied": "Permission refusée pour récupérer les données du centre.",
+        "notFound": "Centre avec l'ID {{id}} introuvable.",
+        "generic": "Erreur lors de la récupération des données du centre.",
+        "missingId": "L'ID du centre est manquant."
+      },
+      "validation": {
+        "nomRequired": "Le nom du centre est requis."
+      },
+      "submit": {
+        "permissionDenied": "Permission refusée pour mettre à jour le centre.",
+        "notFound": "Centre avec l'ID {{id}} introuvable lors de la mise à jour.",
+        "generic": "Erreur lors de la mise à jour du centre.",
+        "networkError": "Erreur réseau lors de la mise à jour du centre."
+      }
+    },
+    "alerts": {
+      "noChanges": "Aucune modification détectée.",
+      "updateSuccess": "Centre mis à jour avec succès !"
+    }
+  },
+  "editUserForm": {
+    "errors": {
+      "upload": {
+        "invalidType": "Type de fichier invalide. Veuillez télécharger une image.",
+        "sizeLimit": "La taille du fichier dépasse la limite de 5 Mo."
+      }
+    }
+  },
+"common": {
+    "unauthorized": "Vous n'êtes pas autorisé à voir cette page.",
+    "saving": "Sauvegarde...",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  },
+  "manageReportTemplates": {
+    "loading": "Chargement des modèles de rapport",
+    "title": "Gérer les Modèles de Rapport",
+    "editTitle": "Modifier le Modèle de Rapport",
+    "addTitle": "Ajouter un Modèle de Rapport",
+    "errors": {
+      "fetchFailed": "Échec du chargement des modèles de rapport.",
+      "deleteFailed": "Échec de la suppression du modèle.",
+      "updateFailed": "Échec de la mise à jour du modèle.",
+      "addFailed": "Échec de l'ajout du modèle."
+    },
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce modèle ?",
+    "success": {
+      "deleteSuccess": "Modèle supprimé avec succès !",
+      "updateSuccess": "Modèle mis à jour avec succès !",
+      "addSuccess": "Modèle ajouté avec succès !"
+    },
+    "buttons": {
+      "addTemplate": "Ajouter un Modèle"
+    },
+    "noTemplates": "Aucun modèle trouvé.",
+    "tableHeaders": {
+      "id": "ID",
+      "name": "Nom",
+      "type": "Type",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Nom",
+      "type": "Type",
+      "typePlaceholder": "Type optionnel pour la catégorisation",
+      "previewImage": "Image de prévisualisation",
+      "currentImage": "Image actuelle",
+      "currentImageAlt": "Image de prévisualisation actuelle",
+      "content": "Contenu"
+    }
+  },
+"editUserForm": {
+    "loading": "Chargement des données utilisateur",
+    "title": "Modifier l'Utilisateur",
+    "alerts": {
+      "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+      "noChanges": "Aucune modification détectée.",
+      "updateSuccess": "Utilisateur mis à jour avec succès !"
+    },
+    "errors": {
+      "fetch": {
+        "missingId": "L'ID utilisateur est manquant.",
+        "noToken": "Jeton d'authentification introuvable.",
+        "permissionDenied": "Permission refusée pour récupérer les données utilisateur.",
+        "notFound": "Utilisateur avec l'ID {{id}} introuvable.",
+        "generic": "Erreur lors de la récupération des données utilisateur."
+      },
+      "upload": {
+        "invalidType": "Type de fichier invalide. Veuillez télécharger une image.",
+        "sizeLimit": "La taille du fichier dépasse la limite de 5 Mo."
+      },
+      "validation": {
+        "firstNameRequired": "Le Prénom est requis.",
+        "lastNameRequired": "Le Nom est requis.",
+        "emailInvalid": "Format d'email invalide.",
+        "birthDateRequired": "La Date de Naissance est requise.",
+        "phoneDigitsOnly": "Le numéro de téléphone doit contenir uniquement des chiffres."
+      },
+      "submit": {
+        "authRequired": "Authentification requise pour mettre à jour l'utilisateur.",
+        "permissionDenied": "Permission refusée pour mettre à jour l'utilisateur.",
+        "notFound": "Utilisateur avec l'ID {{id}} introuvable lors de la mise à jour.",
+        "generic": "Erreur lors de la mise à jour de l'utilisateur.",
+        "networkError": "Erreur réseau lors de la mise à jour de l'utilisateur."
+      }
+    },
+    "labels": {
+      "profilePicture": "Photo de Profil",
+      "changePicture": "Changer la Photo",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "birthDate": "Date de Naissance",
+      "telephone": "Téléphone",
+      "address": "Adresse"
+    },
+    "buttons": {
+      "updating": "Mise à jour...",
+      "updateUser": "Mettre à jour "
+    }
+  },
+"myConsultationsPage": {
+    "alerts": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+      "confirmHide": "Êtes-vous sûr de vouloir masquer cette consultation ?",
+      "hideSuccess": "Consultation masquée avec succès.",
+      "hideError": "Erreur lors du masquage de la consultation."
+    },
+    "errors": {
+      "unidentifiedUser": "Utilisateur non identifié.",
+      "cabinetContextNotFound": "Contexte du cabinet introuvable.",
+      "fetchFailedFallback": "Échec de la récupération des consultations.",
+      "authError": "Erreur d'authentification. Veuillez vous reconnecter.",
+      "authErrorDownload": "Erreur d'authentification. Impossible de télécharger.",
+      "downloadInvalidResponse": "Réponse invalide reçue pour le téléchargement.",
+      "prescriptionNotFound": "Ordonnance introuvable.",
+      "downloadFailedFallback": "Échec du téléchargement du fichier.",
+      "certificateNotFound": "Certificat introuvable.",
+      "hideFailedFallback": "Échec du masquage de la consultation."
+    },
+    "loading": "Chargement...",
+    "title": "Mes Consultations",
+    "errorPrefix": "Erreur",
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "prescription": "Ordonnance",
+      "certificate": "Certificat",
+      "actions": "Actions",
+      "notAvailable": "N/A",
+      "invalidDate": "Date invalide",
+      "defaultType": "Consultation",
+      "noConsultations": "Aucune consultation trouvée."
+    },
+    "buttons": {
+      "download": "Télécharger",
+      "downloadedCertificate": "Téléchargé",
+      "hideConsultation": "Masquer"
+    },
+    "checking": "Vérification..."
+    },
+  "myExaminationsPage": {
+    "alerts": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+      "confirmHide": "Êtes-vous sûr de vouloir masquer cet examen ? Cette action est irréversible depuis cette interface."
+    },
+    "errors": {
+      "authMissing": "Jeton d'authentification manquant. Veuillez vous reconnecter.",
+      "downloadFailed": "Échec du téléchargement du fichier pour l'examen ID {{examId}}.",
+      "hideFailed": "Échec du masquage de l'examen ID {{examId}}.",
+      "unidentifiedUser": "Utilisateur non identifié.",
+      "cabinetContextNotFound": "Contexte du cabinet introuvable.",
+      "authMissingLogin": "Jeton d'authentification manquant. Veuillez vous connecter.",
+      "fetchFailedFallback": "Échec de la récupération des examens."
+    },
+    "common": {
+      "unspecified": "Non spécifié"
+    },
+    "loading": "Chargement...",
+    "title": "Mes Examens",
+    "errorPrefix": "Erreur :",
+    "table": {
+      "dateRequested": "Date de la demande",
+      "type": "Type",
+      "centre": "Centre",
+      "action": "Action"
+    },
+    "buttons": {
+      "downloadRequest": "Télécharger Demande",
+      "downloadResult": "Télécharger Résultat",
+      "hide": "Masquer"
+    },
+    "tooltips": {
+      "downloadNotReady": "Le résultat n'est pas encore disponible pour téléchargement."
+    },
+    "noExaminations": "Aucun examen trouvé."
+  },
+  "common": {
+    "notAvailable": "N/A",
+    "invalidDate": "Date invalide",
+    "loading": "Chargement..."
+  },
+
+
+  "consultationDashboard": {
+    "alerts": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+      "confirmHide": "Êtes-vous sûr de vouloir masquer cette consultation ?",
+      "hideSuccess": "Consultation masquée avec succès.",
+      "hideError": "Erreur lors du masquage de la consultation."
+    },
+    "errors": {
+      "missingDoctorId": "L'ID du médecin est manquant.",
+      "fetchFailedFallback": "Échec de la récupération des consultations.",
+      "hideFailedFallback": "Échec du masquage de la consultation."
+    },
+    "loading": "Chargement...",
+    "title": "Tableau de bord des consultations",
+    "errorPrefix": "Erreur",
+    "searchPlaceholder": "Rechercher par nom de patient...",
+    "table": {
+      "patient": "Patient",
+      "date": "Date",
+      "type": "Type",
+      "actions": "Actions",
+      "notAvailable": "N/A",
+      "invalidDate": "Date invalide",
+      "defaultType": "Consultation",
+      "noConsultations": "Aucune consultation trouvée."
+    },
+    "buttons": {
+      "viewDetails": "Voir Détails",
+      "hideConsultation": "Masquer"
+    }
+  },
+ 
+  "myConsultationsPage": {
+    "alerts": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+      "confirmHide": "Êtes-vous sûr de vouloir masquer cette consultation ?",
+      "hideSuccess": "Consultation masquée avec succès.",
+      "hideError": "Erreur lors du masquage de la consultation."
+    },
+    "errors": {
+      "unidentifiedUser": "Utilisateur non identifié.",
+      "cabinetContextNotFound": "Contexte du cabinet introuvable.",
+      "fetchFailedFallback": "Échec de la récupération des consultations.",
+      "authError": "Erreur d'authentification. Veuillez vous reconnecter.",
+      "authErrorDownload": "Erreur d'authentification. Impossible de télécharger.",
+      "downloadInvalidResponse": "Réponse invalide reçue pour le téléchargement.",
+      "prescriptionNotFound": "Ordonnance introuvable.",
+      "downloadFailedFallback": "Échec du téléchargement du fichier.",
+      "certificateNotFound": "Certificat introuvable.",
+      "hideFailedFallback": "Échec du masquage de la consultation."
+    },
+    "loading": "Chargement...",
+    "title": "Mes Consultations",
+    "errorPrefix": "Erreur",
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "prescription": "Ordonnance",
+      "certificate": "Certificat",
+      "actions": "Actions",
+      "notAvailable": "N/A",
+      "invalidDate": "Date invalide",
+      "defaultType": "Consultation",
+      "noConsultations": "Aucune consultation trouvée."
+    },
+    "buttons": {
+      "download": "Télécharger",
+      "downloadedCertificate": "Téléchargé",
+      "hideConsultation": "Masquer"
+    },
+    "checking": "Vérification..."
+    
+  },
+  "myExaminationsPage": {
+    "alerts": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+      "confirmHide": "Êtes-vous sûr de vouloir masquer cet examen ? Cette action est irréversible depuis cette interface."
+    },
+    "errors": {
+      "authMissing": "Jeton d'authentification manquant. Veuillez vous reconnecter.",
+      "downloadFailed": "Échec du téléchargement du fichier pour l'examen ID {{examId}}.",
+      "hideFailed": "Échec du masquage de l'examen ID {{examId}}.",
+      "unidentifiedUser": "Utilisateur non identifié.",
+      "cabinetContextNotFound": "Contexte du cabinet introuvable.",
+      "authMissingLogin": "Jeton d'authentification manquant. Veuillez vous connecter.",
+      "fetchFailedFallback": "Échec de la récupération des examens."
+    },
+    "common": {
+      "unspecified": "Non spécifié"
+    },
+    "loading": "Chargement...",
+    "title": "Mes Examens",
+    "errorPrefix": "Erreur :",
+    "table": {
+      "dateRequested": "Date de la demande",
+      "type": "Type",
+      "centre": "Centre",
+      "action": "Action"
+    },
+    "buttons": {
+      "downloadRequest": "Télécharger Demande",
+      "downloadResult": "Télécharger Résultat",
+      "hide": "Masquer"
+    },
+    "tooltips": {
+      "downloadNotReady": "Le résultat n'est pas encore disponible pour téléchargement."
+    },
+    "noExaminationsFound": "Aucun examen trouvé pour le statut sélectionné."
+  },
+  "consultationDashboard": {
+    "alerts": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+      "confirmHide": "Êtes-vous sûr de vouloir masquer cette consultation ?",
+      "hideSuccess": "Consultation masquée avec succès.",
+      "hideError": "Erreur lors du masquage de la consultation."
+    },
+    "errors": {
+      "missingDoctorId": "L'ID du médecin est manquant.",
+      "fetchFailedFallback": "Échec de la récupération des consultations.",
+      "hideFailedFallback": "Échec du masquage de la consultation."
+    },
+    "loading": "Chargement...",
+    "title": "Tableau de bord des consultations",
+    "errorPrefix": "Erreur",
+    "searchPlaceholder": "Rechercher par nom de patient...",
+    "table": {
+      "patient": "Patient",
+      "date": "Date",
+      "type": "Type",
+      "actions": "Actions",
+      "notAvailable": "N/A",
+      "invalidDate": "Date invalide",
+      "defaultType": "Consultation",
+      "noConsultations": "Aucune consultation trouvée."
+    },
+    "buttons": {
+      "viewDetails": "Voir Détails",
+      "hideConsultation": "Masquer"
+    }
+  },
+  "doctorExaminationsDashboard": {
+    "alerts": {
+      "unauthorizedOrMissingInfo": "Accès non autorisé ou informations utilisateur manquantes.",
+      "cannotModify": "Impossible de modifier un examen terminé.",
+      "cannotDelete": "Impossible de supprimer un examen terminé.",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet examen ?",
+      "deleteSuccess": "Examen supprimé avec succès."
+    },
+    "errors": {
+      "fetchFailed": "Erreur lors de la récupération des examens du médecin :",
+      "fetchFailedFallback": "Échec de la récupération des examens.",
+      "missingExamId": "L'ID de l'examen est manquant.",
+      "cannotViewReportError": "Impossible de voir le rapport : L'ID de l'examen est manquant.",
+      "deleteFailed": "Erreur lors de la suppression de l'examen :",
+      "deleteFailedFallback": "Échec de la suppression de l'examen.",
+      "hideFailedDoctor": "Erreur lors du masquage de l'examen pour le docteur :",
+      "hideFailedDoctorFallback": "Erreur lors de la tentative de masquage de l'examen."
+    },
+    "loading": "Chargement...",
+    "title": "Tableau de bord des examens du médecin",
+    "searchPlaceholder": "Rechercher par nom de patient...",
+    "statusFilters": {
+      "pending": "En attente",
+      "completed": "Terminé"
+    },
+    "statuses": {
+      "pending": "En attente",
+      "completed": "Terminé"
+    },
+    "noExaminationsFound": "Aucun examen trouvé pour le statut sélectionné.",
+    "tableHeaders": {
+      "dateRequest": "Date de la demande",
+      "patientName": "Nom du patient",
+      "act": "Acte",
+      "recommendation": "Recommandation",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "buttons": {
+      "modify": "Modifier",
+      "delete": "Supprimer",
+      "viewResult": "Voir Résultat",
+      "hideExam": "Masquer"
+    },
+    "tooltips": {
+      "hideExam": "Ne plus afficher cet examen dans cette liste"
+    }
+  },
+  "centerStatistics": {
+    "allMonths": "Tous les mois",
+    "months": {
+      "1": "Janvier",
+      "2": "Février",
+      "3": "Mars",
+      "4": "Avril",
+      "5": "Mai",
+      "6": "Juin",
+      "7": "Juillet",
+      "8": "Août",
+      "9": "Septembre",
+      "10": "Octobre",
+      "11": "Novembre",
+      "12": "Décembre"
+    },
+    "errors": {
+      "failedToLoadPrefix": "Échec du chargement des statistiques. ",
+      "accessDenied": "Accès refusé. Vous devez être DOCTEUR_CENTRE_EXAMEN pour consulter ces statistiques."
+    },
+    "loading": "Chargement des statistiques...",
+    "title": "Examens Complets par Médecin Prescripteur",
+    "yearLabel": "Année : ",
+    "monthLabel": "Mois : ",
+    "noStats": "Aucun examen complet trouvé pour la période sélectionnée.",
+    "tableHeaders": {
+      "prescribingDoctor": "Médecin Prescripteur",
+      "cabinetName": "Nom du Cabinet",
+      "numberOfExaminations": "Nombre d'Examens"
+    }
+  },
+  "centreExaminationsDashboard": {
+    "errors": {
+      "unauthorizedOrMissingInfo": "Accès non autorisé ou informations utilisateur manquantes.",
+      "fetchFailed": "Erreur lors de la récupération des examens du centre :",
+      "fetchFailedFallback": "Échec de la récupération des examens du centre.",
+      "popupBlocked": "Fenêtre contextuelle bloquée. Veuillez autoriser les fenêtres contextuelles pour ce site afin de visualiser le rapport."
+    },
+    "loading": "Chargement...",
+    "title": "Tableau de bord des examens du centre",
+    "filterByAct": "Filtrer par acte :",
+    "searchPlaceholder": "Rechercher par nom de patient...",
+    "noExaminationsFound": "Aucun examen trouvé pour les critères sélectionnés.",
+    "tableHeaders": {
+      "dateRequest": "Date de la demande",
+      "patientName": "Nom du patient",
+      "act": "Acte",
+      "recommendation": "Recommandation",
+      "prescribingDoctor": "Médecin prescripteur",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "buttons": {
+      "prescribeReport": "Prescrire Rapport",
+      "viewReport": "Voir Rapport"
+    }
+  },
+  "medicalExaminationForm": {
+    "examTypes": {
+      "irm": "IRM",
+      "radio": "Radio",
+      "analysesanguine": "Analyse sanguine",
+      "scanner": "Scanner",
+      "echographie": "Échographie",
+      "autre": "Autre"
+    }
+  },
+  
+  "examinationResultPage.errors.unauthorized": "Accès non autorisé. Veuillez vous connecter.",
+  "examinationResultPage.errors.fetchFailed": "Échec du chargement des détails de l'examen.",
+  "examinationResultPage.errors.fetchFailedFallback": "Une erreur est survenue lors du chargement des détails de l'examen.",
+  "examinationResultPage.consoleWarnings.removeIframeAfterPrint": "Impossible de supprimer l'iframe d'impression existante :",
+  "examinationResultPage.consoleErrors.printExecution": "Erreur lors de l'exécution de l'impression :",
+  "examinationResultPage.errors.printExecutionError": "Une erreur est survenue lors de l'impression.",
+  "examinationResultPage.consoleErrors.printSetup": "Erreur lors de la configuration de l'impression :",
+  "examinationResultPage.errors.printSetupError": "Une erreur est survenue lors de la préparation de l'impression.",
+  "examinationResultPage.errors.noDetailsToPrint": "Aucun détail d'examen à imprimer.",
+  "examinationResultPage.unknownCentre": "Centre Inconnu",
+  "examinationResultPage.signatureAlt": "Signature",
+  "examinationResultPage.reportTitle": "Compte Rendu d'Examen",
+  "examinationResultPage.patientLabel": "Patient",
+  "examinationResultPage.dateLabel": "Date",
+  "examinationResultPage.examinationLabel": "Examen",
+  "examinationResultPage.doctorPrefix": "Dr.",
+  "examinationResultPage.signatureLabel": "Signature",
+  "examinationResultPage.loading": "Chargement des détails de l'examen...",
+  "examinationResultPage.noDetails": "Aucun détail trouvé pour cet examen.",
+  "examinationResultPage.prescribingDoctorLabel": "Médecin Prescripteur",
+  "examinationResultPage.reportingDoctorLabel": "Médecin Rapporteur",
+  "examinationResultPage.printButton": "Imprimer",
+  "examinationResultPage.title": "Résultat de l'Examen"
+,
+
+
+
+
+
+
+
+
+  "archivedExaminationsPage": {
+    "errors": {
+      "fetchFailed": "Erreur lors de la récupération des examens archivés :",
+      "fetchFailedFallback": "Une erreur s'est produite lors de la récupération des examens archivés.",
+      "unauthorizedOrIncorrectRole": "Accès non autorisé ou rôle utilisateur incorrect.",
+      "accessDenied": "Vous devez être connecté en tant que Médecin de Centre d'Examen pour voir cette page.",
+      "hideFailedCentre": "Erreur lors du masquage de l'examen pour le centre :",
+      "hideFailedCentreFallback": "Erreur lors de la tentative de masquage de l'examen."
+    },
+    "loading": "Chargement des examens archivés...",
+    "title": "Archive des Examens Réalisés",
+    "searchPlaceholder": "Rechercher par nom ou prénom du patient...",
+    "noExamsFoundSearch": "Aucun examen ne correspond à votre recherche.",
+    "noArchivedExamsFound": "Aucun examen archivé trouvé.",
+    "tableHeaders": {
+      "patient": "Patient",
+      "examType": "Type d'Examen",
+      "creationDate": "Date de Création",
+      "action": "Action"
+    },
+    "buttons": {
+      "viewResult": "Voir Résultat",
+      "hideExam": "Masquer"
+    },
+    "tooltips": {
+      "hideExam": "Ne plus afficher cet examen dans cette liste"
+    }
+  },
+  "common": {
+    "locale": "fr-FR",
+    "clearFilter": "Effacer le filtre",
+    "loading": "Chargement...",
+    "notAvailable": "N/A",
+    "invalidDate": "Date invalide",
+    "back": "Retour"
+  },
+  "uploadSignaturePage.selectFileError": "Veuillez sélectionner un fichier de signature.",
+  "uploadSignaturePage.uploadSuccess": "Signature téléchargée avec succès !",
+  "uploadSignaturePage.uploadError": "Erreur lors du téléchargement de la signature.",
+  "uploadSignaturePage.title": "Télécharger ma Signature Électronique",
+  "uploadSignaturePage.description": "Veuillez télécharger une image de votre signature. Cette signature sera utilisée pour signer électroniquement les résultats d'examen.",
+  "uploadSignaturePage.fileLabel": "Fichier de signature (PNG, JPG) :",
+  "uploadSignaturePage.uploadingButton": "Téléchargement...",
+  "uploadSignaturePage.uploadButton": "Télécharger la Signature",
+
+
+ "common.edit": "Modifier",
+  "common.delete": "Supprimer",
+  "common.save": "Enregistrer",
+  "common.cancel": "Annuler",
+
+
+
+
+  "doctorStatistics.months.1": "Janvier",
+  "doctorStatistics.months.2": "Février",
+  "doctorStatistics.months.3": "Mars",
+  "doctorStatistics.months.4": "Avril",
+  "doctorStatistics.months.5": "Mai",
+  "doctorStatistics.months.6": "Juin",
+  "doctorStatistics.months.7": "Juillet",
+  "doctorStatistics.months.8": "Août",
+  "doctorStatistics.months.9": "Septembre",
+  "doctorStatistics.months.10": "Octobre",
+  "doctorStatistics.months.11": "Novembre",
+  "doctorStatistics.months.12": "Décembre",
+  "doctorStatistics.allMonths": "Tous les mois",
+  "doctorStatistics.errors.failedToLoad": "Échec du chargement des statistiques du médecin.",
+  "doctorStatistics.errors.accessDenied": "Accès refusé. Vous n'avez pas les autorisations nécessaires.",
+  "doctorStatistics.loading": "Chargement des statistiques...",
+  "doctorStatistics.selectedMonthLabel": "Mois sélectionné",
+  "doctorStatistics.title": "Statistiques du Médecin",
+  "doctorStatistics.yearLabel": "Année :",
+  "doctorStatistics.monthLabel": "Mois :",
+  "doctorStatistics.totalFor": "Total pour",
+  "doctorStatistics.noStats": "Aucune statistique disponible pour la période sélectionnée.",
+  "doctorStatistics.centerNameHeader": "Nom du Centre",
+  "doctorStatistics.examCountHeader": "Nombre d'examens",
+
+
+
+
+  "medicalExaminationForm.errors.missingPatientId": "ID patient manquant dans l'URL.",
+  "medicalExaminationForm.errors.loadFailedFallback": "Une erreur est survenue lors du chargement des données initiales.",
+  "medicalExaminationForm.status.saving": "Enregistrement...",
+  "medicalExaminationForm.errors.selectExamType": "Veuillez sélectionner un type d'examen.",
+  "medicalExaminationForm.errors.missingConsultationId": "ID consultation manquant dans l'URL.",
+  "medicalExaminationForm.status.updating": "Mise à jour...",
+  "medicalExaminationForm.status.updateSuccess": "Demande d'examen mise à jour avec succès !",
+  "medicalExaminationForm.status.saveSuccess": "Demande d'examen enregistrée avec succès !",
+  "medicalExaminationForm.errors.saveSuccessIdMissing": "Demande d'examen créée, mais l'ID n'a pas été trouvé dans la réponse.",
+  "medicalExaminationForm.errors.updateFailedFallback": "Échec de la mise à jour de la demande d'examen.",
+  "medicalExaminationForm.errors.saveFailedFallback": "Échec de l'enregistrement de la demande d'examen.",
+  "common.notAvailable": "N/A",
+  "common.invalidDate": "Date invalide",
+  "medicalExaminationForm.errors.printPatientDataMissing": "Données patient manquantes pour l'impression.",
+  "medicalExaminationForm.print.otherCentre": "un Centre au choix de patient ",
+  "medicalExaminationForm.print.centreNotFound": "Centre non trouvé (ID: {{id}})",
+  "medicalExaminationForm.print.title": "Demande d'Examen Médical",
+  "medicalExaminationForm.print.doctorPrefix": "Dr. ",
+  "medicalExaminationForm.print.fallbackDoctorName": "Nom du médecin inconnu",
+  "medicalExaminationForm.print.fallbackCabinetAddress": "Adresse du cabinet inconnue",
+  "medicalExaminationForm.print.fallbackCabinetPhone": "Téléphone du cabinet inconnu",
+  "medicalExaminationForm.print.dateLabel": "Date :",
+  "medicalExaminationForm.print.patientSectionTitle": "Informations Patient",
+  "medicalExaminationForm.print.lastNameLabel": "Nom :",
+  "medicalExaminationForm.print.firstNameLabel": "Prénom :",
+  "medicalExaminationForm.print.dobLabel": "Date de naissance :",
+  "medicalExaminationForm.print.ageLabel": "Âge :",
+  "medicalExaminationForm.print.ageSuffix": "ans",
+  "medicalExaminationForm.print.examSectionTitle": "Détails de l'Examen",
+  "medicalExaminationForm.print.examTypeLabel": "Type d'examen :",
+  "medicalExaminationForm.print.fallbackExamType": "Type d'examen non spécifié",
+  "medicalExaminationForm.print.centreLabel": "Centre d'examen :",
+  "medicalExaminationForm.print.recommendationLabel": "Recommandation :",
+  "medicalExaminationForm.print.fallbackRecommendation": "Aucune recommandation",
+  "medicalExaminationForm.print.signatureLabel": "Signature du médecin",
+  "medicalExaminationForm.errors.printExecutionFailed": "Une erreur est survenue lors de l'exécution de l'impression.",
+  "medicalExaminationForm.errors.printSetupFailed": "Une erreur est survenue lors de la préparation de l'impression.",
+  "medicalExaminationForm.loading": "Chargement...",
+  "medicalExaminationForm.errorPrefix": "Erreur : ",
+  "medicalExaminationForm.titleEdit": "Modifier la Demande d'Examen Médical",
+  "medicalExaminationForm.titleCreate": "Nouvelle Demande d'Examen Médical",
+  "medicalExaminationForm.currentStatusLabel": "Statut actuel :",
+  "medicalExaminationForm.labels.examType": "Type d'examen",
+  "medicalExaminationForm.placeholders.select": "Sélectionner...",
+  "medicalExaminationForm.examTypes.irm": "IRM",
+  "medicalExaminationForm.examTypes.radio": "Radio",
+  "medicalExaminationForm.examTypes.bloodTest": "Analyse sanguine",
+  "medicalExaminationForm.examTypes.scanner": "Scanner",
+  "medicalExaminationForm.examTypes.ultrasound": "Échographie",
+  "medicalExaminationForm.examTypes.other": "Autre",
+  "medicalExaminationForm.placeholders.specifyExamType": "Spécifier le type d'examen",
+  "medicalExaminationForm.labels.centre": "Centre d'examen",
+  "medicalExaminationForm.placeholders.selectCentre": "Sélectionner un centre...",
+  "medicalExaminationForm.labels.recommendation": "Recommandation",
+  "medicalExaminationForm.buttons.update": "Mettre à jour",
+  "medicalExaminationForm.buttons.save": "Enregistrer",
+  "medicalExaminationForm.buttons.print": "Imprimer",
+  "medicalExaminationForm.patientSectionTitle":"Information de Patient",
+
+
+"dashboard.numericalStatisticsTitle": "Statistiques en chiffres",
+
+"common.print": "imprimer",
+
+
+
+  "prescribeReportPage": {
+    "errors": {
+      "fetchExamFailed": "Échec de la récupération des détails de l'examen.",
+      "fetchExamFailedFallback": "Échec de la récupération des détails de l'examen.",
+      "fetchTemplatesFailed": "Échec de la récupération des modèles de rapport.",
+      "fetchTemplatesFailedFallback": "Échec de la récupération des modèles de rapport.",
+      "missingExamId": "ID d'examen manquant pour l'enregistrement du rapport.",
+      "saveReportFailed": "Échec de l'enregistrement du rapport.",
+      "saveReportFailedFallback": "Échec de l'enregistrement du rapport.",
+      "printDataMissing": "Données d'examen ou d'utilisateur manquantes pour l'impression."
+    },
+    "success": {
+      "reportUpdated": "Rapport mis à jour avec succès !",
+      "reportSaved": "Rapport enregistré avec succès !"
+    },
+    "loadingTemplates": "Chargement des modèles...",
+    "title": "Prescrire un Rapport",
+    "patient": "Patient",
+    "act": "Acte",
+    "selectTemplateTitle": "Sélectionner un Modèle de Rapport",
+    "blankDocument": "Document vierge",
+    "backToTemplates": "Retour aux Modèles",
+    "updateReportButton": "Mettre à jour le Rapport",
+    "saveReportButton": "Enregistrer le Rapport"
+  },
+  "common": {
+    "notFound": "Non Trouvé",
+    "unspecified": "Non Spécifié",
+    "locale": "fr-FR",
+    "saving": "Enregistrement...",
+    "print": "Imprimer",
+    "clearFilter": "Effacer le filtre"
+  },
+
+
+
+  "examinationResultPage": {
+    "errors": {
+      "unauthorized": "Vous n'êtes pas autorisé à voir ce résultat.",
+      "fetchFailed": "Erreur lors du chargement des détails de l'examen.",
+      "fetchFailedFallback": "Erreur lors du chargement des détails de l'examen.",
+      "printExecutionError": "Erreur lors de l'exécution de l'impression.",
+      "printSetupError": "Erreur lors de la configuration de l'impression.",
+      "noDetailsToPrint": "Aucun détail d'examen à imprimer."
+    },
+    "consoleErrors": {
+      "fetchFailed": "Erreur lors du chargement des détails de l'examen.",
+      "printExecution": "Erreur lors de l'exécution de l'impression.",
+      "printSetup": "Erreur lors de la configuration de l'impression."
+    },
+    "consoleWarnings": {
+      "removeIframe": "Impossible de supprimer l'iframe d'impression existante.",
+      "removeIframeAfterPrint": "Impossible de supprimer l'iframe d'impression après l'impression."
+    },
+    "unknownCentre": "Centre inconnu",
+    "reportTitle": "Compte Rendu d'Examen",
+    "patientLabel": "Patient",
+    "dateLabel": "Date",
+    "examinationLabel": "Examen",
+    "doctorPrefix": "Dr.",
+    "signatureLabel": "Signature",
+    "signatureAlt": "Signature",
+    "loading": "Chargement...",
+    "noDetails": "Aucun détail d'examen trouvé.",
+    "title": "Résultat de l'examen",
+    "prescribingDoctorLabel": "Médecin Prescripteur",
+    "reportingDoctorLabel": "Médecin Rapporteur",
+    "printButton": "Imprimer"
+  },
+
+
+"common": {
+    "back": "Retour",
+    "BACK": "Retour"
   }
+}

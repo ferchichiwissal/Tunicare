@@ -640,60 +640,64 @@ const ManageAppointments = () => {
                         </div>
                     )}
 
-                    <table className="appointments-table">
-                        <thead>
-                            <tr>
-                                <th>{t('manageAppointments.table.header.patient')}</th>
-                                <th>{t('manageAppointments.table.header.date')}</th>
-                                <th>{t('manageAppointments.table.header.type')}</th>
-                                <th>{t('manageAppointments.table.header.status')}</th>
-                                {/* Conditionally render Action header */}
-                                {showActionColumn && <th>{t('manageAppointments.table.header.action')}</th>}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredAppointments.length > 0 ? (
-                                filteredAppointments.map((appt) => (
-                                    <tr key={appt.idAppointment}>
-                                        {/* Adjust according to your Patient object structure */}
-                                        <td>{appt.patient?.firstName || t('common.notAvailable')} {appt.patient?.lastName || ''}</td>
-                                        {/* Use new formatter and correct field name, pass 't' */}
-                                        <td>{formatLocalDateTime(appt.apptDateTime, t)}</td>
-                                        {/* Translate apptType and apptState for display */}
-                                        <td>{t(`manageAppointments.appointmentType.${appt.apptType?.toLowerCase().replace(/ /g, '')}`, appt.apptType)}</td>
-                                        <td>{t(`manageAppointments.appointmentState.${appt.apptState?.toLowerCase().replace(/ /g, '')}`, appt.apptState)}</td>
-                                        {/* Conditionally render Action cell */}
-                                        {showActionColumn && (
-                                            <td>
-                                                {filterState === 'en attente' && (
-                                                    <>
-                                                        <button onClick={() => handleAccept(appt.idAppointment)} className="btn btn-success btn-sm">{t('manageAppointments.buttons.accept')}</button>
-                                                        {/* Updated button to open modal */}
-                                                        <button onClick={() => openRefuseModal(appt.idAppointment)} className="btn btn-danger btn-sm">{t('manageAppointments.buttons.refusePropose')}</button>
-                                                    </>
-                                                )}
-                                                {/* Check if Doctor and filter is 'accepté' */}
-                                                {filterState === 'accepté' && isDoctor && (
-                                                     <button onClick={() => handleMarkAsDone(appt.idAppointment)} className="btn btn-info btn-sm">{t('manageAppointments.buttons.startConsultation')}</button>
-                                                )}
-                                                {/* Assistant sees nothing in this cell when filter is 'accepté' */}
-                                                {filterState === 'accepté' && !isDoctor && (
-                                                     <span></span> // Empty span for non-doctors when accepted
-                                                )}
-                                            </td>
-                                        )}
-                                    </tr>
-                                ))
-                            ) : (
+                    {/* Conditionally render the table */}
+                    {!showAddForm && (
+                        <table className="appointments-table">
+                            <thead>
                                 <tr>
-                                    {/* Adjust colspan based on whether Action column is visible */}
-                                    <td colSpan={showActionColumn ? 5 : 4}>
-                                        {searchTerm ? t('manageAppointments.table.noResultsSearch') : t('manageAppointments.table.noResultsCriteria')}
-                                    </td>
+                                    <th>{t('manageAppointments.table.header.patient')}</th>
+                                    <th>{t('manageAppointments.table.header.date')}</th>
+                                    <th>{t('manageAppointments.table.header.type')}</th>
+                                    <th>{t('manageAppointments.table.header.status')}</th>
+                                    {/* Conditionally render Action header */}
+                                    {showActionColumn && <th>{t('manageAppointments.table.header.action')}</th>}
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {filteredAppointments.length > 0 ? (
+                                    filteredAppointments.map((appt) => (
+                                        <tr key={appt.idAppointment}>
+                                            {/* Adjust according to your Patient object structure */}
+                                            <td>{appt.patient?.firstName || t('common.notAvailable')} {appt.patient?.lastName || ''}</td>
+                                            {/* Use new formatter and correct field name, pass 't' */}
+                                            <td>{formatLocalDateTime(appt.apptDateTime, t)}</td>
+                                            {/* Translate apptType and apptState for display */}
+                                            <td>{t(`manageAppointments.appointmentType.${appt.apptType?.toLowerCase().replace(/ /g, '')}`, appt.apptType)}</td>
+                                            <td>{t(`manageAppointments.appointmentState.${appt.apptState?.toLowerCase().replace(/ /g, '')}`, appt.apptState)}</td>
+                                            {/* Conditionally render Action cell */}
+                                            {showActionColumn && (
+                                                <td>
+                                                    {filterState === 'en attente' && (
+                                                        <>
+                                                            <button onClick={() => handleAccept(appt.idAppointment)} className="btn btn-success btn-sm">{t('manageAppointments.buttons.accept')}</button>
+                                                            {/* Updated button to open modal */}
+                                                            <button onClick={() => openRefuseModal(appt.idAppointment)} className="btn btn-danger btn-sm">{t('manageAppointments.buttons.refusePropose')}</button>
+                                                        </>
+                                                    )}
+                                                    {/* Check if Doctor and filter is 'accepté' */}
+                                                    {filterState === 'accepté' && isDoctor && (
+                                                         <button onClick={() => handleMarkAsDone(appt.idAppointment)} className="btn btn-info btn-sm">{t('manageAppointments.buttons.startConsultation')}</button>
+                                                    )}
+                                                    {/* Assistant sees nothing in this cell when filter is 'accepté' */}
+                                                    {filterState === 'accepté' && !isDoctor && (
+                                                         <span></span> // Empty span for non-doctors when accepted
+                                                    )}
+                                                </td>
+                                            )}
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        {/* Adjust colspan based on whether Action column is visible */}
+                                        <td colSpan={showActionColumn ? 5 : 4}>
+                                            {searchTerm ? t('manageAppointments.table.noResultsSearch') : t('manageAppointments.table.noResultsCriteria')}
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    )}
+
 
                     {/* Refusal Modal */}
                     {showRefuseModal && (

@@ -1,0 +1,13 @@
+/* Styles for ConsultationPage.js */
+
+.consultation-actions .btn-primary,
+.consultation-actions .btn-info,
+.consultation-actions .btn-warning,
+.consultation-actions .btn-success {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #ffffff !important; /* Ensure text is white */
+}
+
+/* The history button uses btn-secondary, which is typically grey by default. */
+/* No specific style needed here unless a different grey is required. */

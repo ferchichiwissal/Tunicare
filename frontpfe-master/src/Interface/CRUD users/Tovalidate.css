@@ -61,11 +61,11 @@
 }
 
 /* Status Badge Text Color */
-.custom-table .badge {
-  color: #ffffff !important; /* White text color for status badges */
-  /* Use !important if Bootstrap's default badge color overrides */
+.custom-table td span.badge.bg-secondary {
+  color: #ffffff !important; /* White text color for secondary badges */
 }
 
+/* Button styling - Harmonized */
 /* Button styling - Harmonized */
 .btn { /* General button class */
   font-size: 0.85rem; /* Consistent button font size */
@@ -83,7 +83,28 @@
   transform: translateY(-1px); /* Consistent hover transform */
 }
 
-/* Activate button (Green) */
+/* Override Bootstrap button colors with the desired green */
+.btn-success,
+.btn-danger {
+    background-color: #00c6a9 !important; /* Vert d'eau */
+    border-color: #00c6a9 !important; /* Vert d'eau */
+    color: #fff !important; /* Texte blanc */
+}
+
+.btn-success:hover,
+.btn-danger:hover {
+    background-color: #00a38a !important; /* Nuance de vert d'eau au survol */
+    border-color: #00a38a !important;
+}
+
+.btn-success:active,
+.btn-danger:active {
+    background-color: #00806b !important; /* Nuance de vert d'eau à l'état actif */
+    border-color: #00806b !important;
+}
+
+/* Keep specific styles if needed, but override Bootstrap defaults above */
+/* Activate button (Green) - May be overridden by .btn-success rule above */
 .btn-activate {
   background-color: #28a745; /* Keep green */
   color: white;
@@ -93,7 +114,7 @@
   background-color: #218838; /* Darker green */
 }
 
-/* Deactivate button (Red) */
+/* Deactivate button (Red) - May be overridden by .btn-danger rule above */
 .btn-deactivate {
   background-color: var(--error-color, #dc3545); /* Harmonized red */
   color: white;

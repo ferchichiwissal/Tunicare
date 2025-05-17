@@ -7,6 +7,7 @@ import { jwtDecode } from "jwt-decode";
 import { getToken, clearUserData, isTokenExpired, storeUserData, getUserData } from "../../utils/auth";
 import { useAuth } from "../../context/AuthContext"; // Import useAuth
 import './EditUserForm.css'; // Import the CSS file
+// Removed import { ROLES } from "../../utils/auth"; as ROLES is not exported
 // Default avatar path will be handled directly in the src attribute
 
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
@@ -334,7 +335,32 @@ const EditUserForm = () => {
       setUploadSuccess(null); // Clear any previous upload-specific success
       setUploadError(null); // Clear any previous upload-specific error
 
-      navigate("/dashboard"); // Or navigate back to user list/profile
+      // Get the current logged-in user's role
+      const currentUserData = getUserData(); // Assuming getUserData returns the full user object with roles
+      const currentUserRoles = currentUserData?.roles || [];
+
+      console.log('Current User Data:', currentUserData); // Log current user data
+      console.log('Current User Roles:', currentUserRoles); // Log current user roles
+
+      // Determine redirection path based on the current user's role
+      let redirectPath = '/dashboard'; // Default redirection
+
+      // Check roles using string comparison, assuming roles are strings like 'ROLE_ADMIN'
+      if (currentUserRoles.includes('ROLE_ADMIN')) {
+          redirectPath = '/users'; // Redirect Admin to user management page
+      } else if (currentUserRoles.includes('ROLE_DOCTOR') || currentUserRoles.includes('ROLE_DOCTOR_CENTRE_EXAMEN') || currentUserRoles.includes('ROLE_ASSISTANT')) {
+          // Doctors, Doctor_Centre_Examen, and Assistants might go back to a dashboard or user list
+          // Assuming they should also go back to /users if they were managing users
+           redirectPath = '/users'; // Redirect to user management page
+      }
+       // Patients modifying their own profile might still go to their dashboard,
+       // but this form is likely used by admins/doctors/assistants to edit others.
+       // If a patient uses this form, the default '/dashboard' might be appropriate,
+       // or we could add a check if the edited ID matches the current user ID.
+
+      console.log('Redirecting to:', redirectPath); // Log redirection path
+      window.location.href = redirectPath; // Redirect and refresh
+
     } catch (error) {
       console.error("Error updating user:", error);
        if (error.response) {
@@ -527,3 +553,4 @@ const EditUserForm = () => {
 };
 
 export default EditUserForm;
+

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../utils/apiClient';
 import AuthContext from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
-// import './CentreExaminationsDashboard.css'; // Optional: Create and import CSS
+import './CentreExaminationsDashboard.css'; // Optional: Create and import CSS
 
 const CentreExaminationsDashboard = () => {
     const { t } = useTranslation();
@@ -94,7 +94,7 @@ const CentreExaminationsDashboard = () => {
     }
 
     return (
-        <div className="container mt-5">
+        <div className="user-table-container">
             <h2>{t('centreExaminationsDashboard.title')}</h2>
 
             {/* Act Filter */}
@@ -116,7 +116,7 @@ const CentreExaminationsDashboard = () => {
                         </label>
                     </div>
                 ))}
-                <button className="btn btn-sm btn-secondary ms-2" onClick={() => setSelectedAct('')}>{t('common.clearFilter')}</button>
+                <button className="btn btn-sm btn-secondary ms-2 clear-filter-button" onClick={() => setSelectedAct('')}>{t('common.clearFilter')}</button>
             </div>
             
             {/* Search Bar by Patient Name */}
@@ -133,15 +133,14 @@ const CentreExaminationsDashboard = () => {
             {filteredExaminations.length === 0 ? (
                 <p>{t('centreExaminationsDashboard.noExaminationsFound')}</p>
             ) : (
-                <table className="table table-striped table-hover">
-                    <thead className="thead-dark">
+                <table className="table table-striped table-hover custom-table">
+                    <thead>
                         <tr>
                             <th>{t('centreExaminationsDashboard.tableHeaders.dateRequest')}</th>
                             <th>{t('centreExaminationsDashboard.tableHeaders.patientName')}</th>
                             <th>{t('centreExaminationsDashboard.tableHeaders.act')}</th>
                             <th>{t('centreExaminationsDashboard.tableHeaders.recommendation')}</th>
                             <th>{t('centreExaminationsDashboard.tableHeaders.prescribingDoctor')}</th>
-                            <th>{t('centreExaminationsDashboard.tableHeaders.status')}</th>
                             <th>{t('centreExaminationsDashboard.tableHeaders.actions')}</th>
                         </tr>
                     </thead>
@@ -157,7 +156,6 @@ const CentreExaminationsDashboard = () => {
                                 </td>
                                 {/* Use direct DTO fields */}
                                 <td>{exam.doctorFirstName} {exam.doctorLastName}</td>
-                                <td><span className={`badge bg-${exam.etat === 'en attente' ? 'warning' : 'success'}`}>{exam.etat}</span></td>
                                 <td>
                                     {exam.etat === 'en attente' && (
                                         <button

@@ -103,9 +103,11 @@
       "pendingConfirmationAppointments": "Appointments to Confirm",
       "pendingExaminationRequests": "Pending Examination Requests",
       "unreadExaminationResults": "Unread Examination Results",
-      "appointmentCompletionRateWeek": "Appt. Rate (Week)",
-      "appointmentCompletionRateMonth": "Appt. Rate (Month)",
-      "pendingPatientRegistrations": "Pending Patient Registrations"
+      "appointmentCompletionRateWeek": "Appt. Rate (Current Week)",
+      "appointmentCompletionRateMonth": "Appt. Rate(Current Month)",
+      "pendingPatientRegistrations": "Pending Patient Registrations",
+      "totalAppointmentsThisMonth": "Number of Appointments(Current Month)",
+      "newPatientsThisMonth": "New Patients(Current Month)"
     },
     "patient": {
       "totalConsultations": "Total Consultations",
@@ -114,6 +116,8 @@
       "appointmentDetails": "On {{date}} at {{time}} with Dr. {{doctor}} ({{cabinet}})",
       "pendingAppointments": "Pending Appointments",
       "availableCertificates": "Available Certificates",
+      "refusedAppointmentWithProposal": "Refused Appointment ",
+      "proposedDate": "Proposed Date: {{date}} at {{time}}",
       "charts": {
         "consultationsPerMonth": {
           "label": "Consultations per Month",
@@ -139,17 +143,27 @@
       "totalDoctorCentres": "Total Centre Doctors",
       "totalCabinets": "Total Cabinets",
       "totalExamCentres": "Total Exam Centres",
-      "newUsersThisWeek": "New Users (Week)",
-      "newUsersThisMonth": "New Users (Month)",
+      "newUsersThisWeek": "New Users( Current Week)",
+      "newUsersThisMonth": "New Users (Current Month)",
       "appointmentsToday": "Appointments Created (Today)",
-      "appointmentsThisWeek": "Appointments Created (Week)",
-      "appointmentsThisMonth": "Appointments Created (Month)",
+      "appointmentsThisWeek": "Appointments Created (Current Week)",
+      "appointmentsThisMonth": "Appointments Created (Current Month)",
       "consultationsToday": "Consultations (Today)",
-      "consultationsThisWeek": "Consultations (Week)",
-      "consultationsThisMonth": "Consultations (Month)",
+      "consultationsThisWeek": "Consultations (Current Week)",
+      "consultationsThisMonth": "Consultations (Current Month)",
       "examsToday": "Exams Requested (Today)",
-      "examsThisWeek": "Exams Requested (Week)",
-      "examsThisMonth": "Exams Requested (Month)"
+      "examsThisWeek": "Exams Requested (Current Week)",
+      "examsThisMonth": "Exams Requested (Current Month)",
+      "generatedMedicalReportsMonth":"generated Medical Reports"
+    },
+    "assistant": {
+      "appointmentsToday": "Appointments Today",
+      "pendingConfirmation": "Pending Confirmation",
+      "pendingPatientRegistrations": "Pending Patient Registrations",
+      "totalPatientsInCabinet": "Total Patients in Cabinet",
+      "patientsActivatedToday": "Patients Activated Today",
+      "newUsersToday": "New Users Today",
+      "pendingConfirmationAppointments": "Pending Confirmation Appointments"
     },
     "tiles": {
       "performance": {
@@ -361,7 +375,7 @@
     "buttons": {
       "edit": "Edit",
       "delete": "Delete",
-      "activate": "Activate",
+      "activate":   " Activate ",
       "deactivate": "Deactivate"
     },
     "alerts": {
@@ -461,8 +475,9 @@
     },
     "noUsersFound": "No users pending validation found",
     "status": {
-      "active": "Active",
-      "inactivePending": "Inactive/Pending"
+       "pending": "Pending",
+      "active": "Active"
+
     },
     "buttons": {
       "activate": "Activate",
@@ -1103,7 +1118,7 @@
       "bloodTest": "Blood Test",
       "scanner": "CT Scan",
       "ultrasound": "Ultrasound",
-      "other": "Other (specify)"
+      "other": "Other exam"
     },
     "buttons": {
       "save": "🔘 Save",
@@ -1129,7 +1144,7 @@
       "printSetupFailed": "Error preparing print."
     },
     "print": {
-      "otherCentre": "Other",
+      "otherCentre": " A center of the patient's choice",
       "centreNotFound": "Centre (Name not found)",
       "title": "Medical Exam Request",
       "doctorPrefix": "Dr. ",
@@ -1673,19 +1688,654 @@
         "cannotViewReportError": "An error occurred while trying to view the report."
       }
     },
+ 
+
+  
+  "editCentreForm": {
+    "title": "Edit Centre",
+    "labels": {
+      "nom": "Name",
+      "telephone": "Phone",
+      "address": "Address"
+    },
+    "buttons": {
+      "updating": "Updating...",
+      "updateCentre": "Update Centre"
+    }
+  
+},
+
+  "loading": "Loading",
+  "common": {
+    "cancel": "Cancel"
+  },
+  "editCentreForm": {
+    "title": "Edit Centre",
+    "labels": {
+      "nom": "Name",
+      "telephone": "Phone",
+      "address": "Address"
+    },
+    "buttons": {
+      "updating": "Updating...",
+      "updateCentre": "Update Centre"
+    },
+    "errors": {
+      "fetch": {
+        "permissionDenied": "Permission denied to fetch centre data.",
+        "notFound": "Centre with ID {{id}} not found.",
+        "generic": "Error fetching centre data.",
+        "missingId": "Centre ID is missing."
+      },
+      "validation": {
+        "nomRequired": "Centre name is required."
+      },
+      "submit": {
+        "permissionDenied": "Permission denied to update centre.",
+        "notFound": "Centre with ID {{id}} not found during update.",
+        "generic": "Error updating centre.",
+        "networkError": "Network error while updating centre."
+      }
+    },
+    "alerts": {
+      "noChanges": "No changes detected.",
+      "updateSuccess": "Centre updated successfully!"
+    }
+  },
+  "editUserForm": {
+    "errors": {
+      "upload": {
+        "invalidType": "Invalid file type. Please upload an image.",
+        "sizeLimit": "File size exceeds the 5MB limit."
+      }
+    }
+  },
+
+"common": {
+    "unauthorized": "You are not authorized to view this page.",
+    "saving": "Saving...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "manageReportTemplates": {
+    "loading": "Loading report templates",
+    "title": "Manage Report Templates",
+    "editTitle": "Edit Report Template",
+    "addTitle": "Add Report Template",
+    "errors": {
+      "fetchFailed": "Failed to load report templates.",
+      "deleteFailed": "Failed to delete template.",
+      "updateFailed": "Failed to update template.",
+      "addFailed": "Failed to add template."
+    },
+    "confirmDelete": "Are you sure you want to delete this template?",
+    "success": {
+      "deleteSuccess": "Template deleted successfully!",
+      "updateSuccess": "Template updated successfully!",
+      "addSuccess": "Template added successfully!"
+    },
+    "buttons": {
+      "addTemplate": "Add Template"
+    },
+    "noTemplates": "No templates found.",
+    "tableHeaders": {
+      "id": "ID",
+      "name": "Name",
+      "type": "Type",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Name",
+      "type": "Type",
+      "typePlaceholder": "Optional type for categorization",
+      "previewImage": "Preview Image",
+      "currentImage": "Current Image",
+      "currentImageAlt": "Current preview image",
+      "content": "Content"
+    }
+  },
+
+"editUserForm": {
+    "loading": "Loading user data",
+    "title": "Edit User",
+    "alerts": {
+      "sessionExpired": "Your session has expired. Please log in again.",
+      "noChanges": "No changes detected.",
+      "updateSuccess": "User updated successfully!"
+    },
+    "errors": {
+      "fetch": {
+        "missingId": "User ID is missing.",
+        "noToken": "Authentication token not found.",
+        "permissionDenied": "Permission denied to fetch user data.",
+        "notFound": "User with ID {{id}} not found.",
+        "generic": "Error fetching user data."
+      },
+      "upload": {
+        "invalidType": "Invalid file type. Please upload an image.",
+        "sizeLimit": "File size exceeds the 5MB limit."
+      },
+      "validation": {
+        "firstNameRequired": "First Name is required.",
+        "lastNameRequired": "Last Name is required.",
+        "emailInvalid": "Invalid email format.",
+        "birthDateRequired": "Birth Date is required.",
+        "phoneDigitsOnly": "Phone number must contain only digits."
+      },
+      "submit": {
+        "authRequired": "Authentication required to update user.",
+        "permissionDenied": "Permission denied to update user.",
+        "notFound": "User with ID {{id}} not found during update.",
+        "generic": "Error updating user.",
+        "networkError": "Network error while updating user."
+      }
+    },
+    "labels": {
+      "profilePicture": "Profile Picture",
+      "changePicture": "Change Picture",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "birthDate": "Birth Date",
+      "telephone": "Telephone",
+      "address": "Address"
+    },
+    "buttons": {
+      "updating": "Updating...",
+      "updateUser": "Update "
+    }
+  },
+
+  "myConsultationsPage": {
+    "alerts": {
+      "sessionExpired": "Session expired. Please log in again.",
+      "confirmHide": "Are you sure you want to hide this consultation?",
+      "hideSuccess": "Consultation hidden successfully.",
+      "hideError": "Error hiding consultation."
+    },
+    "errors": {
+      "unidentifiedUser": "Unidentified user.",
+      "cabinetContextNotFound": "Cabinet context not found.",
+      "fetchFailedFallback": "Failed to fetch consultations.",
+      "authError": "Authentication error. Please log in again.",
+      "authErrorDownload": "Authentication error. Cannot download.",
+      "downloadInvalidResponse": "Received invalid response for download.",
+      "prescriptionNotFound": "Prescription not found.",
+      "downloadFailedFallback": "Failed to download file.",
+      "certificateNotFound": "Certificate not found.",
+      "hideFailedFallback": "Failed to hide consultation."
+    },
+    "loading": "Loading...",
+    "title": "My Consultations",
+    "errorPrefix": "Error",
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "prescription": "Prescription",
+      "certificate": "Certificate",
+      "actions": "Actions",
+      "notAvailable": "N/A",
+      "invalidDate": "Invalid Date",
+      "defaultType": "Consultation",
+      "noConsultations": "No consultations found."
+    },
+    "buttons": {
+      "download": "Download",
+      "downloadedCertificate": "Downloaded",
+      "hideConsultation": "Hide"
+    },
+    "checking": "Checking..."
+  },
+  "myExaminationsPage": {
+    "alerts": {
+      "sessionExpired": "Session expired. Please log in again.",
+      "confirmHide": "Are you sure you want to hide this examination? This action is irreversible from this interface."
+    },
+    "errors": {
+      "authMissing": "Authentication token missing. Please log in again.",
+      "downloadFailed": "Failed to download file for examination ID {{examId}}.",
+      "hideFailed": "Failed to hide examination ID {{examId}}.",
+      "unidentifiedUser": "Unidentified user.",
+      "cabinetContextNotFound": "Cabinet context not found.",
+      "authMissingLogin": "Authentication token missing. Please log in.",
+      "fetchFailedFallback": "Failed to fetch examinations."
+    },
+    "common": {
+      "unspecified": "Unspecified"
+    },
+    "loading": "Loading...",
+    "title": "My Examinations",
+    "errorPrefix": "Error:",
+    "table": {
+      "dateRequested": "Date Requested",
+      "type": "Type",
+      "centre": "Centre",
+      "action": "Action"
+    },
+    "buttons": {
+      "downloadRequest": "Download Request",
+      "downloadResult": "Download Result",
+      "hide": "Hide"
+    },
+    "tooltips": {
+      "downloadNotReady": "The result is not yet available for download."
+    },
+    "noExaminationsFound": "No examinations found for the selected status."
+  },
+  "consultationDashboard": {
+    "alerts": {
+      "sessionExpired": "Session expired. Please log in again.",
+      "confirmHide": "Are you sure you want to hide this consultation?",
+      "hideSuccess": "Consultation hidden successfully.",
+      "hideError": "Error hiding consultation."
+    },
+    "errors": {
+      "missingDoctorId": "Doctor ID is missing.",
+      "fetchFailedFallback": "Failed to fetch consultations.",
+      "hideFailedFallback": "Failed to hide consultation."
+    },
+    "loading": "Loading...",
+    "title": "Consultations Dashboard",
+    "errorPrefix": "Error",
+    "searchPlaceholder": "Search by patient name...",
+    "table": {
+      "patient": "Patient",
+      "date": "Date",
+      "type": "Type",
+      "actions": "Actions",
+      "notAvailable": "N/A",
+      "invalidDate": "Invalid Date",
+      "defaultType": "Consultation",
+      "noConsultations": "No consultations found."
+    },
+    "buttons": {
+      "viewDetails": "View Details",
+      "hideConsultation": "Hide"
+    }
+  },
+  "doctorExaminationsDashboard": {
+    "alerts": {
+      "unauthorizedOrMissingInfo": "Unauthorized access or missing user information.",
+      "cannotModify": "Cannot modify a completed examination.",
+      "cannotDelete": "Cannot delete a completed examination.",
+      "confirmDelete": "Are you sure you want to delete this examination?",
+      "deleteSuccess": "Examination deleted successfully."
+    },
+    "errors": {
+      "fetchFailed": "Error fetching doctor's examinations:",
+      "fetchFailedFallback": "Failed to fetch examinations.",
+      "missingExamId": "Examination ID is missing.",
+      "cannotViewReportError": "Cannot view report: Examination ID is missing.",
+      "deleteFailed": "Error deleting examination:",
+      "deleteFailedFallback": "Failed to delete examination.",
+      "hideFailedDoctor": "Error hiding examination for doctor:",
+      "hideFailedDoctorFallback": "Error attempting to hide examination."
+    },
+    "loading": "Loading...",
+    "title": "Doctor Examinations Dashboard",
+    "searchPlaceholder": "Search by patient name...",
+    "statusFilters": {
+      "pending": "Pending",
+      "completed": "Completed"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "completed": "Completed"
+    },
+    "noExaminationsFound": "No examinations found for the selected status.",
+    "tableHeaders": {
+      "dateRequest": "Date Requested",
+      "patientName": "Patient Name",
+      "act": "Act",
+      "recommendation": "Recommendation",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "buttons": {
+      "modify": "Modify",
+      "delete": "Delete",
+      "viewResult": "View Result",
+      "hideExam": "Hide"
+    },
+    "tooltips": {
+      "hideExam": "Hide this examination from this list"
+    }
+  },
+  "centerStatistics": {
+    "allMonths": "All Months",
+    "months": {
+      "1": "January",
+      "2": "February",
+      "3": "March",
+      "4": "April",
+      "5": "May",
+      "6": "June",
+      "7": "July",
+      "8": "August",
+      "9": "September",
+      "10": "October",
+      "11": "November",
+      "12": "December"
+    },
+    "errors": {
+      "failedToLoadPrefix": "Failed to load statistics. ",
+      "accessDenied": "Access denied. You must be a DOCTOR_CENTRE_EXAMEN to view these statistics."
+    },
+    "loading": "Loading statistics...",
+    "title": "Completed Examinations by Referring Doctor",
+    "yearLabel": "Year: ",
+    "monthLabel": "Month: ",
+    "noStats": "No completed examinations found for the selected period.",
+    "tableHeaders": {
+      "prescribingDoctor": "Prescribing Doctor",
+      "cabinetName": "Cabinet Name",
+      "numberOfExaminations": "Number of Examinations"
+    }
+  },
+  "centreExaminationsDashboard": {
+    "errors": {
+      "unauthorizedOrMissingInfo": "Unauthorized access or missing user information.",
+      "fetchFailed": "Error fetching centre examinations:",
+      "fetchFailedFallback": "Failed to fetch centre examinations.",
+      "popupBlocked": "Popup blocked. Please allow popups for this site to view the report."
+    },
+    "loading": "Loading...",
+    "title": "Centre Examinations Dashboard",
+    "filterByAct": "Filter by Act:",
+    "searchPlaceholder": "Search by patient name...",
+    "noExaminationsFound": "No examinations found for the selected criteria.",
+    "tableHeaders": {
+      "dateRequest": "Date Requested",
+      "patientName": "Patient Name",
+      "act": "Act",
+      "recommendation": "Recommendation",
+      "prescribingDoctor": "Prescribing Doctor",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "buttons": {
+      "prescribeReport": "Prescribe Report",
+      "viewReport": "View Report"
+    }
+  },
+  "medicalExaminationForm": {
+    "examTypes": {
+      "irm": "IRM",
+      "radio": "Radio",
+      "analysesanguine": "Blood Analysis",
+      "scanner": "Scanner",
+      "echographie": "Echography",
+      "autre": "Other"
+    }
+  },
+  
+"examinationResultPage.errors.unauthorized": "Unauthorized access. Please log in.",
+  "examinationResultPage.errors.fetchFailed": "Failed to load examination details.",
+  "examinationResultPage.errors.fetchFailedFallback": "An error occurred while loading examination details.",
+  "examinationResultPage.consoleWarnings.removeIframeAfterPrint": "Could not remove existing print iframe:",
+  "examinationResultPage.consoleErrors.printExecution": "Error during print execution:",
+  "examinationResultPage.errors.printExecutionError": "An error occurred during printing.",
+  "examinationResultPage.consoleErrors.printSetup": "Error during print setup:",
+  "examinationResultPage.errors.printSetupError": "An error occurred while preparing for printing.",
+  "examinationResultPage.errors.noDetailsToPrint": "No examination details to print.",
+  "examinationResultPage.unknownCentre": "Unknown Centre",
+  "examinationResultPage.signatureAlt": "Signature",
+  "examinationResultPage.reportTitle": "Examination Report",
+  "examinationResultPage.patientLabel": "Patient",
+  "examinationResultPage.dateLabel": "Date",
+  "examinationResultPage.examinationLabel": "Examination",
+  "examinationResultPage.doctorPrefix": "Dr.",
+  "examinationResultPage.signatureLabel": "Signature",
+  "examinationResultPage.loading": "Loading examination details...",
+  "examinationResultPage.noDetails": "No details found for this examination.",
+  "examinationResultPage.prescribingDoctorLabel": "Prescribing Doctor",
+  "examinationResultPage.reportingDoctorLabel": "Reporting Doctor",
+  "examinationResultPage.printButton": "Print",
+  "examinationResultPage.title": "Examination Result",
+
+
+
+
+  
+  "archivedExaminationsPage": {
+    "errors": {
+      "fetchFailed": "Error fetching archived examinations:",
+      "fetchFailedFallback": "An error occurred while fetching archived examinations.",
+      "unauthorizedOrIncorrectRole": "Unauthorized access or incorrect user role.",
+      "accessDenied": "You must be logged in as an Examination Centre Doctor to view this page.",
+      "hideFailedCentre": "Error hiding examination for centre:",
+      "hideFailedCentreFallback": "Error attempting to hide examination."
+    },
+    "loading": "Loading archived examinations...",
+    "title": "Archived Completed Examinations",
+    "searchPlaceholder": "Search by patient name...",
+    "noExamsFoundSearch": "No examinations match your search.",
+    "noArchivedExamsFound": "No archived examinations found.",
+    "tableHeaders": {
+      "patient": "Patient",
+      "examType": "Examination Type",
+      "creationDate": "Creation Date",
+      "action": "Action"
+    },
+    "buttons": {
+      "viewResult": "View Result",
+      "hideExam": "Hide"
+    },
+    "tooltips": {
+      "hideExam": "Hide this examination from this list"
+    }
+  },
+  "common": {
+    "locale": "en-US",
+    "clearFilter": "Clear Filter",
+    "loading": "Loading...",
+    "notAvailable": "N/A",
+    "invalidDate": "Invalid Date",
+    "back": "Back"
+  },
+  "uploadSignaturePage.selectFileError": "Please select a signature file.",
+  "uploadSignaturePage.uploadSuccess": "Signature uploaded successfully!",
+  "uploadSignaturePage.uploadError": "Error uploading signature.",
+  "uploadSignaturePage.title": "Upload My Electronic Signature",
+  "uploadSignaturePage.description": "Please upload an image of your signature. This signature will be used to electronically sign examination results.",
+  "uploadSignaturePage.fileLabel": "Signature File (PNG, JPG):",
+  "uploadSignaturePage.uploadingButton": "Uploading...",
+  "uploadSignaturePage.uploadButton": "Upload Signature",
+
+
+
+ "common.edit": "Edit",
+  "common.delete": "Delete",
+  "common.save": "Save",
+  "common.cancel": "Cancel",
+
+
+
+
+  "doctorStatistics.months.1": "January",
+  "doctorStatistics.months.2": "February",
+  "doctorStatistics.months.3": "March",
+  "doctorStatistics.months.4": "April",
+  "doctorStatistics.months.5": "May",
+  "doctorStatistics.months.6": "June",
+  "doctorStatistics.months.7": "July",
+  "doctorStatistics.months.8": "August",
+  "doctorStatistics.months.9": "September",
+  "doctorStatistics.months.10": "October",
+  "doctorStatistics.months.11": "November",
+  "doctorStatistics.months.12": "December",
+  "doctorStatistics.allMonths": "All Months",
+  "doctorStatistics.errors.failedToLoad": "Failed to load doctor statistics.",
+  "doctorStatistics.errors.accessDenied": "Access denied. You do not have the necessary permissions.",
+  "doctorStatistics.loading": "Loading statistics...",
+  "doctorStatistics.selectedMonthLabel": "Selected Month",
+  "doctorStatistics.title": "Doctor Statistics",
+  "doctorStatistics.yearLabel": "Year:",
+  "doctorStatistics.monthLabel": "Month:",
+  "doctorStatistics.totalFor": "Total for",
+  "doctorStatistics.noStats": "No statistics available for the selected period.",
+  "doctorStatistics.centerNameHeader": "Center Name",
+  "doctorStatistics.examCountHeader": "Exam Count",
+
+
+
+
+
+  "medicalExaminationForm.errors.missingPatientId": "Missing patient ID in URL.",
+  "medicalExaminationForm.errors.loadFailedFallback": "An error occurred while loading initial data.",
+  "medicalExaminationForm.status.saving": "Saving...",
+  "medicalExaminationForm.errors.selectExamType": "Please select an examination type.",
+  "medicalExaminationForm.errors.missingConsultationId": "Missing consultation ID in URL.",
+  "medicalExaminationForm.status.updating": "Updating...",
+  "medicalExaminationForm.status.updateSuccess": "Examination request updated successfully!",
+  "medicalExaminationForm.status.saveSuccess": "Examination request saved successfully!",
+  "medicalExaminationForm.errors.saveSuccessIdMissing": "Examination request created, but ID not found in response.",
+  "medicalExaminationForm.errors.updateFailedFallback": "Failed to update examination request.",
+  "medicalExaminationForm.errors.saveFailedFallback": "Failed to save examination request.",
+  "common.notAvailable": "N/A",
+  "common.invalidDate": "Invalid Date",
+  "medicalExaminationForm.errors.printPatientDataMissing": "Missing patient data for printing.",
+  "medicalExaminationForm.print.otherCentre": "A center of the patient's choice",
+  "medicalExaminationForm.print.centreNotFound": "Centre not found (ID: {{id}})",
+  "medicalExaminationForm.print.title": "Medical Examination Request",
+  "medicalExaminationForm.print.doctorPrefix": "Dr. ",
+  "medicalExaminationForm.print.fallbackDoctorName": "Unknown Doctor Name",
+  "medicalExaminationForm.print.fallbackCabinetAddress": "Unknown Cabinet Address",
+  "medicalExaminationForm.print.fallbackCabinetPhone": "Unknown Cabinet Phone",
+  "medicalExaminationForm.print.dateLabel": "Date:",
+  "medicalExaminationForm.print.patientSectionTitle": "Patient Information",
+  "medicalExaminationForm.print.lastNameLabel": "Last Name:",
+  "medicalExaminationForm.print.firstNameLabel": "First Name:",
+  "medicalExaminationForm.print.dobLabel": "Date of Birth:",
+  "medicalExaminationForm.print.ageLabel": "Age:",
+  "medicalExaminationForm.print.ageSuffix": "years",
+  "medicalExaminationForm.print.examSectionTitle": "Examination Details",
+  "medicalExaminationForm.print.examTypeLabel": "Examination Type:",
+  "medicalExaminationForm.print.fallbackExamType": "Examination type not specified",
+  "medicalExaminationForm.print.centreLabel": "Examination Centre:",
+  "medicalExaminationForm.print.recommendationLabel": "Recommendation:",
+  "medicalExaminationForm.print.fallbackRecommendation": "No recommendation",
+  "medicalExaminationForm.print.signatureLabel": "Doctor's Signature",
+  "medicalExaminationForm.errors.printExecutionFailed": "An error occurred during print execution.",
+  "medicalExaminationForm.errors.printSetupFailed": "An error occurred while preparing for printing.",
+  "medicalExaminationForm.loading": "Loading...",
+  "medicalExaminationForm.errorPrefix": "Error: ",
+  "medicalExaminationForm.titleEdit": "Edit Medical Examination Request",
+  "medicalExaminationForm.titleCreate": "New Medical Examination Request",
+  "medicalExaminationForm.currentStatusLabel": "Current Status:",
+  "medicalExaminationForm.labels.examType": "Examination Type",
+  "medicalExaminationForm.placeholders.select": "Select...",
+  "medicalExaminationForm.examTypes.irm": "MRI",
+  "medicalExaminationForm.examTypes.radio": "X-ray",
+  "medicalExaminationForm.examTypes.bloodTest": "Blood Test",
+  "medicalExaminationForm.examTypes.scanner": "Scanner",
+  "medicalExaminationForm.examTypes.ultrasound": "Ultrasound",
+  "medicalExaminationForm.examTypes.other": "Other",
+  "medicalExaminationForm.placeholders.specifyExamType": "Specify examination type",
+  "medicalExaminationForm.labels.centre": "Examination Centre",
+  "medicalExaminationForm.placeholders.selectCentre": "Select a centre...",
+  "medicalExaminationForm.labels.recommendation": "Recommendation",
+  "medicalExaminationForm.buttons.update": "Update",
+  "medicalExaminationForm.buttons.save": "Save",
+  "medicalExaminationForm.buttons.print": "Print",
+
+  "medicalExaminationForm.patientSectionTitle":"Patient Information ",
+
+
+
+"common.print": "printPatientDataMissing",
+
+"dashboard.numericalStatisticsTitle": "Numerical Statistics",
+
+
+
+  "prescribeReportPage": {
+    "errors": {
+      "fetchExamFailed": "Failed to fetch examination details.",
+      "fetchExamFailedFallback": "Failed to fetch examination details.",
+      "fetchTemplatesFailed": "Failed to fetch report templates.",
+      "fetchTemplatesFailedFallback": "Failed to fetch report templates.",
+      "missingExamId": "Missing examination ID for report saving.",
+      "saveReportFailed": "Failed to save report.",
+      "saveReportFailedFallback": "Failed to save report.",
+      "printDataMissing": "Missing examination or user data for printing."
+    },
+    "success": {
+      "reportUpdated": "Report updated successfully!",
+      "reportSaved": "Report saved successfully!"
+    },
+    "loadingTemplates": "Loading templates...",
+    "title": "Prescribe Report",
+    "patient": "Patient",
+    "act": "Act",
+    "selectTemplateTitle": "Select a Report Template",
+    "blankDocument": "Blank Document",
+    "backToTemplates": "Back to Templates",
+    "updateReportButton": "Update Report",
+    "saveReportButton": "Save Report"
+  },
+    "common": {
+    "notFound": "Not Found",
+    "unspecified": "Unspecified",
+    "locale": "en-US",
+    "saving": "Saving...",
+    "print": "Print",
+     "clearFilter": "Clear Filter"
+
+  },
+
+
   "examinationResultPage": {
     "errors": {
-      "unauthorized": "Unauthorized. Please log in to view this page.",
-      "fetchFailed": "Failed to fetch examination details.",
-      "fetchFailedFallback": "Could not load examination details. Please try again."
+      "unauthorized": "You are not authorized to view this result.",
+      "fetchFailed": "Error loading examination details.",
+      "fetchFailedFallback": "Error loading examination details.",
+      "printExecutionError": "Error during print execution.",
+      "printSetupError": "Error during print setup.",
+      "noDetailsToPrint": "No examination details to print."
     },
-    "loading": "Loading examination details...",
-    "noDetails": "No details found for this examination.",
+    "consoleErrors": {
+      "fetchFailed": "Error loading examination details.",
+      "printExecution": "Error during print execution:",
+      "printSetup": "Error during print setup:"
+    },
+    "consoleWarnings": {
+      "removeIframe": "Could not remove existing print iframe.",
+      "removeIframeAfterPrint": "Could not remove print iframe after printing."
+    },
     "unknownCentre": "Unknown Centre",
-    "title": "Examination Report",
+    "reportTitle": "Examination Report",
     "patientLabel": "Patient",
     "dateLabel": "Date",
     "examinationLabel": "Examination",
-    "reportByLabel": "Report by"
+    "doctorPrefix": "Dr.",
+    "signatureLabel": "Signature",
+    "signatureAlt": "Signature",
+    "loading": "Loading...",
+    "noDetails": "No examination details found.",
+    "title": "Examination Result",
+    "prescribingDoctorLabel": "Prescribing Doctor",
+    "reportingDoctorLabel": "Reporting Doctor",
+    "printButton": "Print"
+  },
+
+
+"common": {
+    "back": "Back",
+    "BACK": "Back"
   }
+
+
+
+
+
+
+
+
+
+
+
+
 }

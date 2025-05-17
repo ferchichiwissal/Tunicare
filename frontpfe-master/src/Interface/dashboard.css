@@ -199,13 +199,14 @@ body {
   flex-direction: column;
   justify-content: space-between;
   transition: transform 0.3s, box-shadow 0.3s;
-  border: 1px solid transparent; /* Placeholder for hover border */
+  border: 1px solid var(--primary-color, #00c6a9); /* Bordure vert d'eau par défaut */
 }
 
 .tile:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   border-color: var(--primary-color); /* Accent border on hover */
+  background-color: var(--light-blue, #e0f7f4); /* Arrière-plan vert d'eau clair au survol */
 }
 
 .tile-header {
@@ -236,6 +237,9 @@ body {
 }
 .tile-header h3 span:nth-child(2) { /* Target the second span specifically */
     color: var(--text-color, #000000); /* Make the second span black */
+    font-weight: bold; /* Mettre en gras */
+    text-align: center; /* Centrer le texte */
+    font-size: 1.1rem; /* Diminuer un peu la taille de la police */
 }
 .tile-header h3 span:first-child { /* Style first span as title */
   font-size: 1rem;

@@ -12,7 +12,7 @@ import apiClient from '../utils/apiClient'; // Import apiClient
 
 // Register chart elements
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineElement, PointElement); // Added LineElement, PointElement
-const INACTIVITY_TIMEOUT = 1 * 60 * 1000; // 1 minute
+const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
 const Dashboard = ({ onLogout }) => { 
   // const [user, setUser] = useState(null); // Will be replaced by useAuth()
@@ -419,7 +419,7 @@ const Dashboard = ({ onLogout }) => {
   
         <div className="app-body-main-content">
           <section className="service-section">
-            <h2>{t('dashboard.title', { firstName: user.firstName, lastName: user.lastName })}</h2>
+            <h2>{t('dashboard.numericalStatisticsTitle')}</h2>
             <div className="tiles">
               {/* Dynamic tiles based on role and dashboardStats */}
               {user.role === "DOCTOR" && dashboardStats && (
@@ -592,9 +592,9 @@ const Dashboard = ({ onLogout }) => {
                       <div className="tile-header">
                         <i className="ph-calendar-x-light"></i> {}
                         <h3>
-                          <span>{t('dashboard.patient.refusedAppointmentWithProposal', 'RDV Refusé avec Proposition')}</span>
+                          <span>{t('dashboard.patient.refusedAppointmentWithProposal')}</span>
                           <span>
-                            {`Date proposée: ${new Date(dashboardStats.nextRefusedAppointmentWithProposal.appointmentDate).toLocaleDateString()} à ${dashboardStats.nextRefusedAppointmentWithProposal.appointmentTime}`}
+                            {t('dashboard.patient.proposedDate', { date: new Date(dashboardStats.nextRefusedAppointmentWithProposal.appointmentDate).toLocaleDateString(), time: dashboardStats.nextRefusedAppointmentWithProposal.appointmentTime })}
                           </span>
                         </h3>
                       </div>
@@ -605,7 +605,7 @@ const Dashboard = ({ onLogout }) => {
                       <div className="tile-header">
                         <i className="ph-smiley-sad-light"></i> {}
                         <h3>
-                          <span>{t('dashboard.patient.noRefusedAppointmentWithProposal', 'Aucun RDV refusé avec proposition')}</span>
+                          <span>{t('dashboard.patient.noRefusedAppointmentWithProposal')}</span>
                         </h3>
                       </div>
                     </article>
@@ -618,7 +618,7 @@ const Dashboard = ({ onLogout }) => {
                     <div className="tile-header">
                       <i className="ph-calendar-check-light"></i>
                       <h3>
-                        <span>{t('dashboard.assistant.appointmentsToday', 'RDV Acceptés Aujourd\'hui')}</span>
+                        <span>{t('dashboard.assistant.appointmentsToday')}</span>
                         <span>{dashboardStats.todaysAcceptedAppointments}</span>
                       </h3>
                     </div>
@@ -627,7 +627,7 @@ const Dashboard = ({ onLogout }) => {
                     <div className="tile-header">
                       <i className="ph-clock-countdown-light"></i>
                       <h3>
-                        <span>{t('dashboard.assistant.pendingConfirmationAppointments', 'RDV à confirmer')}</span>
+                        <span>{t('dashboard.assistant.pendingConfirmationAppointments')}</span>
                         <span>{dashboardStats.pendingConfirmationAppointmentsCount}</span>
                       </h3>
                     </div>
@@ -636,7 +636,7 @@ const Dashboard = ({ onLogout }) => {
                     <div className="tile-header">
                       <i className="ph-user-plus-light"></i>
                       <h3>
-                        <span>{t('dashboard.assistant.pendingPatientRegistrations', 'Inscriptions Patients en Attente')}</span>
+                        <span>{t('dashboard.assistant.pendingPatientRegistrations')}</span>
                         <span>{dashboardStats.pendingPatientRegistrationsCount}</span>
                       </h3>
                     </div>
@@ -645,7 +645,7 @@ const Dashboard = ({ onLogout }) => {
                     <div className="tile-header">
                       <i className="ph-users-three-light"></i>
                       <h3>
-                        <span>{t('dashboard.assistant.totalPatientsInCabinet', 'Total Patients Cabinet')}</span>
+                        <span>{t('dashboard.assistant.totalPatientsInCabinet')}</span>
                         <span>{dashboardStats.totalPatientsInCabinet}</span>
                       </h3>
                     </div>
@@ -654,7 +654,7 @@ const Dashboard = ({ onLogout }) => {
                     <div className="tile-header">
                       <i className="ph-user-check-light"></i>
                       <h3>
-                        <span>{t('dashboard.assistant.patientsActivatedToday', 'Patients Activés Aujourd\'hui')}</span>
+                        <span>{t('dashboard.assistant.patientsActivatedToday')}</span>
                         <span>{dashboardStats.patientsActivatedTodayInCabinet}</span>
                       </h3>
                     </div>
@@ -663,7 +663,7 @@ const Dashboard = ({ onLogout }) => {
                     <div className="tile-header">
                       <i className="ph-users-light"></i>
                       <h3>
-                        <span>{t('dashboard.assistant.newUsersToday', 'Nouveaux Utilisateurs Aujourd\'hui')}</span>
+                        <span>{t('dashboard.assistant.newUsersToday')}</span>
                         <span>{dashboardStats.newUsersTodayInCabinet}</span>
                       </h3>
                     </div>
@@ -879,7 +879,7 @@ const Dashboard = ({ onLogout }) => {
                     <div className="tile-header">
                       <i className="ph-file-text-light"></i> {}
                       <h3>
-                        <span>{t('dashboard.admin.medicalReportsGeneratedThisMonth', 'Rapports Médicaux Générés (Mois)')}</span>
+                        <span>{t('dashboard.admin.generatedMedicalReportsMonth')}</span>
                         <span>{dashboardStats.medicalReportsGeneratedThisMonth}</span>
                       </h3>
                     </div>

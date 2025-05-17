@@ -8,15 +8,10 @@ const EditCentreDexamenForm = () => { // Renamed from EditCabinetForm for clarit
     const { t } = useTranslation();
     const { id } = useParams(); // User ID of the doctor
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        birthDate: "",
+        nom: "",
+        adresse: "",
         tel: "",
-        address: "",
-        speciality: "", // Added speciality
-        photoProfil: null,
-        gender: "",
-        email: "", // Assuming email might be needed or part of user data
+        // Ajoutez d'autres champs si nécessaire pour un centre d'examen
     });
     const [initialData, setInitialData] = useState({});
     const [loading, setLoading] = useState(true);
@@ -29,40 +24,37 @@ const EditCentreDexamenForm = () => { // Renamed from EditCabinetForm for clarit
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
-    // --- Fetch User (Doctor) Data ---
+    // --- Fetch Centre Data ---
     useEffect(() => {
-        const fetchDoctorData = async () => {
+        const fetchCentreData = async () => {
             setLoading(true);
             setError('');
             try {
-                const response = await apiClient.get(`/Users/allid/${id}`); // API endpoint for user details
-                const doctorData = {
-                    firstName: response.data.firstName || "",
-                    lastName: response.data.lastName || "",
-                    email: response.data.email || "",
-                    address: response.data.address || "",
-                    birthDate: response.data.birthDate ? response.data.birthDate.split("T")[0] : "",
+                const response = await apiClient.get(`/api/centres-examen/${id}`); // API endpoint for centre details
+                const centreData = {
+                    nom: response.data.name || "",
+                    adresse: response.data.adress || "",
                     tel: response.data.tel || "",
-                    gender: response.data.gender || "",
-                    photoProfil: response.data.photoProfil, // Base64 string or null
-                    speciality: response.data.speciality || "", // Assuming speciality is part of user data
+                    // Ajoutez d'autres champs si nécessaire
                 };
-                setFormData(doctorData);
-                setInitialData(doctorData);
+                setFormData(centreData);
+                setInitialData(centreData);
 
-                if (previewUrl) { // Clean up old preview URL if any
+                // Pas de gestion de photo de profil pour un centre d'examen ici
+                if (previewUrl) {
                     URL.revokeObjectURL(previewUrl);
                     setPreviewUrl(null);
                     setSelectedFile(null);
                 }
+
             } catch (err) {
-                console.error("Error fetching doctor data:", err);
+                console.error("Error fetching centre data:", err);
                 if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-                    setError(t('editUserForm.errors.fetch.permissionDenied')); // Reusing translation
+                    setError(t('editCentreForm.errors.fetch.permissionDenied')); // Nouvelle traduction
                 } else if (err.response && err.response.status === 404) {
-                    setError(t('editUserForm.errors.fetch.notFound', { id })); // Reusing translation
+                    setError(t('editCentreForm.errors.fetch.notFound', { id })); // Nouvelle traduction
                 } else {
-                    setError(t('editUserForm.errors.fetch.generic')); // Reusing translation
+                    setError(t('editCentreForm.errors.fetch.generic')); // Nouvelle traduction
                 }
             } finally {
                 setLoading(false);
@@ -70,13 +62,13 @@ const EditCentreDexamenForm = () => { // Renamed from EditCabinetForm for clarit
         };
 
         if (id) {
-            fetchDoctorData();
+            fetchCentreData();
         } else {
-            setError(t('editUserForm.errors.fetch.missingId')); // Reusing translation
+            setError(t('editCentreForm.errors.fetch.missingId')); // Nouvelle traduction
             setLoading(false);
         }
 
-        return () => { // Cleanup preview URL on unmount
+        return () => { // Cleanup preview URL on unmount (still relevant if photoProfil was ever used)
             if (previewUrl) {
                 URL.revokeObjectURL(previewUrl);
             }
@@ -122,12 +114,11 @@ const EditCentreDexamenForm = () => { // Renamed from EditCabinetForm for clarit
         }
     }, [previewUrl, t]);
 
-    // --- Form Validation (Example) ---
+    // --- Form Validation ---
     const validateForm = () => {
         const newErrors = {};
-        if (!formData.firstName) newErrors.firstName = t('editUserForm.errors.validation.firstNameRequired');
-        if (!formData.lastName) newErrors.lastName = t('editUserForm.errors.validation.lastNameRequired');
-        // Add other validations as needed (e.g., birthDate, speciality)
+        if (!formData.nom) newErrors.nom = t('editCentreForm.errors.validation.nomRequired'); // Nouvelle traduction
+        // Ajoutez d'autres validations si nécessaire (tel, adresse)
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -141,173 +132,81 @@ const EditCentreDexamenForm = () => { // Renamed from EditCabinetForm for clarit
         setSuccess('');
         setIsSubmitting(true);
 
-        const submissionFormData = new FormData();
-        let hasChanges = false;
-
-        // Append changed text fields
-        Object.keys(formData).forEach((key) => {
-            if (key !== 'photoProfil' && formData[key] !== initialData[key]) {
-                submissionFormData.append(key, formData[key] === null ? '' : formData[key]);
-                hasChanges = true;
-            }
-        });
-
-        if (selectedFile) {
-            submissionFormData.append('photoProfilFile', selectedFile);
-            hasChanges = true;
-        }
-
-        if (!hasChanges) {
-            alert(t('editUserForm.alerts.noChanges'));
-            setIsSubmitting(false);
-            return;
-        }
+        // Prepare data with backend expected field names
+        const dataToSend = {
+            name: formData.nom,
+            adress: formData.adresse,
+            tel: formData.tel,
+            // Include other fields if they exist in formData and map them correctly
+        };
 
         try {
-            // Using the same update endpoint as EditUserForm.js
-            await apiClient.put(`/Users/update/${id}`, submissionFormData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            setSuccess(t('editUserForm.alerts.updateSuccess')); // Reusing translation
-            setSelectedFile(null);
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-            setPreviewUrl(null);
-            setUploadError(null);
-            // Fetch data again to reflect changes if staying on page, or navigate
-            // For now, let's assume navigation after success
+
+            // API endpoint for updating centre details
+            // Send the mapped data object
+            await apiClient.put(`/api/centres-examen/${id}`, dataToSend); // Sending mapped data
+            setSuccess(t('editCentreForm.alerts.updateSuccess')); // Nouvelle traduction
+
+            // Navigate after success
             setTimeout(() => {
-                navigate('/manage-centres'); // Or appropriate page for doctors/centres
+                navigate('/manage-centres'); // Naviguer vers la liste des centres
             }, 2000);
         } catch (err) {
-            console.error("Error updating doctor:", err);
+            console.error("Error updating centre:", err);
             if (err.response) {
                 if (err.response.status === 401 || err.response.status === 403) {
-                    setError(t('editUserForm.errors.submit.permissionDenied'));
+                    setError(t('editCentreForm.errors.submit.permissionDenied')); // Nouvelle traduction
                 } else if (err.response.status === 404) {
-                    setError(t('editUserForm.errors.submit.notFound', { id }));
+                    setError(t('editCentreForm.errors.submit.notFound', { id })); // Nouvelle traduction
                 } else {
-                    setError(err.response.data?.message || t('editUserForm.errors.submit.generic'));
+                    setError(err.response.data?.message || t('editCentreForm.errors.submit.generic')); // Nouvelle traduction
                 }
             } else {
-                setError(t('editUserForm.errors.submit.networkError'));
+                setError(t('editCentreForm.errors.submit.networkError')); // Nouvelle traduction
             }
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    if (loading) return <p className="loading-message">{t('loading')}...</p>;
+    if (loading) return <p className="loading-message">{t('loading')}</p>;
 
     return (
         // Class name can be 'edit-user-container' or a new specific one like 'edit-doctor-centre-container'
         <div className="edit-user-container container mt-4">
-            <h2>{t('editDoctorCentreForm.title', { id })}</h2> {/* Create new translation key */}
+            <h2>{t('editCentreForm.title')}</h2> {/* Nouvelle traduction */}
             {error && <div className="alert alert-danger">{error}</div>}
             {success && <div className="alert alert-success">{success}</div>}
 
             <form onSubmit={handleSubmit} noValidate>
-                {/* Profile Picture Section */}
-                <div className="row mb-4 align-items-center">
-                    <div className="col-md-3 text-center">
-                        <label className="form-label">{t('editUserForm.labels.profilePicture')}</label>
-                        <img
-                            src={(() => {
-                                console.log("EditCentreDexamenForm - Checking avatar source:");
-                                console.log("EditCentreDexamenForm - formData.photoProfil:", formData.photoProfil);
-                                console.log("EditCentreDexamenForm - formData.gender:", formData.gender);
-                                console.log("EditCentreDexamenForm - previewUrl:", previewUrl);
-
-                                const femaleAvatar = '/images/avatar  femme.jpg';
-                                const maleAvatar = '/images/avatar  homme.jpg';
-                                let defaultAvatar = maleAvatar;
-                                if (formData.gender) {
-                                    const genderLower = formData.gender.toLowerCase();
-                                    if (genderLower === 'femme' || genderLower === 'female') {
-                                        defaultAvatar = femaleAvatar;
-                                    }
-                                }
-                                console.log("EditCentreDexamenForm - Selected defaultAvatar:", defaultAvatar);
-                                const finalSrc = previewUrl || (formData.photoProfil ? `data:image/jpeg;base64,${formData.photoProfil}` : defaultAvatar);
-                                console.log("EditCentreDexamenForm - Final image src:", finalSrc);
-                                return finalSrc;
-                            })()}
-                            alt={t('editUserForm.labels.profilePicture')}
-                            className="img-thumbnail rounded-circle mb-2 current-profile-pic"
-                            style={{ width: '150px', height: '150px', objectFit: 'cover' }}
-                        />
-                    </div>
-                    <div className="col-md-9">
-                        <label htmlFor="edit-photoProfil" className="form-label">{t('editUserForm.labels.changePicture')}</label>
-                        <input
-                            type="file"
-                            id="edit-photoProfil"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="form-control mb-2"
-                            disabled={isSubmitting}
-                        />
-                        {uploadError && <div className="alert alert-danger mt-2 p-2">{uploadError}</div>}
-                    </div>
-                </div>
-                <hr />
-
-                {/* Doctor Information Fields based on screenshot */}
+                {/* Centre Information Fields */}
                 <div className="row g-3 mb-3">
                     <div className="col-md-6">
-                        <label htmlFor="firstName" className="form-label required">{t('editUserForm.labels.firstName')}</label>
-                        <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleInputChange}
-                               className={`form-control ${errors.firstName ? 'is-invalid' : ''}`} required disabled={isSubmitting} />
-                        <div className="invalid-feedback">{errors.firstName}</div>
+                        <label htmlFor="nom" className="form-label required">{t('editCentreForm.labels.nom')}</label>
+                        <input type="text" id="nom" name="nom" value={formData.nom} onChange={handleInputChange}
+                               className={`form-control ${errors.nom ? 'is-invalid' : ''}`} required disabled={isSubmitting} />
+                        <div className="invalid-feedback">{errors.nom}</div>
                     </div>
                     <div className="col-md-6">
-                        <label htmlFor="lastName" className="form-label required">{t('editUserForm.labels.lastName')}</label>
-                        <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleInputChange}
-                               className={`form-control ${errors.lastName ? 'is-invalid' : ''}`} required disabled={isSubmitting} />
-                        <div className="invalid-feedback">{errors.lastName}</div>
-                    </div>
-                </div>
-
-                <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                        <label htmlFor="birthDate" className="form-label required">{t('editUserForm.labels.birthDate')}</label>
-                        <input type="date" id="birthDate" name="birthDate" value={formData.birthDate} onChange={handleInputChange}
-                               className={`form-control ${errors.birthDate ? 'is-invalid' : ''}`} required disabled={isSubmitting} />
-                        <div className="invalid-feedback">{errors.birthDate}</div>
-                    </div>
-                    <div className="col-md-6">
-                        <label htmlFor="tel" className="form-label">{t('editUserForm.labels.telephone')}</label>
+                        <label htmlFor="tel" className="form-label">{t('editCentreForm.labels.telephone')}</label>
                         <input type="text" id="tel" name="tel" value={formData.tel} onChange={handleInputChange}
                                className={`form-control ${errors.tel ? 'is-invalid' : ''}`} disabled={isSubmitting} />
                         <div className="invalid-feedback">{errors.tel}</div>
                     </div>
+                    <div className="col-md-6">
+                        <label htmlFor="adresse" className="form-label">{t('editCentreForm.labels.address')}</label>
+                        <input type="text" id="adresse" name="adresse" value={formData.adresse} onChange={handleInputChange}
+                               className="form-control" disabled={isSubmitting} />
+                    </div>
                 </div>
 
-                <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                        <label htmlFor="address" className="form-label">{t('editUserForm.labels.address')}</label>
-                        <input type="text" id="address" name="address" value={formData.address} onChange={handleInputChange}
-                               className="form-control" disabled={isSubmitting} />
-                    </div>
-                    <div className="col-md-6">
-                        <label htmlFor="speciality" className="form-label">{t('editDoctorCentreForm.labels.speciality')}</label> {/* New translation key */}
-                        <input type="text" id="speciality" name="speciality" value={formData.speciality} onChange={handleInputChange}
-                               className="form-control" disabled={isSubmitting} />
-                    </div>
-                </div>
-                 {/* Hidden or display-only email if needed */}
-                 {/* <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                        <label htmlFor="email" className="form-label">{t('editUserForm.labels.email')}</label>
-                        <input type="email" id="email" name="email" value={formData.email}
-                               className="form-control" disabled />
-                    </div>
-                </div> */}
+                {/* Ajoutez d'autres champs spécifiques au centre d'examen ici si nécessaire */}
 
 
                 <div className="row g-3">
                     <div className="col-12 text-center">
                         <button type="submit" className="btn btn-primary btn-lg" disabled={isSubmitting}>
-                            {isSubmitting ? t('editUserForm.buttons.updating') : t('editDoctorCentreForm.buttons.updateDoctor')} {/* New translation key */}
+                            {isSubmitting ? t('editCentreForm.buttons.updating') : t('editCentreForm.buttons.updateCentre')}
                         </button>
                         <button type="button" className="btn btn-secondary ms-2 btn-lg" onClick={() => navigate('/manage-centres')} disabled={isSubmitting}>
                             {t('common.cancel')}

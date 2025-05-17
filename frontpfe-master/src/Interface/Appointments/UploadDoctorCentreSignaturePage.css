@@ -1,0 +1,139 @@
+/* General Container Styling */
+.cabinet-settings-page {
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.cabinet-settings-page h2 {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid; /* Color will be set by theme */
+    display: inline-block; /* To make border only under text */
+}
+
+.cabinet-settings-page h3 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.cabinet-settings-page p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* Form Elements */
+.cabinet-settings-page .form-group {
+    margin-bottom: 20px;
+}
+
+.cabinet-settings-page label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.cabinet-settings-page input[type="file"] {
+    display: block;
+    margin-bottom: 15px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%; /* Adjust as needed */
+    max-width: 400px; /* Limit width */
+}
+
+/* Button Styling (using the requested teal color) */
+.cabinet-settings-page .btn-primary {
+    background-color: #20c997; /* Updated teal color */
+    border-color: #20c997; /* Updated teal color */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.cabinet-settings-page .btn-primary:hover:not(:disabled) {
+    background-color: #1aa67d; /* Darker teal for hover */
+    border-color: #179171; /* Darker teal for hover */
+}
+
+.cabinet-settings-page .btn-primary:disabled {
+    background-color: #6c757d; /* Grey when disabled */
+    border-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* Messages */
+.cabinet-settings-page .error-message {
+    color: #dc3545; /* Red for errors */
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.cabinet-settings-page .success-message {
+    color: #28a745; /* Green for success */
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+/* --- Theme Specific Styles --- */
+
+/* Light Theme (Default) */
+.cabinet-settings-page.light {
+    background-color: #ffffff;
+    color: #333;
+}
+
+.cabinet-settings-page.light h2 {
+    border-bottom-color: #20c997; /* Updated teal border */
+}
+
+.cabinet-settings-page.light input[type="file"] {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+/* Dark Theme */
+.cabinet-settings-page.dark {
+    background-color: #2c3034; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.cabinet-settings-page.dark h2 {
+    border-bottom-color: #20c997; /* Updated teal border */
+}
+
+.cabinet-settings-page.dark h3 {
+    color: #f8f9fa;
+}
+
+.cabinet-settings-page.dark input[type="file"] {
+    background-color: #3a3f44;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+.cabinet-settings-page.dark .error-message {
+    background-color: #572a30;
+    border-color: #8b4c53;
+    color: #f8d7da;
+}
+
+.cabinet-settings-page.dark .success-message {
+    background-color: #2a4b31;
+    border-color: #4c7a53;
+    color: #d4edda;
+}

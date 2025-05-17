@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import './ExaminationResultPage.css';
 
 const ExaminationResultPage = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation(); // Initialize useTranslation and get i18n instance
     const { examinationId } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth(); // Utiliser useAuth
@@ -33,7 +33,7 @@ const ExaminationResultPage = () => {
                 const response = await apiClient.get(`/api/medical-examinations/${examinationId}/result`);
                 setExaminationDetails(response.data);
             } catch (err) {
-                console.error(t('examinationResultPage.errors.fetchFailed'), err);
+                console.error(t('examinationResultPage.consoleErrors.fetchFailed'), err);
                 setError(err.response?.data?.message || t('examinationResultPage.errors.fetchFailedFallback'));
             } finally {
                 setIsLoading(false);
@@ -47,7 +47,8 @@ const ExaminationResultPage = () => {
 
     const formatDate = (dateString) => {
         if (!dateString) return "";
-        return new Date(dateString).toLocaleDateString(t('common.locale'), {
+        // Use i18n.language directly for locale
+        return new Date(dateString).toLocaleDateString(i18n.language, {
             day: '2-digit', month: '2-digit', year: 'numeric'
         });
     };
@@ -60,7 +61,7 @@ const ExaminationResultPage = () => {
             try {
                 iframe.parentNode.removeChild(iframe);
             } catch (e) {
-                console.warn("Could not remove existing print iframe:", e);
+                console.warn(t('examinationResultPage.consoleWarnings.removeIframe'), e);
             }
         }
 
@@ -79,7 +80,7 @@ const ExaminationResultPage = () => {
         const iframeWin = iframe.contentWindow;
 
         iframeDoc.open();
-        iframeDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Compte Rendu d\'Examen</title>');
+        iframeDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + t('examinationResultPage.reportTitle') + '</title>');
         iframeDoc.write(`
             <style>
                 body { font-family: Arial, sans-serif; margin: 20px; font-size: 12px; }
@@ -109,7 +110,7 @@ const ExaminationResultPage = () => {
                 try {
                     iframeToRemove.parentNode.removeChild(iframeToRemove);
                 } catch (e) {
-                    console.warn("Could not remove print iframe after print:", e);
+                    console.warn(t('examinationResultPage.consoleWarnings.removeIframeAfterPrint'), e);
                 }
             }
         };
@@ -121,21 +122,21 @@ const ExaminationResultPage = () => {
                     iframeWin.print();
                     setTimeout(cleanupIframe, 2000);
                 } catch (printError) {
-                    console.error("Error during iframe print execution:", printError);
-                    alert(t('examinationResultPage.errors.printExecutionError', "Erreur lors de l'exécution de l'impression."));
+                    console.error(t('examinationResultPage.consoleErrors.printExecution'), printError);
+                    alert(t('examinationResultPage.errors.printExecutionError'));
                     cleanupIframe();
                 }
             }, 100);
         } catch (e) {
-            console.error("Error setting up print via iframe:", e);
-            alert(t('examinationResultPage.errors.printSetupError', "Erreur lors de la préparation de l'impression."));
+            console.error(t('examinationResultPage.consoleErrors.printSetup'), e);
+            alert(t('examinationResultPage.errors.printSetupError'));
             cleanupIframe();
         }
     };
 
     const handlePrint = () => {
         if (!examinationDetails) {
-            setError(t('examinationResultPage.errors.noDetailsToPrint', "Aucun détail d'examen à imprimer."));
+            setError(t('examinationResultPage.errors.noDetailsToPrint'));
             return;
         }
 
@@ -161,7 +162,7 @@ const ExaminationResultPage = () => {
              // Construire l'URL complète pour l'image de signature
              // Assurez-vous que apiClient.defaults.baseURL est défini et correct
             const signatureUrl = `${apiClient.defaults.baseURL}/uploads/doctor_signatures/${user.signatureImagePath.split('/').pop()}`;
-            signatureImageHtml = `<img src="${signatureUrl}" alt="${t('examinationResultPage.signatureAlt', 'Signature')}" />`;
+            signatureImageHtml = `<img src="${signatureUrl}" alt="${t('examinationResultPage.signatureAlt')}" />`;
         }
 
 
@@ -171,7 +172,7 @@ const ExaminationResultPage = () => {
                 <div>${centreAddress}</div>
                 <div>${centrePhone}</div>
             </div>
-            <div class="title-print">${t('examinationResultPage.reportTitle', "Compte Rendu d'Examen")}</div>
+            <div class="title-print">${t('examinationResultPage.reportTitle')}</div>
             <div class="patient-info-print">
                 <p><strong>${t('examinationResultPage.patientLabel')}:</strong> ${patientName}</p>
                 <p><strong>${t('examinationResultPage.dateLabel')}:</strong> ${formatDate(examinationDate)}</p>
@@ -184,9 +185,9 @@ const ExaminationResultPage = () => {
                 <div class="date-print">
                 </div>
                 <div class="signature-print">
-                    Dr. ${reportingDoctorFirstName} ${reportingDoctorLastName}<br/>
+                    ${t('examinationResultPage.doctorPrefix')} ${reportingDoctorFirstName} ${reportingDoctorLastName}<br/>
                     ${signatureImageHtml}
-                    (${t('examinationResultPage.signatureLabel', 'Signature')})
+                    (${t('examinationResultPage.signatureLabel')})
                 </div>
             </div>
         `;
@@ -201,11 +202,11 @@ const ExaminationResultPage = () => {
     // La structure devrait maintenant être correcte.
 
     if (error) {
-        return <div className="container mt-5 alert alert-danger">{error} <button onClick={() => navigate(-1)} className="btn btn-link">{t('common.back')}</button></div>;
+        return <div className="container mt-5 alert alert-danger">{error} <button onClick={() => navigate(-1)} className="btn btn-link">{t('common.BACK')}</button></div>;
     }
 
     if (!examinationDetails) {
-        return <div className="container mt-5"><p>{t('examinationResultPage.noDetails')}</p> <button onClick={() => navigate(-1)} className="btn btn-link">{t('common.back')}</button></div>;
+        return <div className="container mt-5"><p>{t('examinationResultPage.noDetails')}</p> <button onClick={() => navigate(-1)} className="btn btn-link">{t('common.BACK')}</button></div>;
     }
 
     const {
@@ -251,7 +252,7 @@ const ExaminationResultPage = () => {
                     {prescribingDoctorFirstName && (user?.firstName !== prescribingDoctorFirstName || user?.lastName !== prescribingDoctorLastName) && (
                         <div className="doctor-info mt-3 text-muted">
                             <p>
-                                {t('examinationResultPage.prescribingDoctorLabel', 'Médecin Prescripteur')}: {prescribingDoctorFirstName} {prescribingDoctorLastName}
+                                {t('examinationResultPage.prescribingDoctorLabel')}: {prescribingDoctorFirstName} {prescribingDoctorLastName}
                             </p>
                         </div>
                     )}
@@ -260,7 +261,7 @@ const ExaminationResultPage = () => {
                     {reportingDoctorFirstName && (user?.firstName !== reportingDoctorFirstName || user?.lastName !== reportingDoctorLastName) && (
                         <div className="doctor-centre-info mt-3 text-muted">
                             <p>
-                                {t('examinationResultPage.reportingDoctorLabel', 'Médecin Rapporteur')}: {reportingDoctorFirstName} {reportingDoctorLastName}
+                                {t('examinationResultPage.reportingDoctorLabel')}: {reportingDoctorFirstName} {reportingDoctorLastName}
                             </p>
                         </div>
                     )}
@@ -269,7 +270,7 @@ const ExaminationResultPage = () => {
                     <button onClick={() => navigate(-1)} className="btn btn-secondary mr-2">{t('common.back')}</button>
                     {user?.role === 'DOCTOR_CENTRE_EXAMEN' && (
                         <button onClick={handlePrint} className="btn btn-primary">
-                            {t('examinationResultPage.printButton', 'Imprimer')}
+                            {t('examinationResultPage.printButton')}
                         </button>
                     )}
                 </div>

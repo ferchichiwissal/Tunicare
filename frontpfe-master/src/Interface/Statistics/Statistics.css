@@ -28,7 +28,7 @@
 }
 
 .statistics-table th {
-    background-color: #007bff; /* Blue header */
+    background-color: #00c6a9; /* Teal header */
     color: white;
     font-weight: bold;
 }
@@ -38,7 +38,7 @@
 }
 
 .statistics-table tr:hover {
-    background-color: #e9ecef; /* Lighter blue on hover */
+    background-color: #e0f2f1; /* Lighter teal on hover */
 }
 
 .error-message p {
@@ -86,7 +86,7 @@
 }
 
 .center-stat-block h3 {
-    color: #0056b3;
+    color: #00c6a9; /* Teal color */
     margin-top: 0;
     margin-bottom: 10px;
     border-bottom: 1px solid #eee;

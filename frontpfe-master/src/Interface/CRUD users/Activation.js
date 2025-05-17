@@ -274,14 +274,13 @@ const Activation = () => {
             <th>{t('activation.tableHeaders.email')}</th>
             <th>{t('activation.tableHeaders.speciality')}</th>
             <th>{t('activation.tableHeaders.centre')}</th> {/* Added Centre Name */}
-            <th>{t('activation.tableHeaders.status')}</th>
             <th>{t('activation.tableHeaders.actions')}</th>
           </tr>
         </thead>
         <tbody>
           {!loading && filteredDoctors.length === 0 ? (
             <tr>
-              <td colSpan="8">{t('activation.noDoctorsFound')}</td>
+              <td colSpan="7">{t('activation.noDoctorsFound')}</td>
             </tr>
           ) : (
             filteredDoctors.map((doctor) => (
@@ -293,8 +292,6 @@ const Activation = () => {
                 <td>{doctor.speciality}</td>
                 {/* Assuming doctor object has centreDexamen.name */}
                 <td>{doctor.centreDexamen?.name || t('activation.unknownCentre')}</td>
-                {/* Status should always be inactive on this page */}
-                <td><span className="badge bg-secondary">{t('activation.status.inactivePending')}</span></td>
                 <td>
                   {/* Use Bootstrap button classes */}
                   <button

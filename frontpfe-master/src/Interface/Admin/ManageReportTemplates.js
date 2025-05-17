@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import apiClient from '../../utils/apiClient';
 import AuthContext from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
-// import './ManageReportTemplates.css'; // Optional CSS
+import './ManageReportTemplates.css'; // Optional CSS
 
 const ManageReportTemplates = () => {
     const { t } = useTranslation();
@@ -201,7 +201,7 @@ const handleSaveTemplate = async (event) => {
                                 {isEditing && currentTemplate.previewImageUrl && !previewImageFile && (
                                     <div className="mt-2">
                                         <small>{t('manageReportTemplates.form.currentImage')}:</small>
-                                        <img src={currentTemplate.previewImageUrl} alt="Current preview" style={{ width: '100px', height: 'auto', display: 'block', marginTop: '5px' }} />
+                                        <img src={currentTemplate.previewImageUrl} alt={t('manageReportTemplates.form.currentImageAlt')} style={{ width: '100px', height: 'auto', display: 'block', marginTop: '5px' }} />
                                     </div>
                                 )}
                             </div>
@@ -241,7 +241,6 @@ const handleSaveTemplate = async (event) => {
                         <table className="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>{t('manageReportTemplates.tableHeaders.id')}</th>
                                     <th>{t('manageReportTemplates.tableHeaders.name')}</th>
                                     <th>{t('manageReportTemplates.tableHeaders.type')}</th>
                                     <th>{t('manageReportTemplates.tableHeaders.actions')}</th>
@@ -250,7 +249,6 @@ const handleSaveTemplate = async (event) => {
                             <tbody>
                                 {templates.map(template => (
                                     <tr key={template.id}>
-                                        <td>{template.id}</td>
                                         <td>{template.nomModele}</td>
                                         <td>{template.typeModele || '-'}</td>
                                         <td>

@@ -358,7 +358,7 @@ const MyExaminationsPage = () => {
                                 {/* <td>{exam.resultat || t('common.notAvailable')}</td> {/* Suppressed Result Cell */}
                                 <td className="actions-cell">
                                     <button
-                                        className="btn btn-info btn-sm me-2" // Bootstrap classes for margin
+                                        className="btn btn-primary btn-sm me-2" // Bootstrap classes for margin
                                         onClick={() => handleDownloadRequest(exam.idExam)}
                                         disabled={downloading === `request_${exam.idExam}`}
                                         title={t('myExaminationsPage.buttons.downloadRequest', 'Télécharger Demande')}
@@ -375,7 +375,7 @@ const MyExaminationsPage = () => {
                                     </button>
                                     {/* --- Hide Button --- */}
                                     <button
-                                        className="btn btn-danger btn-sm ms-2" // Added margin-start
+                                        className="btn btn-primary btn-sm ms-2" // Added margin-start
                                         onClick={() => handleHideExamination(exam.idExam)}
                                         disabled={hidingExamId === exam.idExam}
                                         title={t('myExaminationsPage.buttons.hide', 'Ne plus afficher')}
@@ -397,3 +397,4 @@ const MyExaminationsPage = () => {
 };
 
 export default MyExaminationsPage;
+

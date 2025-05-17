@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Importer Link pour la navigation
 import apiClient from '../../utils/apiClient';
 import { useAuth } from '../../context/AuthContext';
-import './MyExaminationsPage.css';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
+import './ConsultationDashboard.css'; // Import ConsultationDashboard CSS
 
 const ArchivedExaminationsPage = () => {
+    const { t } = useTranslation(); // Initialize useTranslation
     const [archivedExams, setArchivedExams] = useState([]);
     const [searchTerm, setSearchTerm] = useState(''); // État pour le terme de recherche
     const [loading, setLoading] = useState(true);
@@ -20,23 +22,23 @@ const ArchivedExaminationsPage = () => {
                     setArchivedExams(response.data);
                     setError(null);
                 } catch (err) {
-                    console.error("Erreur lors de la récupération des examens archivés:", err);
-                    setError(err.response?.data?.message || err.message || "Une erreur s'est produite lors de la récupération des examens archivés.");
+                    console.error(t('archivedExaminationsPage.errors.fetchFailed'), err);
+                    setError(err.response?.data?.message || err.message || t('archivedExaminationsPage.errors.fetchFailedFallback'));
                     setArchivedExams([]);
                 } finally {
                     setLoading(false);
                 }
             } else {
                 setLoading(false);
-                setError("Accès non autorisé ou rôle utilisateur incorrect.");
+                setError(t('archivedExaminationsPage.errors.unauthorizedOrIncorrectRole'));
             }
         };
 
         fetchArchivedExams();
-    }, [user]);
+    }, [user, t]); // Added t to dependency array
 
     if (loading) {
-        return <div className="container mt-5"><p className="text-center">Chargement des examens archivés...</p></div>;
+        return <div className="container mt-5"><p className="text-center">{t('archivedExaminationsPage.loading')}</p></div>;
     }
 
     if (error) {
@@ -47,7 +49,7 @@ const ArchivedExaminationsPage = () => {
         return (
             <div className="container mt-5">
                 <div className="alert alert-warning" role="alert">
-                    Vous devez être connecté en tant que Médecin de Centre d'Examen pour voir cette page.
+                    {t('archivedExaminationsPage.errors.accessDenied')}
                 </div>
             </div>
         );
@@ -63,8 +65,8 @@ const ArchivedExaminationsPage = () => {
             setArchivedExams(prevExams => prevExams.filter(exam => exam.idExam !== examIdToHide));
             // Optionnel: afficher une notification de succès
         } catch (err) {
-            console.error("Erreur lors du masquage de l'examen pour le centre:", err);
-            setError(err.response?.data?.message || "Erreur lors de la tentative de masquage de l'examen.");
+            console.error(t('archivedExaminationsPage.errors.hideFailedCentre'), err);
+            setError(err.response?.data?.message || t('archivedExaminationsPage.errors.hideFailedCentreFallback'));
             // Optionnel: afficher une notification d'erreur à l'utilisateur
         }
     };
@@ -75,14 +77,14 @@ const ArchivedExaminationsPage = () => {
     });
 
     return (
-        <div className="my-examinations-container container mt-5">
-            <h2 className="text-center mb-4">Archive des Examens Réalisés</h2>
-            
+        <div className="consultation-dashboard-container container mt-5">
+            <h2 className="text-center mb-4">{t('archivedExaminationsPage.title')}</h2>
+
             <div className="mb-3">
                 <input
                     type="text"
                     className="form-control"
-                    placeholder="Rechercher par nom ou prénom du patient..."
+                    placeholder={t('archivedExaminationsPage.searchPlaceholder')}
                     value={searchTerm}
                     onChange={handleSearchChange}
                 />
@@ -90,18 +92,18 @@ const ArchivedExaminationsPage = () => {
 
             {filteredExams.length === 0 ? (
                 <p className="text-center">
-                    {searchTerm ? "Aucun examen ne correspond à votre recherche." : "Aucun examen archivé trouvé."}
+                    {searchTerm ? t('archivedExaminationsPage.noExamsFoundSearch') : t('archivedExaminationsPage.noArchivedExamsFound')}
                 </p>
             ) : (
                 <div className="table-responsive">
-                    <table className="table table-striped table-hover">
-                        <thead className="thead-dark">
+                    <table className="table table-striped table-hover custom-table">
+                        <thead>
                             <tr>
-                                <th>Patient</th>
-                                <th>Type d'Examen</th>
-                                <th>Date de Création</th>
+                                <th>{t('archivedExaminationsPage.tableHeaders.patient')}</th>
+                                <th>{t('archivedExaminationsPage.tableHeaders.examType')}</th>
+                                <th>{t('archivedExaminationsPage.tableHeaders.creationDate')}</th>
                                 {/* Statut retiré car tous sont 'terminé' */}
-                                <th>Action</th>
+                                <th>{t('archivedExaminationsPage.tableHeaders.action')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -112,15 +114,15 @@ const ArchivedExaminationsPage = () => {
                                     <td>{new Date(exam.createdAt).toLocaleDateString()}</td>
                                     {/* Statut retiré */}
                                     <td>
-                                        <Link to={`/examination-result/${exam.idExam}`} className="btn btn-info btn-sm me-2">
-                                            Voir Résultat
+                                        <Link to={`/examination-result/${exam.idExam}`} className="btn btn-primary btn-sm me-2">
+                                            {t('archivedExaminationsPage.buttons.viewResult')}
                                         </Link>
                                         <button
                                             onClick={() => handleHideExam(exam.idExam)}
-                                            className="btn btn-outline-secondary btn-sm"
-                                            title="Ne plus afficher cet examen dans cette liste"
+                                            className="btn btn-primary btn-sm"
+                                            title={t('archivedExaminationsPage.tooltips.hideExam')}
                                         >
-                                            Ne plus afficher
+                                            {t('archivedExaminationsPage.buttons.hideExam')}
                                         </button>
                                     </td>
                                 </tr>

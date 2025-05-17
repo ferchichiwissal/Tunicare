@@ -27,7 +27,6 @@ function AddForm() { // Renamed component for clarity
     confirmPassword: "",
     tel: "",
     address: "",
-    photoProfil: null, // Keep null for file input
     gendre: "",
   });
 
@@ -125,10 +124,6 @@ function AddForm() { // Renamed component for clarity
     }
   };
 
-   const handleFileChange = (e) => {
-    setFormData({ ...formData, photoProfil: e.target.files[0] });
-  };
-
   const validateForm = () => {
     const newErrors = {};
 
@@ -220,13 +215,10 @@ function AddForm() { // Renamed component for clarity
 
     const formDataToSend = new FormData();
      Object.keys(formData).forEach(key => {
-        if (key !== 'photoProfil' && key !== 'confirmPassword') { // Exclude confirmPassword
+        if (key !== 'confirmPassword') { // Exclude confirmPassword
             formDataToSend.append(key, formData[key]);
         }
     });
-    if (formData.photoProfil) {
-      formDataToSend.append("photoProfil", formData.photoProfil);
-    }
 
     try {
       const response = await axios.post(apiUrl, formDataToSend, {
@@ -366,9 +358,9 @@ function AddForm() { // Renamed component for clarity
             </div>
           </div>
 
-          {/* Row 4: Gender, Photo */}
+          {/* Row 4: Gender */}
           <div className="row g-3 mb-3">
-            <div className="col-md-6">
+            <div className="col-md-12"> {/* Changed to col-md-12 as photo field is removed */}
               <label htmlFor="add-gender" className="form-label required">{t('addForm.labels.gender')}</label>
               <select
                 id="add-gender"
@@ -384,17 +376,6 @@ function AddForm() { // Renamed component for clarity
                 <option value="Other">{t('addForm.genderOptions.other')}</option>
               </select>
               <div className="invalid-feedback">{errors.gendre}</div>
-            </div>
-            <div className="col-md-6">
-              <label htmlFor="add-photo" className="form-label">{t('addForm.labels.photo')}</label>
-              <input
-                type="file"
-                id="add-photo"
-                name="photoProfil"
-                onChange={handleFileChange}
-                className={`form-control ${errors.photoProfil ? 'is-invalid' : ''}`}
-                accept="image/*"
-              />
             </div>
           </div>
 

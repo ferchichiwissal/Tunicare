@@ -2,9 +2,11 @@ import React, { useState, useEffect, useContext } from 'react'; // Ajout de useC
 import apiClient from '../../utils/apiClient';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext'; // Importer useAuth
-// import './UploadDoctorCentreSignaturePage.css';
+import { useTranslation } from 'react-i18next'; // Importer useTranslation
+import './UploadDoctorCentreSignaturePage.css';
 
 function UploadDoctorCentreSignaturePage() {
+    const { t } = useTranslation(); // Initialiser useTranslation
     const auth = useAuth(); // Utiliser le contexte d'authentification
     const [selectedFile, setSelectedFile] = useState(null);
     const [message, setMessage] = useState('');
@@ -33,7 +35,7 @@ function UploadDoctorCentreSignaturePage() {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!selectedFile) {
-            setError('Veuillez sélectionner un fichier de signature.');
+            setError(t('uploadSignaturePage.selectFileError'));
             return;
         }
 
@@ -50,10 +52,10 @@ function UploadDoctorCentreSignaturePage() {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            setMessage(response.data.message || 'Signature téléchargée avec succès !');
+            setMessage(response.data.message || t('uploadSignaturePage.uploadSuccess'));
             setSelectedFile(null); // Réinitialiser le champ de fichier
         } catch (err) {
-            const errorMessage = err.response?.data?.message || 'Erreur lors du téléchargement de la signature.';
+            const errorMessage = err.response?.data?.message || t('uploadSignaturePage.uploadError');
             setError(errorMessage);
             console.error("Upload signature error:", err);
         } finally {
@@ -62,15 +64,14 @@ function UploadDoctorCentreSignaturePage() {
     };
 
     return (
-        <div className="upload-signature-container">
-            <h2>Télécharger ma Signature Électronique</h2>
+        <div className="cabinet-settings-page"> {/* Changed class to match CabinetSettingsPage.css */}
+            <h2>{t('uploadSignaturePage.title')}</h2>
             <p>
-                Veuillez télécharger une image de votre signature. Cette signature sera utilisée
-                pour signer électroniquement les résultats d'examen.
+                {t('uploadSignaturePage.description')}
             </p>
-            <form onSubmit={handleSubmit} className="upload-signature-form">
-                <div className="form-group">
-                    <label htmlFor="signatureFile">Fichier de signature (PNG, JPG) :</label>
+            <form onSubmit={handleSubmit}> {/* Removed form class, not strictly necessary unless styled */}
+                <div className="form-group"> {/* This class exists in both, keep it */}
+                    <label htmlFor="signatureFile">{t('uploadSignaturePage.fileLabel')}</label>
                     <input
                         type="file"
                         id="signatureFile"
@@ -79,10 +80,10 @@ function UploadDoctorCentreSignaturePage() {
                         disabled={isLoading}
                     />
                 </div>
-                {error && <p className="error-message">{error}</p>}
-                {message && <p className="success-message">{message}</p>}
-                <button type="submit" className="submit-btn" disabled={isLoading}>
-                    {isLoading ? 'Téléchargement...' : 'Télécharger la Signature'}
+                {error && <p className="error-message">{error}</p>} {/* This class exists in both, keep it */}
+                {message && <p className="success-message">{message}</p>} {/* This class exists in both, keep it */}
+                <button type="submit" className="btn btn-primary" disabled={isLoading}> {/* Changed class to btn btn-primary */}
+                    {isLoading ? t('uploadSignaturePage.uploadingButton') : t('uploadSignaturePage.uploadButton')}
                 </button>
             </form>
             {/* Vous pouvez ajouter un aperçu de la signature actuelle si elle existe */}

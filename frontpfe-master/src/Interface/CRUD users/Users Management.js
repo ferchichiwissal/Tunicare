@@ -452,7 +452,6 @@ const UserTable = () => {
             <th>{t('userManagement.tableHeaders.lastName')}</th>
             <th>{t('userManagement.tableHeaders.email')}</th>
             <th>{t('userManagement.tableHeaders.role')}</th>
-            <th>{t('userManagement.tableHeaders.status')}</th>
             {/* Conditionally show Speciality for Doctor Centres */}
             {viewType === 'doctorCentres' && <th>{t('userManagement.tableHeaders.speciality')}</th>}
             <th>{t('userManagement.tableHeaders.actions')}</th>
@@ -476,26 +475,29 @@ const UserTable = () => {
                 <td>{user.lastName}</td>
                 <td>{user.email ? user.email : t('userManagement.noEmail')}</td>
                 <td>{user.role}</td>
-                <td>{user.displayStatus ? <span className="badge bg-success">{t('userManagement.status.active')}</span> : <span className="badge bg-secondary">{t('userManagement.status.inactive')}</span>}</td>
                 {/* Conditionally render Speciality */}
                 {viewType === 'doctorCentres' && <td>{user.speciality ? user.speciality : 'N/A'}</td>}
                 <td>
-                  <button onClick={() => handleEditClick(user)} className="btn btn-sm btn-primary me-1" disabled={loading}>{t('userManagement.buttons.edit')} ✏️</button>
-                  <button
-                    onClick={() => handleDelete(user)} // Pass whole user object
-                    className="btn btn-sm btn-danger me-1"
-                    disabled={loading}
-                  >
-                    {t('userManagement.buttons.delete')} 🗑️
-                  </button>
-                   <button
-                    onClick={() => handleToggleStatus(user)}
-                    className="btn btn-sm btn-warning"
-                    disabled={loading}
-                  >
-                    {/* Use 'Deactivate'/'Activate' based on status */}
-                    {user.displayStatus ? t('userManagement.buttons.deactivate') : t('userManagement.buttons.activate')} 🔻
-                  </button>
+                  <div className="action-buttons-container">
+                    <button onClick={() => handleEditClick(user)} className="btn btn-sm btn-custom-teal me-1 btn-edit-custom" disabled={loading} style={{ backgroundColor: '#00c6a9', borderColor: '#00c6a9', color: '#ffffff', minWidth: '120px', textAlign: 'center' }}>{t('userManagement.buttons.edit')} ✏️</button>
+                    <button
+                      onClick={() => handleDelete(user)} // Pass whole user object
+                      className="btn btn-sm btn-custom-teal me-1"
+                      disabled={loading}
+                      style={{ backgroundColor: '#00c6a9', borderColor: '#00c6a9', color: '#ffffff', minWidth: '120px', textAlign: 'center' }}
+                    >
+                      {t('userManagement.buttons.delete')} 🗑️
+                    </button>
+                     <button
+                      onClick={() => handleToggleStatus(user)}
+                      className="btn btn-sm btn-custom-teal btn-toggle-status-custom"
+                      disabled={loading}
+                      style={{ backgroundColor: '#00c6a9', borderColor: '#00c6a9', color: '#ffffff', minWidth: '120px', textAlign: 'center' }}
+                    >
+                      {/* Use 'Deactivate'/'Activate' based on status */}
+                      {user.displayStatus ? t('userManagement.buttons.deactivate') : t('userManagement.buttons.activate')} 🔻
+                    </button>
+                  </div>
                 </td>
               </tr>
               );

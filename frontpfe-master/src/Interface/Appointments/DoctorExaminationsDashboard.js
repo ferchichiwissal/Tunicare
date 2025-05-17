@@ -104,10 +104,19 @@ const DoctorExaminationsDashboard = () => {
 
     const formatDate = (dateString) => {
         if (!dateString) return "";
-        return new Date(dateString).toLocaleDateString(t('common.locale'), {
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit'
-        });
+        try {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Les mois sont de 0 à 11
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        } catch (e) {
+            console.error("Erreur de formatage de date:", e, "Chaîne de date:", dateString);
+            return "Date invalide";
+        }
     };
 
 
@@ -120,116 +129,122 @@ const DoctorExaminationsDashboard = () => {
     }
 
     return (
-        <div className="container mt-5">
+        <div className="user-table-container"> {/* Use the container class */}
             <h2>{t('doctorExaminationsDashboard.title')}</h2>
 
-            <div className="row mb-3">
-                <div className="col-md-6">
+            {/* Filter Section (Radio Buttons) */}
+            <div className="mb-3"> {/* Add margin bottom */}
+                <div className="form-check form-check-inline"> {/* Use form-check and form-check-inline */}
                     <input
-                        type="text"
-                        className="form-control"
-                        placeholder={t('doctorExaminationsDashboard.searchPlaceholder')}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="form-check-input"
+                        type="radio"
+                        name="statusFilter"
+                        id="statusEnAttente"
+                        value="en attente"
+                        checked={statusFilter === 'en attente'}
+                        onChange={(e) => setStatusFilter(e.target.value)}
                     />
+                    <label className="form-check-label" htmlFor="statusEnAttente">
+                        {t('doctorExaminationsDashboard.statusFilters.pending', 'En attente')}
+                    </label>
                 </div>
-                <div className="col-md-6">
-                    <div className="btn-group" role="group" aria-label="Status filter">
-                        {/* Bouton radio "Tous" retiré */}
-                        <input
-                            type="radio" className="btn-check" name="statusFilter" id="statusEnAttente"
-                            value="en attente" autoComplete="off" checked={statusFilter === 'en attente'}
-                            onChange={(e) => setStatusFilter(e.target.value)} />
-                        <label className="btn btn-outline-primary" htmlFor="statusEnAttente">
-                            {t('doctorExaminationsDashboard.statusFilters.pending', 'En attente')}
-                        </label>
-
-                        <input
-                            type="radio" className="btn-check" name="statusFilter" id="statusTermine"
-                            value="terminé" autoComplete="off" checked={statusFilter === 'terminé'}
-                            onChange={(e) => setStatusFilter(e.target.value)} />
-                        <label className="btn btn-outline-primary" htmlFor="statusTermine">
-                            {t('doctorExaminationsDashboard.statusFilters.completed', 'Terminé')}
-                        </label>
-                    </div>
+                <div className="form-check form-check-inline">
+                    <input
+                        className="form-check-input"
+                        type="radio"
+                        name="statusFilter"
+                        id="statusTermine"
+                        value="terminé"
+                        checked={statusFilter === 'terminé'}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                    />
+                    <label className="form-check-label" htmlFor="statusTermine">
+                        {t('doctorExaminationsDashboard.statusFilters.completed', 'Terminé')}
+                    </label>
                 </div>
             </div>
-            
-            {/* Les lignes suivantes (ancienne barre de recherche) doivent être supprimées */}
-            {/* className="form-control"
-            placeholder={t('doctorExaminationsDashboard.searchPlaceholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            </div> */}
 
-            {filteredExaminations.length === 0 ? (
-                <p>{t('doctorExaminationsDashboard.noExaminationsFound')}</p>
-            ) : (
-                <table className="table table-striped table-hover">
-                    <thead className="thead-dark">
-                        <tr>
-                            <th>{t('doctorExaminationsDashboard.tableHeaders.dateRequest')}</th>
-                            <th>{t('doctorExaminationsDashboard.tableHeaders.patientName')}</th>
-                            <th>{t('doctorExaminationsDashboard.tableHeaders.act')}</th>
-                            <th>{t('doctorExaminationsDashboard.tableHeaders.recommendation')}</th>
-                            <th>{t('doctorExaminationsDashboard.tableHeaders.status')}</th>
-                            <th>{t('doctorExaminationsDashboard.tableHeaders.actions')}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredExaminations.map(exam => (
-                            <tr key={exam.idExam}>
-                                <td>{formatDate(exam.createdAt)}</td>
-                                {/* Use direct patient name fields from DTO */}
-                                <td>{exam.patientFirstName} {exam.patientLastName}</td>
-                                <td>{exam.act}</td>
-                                <td style={{maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}
-                                    dangerouslySetInnerHTML={{ __html: exam.recommandation || '' }}>
-                                </td>
-                                <td><span className={`badge bg-${exam.etat === 'en attente' ? 'warning' : 'success'}`}>{exam.etat}</span></td>
-                                <td>
-                                    {statusFilter === 'en attente' && exam.etat === 'en attente' && (
-                                        <>
-                                            <button
-                                                className="btn btn-sm btn-primary me-1"
-                                                onClick={() => handleModifier(exam)}
-                                                // disabled={exam.etat !== 'en attente'} // Redondant si statusFilter est 'en attente'
-                                            >
-                                                {t('doctorExaminationsDashboard.buttons.modify')}
-                                            </button>
-                                            <button
-                                                className="btn btn-sm btn-danger"
-                                                onClick={() => handleSupprimer(exam.idExam)}
-                                                // disabled={exam.etat !== 'en attente'} // Redondant
-                                            >
-                                                {t('doctorExaminationsDashboard.buttons.delete')}
-                                            </button>
-                                        </>
-                                    )}
-                                    {statusFilter === 'terminé' && exam.etat === 'terminé' && (
-                                        <>
-                                            <button
-                                                className="btn btn-sm btn-info me-1"
-                                                onClick={() => handleVoirResultat(exam)}
-                                            >
-                                                {t('doctorExaminationsDashboard.buttons.viewResult')}
-                                            </button>
-                                            <button
-                                                onClick={() => handleHideExam(exam.idExam)}
-                                                className="btn btn-outline-secondary btn-sm"
-                                                title="Ne plus afficher cet examen dans cette liste"
-                                            >
-                                                Ne plus afficher
-                                            </button>
-                                        </>
-                                    )}
-                                </td>
+            {/* Search Section */}
+            <div className="mb-4"> {/* Add margin bottom */}
+                <input
+                    type="text"
+                    className="form-control"
+                    placeholder={t('doctorExaminationsDashboard.searchPlaceholder')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
+            {isLoading && <p>{t('doctorExaminationsDashboard.loading')}</p>} {/* Loading indicator */}
+            {error && <div className="alert alert-danger">{error}</div>} {/* Error message */}
+
+            {/* Add Bootstrap responsive table wrapper */}
+            <div className="table-responsive">
+                {filteredExaminations.length === 0 && !isLoading && !error ? (
+                    <p>{t('doctorExaminationsDashboard.noExaminationsFound')}</p>
+                ) : (
+                    <table className="table table-striped table-hover custom-table"> {/* Add Bootstrap table classes */}
+                        <thead>
+                            <tr>
+                                <th>{t('doctorExaminationsDashboard.tableHeaders.dateRequest')}</th>
+                                <th>{t('doctorExaminationsDashboard.tableHeaders.patientName')}</th>
+                                <th>{t('doctorExaminationsDashboard.tableHeaders.act')}</th>
+                                <th>{t('doctorExaminationsDashboard.tableHeaders.recommendation')}</th>
+                                <th>{t('doctorExaminationsDashboard.tableHeaders.actions')}</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+                        </thead>
+                        <tbody>
+                            {filteredExaminations.map(exam => (
+                                <tr key={exam.idExam}>
+                                    <td>{formatDate(exam.createdAt)}</td>
+                                    <td>{exam.patientFirstName} {exam.patientLastName}</td>
+                                    <td>{exam.act}</td>
+                                    <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                                        dangerouslySetInnerHTML={{ __html: exam.recommandation || '' }}>
+                                    </td>
+                                    {/* Removed Status column */}
+                                    <td>
+                                        {statusFilter === 'en attente' && exam.etat === 'en attente' && (
+                                            <>
+                                                <button
+                                                    className="btn btn-sm btn-info me-1 edit-button"
+                                                    onClick={() => handleModifier(exam)}
+                                                >
+                                                    {t('doctorExaminationsDashboard.buttons.modify')} ✏️
+                                                </button>
+                                                <button
+                                                    className="btn btn-sm btn-info delete-button"
+                                                    style={{ backgroundColor: '#00c6a9', borderColor: '#00c6a9' }}
+                                                    onClick={() => handleSupprimer(exam.idExam)}
+                                                >
+                                                    {t('doctorExaminationsDashboard.buttons.delete')} 🗑️
+                                                </button>
+                                            </>
+                                        )}
+                                        {statusFilter === 'terminé' && exam.etat === 'terminé' && (
+                                            <>
+                                                <button
+                                                    className="btn btn-sm btn-info me-1"
+                                                    onClick={() => handleVoirResultat(exam)}
+                                                >
+                                                    {t('doctorExaminationsDashboard.buttons.viewResult')} 📄
+                                                </button>
+                                                <button
+                                                    onClick={() => handleHideExam(exam.idExam)}
+                                                    className="btn btn-outline-secondary btn-sm"
+                                                    title={t('doctorExaminationsDashboard.tooltips.hideExam')}
+                                                >
+                                                    {t('doctorExaminationsDashboard.buttons.hideExam')} 👁️‍🗨️
+                                                </button>
+                                            </>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
+            </div>
         </div>
     );
 };

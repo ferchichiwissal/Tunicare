@@ -5,7 +5,7 @@ import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 import apiClient from '../../utils/apiClient'; // Import apiClient instead of axios
 import AuthContext from '../../context/AuthContext'; // Import AuthContext
 import { useTranslation } from 'react-i18next'; // Import useTranslation
-// import './MedicalExaminationForm.css'; // Optional CSS
+import './MedicalExaminationForm.css'; // Optional CSS
 
 const MedicalExaminationForm = () => {
     const { t } = useTranslation(); // Initialize translation function
@@ -89,6 +89,13 @@ const MedicalExaminationForm = () => {
         };
         fetchData();
     }, [patientId, examIdToEdit, API_URL, t]); // Added examIdToEdit and t to dependencies
+
+    // Mapping for API status values to translation keys
+    const statusTranslationKeys = {
+        'en attente': 'pending',
+        'terminé': 'completed', // Assuming 'terminé' is another possible status
+        // Add other status mappings here if needed
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -372,11 +379,7 @@ const MedicalExaminationForm = () => {
             {error && <p style={{ color: 'red', marginBottom: '10px' }}>{t('medicalExaminationForm.errorPrefix')}{error}</p>}
 
             <form onSubmit={handleSubmit}>
-                {examIdToEdit && currentExamStatus && (
-                    <div className="alert alert-info" role="alert">
-                        {t('medicalExaminationForm.currentStatusLabel')} {currentExamStatus}
-                    </div>
-                )}
+                {/* Removed the status display as requested */}
                 <div className="form-group" style={{ marginBottom: '15px' }}>
                     <label htmlFor="examenType">{t('medicalExaminationForm.labels.examType')}</label> {/* Use translation key */}
                     <select
@@ -441,9 +444,9 @@ const MedicalExaminationForm = () => {
                 {submitStatus && <p style={{ marginBottom: '10px' }}>{submitStatus}</p>}
 
                 <div className="form-actions">
-                    <button 
-                        type="submit" 
-                        className="btn btn-primary" 
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
                         style={{ marginRight: '10px' }}
                         disabled={examIdToEdit && currentExamStatus && currentExamStatus !== 'en attente'} // Disable if editing and not 'en attente'
                     >
@@ -452,10 +455,10 @@ const MedicalExaminationForm = () => {
                             : t('medicalExaminationForm.buttons.save')
                         }
                     </button>
-                    <button 
-                        type="button" 
-                        onClick={handlePrint} 
-                        className="btn btn-info" 
+                    <button
+                        type="button"
+                        onClick={handlePrint}
+                        className="btn btn-info"
                         disabled={!currentExamIdInForm && !examIdToEdit} // Disable print if no exam ID
                     >
                         {t('medicalExaminationForm.buttons.print')}
