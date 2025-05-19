@@ -16,6 +16,8 @@ import pi.pperformance.elite.dto.AdminGlobalStatisticsDTO; // Ajout de l'import
 import pi.pperformance.elite.dto.RecentActivityDTO;
 import pi.pperformance.elite.dto.SimpleAppointmentDTO;
 import pi.pperformance.elite.dto.AssistantStatisticsDTO; // Import the new DTO
+import pi.pperformance.elite.dto.AppointmentDistributionDTO; // Import the new DTO
+import pi.pperformance.elite.dto.MonthlyStatDTO; // Import MonthlyStatDTO
 import pi.pperformance.elite.entities.*;
 import pi.pperformance.elite.enums.RendezVousStatus;
 
@@ -233,8 +235,9 @@ public class StatisticsService implements IStatisticsService {
 
         // long acceptedAppointmentsMonth = rendezVousRepository.countByDoctorAndCabinetAndApptStateAndApptDateTimeBetween(
         //     currentDoctor, currentCabinet, RendezVousStatus.ACCEPTE.name(), startOfMonth, endOfMonth); // Not needed for current DTO
-        long realizedAppointmentsMonth = rendezVousRepository.countByCabinetAndApptDateTimeBetweenAndApptState(
-            currentCabinet, startOfMonth, endOfMonth, "réalisé"); // Corrected parameter order
+        // Calculate total appointments this month in the cabinet (regardless of state)
+        long totalAppointmentsThisMonthInCabinet = rendezVousRepository.countByCabinetAndApptDateTimeBetween(
+            currentCabinet, startOfMonth, endOfMonth);
         // double appointmentCompletionRateMonth = (acceptedAppointmentsMonth > 0) ? ((double) realizedAppointmentsMonth / acceptedAppointmentsMonth) * 100 : 0.0; // This was for the rate
 
         // Calculer pendingPatientRegistrationsCount
@@ -250,7 +253,7 @@ public class StatisticsService implements IStatisticsService {
 
         return new DoctorStatisticsDTO(todaysAcceptedAppointments, todaysConsultationsRealized, totalPatientsInCabinet, upcomingAppointmentsToday,
                                        pendingConfirmationAppointmentsCount, pendingExaminationRequestsCount, unreadExaminationResultsCount, appointmentCompletionRate,
-                                       newPatientsThisMonthInCabinet, realizedAppointmentsMonth, pendingPatientRegistrationsCount);
+                                       newPatientsThisMonthInCabinet, totalAppointmentsThisMonthInCabinet, pendingPatientRegistrationsCount);
     }
 
     @Override
@@ -413,7 +416,7 @@ public class StatisticsService implements IStatisticsService {
 
     @Override
     public AdminGlobalStatisticsDTO getAdminGlobalDashboardStatistics() {
-        // Implémentation temporaire, les vrais calculs viendront ensuite
+        // Implémentation pour les statistiques globales de l'administrateur
         long totalUsers = userRepository.count();
         long totalPatients = userRepository.countByRole(Role.PATIENT);
         long totalDoctors = userRepository.countByRole(Role.DOCTOR);
@@ -423,41 +426,24 @@ public class StatisticsService implements IStatisticsService {
         long totalExamCentres = centreDexamenRepository.count();
 
         LocalDate today = LocalDate.now();
-        LocalDateTime startOfToday = today.atStartOfDay();
-        LocalDateTime endOfToday = today.plusDays(1).atStartOfDay();
-        Date todayDateForRepo = Date.from(startOfToday.atZone(ZoneId.systemDefault()).toInstant());
-        Date tomorrowDateForRepo = Date.from(endOfToday.atZone(ZoneId.systemDefault()).toInstant());
-
-        LocalDateTime startOfWeek = today.with(java.time.DayOfWeek.MONDAY).atStartOfDay();
-        LocalDateTime endOfWeek = today.with(java.time.DayOfWeek.SUNDAY).plusDays(1).atStartOfDay();
-        Date startOfWeekDateForRepo = Date.from(startOfWeek.atZone(ZoneId.systemDefault()).toInstant());
-        Date endOfWeekDateForRepo = Date.from(endOfWeek.atZone(ZoneId.systemDefault()).toInstant());
-
         LocalDateTime startOfMonth = today.withDayOfMonth(1).atStartOfDay();
         LocalDateTime endOfMonth = today.withDayOfMonth(today.lengthOfMonth()).plusDays(1).atStartOfDay();
         Date startOfMonthDateForRepo = Date.from(startOfMonth.atZone(ZoneId.systemDefault()).toInstant());
         Date endOfMonthDateForRepo = Date.from(endOfMonth.atZone(ZoneId.systemDefault()).toInstant());
 
         // User statistics (User entity has createdAt as LocalDate)
-        // long newUsersThisWeek = userRepository.countByCreatedAtBetween(startOfWeek.toLocalDate(), endOfWeek.toLocalDate().minusDays(1)); // Supprimé
         long newUsersThisMonth = userRepository.countByCreatedAtBetween(startOfMonth.toLocalDate(), endOfMonth.toLocalDate().minusDays(1)); // endOfMonth is exclusive start of next day
 
         // Appointment statistics (assuming RendezVous entity has a createdAt field of type LocalDateTime)
-        // long appointmentsToday = rendezVousRepository.countByCreatedAtBetween(startOfToday, endOfToday); // Supprimé
-        // long appointmentsThisWeek = rendezVousRepository.countByCreatedAtBetween(startOfWeek, endOfWeek); // Supprimé
         long appointmentsThisMonth = rendezVousRepository.countByCreatedAtBetween(startOfMonth, endOfMonth);
 
         // Consultation statistics (Consultation entity has dateConsultation of type Date)
-        // long consultationsToday = consultationRepository.countByDateConsultationBetween(todayDateForRepo, tomorrowDateForRepo); // Supprimé
-        // long consultationsThisWeek = consultationRepository.countByDateConsultationBetween(startOfWeekDateForRepo, endOfWeekDateForRepo); // Supprimé
         long consultationsThisMonth = consultationRepository.countByDateConsultationBetween(startOfMonthDateForRepo, endOfMonthDateForRepo);
 
         // Medical Examination statistics (assuming MedicalExamination entity has a createdAt field of type LocalDateTime)
-        // long examsToday = medicalExaminationRepository.countByCreatedAtBetween(startOfToday, endOfToday); // Supprimé
-        // long examsThisWeek = medicalExaminationRepository.countByCreatedAtBetween(startOfWeek, endOfWeek); // Supprimé
         long examsThisMonth = medicalExaminationRepository.countByCreatedAtBetween(startOfMonth, endOfMonth);
         long medicalReportsGeneratedThisMonth = medicalExaminationRepository.countByResultatIsNotNullAndResultatNotAndUpdatedAtBetween("", startOfMonth, endOfMonth);
-        
+
         return new AdminGlobalStatisticsDTO(
             totalUsers, totalPatients, totalDoctors, totalAssistants, totalDoctorCentres,
             totalCabinets, totalExamCentres, newUsersThisMonth,
@@ -466,7 +452,7 @@ public class StatisticsService implements IStatisticsService {
     }
 
     @Override
-    public List<pi.pperformance.elite.dto.MonthlyStatDTO> getPatientConsultationsPerMonth(Long patientId, Long cabinetId) {
+    public List<MonthlyStatDTO> getPatientConsultationsPerMonth(Long patientId, Long cabinetId) {
         if (patientId == null || cabinetId == null) {
             return Collections.emptyList();
         }
@@ -479,7 +465,7 @@ public class StatisticsService implements IStatisticsService {
     }
 
     @Override
-    public List<pi.pperformance.elite.dto.MonthlyStatDTO> getPatientExamsPerMonth(Long patientId, Long cabinetId) {
+    public List<MonthlyStatDTO> getPatientExamsPerMonth(Long patientId, Long cabinetId) {
         if (patientId == null || cabinetId == null) {
             return Collections.emptyList();
         }
@@ -490,16 +476,18 @@ public class StatisticsService implements IStatisticsService {
         return medicalExaminationRepository.countExamsByMonthForPatientAndCabinet(patientId, cabinetId, twelveMonthsAgoDateTime);
     }
 
+
+
     @Override
     public AssistantStatisticsDTO getAssistantDashboardStatistics(Long assistantId, Long cabinetId) {
         if (assistantId == null || cabinetId == null) {
             return new AssistantStatisticsDTO(0, 0, 0, 0, 0, 0);
         }
-
         User assistantUser = userRepository.findById(assistantId).orElse(null);
         if (assistantUser == null || !(assistantUser instanceof Assistant)) {
-            return new AssistantStatisticsDTO(0, 0, 0, 0, 0, 0);
+             return new AssistantStatisticsDTO(0, 0, 0, 0, 0, 0);
         }
+        Assistant currentAssistant = (Assistant) assistantUser;
 
         CabinetDr currentCabinet = cabinetRepository.findById(cabinetId).orElse(null);
         if (currentCabinet == null) {
@@ -507,47 +495,137 @@ public class StatisticsService implements IStatisticsService {
         }
 
         LocalDate today = LocalDate.now();
-        LocalDateTime startOfTodayLdt = today.atStartOfDay();
-        LocalDateTime endOfTodayLdt = today.plusDays(1).atStartOfDay();
-        Date startOfTodayDate = Date.from(startOfTodayLdt.atZone(ZoneId.systemDefault()).toInstant());
-        Date endOfTodayDate = Date.from(endOfTodayLdt.atZone(ZoneId.systemDefault()).toInstant());
+        LocalDateTime startOfToday = today.atStartOfDay();
+        LocalDateTime endOfToday = today.plusDays(1).atStartOfDay();
 
+        // Count appointments for today in the assistant's cabinet
+        long todaysAppointmentsCount = rendezVousRepository.countByCabinetAndApptDateTimeBetween(currentCabinet, startOfToday, endOfToday);
 
-        // RDV Acceptés Aujourd'hui pour le cabinet
-        long todaysAcceptedAppointments = rendezVousRepository.countByCabinetAndApptDateTimeBetweenAndApptState(
-                currentCabinet, startOfTodayLdt, endOfTodayLdt, "accepté");
-
-        // RDV à confirmer pour le cabinet
+        // Count pending appointments in the assistant's cabinet
         long pendingConfirmationAppointmentsCount = rendezVousRepository.countByCabinet_IdSiteAndApptState(cabinetId, "en attente"); // Match database string
 
-        // Inscriptions de Patients en Attente pour le cabinet
-        long pendingPatientRegistrationsCount = userCabinetRegistrationRepository.countByCabinetAndIsActiveAndUser_Role(currentCabinet, false, Role.PATIENT);
-        
-        // Total patients in cabinet
+        // Count total patients registered in the assistant's cabinet
         long totalPatientsInCabinet = userCabinetRegistrationRepository.countByCabinetAndIsActive(currentCabinet, true);
 
-        // Patients activés aujourd'hui dans le cabinet (i.e., enregistrés aujourd'hui et actifs)
-        long patientsActivatedTodayInCabinet = userCabinetRegistrationRepository.countByCabinetAndIsActiveTrueAndRegistrationDate(currentCabinet, today);
+        // Count pending patient registrations in the assistant's cabinet
+        long pendingPatientRegistrationsCount = userCabinetRegistrationRepository.countByCabinetAndIsActiveAndUser_Role(currentCabinet, false, Role.PATIENT);
 
-        // Nouveaux utilisateurs (patients) liés au cabinet et créés aujourd'hui
-        // This counts patients registered to this cabinet and whose User account was created today.
-        long newPatientsTodayInCabinet = userCabinetRegistrationRepository.countByCabinetAndUser_CreatedAt(currentCabinet, today);
-        
-        // Nouveaux utilisateurs (assistants) liés au cabinet et créés aujourd'hui
-        // Assumes Assistant entity has 'cabinet' and User (parent) has 'createdAt'
-        // And a method countByCabinetAndCreatedAt exists in UserRepository for Assistants
-        long newAssistantsTodayInCabinet = userRepository.countAssistantsByCabinetAndCreatedAt(currentCabinet, today);
+        // Count total doctors associated with the cabinet (assuming UserCabinetRegistration links doctors to cabinets)
+        long totalDoctorsInCabinet = userCabinetRegistrationRepository.countByCabinetAndIsActiveAndUser_Role(currentCabinet, true, Role.DOCTOR);
 
-        long newUsersTodayInCabinet = newPatientsTodayInCabinet + newAssistantsTodayInCabinet;
-
+        // Count total examinations performed in the cabinet (assuming MedicalExamination has a link to Cabinet or CentreDexamen linked to Cabinet)
+        // This might need adjustment based on how exams are linked to cabinets/centres
+        // long totalExamsInCabinet = medicalExaminationRepository.countByCabinetId(cabinetId); // Assuming a method like this exists or can be added
 
         return new AssistantStatisticsDTO(
-            todaysAcceptedAppointments,
+            todaysAppointmentsCount,
             pendingConfirmationAppointmentsCount,
-            pendingPatientRegistrationsCount,
             totalPatientsInCabinet,
-            patientsActivatedTodayInCabinet,
-            newUsersTodayInCabinet
+            pendingPatientRegistrationsCount,
+            totalDoctorsInCabinet,
+            0 // Temporarily set totalExamsInCabinet to 0 to resolve compilation error
         );
+    }
+
+    @Override
+    public AppointmentDistributionDTO getDoctorAppointmentDistributionByMonth(Long cabinetId, Integer year, Integer month) {
+        if (cabinetId == null || year == null || month == null) {
+            return new AppointmentDistributionDTO(0, 0, 0);
+        }
+
+        // Calculate the start and end of the specified month
+        LocalDate startOfMonth = LocalDate.of(year, month, 1);
+        LocalDateTime startOfMonthDateTime = startOfMonth.atStartOfDay();
+        LocalDateTime endOfMonthDateTime = startOfMonth.plusMonths(1).atStartOfDay();
+
+        // Get counts for each status for the given month and cabinet
+        long acceptedCount = rendezVousRepository.countByCabinet_IdSiteAndApptStateAndApptDateTimeBetween(
+                cabinetId, RendezVousStatus.ACCEPTE.name(), startOfMonthDateTime, endOfMonthDateTime);
+        long realizedCount = rendezVousRepository.countByCabinet_IdSiteAndApptStateAndApptDateTimeBetween(
+                cabinetId, RendezVousStatus.REALISE.name(), startOfMonthDateTime, endOfMonthDateTime);
+        long refusedCount = rendezVousRepository.countByCabinet_IdSiteAndApptStateAndApptDateTimeBetween(
+                cabinetId, RendezVousStatus.REFUSE.name(), startOfMonthDateTime, endOfMonthDateTime);
+
+        return new AppointmentDistributionDTO(acceptedCount, realizedCount, refusedCount);
+    }
+
+    // Implement the new methods for Doctor graphs
+    @Override
+    public List<MonthlyStatDTO> getDoctorConsultationsPerMonth(Long doctorId, Long cabinetId) {
+        if (doctorId == null || cabinetId == null) {
+            return Collections.emptyList();
+        }
+
+        User userDoctor = userRepository.findById(doctorId).orElse(null);
+        if (userDoctor == null || !(userDoctor instanceof Doctor)) {
+             System.err.println("Doctor entity not found for ID: " + doctorId);
+             return Collections.emptyList();
+        }
+        Doctor currentDoctor = (Doctor) userDoctor;
+
+        CabinetDr currentCabinet = cabinetRepository.findById(cabinetId).orElse(null);
+        if (currentCabinet == null) {
+             System.err.println("Cabinet entity not found for ID: " + cabinetId);
+             return Collections.emptyList();
+        }
+
+        // Calculate the date 12 months ago to limit the query
+        LocalDate today = LocalDate.now();
+        Date twelveMonthsAgoDate = Date.from(today.minusMonths(12).withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        return consultationRepository.countConsultationsByMonthForDoctorAndCabinet(doctorId, cabinetId, twelveMonthsAgoDate);
+    }
+
+    @Override
+    public List<MonthlyStatDTO> getDoctorPatientsPerMonth(Long doctorId, Long cabinetId) {
+        if (doctorId == null || cabinetId == null) {
+            return Collections.emptyList();
+        }
+
+        // Although doctorId is passed, the patient count is per cabinet, so we only strictly need cabinetId here.
+        // However, keeping doctorId in the signature aligns with the consultation method and controller endpoint.
+
+        CabinetDr currentCabinet = cabinetRepository.findById(cabinetId).orElse(null);
+        if (currentCabinet == null) {
+             System.err.println("Cabinet entity not found for ID: " + cabinetId);
+             return Collections.emptyList();
+        }
+
+        // Calculate the date 12 months ago to limit the query
+        LocalDate today = LocalDate.now();
+        LocalDate twelveMonthsAgoDate = today.minusMonths(12).withDayOfMonth(1);
+
+        // Note: The repository method expects LocalDate for startDate
+        return userCabinetRegistrationRepository.countActivePatientRegistrationsByMonthForCabinet(cabinetId, twelveMonthsAgoDate);
+    }
+
+    // Implement the new methods for Admin global graphs
+    @Override
+    public List<MonthlyStatDTO> getGlobalConsultationsPerMonth() {
+        // Calculate the date 12 months ago to limit the query
+        LocalDate today = LocalDate.now();
+        Date twelveMonthsAgoDate = Date.from(today.minusMonths(12).withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        return consultationRepository.countGlobalConsultationsByMonth(twelveMonthsAgoDate);
+    }
+
+    @Override
+    public List<MonthlyStatDTO> getGlobalExamsPerMonth() {
+        // Implement real logic to fetch global exams per month
+        // This requires a method in MedicalExaminationRepository
+        // Calculate the date 12 months ago to limit the query
+        LocalDate today = LocalDate.now();
+        LocalDateTime twelveMonthsAgoDateTime = today.minusMonths(12).withDayOfMonth(1).atStartOfDay();
+        return medicalExaminationRepository.countGlobalExamsByMonth(twelveMonthsAgoDateTime); // Corrected method name and added parameter
+    }
+
+    @Override
+    public List<MonthlyStatDTO> getGlobalPatientsPerMonth() {
+        // Implement real logic to fetch global active patient registrations per month
+        // This requires a method in UserCabinetRegistrationRepository
+        // Calculate the date 12 months ago to limit the query
+        LocalDate today = LocalDate.now();
+        LocalDate twelveMonthsAgoDate = today.minusMonths(12).withDayOfMonth(1);
+        return userCabinetRegistrationRepository.countGlobalActivePatientRegistrationsByMonth(twelveMonthsAgoDate); // Added parameter
     }
 }

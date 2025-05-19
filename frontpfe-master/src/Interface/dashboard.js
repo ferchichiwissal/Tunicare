@@ -1,9 +1,9 @@
- import React, { useEffect, useState, useContext } from "react"; // Added useContext
+import React, { useEffect, useState, useContext } from "react"; // Added useContext
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Line, Bar } from 'react-chartjs-2';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 import { jwtDecode } from "jwt-decode";
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineElement, PointElement } from 'chart.js'; // Added LineElement, PointElement
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineElement, PointElement, ArcElement } from 'chart.js';
 import './dashboard.css';
 import Chatbot from './Chatbot';
 import './Chatbot.css';
@@ -11,10 +11,10 @@ import { useAuth } from '../context/AuthContext'; // Import useAuth
 import apiClient from '../utils/apiClient'; // Import apiClient
 
 // Register chart elements
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineElement, PointElement); // Added LineElement, PointElement
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineElement, PointElement, ArcElement); // Added ArcElement
 const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
-const Dashboard = ({ onLogout }) => { 
+const Dashboard = ({ onLogout }) => {
   // const [user, setUser] = useState(null); // Will be replaced by useAuth()
   const { user: authUser, token } = useAuth(); // Use user from AuthContext
   const [loading, setLoading] = useState(true);
@@ -22,8 +22,20 @@ const Dashboard = ({ onLogout }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [dashboardStats, setDashboardStats] = useState(null); // State for statistics
   const [statsLoading, setStatsLoading] = useState(true); // Loading state for statistics
-  // const [patientConsultationsChartData, setPatientConsultationsChartData] = useState(null); // Supprimé
-  // const [patientExamsChartData, setPatientExamsChartData] = useState(null); // Supprimé
+  const [doctorMonthlyConsultations, setDoctorMonthlyConsultations] = useState([]); // State for doctor's monthly consultations
+  const [doctorMonthlyPatients, setDoctorMonthlyPatients] = useState([]); // State for doctor's monthly patients
+  const [monthlyStatsLoading, setMonthlyStatsLoading] = useState(true); // Loading state for monthly statistics
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // State for selected month (1-indexed)
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // State for selected year
+  const [monthlyAppointmentDistribution, setMonthlyAppointmentDistribution] = useState(null); // State for monthly appointment distribution
+  const [monthlyAppointmentDistributionLoading, setMonthlyAppointmentDistributionLoading] = useState(true); // Loading state for monthly appointment distribution
+
+  // New states for Admin monthly statistics
+  const [adminMonthlyConsultations, setAdminMonthlyConsultations] = useState([]);
+  const [adminMonthlyExams, setAdminMonthlyExams] = useState([]);
+  const [adminMonthlyPatients, setAdminMonthlyPatients] = useState([]);
+  const [adminMonthlyStatsLoading, setAdminMonthlyStatsLoading] = useState(true);
+
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -62,7 +74,7 @@ const Dashboard = ({ onLogout }) => {
   };
 
   // -------------------- React Hooks -------------------- //
-  
+
   // Monitor token expiry on component mount
   useEffect(() => {
     handleTokenExpiry();
@@ -81,7 +93,7 @@ const Dashboard = ({ onLogout }) => {
         } else {
             performLogout(); // Fallback if onLogout is not a valid function
         }
-        alert(t('sessionExpiredAlert')); 
+        alert(t('sessionExpiredAlert'));
         navigate("/sign-in"); // Redirect to the login page
       }, INACTIVITY_TIMEOUT);
     };
@@ -115,10 +127,12 @@ const Dashboard = ({ onLogout }) => {
     fetchUser();
   }, [authUser, token, loading, navigate]);
 
-  // Fetch dashboard statistics based on user role
+  // Fetch dashboard statistics and monthly stats based on user role
   useEffect(() => {
     if (authUser && authUser.role) {
       setStatsLoading(true);
+      setAdminMonthlyStatsLoading(true); // Start loading for admin monthly stats
+
       let statsEndpoint = "";
       if (authUser.role === "DOCTOR") {
         statsEndpoint = "/api/statistics/dashboard/doctor";
@@ -131,8 +145,8 @@ const Dashboard = ({ onLogout }) => {
       } else if (authUser.role === "ASSISTANT") {
         statsEndpoint = "/api/statistics/dashboard/assistant";
       }
-      // Could add other roles if necessary
 
+      // Fetch main dashboard stats
       if (statsEndpoint) {
         apiClient.get(statsEndpoint)
           .then(response => {
@@ -147,54 +161,190 @@ const Dashboard = ({ onLogout }) => {
       } else {
         setStatsLoading(false); // No endpoint for this role
       }
+
+      // Fetch monthly statistics specifically for ADMIN
+      if (authUser.role === "ADMIN") {
+        const fetchAdminMonthlyStats = async () => {
+          try {
+            const consultationsResponse = await apiClient.get("/api/statistics/admin/global-consultations-per-month");
+            const sortedConsultations = consultationsResponse.data.sort((a, b) => {
+              if (a.year !== b.year) return a.year - b.year;
+              return a.month - b.month;
+            });
+            setAdminMonthlyConsultations(sortedConsultations);
+
+            const examsResponse = await apiClient.get("/api/statistics/admin/global-exams-per-month");
+            const sortedExams = examsResponse.data.sort((a, b) => {
+              if (a.year !== b.year) return a.year - b.year;
+              return a.month - b.month;
+            });
+            setAdminMonthlyExams(sortedExams);
+
+            const patientsResponse = await apiClient.get("/api/statistics/admin/global-patients-per-month");
+            const sortedPatients = patientsResponse.data.sort((a, b) => {
+              if (a.year !== b.year) return a.year - b.year;
+              return a.month - b.month;
+            });
+            setAdminMonthlyPatients(sortedPatients);
+
+            setAdminMonthlyStatsLoading(false);
+          } catch (error) {
+            console.error("Error fetching admin monthly statistics:", error);
+            setAdminMonthlyStatsLoading(false);
+            // Handle error
+          }
+        };
+        fetchAdminMonthlyStats();
+      } else {
+        setAdminMonthlyStatsLoading(false); // Not an admin, no monthly stats to fetch
+      }
     }
-
-    // La logique de fetch pour les graphiques patient a été supprimée ici.
-    // Les données pour la tuile nextAcceptedAppointment sont déjà dans dashboardStats.
   }, [authUser, t]); // Depends on authUser and t to execute when the user is loaded and for translations
-  
-  // ---------------------------------------------------- //
- 
-  // Redirect if session has expired
-  if (sessionExpired) return null;
 
-  // Display loading if the context user or statistics are loading
-  if (loading || (authUser && statsLoading)) {
-    return <div>{t('loading')}</div>;
-  }
-  
-  // If no authenticated user after loading, render nothing or redirect (already handled by useEffect)
-  if (!authUser) {
-    return null; 
-  }
-  
-  // Rename authUser to user for the rest of the component to minimize changes
-  const user = authUser;
+  // Fetch monthly statistics for Doctor charts
+  useEffect(() => {
+    if (authUser && authUser.role === "DOCTOR") {
+      setMonthlyStatsLoading(true);
+      const fetchMonthlyStats = async () => {
+        try {
+          const consultationsResponse = await apiClient.get("/api/statistics/doctor/consultations-per-month");
+          // Sort data chronologically before setting state
+          const sortedConsultations = consultationsResponse.data.sort((a, b) => {
+            if (a.year !== b.year) {
+              return a.year - b.year;
+            }
+            return a.month - b.month;
+          });
+          setDoctorMonthlyConsultations(sortedConsultations);
 
-  // Data for the first chart: Payments Over Time
-  const paymentData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          const patientsResponse = await apiClient.get("/api/statistics/doctor/patients-per-month");
+          // Sort data chronologically before setting state
+          const sortedPatients = patientsResponse.data.sort((a, b) => {
+            if (a.year !== b.year) {
+              return a.year - b.year;
+            }
+            return a.month - b.month;
+          });
+          setDoctorMonthlyPatients(sortedPatients);
+
+          setMonthlyStatsLoading(false);
+        } catch (error) {
+          console.error("Error fetching monthly statistics:", error);
+          setMonthlyStatsLoading(false);
+          // Handle error
+        }
+      };
+      fetchMonthlyStats();
+    } else {
+      setMonthlyStatsLoading(false); // Not a doctor, no monthly stats to fetch
+    }
+  }, [authUser]); // Depends on authUser
+
+  // Helper function to generate month options for the selector
+  const getMonthOptions = () => {
+    const months = [];
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(2000, i, 1); // Use a fixed year, only month matters
+      months.push({
+        value: i + 1, // Month is 1-indexed for backend
+        label: date.toLocaleString(t('locale'), { month: 'long' }), // Use current locale for month name
+      });
+    }
+    return months;
+  };
+
+  // Helper function to generate year options for the selector
+  const getYearOptions = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    // Generate options for the last 5 years and the next 5 years
+    for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+      years.push({ value: i, label: i.toString() });
+    }
+    return years;
+  };
+
+  // Fetch monthly appointment distribution for Doctor chart
+  useEffect(() => {
+    if (authUser && authUser.role === "DOCTOR" && selectedMonth && selectedYear) {
+      setMonthlyAppointmentDistributionLoading(true);
+      const fetchMonthlyAppointmentDistribution = async () => {
+        try {
+          const response = await apiClient.get("/api/statistics/doctor/appointment-distribution-by-month", {
+            params: {
+              year: selectedYear,
+              month: selectedMonth
+            }
+          });
+          // Assuming the backend returns an object like { acceptedCount: count, realizedCount: count, refusedCount: count }
+          const distributionData = {
+            labels: [t('dashboard.charts.appointmentsDistribution.accepted'), t('dashboard.charts.appointmentsDistribution.realized'), t('dashboard.charts.appointmentsDistribution.refused')],
+            datasets: [
+              {
+                data: [response.data.acceptedCount, response.data.realizedCount, response.data.refusedCount],
+                backgroundColor: [
+                  'rgba(75, 192, 192, 0.8)', // Couleur pour "Accepté"
+                  'rgba(54, 162, 235, 0.8)', // Nouvelle couleur pour "Réalisé"
+                  'rgba(255, 99, 132, 0.8)', // Couleur pour "Refusé"
+                ],
+              },
+            ],
+          };
+          setMonthlyAppointmentDistribution(distributionData);
+          setMonthlyAppointmentDistributionLoading(false);
+        } catch (error) {
+          console.error("Error fetching monthly appointment distribution:", error);
+          setMonthlyAppointmentDistribution(null); // Clear previous data on error
+          setMonthlyAppointmentDistributionLoading(false);
+          // Handle error
+        }
+      };
+      fetchMonthlyAppointmentDistribution();
+    } else if (authUser?.role !== "DOCTOR") {
+      setMonthlyAppointmentDistribution(null); // Clear data if not a doctor
+      setMonthlyAppointmentDistributionLoading(false);
+    }
+  }, [authUser, selectedMonth, selectedYear, t]); // Depends on authUser, selectedMonth, selectedYear, and t
+
+  // Data and Options for Doctor Appointments Distribution Chart (Pie Chart)
+  const doctorAppointmentsDistributionData = monthlyAppointmentDistribution; // Use the fetched data directly
+
+  const doctorAppointmentsDistributionOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+      },
+      title: {
+        display: true,
+        text: t('dashboard.charts.appointmentsDistribution.title'),
+      }
+    }
+  };
+
+  // Data for Doctor Consultations Evolution Chart
+  const doctorConsultationsEvolutionData = {
+    labels: doctorMonthlyConsultations.map(stat => `${stat.month}/${stat.year}`),
     datasets: [
       {
-        label: t('dashboard.charts.payments.label'),
-        data: [800, 980, 1200, 1580, 1850, 2000],
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        label: t('dashboard.charts.consultationsEvolution.label'),
+        data: doctorMonthlyConsultations.map(stat => stat.count),
         borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1,
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.1,
       },
     ],
   };
 
-  // Options for the payment chart
-  const paymentOptions = {
+  const doctorConsultationsEvolutionOptions = {
     responsive: true,
     plugins: {
-      title: {
-        display: true,
-        text: t('dashboard.charts.payments.title'),
-      },
       legend: {
         position: 'top',
+      },
+      title: {
+        display: true,
+        text: t('dashboard.charts.consultationsEvolution.title'),
       },
     },
     scales: {
@@ -203,62 +353,314 @@ const Dashboard = ({ onLogout }) => {
           display: true,
           text: t('dashboard.charts.monthAxisLabel'),
         },
+        grid: {
+          display: true, // Enable grid lines
+        },
       },
       y: {
         title: {
           display: true,
-          text: t('dashboard.charts.payments.yAxisLabel'),
+          text: t('dashboard.charts.countAxisLabel'), // Assuming a generic count label
         },
         beginAtZero: true,
+        grid: {
+          display: true, // Enable grid lines
+        },
       },
     },
   };
 
-  // Data for the second chart: Number of Phone Calls per Month
-  const phoneCallsData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+  const doctorExamsEvolutionData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     datasets: [
       {
-        label: t('dashboard.charts.phoneCalls.label'),
-        data: [200, 400, 510, 620, 730, 800],
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgba(255, 99, 132, 1)',
+        label: t('dashboard.charts.examsEvolution.label'),
+        data: [10, 15, 12, 18, 20, 25, 22, 28, 30, 35, 32, 40], // Dummy data
+        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+        borderColor: 'rgba(153, 102, 255, 1)',
         borderWidth: 1,
       },
     ],
   };
 
-  // Options for the phone calls chart
-  const phoneCallsOptions = {
+  const doctorExamsEvolutionOptions = {
     responsive: true,
     plugins: {
-      title: {
-        display: true,
-        text: t('dashboard.charts.phoneCalls.title'),
-      },
       legend: {
         position: 'top',
+      },
+      title: {
+        display: true,
+        text: t('dashboard.charts.examsEvolution.title'),
       },
     },
     scales: {
       x: {
         title: {
           display: true,
-          text: t('dashboard.charts.monthAxisLabel'), // Reuse month label
+          text: t('dashboard.charts.monthAxisLabel'),
+        },
+        grid: {
+          display: false, // Keep grid lines disabled for this dummy data chart
         },
       },
       y: {
         title: {
           display: true,
-          text: t('dashboard.charts.phoneCalls.yAxisLabel'),
+          text: t('dashboard.charts.countAxisLabel'),
         },
         beginAtZero: true,
+        grid: {
+          display: false, // Keep grid lines disabled for this dummy data chart
+        },
       },
     },
   };
 
+  // Data for Doctor Patients Evolution Chart
+  const doctorPatientsEvolutionData = {
+    labels: doctorMonthlyPatients.map(stat => `${stat.month}/${stat.year}`),
+    datasets: [
+      {
+        label: t('dashboard.charts.patientsEvolution.label'),
+        data: doctorMonthlyPatients.map(stat => stat.count),
+        borderColor: 'rgba(255, 159, 64, 1)',
+        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+        tension: 0.1,
+      },
+    ],
+  };
 
+  const doctorPatientsEvolutionOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: t('dashboard.charts.patientsEvolution.title'),
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: t('dashboard.charts.monthAxisLabel'),
+        },
+        grid: {
+          display: true, // Enable grid lines
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: t('dashboard.charts.countAxisLabel'),
+        },
+        beginAtZero: true,
+        grid: {
+          display: true, // Enable grid lines
+        },
+      },
+    },
+  };
 
+  // ---------------------------------------------------- //
+
+  // Redirect if session has expired
+  if (sessionExpired) return null;
+
+  // Display loading if the context user or statistics are loading
+  if (loading || (authUser && statsLoading) || (authUser?.role === "DOCTOR" && monthlyStatsLoading) || (authUser?.role === "DOCTOR" && monthlyAppointmentDistributionLoading) || (authUser?.role === "ADMIN" && adminMonthlyStatsLoading)) {
+    return <div>{t('loading')}</div>;
+  }
+
+  // If no authenticated user after loading, render nothing or redirect (already handled by useEffect)
+  if (!authUser) {
+    return null;
+  }
+
+  // Rename authUser to user for the rest of the component to minimize changes
+  const user = authUser;
+
+  // Data for users distribution pie chart (ADMIN only)
+  const usersDistributionData = user.role === "ADMIN" && dashboardStats ? {
+    labels: [t('dashboard.admin.patients'), t('dashboard.admin.doctors'), t('dashboard.admin.assistants'), t('dashboard.admin.doctorCentres')], // Added Doctor Centres
+    datasets: [
+      {
+        data: [
+          dashboardStats.totalPatients,
+          dashboardStats.totalDoctors,
+          dashboardStats.totalAssistants,
+          dashboardStats.totalDoctorCentres // Added data for Doctor Centres
+        ],
+        backgroundColor: [
+          'rgba(54, 162, 235, 0.8)', // Patients (Blue)
+          'rgba(255, 99, 132, 0.8)', // Doctors (Red)
+          'rgba(75, 192, 192, 0.8)', // Assistants (Green)
+          'rgba(255, 205, 86, 0.8)' // Doctor Centres (Yellow) - New color
+        ]
+      }
+    ]
+  } : null;
+
+  // Options for users distribution pie chart
+  const usersDistributionOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+      },
+      title: {
+        display: true,
+        text: t('dashboard.admin.usersDistribution'),
+      }
+    }
+  };
+
+  // Data for Admin Consultations Evolution Chart
+  const adminConsultationsEvolutionData = {
+    labels: adminMonthlyConsultations.map(stat => `${stat.month}/${stat.year}`),
+    datasets: [
+      {
+        label: t('dashboard.admin.charts.consultationsEvolution.label'),
+        data: adminMonthlyConsultations.map(stat => stat.count),
+        borderColor: 'rgba(75, 192, 192, 1)', // Green
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.1,
+      },
+    ],
+  };
+
+  const adminConsultationsEvolutionOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: t('dashboard.admin.charts.consultationsEvolution.title'),
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: t('dashboard.charts.monthAxisLabel'),
+        },
+        grid: {
+          display: true,
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: t('dashboard.charts.countAxisLabel'),
+        },
+        beginAtZero: true,
+        grid: {
+          display: true,
+        },
+      },
+    },
+  };
+
+  // Data for Admin Exams Evolution Chart
+  const adminExamsEvolutionData = {
+    labels: adminMonthlyExams.map(stat => `${stat.month}/${stat.year}`),
+    datasets: [
+      {
+        label: t('dashboard.admin.charts.examsEvolution.label'),
+        data: adminMonthlyExams.map(stat => stat.count),
+        backgroundColor: 'rgba(153, 102, 255, 0.6)', // Purple
+        borderColor: 'rgba(153, 102, 255, 1)',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const adminExamsEvolutionOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: t('dashboard.admin.charts.examsEvolution.title'),
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: t('dashboard.charts.monthAxisLabel'),
+        },
+        grid: {
+          display: true,
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: t('dashboard.charts.countAxisLabel'),
+        },
+        beginAtZero: true,
+        grid: {
+          display: true,
+        },
+      },
+    },
+  };
+
+  // Data for Admin Patients Evolution Chart
+  const adminPatientsEvolutionData = {
+    labels: adminMonthlyPatients.map(stat => `${stat.month}/${stat.year}`),
+    datasets: [
+      {
+        label: t('dashboard.admin.charts.patientsEvolution.label'),
+        data: adminMonthlyPatients.map(stat => stat.count),
+        borderColor: 'rgba(255, 159, 64, 1)', // Orange
+        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+        tension: 0.1,
+      },
+    ],
+  };
+
+  const adminPatientsEvolutionOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: t('dashboard.admin.charts.patientsEvolution.title'),
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: t('dashboard.charts.monthAxisLabel'),
+        },
+        grid: {
+          display: true,
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: t('dashboard.charts.countAxisLabel'),
+        },
+        beginAtZero: true,
+        grid: {
+          display: true,
+        },
+      },
+    },
+  };
 
   // Define navigation links based on the user's role
   let navigationLinks;
@@ -308,14 +710,14 @@ const Dashboard = ({ onLogout }) => {
         <a href="/Logout">{t('nav.logout')}</a>
       </>
     );
-  } 
-  
+  }
+
   else if (user.role === "ASSISTANT" ) {
     navigationLinks = (
       <>
         <a href="#">{t('nav.dashboard')}</a>
         {/* Assistants/Doctors might not need 'Add an Account' directly, adjust if needed */}
- 
+
          <a href="/add">{t('nav.addAccountAssistant')}</a>
         <a href="/Tovalidate">{t('nav.confirmation')}</a>
         <a href="/UserManagement">{t('nav.changeRole')}</a> {/* Consider filtering users by their cabinet */}
@@ -329,12 +731,12 @@ const Dashboard = ({ onLogout }) => {
         <a href="/Logout">{t('nav.logout')}</a>
       </>
     );
-  } 
-  
-  
-  
-  
-  
+  }
+
+
+
+
+
   else if (user.role === "PATIENT") {
     navigationLinks = (
       <>
@@ -357,7 +759,6 @@ const Dashboard = ({ onLogout }) => {
 
 
 
- 
   else if (user.role === "DOCTOR_CENTRE_EXAMEN") {
     navigationLinks = (
       <>
@@ -375,7 +776,20 @@ const Dashboard = ({ onLogout }) => {
   }
 
 
+else if (user.role === "ADMIN_CENTRE_EXAMEN") {
+    navigationLinks = (
+      <>
+        <a href="#">{t('nav.dashboard')}</a>
 
+
+
+
+        <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
+        <a href="/change-password">{t('nav.changePassword')}</a>
+        <a href="/Logout">{t('nav.logout')}</a>
+       </>
+    );
+  }
 
 
 
@@ -393,7 +807,7 @@ const Dashboard = ({ onLogout }) => {
             </h1>
           </div>*/}
         </div>
-  
+
         <div className="app-header-actions">
           <div className="app-header-actions-buttons">
             <button className="icon-button large"><i className="ph-magnifying-glass"></i></button>
@@ -405,7 +819,7 @@ const Dashboard = ({ onLogout }) => {
           </div>
         </div>
       </header>
-  
+
       <div className="app-body">
         <div className="app-body-navigation">
           <nav className="navigation">
@@ -416,7 +830,7 @@ const Dashboard = ({ onLogout }) => {
             <div>{t('footer.copyright', { year: 2025 })}</div>
           </footer>
         </div>
-  
+
         <div className="app-body-main-content">
           <section className="service-section">
             <h2>{t('dashboard.numericalStatisticsTitle')}</h2>
@@ -701,7 +1115,7 @@ const Dashboard = ({ onLogout }) => {
                         </h3>
                       </div>
                       <ul className="upcoming-appointments-list">
-                        {dashboardStats.upcomingExamsToday.map(exam => (
+                        {dashboardStats.upcomingAppointmentsToday.map(exam => (
                           <li key={exam.id}>
                             {exam.time} - {exam.patientName}
                           </li>
@@ -837,7 +1251,7 @@ const Dashboard = ({ onLogout }) => {
                         <span>{t('dashboard.admin.consultationsThisWeek')}</span>
                         <span>{dashboardStats.consultationsThisWeek}</span>
                       </h3>
-                    </div>
+                      </div>
                   </article> */}
                   <article className="tile">
                     <div className="tile-header">
@@ -845,33 +1259,6 @@ const Dashboard = ({ onLogout }) => {
                       <h3>
                         <span>{t('dashboard.admin.consultationsThisMonth')}</span>
                         <span>{dashboardStats.consultationsThisMonth}</span>
-                      </h3>
-                    </div>
-                  </article>
-                  {/* <article className="tile">
-                    <div className="tile-header">
-                      <i className="ph-test-tube-light"></i>
-                      <h3>
-                        <span>{t('dashboard.admin.examsToday')}</span>
-                        <span>{dashboardStats.examsToday}</span>
-                      </h3>
-                    </div>
-                  </article> */}
-                  {/* <article className="tile">
-                    <div className="tile-header">
-                      <i className="ph-thermometer-cold-light"></i>
-                      <h3>
-                        <span>{t('dashboard.admin.examsThisWeek')}</span>
-                        <span>{dashboardStats.examsThisWeek}</span>
-                      </h3>
-                    </div>
-                  </article> */}
-                  <article className="tile">
-                    <div className="tile-header">
-                      <i className="ph-microscope-light"></i>
-                      <h3>
-                        <span>{t('dashboard.admin.examsThisMonth')}</span>
-                        <span>{dashboardStats.examsThisMonth}</span>
                       </h3>
                     </div>
                   </article>
@@ -886,7 +1273,6 @@ const Dashboard = ({ onLogout }) => {
                   </article>
                 </>
               )}
-              {/* Keep static tiles if no custom stats are loaded or for other roles */}
               {(!dashboardStats && !statsLoading) && (
                 <>
                   <article className="tile">
@@ -904,17 +1290,142 @@ const Dashboard = ({ onLogout }) => {
               )}
             </div>
           </section>
-  
+
+          {/* Display charts based on role */}
+          {user.role === "ADMIN" && dashboardStats && (
+            <section className="charts-section">
+              <h2>{t('dashboard.admin.statisticsTitle')}</h2>
+              <div className="admin-charts-grid"> {/* Added a parent div for grid layout */}
+
+                {/* Admin Consultations Evolution Chart */}
+                {/* Admin Consultations Evolution Chart */}
+                <div className="chart-container">
+                  <h4>{t('dashboard.admin.charts.consultationsEvolution.title')}</h4>
+                  {adminMonthlyStatsLoading ? (
+                    <div>{t('loading')}</div>
+                  ) : adminMonthlyConsultations && adminMonthlyConsultations.length > 0 ? (
+                    <Line data={adminConsultationsEvolutionData} options={adminConsultationsEvolutionOptions} />
+                  ) : (
+                    <div>{t('dashboard.charts.noDataAvailable')}</div>
+                  )}
+                  <p className="chart-description">{t('dashboard.admin.charts.consultationsEvolution.description')}</p>
+                </div>
+
+                {/* Admin Exams Evolution Chart */}
+                 <div className="chart-container">
+                  <h4>{t('dashboard.admin.charts.examsEvolution.title')}</h4>
+                  {adminMonthlyStatsLoading ? (
+                    <div>{t('loading')}</div>
+                  ) : adminMonthlyExams && adminMonthlyExams.length > 0 ? (
+                    <Bar data={adminExamsEvolutionData} options={adminExamsEvolutionOptions} />
+                  ) : (
+                    <div>{t('dashboard.charts.noDataAvailable')}</div>
+                  )}
+                  <p className="chart-description">{t('dashboard.admin.charts.examsEvolution.description')}</p>
+                </div>
+
+                {/* Admin Patients Evolution Chart */}
+                <div className="chart-container">
+                  <h4>{t('dashboard.admin.charts.patientsEvolution.title')}</h4>
+                   {adminMonthlyStatsLoading ? (
+                    <div>{t('loading')}</div>
+                  ) : adminMonthlyPatients && adminMonthlyPatients.length > 0 ? (
+                    <Line data={adminPatientsEvolutionData} options={adminPatientsEvolutionOptions} />
+                  ) : (
+                    <div>{t('dashboard.charts.noDataAvailable')}</div>
+                  )}
+                  <p className="chart-description">{t('dashboard.admin.charts.patientsEvolution.description')}</p>
+                </div>
+                {/* Users Distribution Pie Chart */}
+                {usersDistributionData && (
+                  <div className="chart-container">
+                    <Pie data={usersDistributionData} options={usersDistributionOptions} />
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Add Charts Section for DOCTOR role */}
+          {user.role === "DOCTOR" && (
+            <section className="charts-section">
+              <h2>{t('dashboard.charts.visualStatisticsTitle')}</h2> {/* Added a title for the charts section */}
+              <div className="doctor-charts-grid"> {/* Added a parent div with class for grid layout */}
+                {/* Doctor Consultations Evolution Chart */}
+                {doctorMonthlyConsultations.length > 0 && (
+                  <div className="chart-container">
+                    <h4>{t('dashboard.charts.consultationsEvolution.title')}</h4>
+                    <Line data={doctorConsultationsEvolutionData} options={doctorConsultationsEvolutionOptions} />
+                    <p className="chart-description">{t('dashboard.charts.consultationsEvolution.description')}</p>
+                  </div>
+                )}
+
+                {/* Doctor Exams Evolution Chart (using dummy data for now) */}
+                {/* This chart still uses dummy data as the backend method for doctor exams evolution was not implemented in the previous step */}
+                 <div className="chart-container">
+                    <h4>{t('dashboard.charts.examsEvolution.title')}</h4>
+                    <Bar data={doctorExamsEvolutionData} options={doctorExamsEvolutionOptions} />
+                    <p className="chart-description">{t('dashboard.charts.examsEvolution.description')}</p>
+                  </div>
+
+
+                {/* Month and Year Selectors for Appointment Distribution */}
+                <div className="chart-container"> {/* Wrap the pie chart and selectors in a container */}
+                  <h4>{t('dashboard.charts.appointmentsDistribution.title')}</h4>
+                  <div className="month-year-selector">
+                    <label htmlFor="month-select">{t('dashboard.selectMonth')}:</label>
+                    <select
+                      id="month-select"
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                    >
+                      {getMonthOptions().map(month => (
+                        <option key={month.value} value={month.value}>{month.label}</option>
+                      ))}
+                    </select>
+
+                    <label htmlFor="year-select" style={{ marginLeft: '10px' }}>{t('dashboard.selectYear')}:</label>
+                    <select
+                      id="year-select"
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                    >
+                      {getYearOptions().map(year => (
+                        <option key={year.value} value={year.value}>{year.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {monthlyAppointmentDistributionLoading ? (
+                    <div>{t('loading')}</div>
+                  ) : monthlyAppointmentDistribution ? (
+                    <Pie data={doctorAppointmentsDistributionData} options={doctorAppointmentsDistributionOptions} />
+                  ) : (
+                    <div>{t('dashboard.charts.appointmentsDistribution.noData')}</div>
+                  )}
+                </div>
+
+                {/* Doctor Patients Evolution Chart */}
+                {doctorMonthlyPatients.length > 0 && (
+                  <div className="chart-container">
+                    <h4>{t('dashboard.charts.patientsEvolution.title')}</h4>
+                    <Line data={doctorPatientsEvolutionData} options={doctorPatientsEvolutionOptions} />
+                    <p className="chart-description">{t('dashboard.charts.patientsEvolution.description')}</p>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
           {/* The "Performance" section can also be conditional or customized */}
-          {/* 
+          {/*
           <section className="service-section">
             <h2>{t('dashboard.performanceSectionTitle')}</h2>
             <div className="tiles">
               ...
             </div>
-          </section> 
+          </section>
           */}
-  
+
           {/* Only display charts for specific roles if needed, or remove if not used */}
           {user.role === 'EMPLOYEE' && (
             <>
@@ -922,12 +1433,12 @@ const Dashboard = ({ onLogout }) => {
                 <h3>{t('dashboard.charts.performanceTitle', { firstName: user.first_name, lastName: user.last_name })}</h3>
                 <div className="chart-container">
                   <h4>{t('dashboard.charts.payments.label')}</h4> {/* Reuse label */}
-                  <Bar data={paymentData} options={paymentOptions} />
+                  {/* Removed dummy payment chart */}
                 </div>
-  
+
                 <div className="chart-container">
                   <h4>{t('dashboard.charts.phoneCalls.title')}</h4> {/* Reuse title */}
-                  <Bar data={phoneCallsData} options={phoneCallsOptions} />
+                  {/* Removed dummy phone calls chart */}
                 </div>
               </section>
             </>
@@ -944,7 +1455,7 @@ const Dashboard = ({ onLogout }) => {
             <i className={isSidebarOpen ? "ph-arrow-circle-right" : "ph-arrow-circle-left"}></i>
           </button>
         </div>
-  
+
         {/* Conditionally apply class based on isSidebarOpen state */}
         <div className={`sidebar ${isSidebarOpen ? '' : 'sidebar-closed'}`}>
           <div className="sidebar-header">
@@ -967,31 +1478,31 @@ const Dashboard = ({ onLogout }) => {
             </div>
 
             <h3>{user.firstName} {user.lastName}</h3>
-  
+
             <div className="user-info-item">
               <p><strong>{t('dashboard.sidebar.emailLabel')}:</strong> <span>{user.email}</span></p>
             </div>
           </div>
-  
+
           <div className="sidebar-content">
             <div className="user-info-item">
               <p><strong>{t('dashboard.sidebar.birthDateLabel')}:</strong> <span>{user.birthDate ? user.birthDate : t('dashboard.sidebar.notProvided')}</span></p>
             </div>
-            
+
             <div className="user-info-item">
               <p><strong>{t('dashboard.sidebar.roleLabel')}:</strong> <span>{user.role}</span></p> {/* Role might need translation itself if it's displayed */}
             </div>
-            
-           
-            
+
+
+
             <div className="user-info-item">
               <p><strong>{t('dashboard.sidebar.genderLabel')}:</strong> <span>{user.gender}</span></p> {/* Gender might need translation */}
             </div>
-            
-            <div className="user-info-item">
+
+            <div className="user_info-item">
               <p><strong>{t('dashboard.sidebar.addressLabel')}:</strong> <span>{user.address}</span></p>
             </div>
-            
+
             <div className="user-info-item">
               <p><strong>{t('dashboard.sidebar.phoneLabel')}:</strong> <span>{user.tel}</span></p>
             </div>
@@ -1005,10 +1516,11 @@ const Dashboard = ({ onLogout }) => {
               <p><strong>{t('dashboard.sidebar.specialtyLabel')}:</strong> <span>{user.speciality ? user.speciality : t('dashboard.sidebar.notProvided')}</span></p> {/* Corrected field name */}
             </div>
           )}
-             
+
           </div>
         </div>
       </div>
     </div>
-  );}
+  );
+}
 export default Dashboard;

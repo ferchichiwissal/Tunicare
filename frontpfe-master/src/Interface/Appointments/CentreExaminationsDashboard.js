@@ -79,10 +79,24 @@ const CentreExaminationsDashboard = () => {
 
     const formatDate = (dateString) => {
         if (!dateString) return "";
-        return new Date(dateString).toLocaleDateString(t('common.locale'), {
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit'
-        });
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+            // Handle invalid date string, perhaps return original string or an error message
+            return dateString; // Or return "Invalid Date" or similar
+        }
+        const locale = t('common.locale') || 'en-US'; // Use fallback locale if translation is missing
+        try {
+            return date.toLocaleDateString(locale, {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        } catch (e) {
+            console.error("Error formatting date with locale:", locale, dateString, e);
+            return date.toLocaleDateString('en-US', { // Fallback to a known good locale
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
     };
 
     if (isLoading) {
@@ -116,7 +130,6 @@ const CentreExaminationsDashboard = () => {
                         </label>
                     </div>
                 ))}
-                <button className="btn btn-sm btn-secondary ms-2 clear-filter-button" onClick={() => setSelectedAct('')}>{t('common.clearFilter')}</button>
             </div>
             
             {/* Search Bar by Patient Name */}

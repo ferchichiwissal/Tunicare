@@ -61,6 +61,7 @@ public class SecurityConfig {
                 .requestMatchers("/Users/alluser").hasRole("ADMIN")
                 .requestMatchers("/Users/delete/{id}").hasRole("ADMIN") // Global delete only for Admin
                 .requestMatchers("/api/doctor-centre-examen/{id}").hasAnyRole("ADMIN", "DOCTOR_CENTRE_EXAMEN")
+                .requestMatchers("/api/doctor-admin/**").hasRole("ADMIN") // Nouveaux endpoints pour la gestion des docteurs centre
                 // Specific DOCTOR/ASSISTANT/ADMIN endpoints (Cabinet specific actions)
                 .requestMatchers("/Users/cabinet/{cabinetId}/user/{userId}").hasAnyRole("ADMIN", "DOCTOR", "ASSISTANT") // Cabinet-specific Deletion endpoint
                 .requestMatchers("/Users/cabinet/{cabinetId}/user/{userId}/toggle-status").hasAnyRole("ADMIN", "DOCTOR", "ASSISTANT") // Toggle registration status
@@ -111,6 +112,8 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/dashboard/doctor-centre").hasRole("DOCTOR_CENTRE_EXAMEN") // Dashboard stats
                 // Statistics for ADMIN
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/dashboard/admin").hasRole("ADMIN") // Admin Dashboard stats
+                // Statistics for ADMIN monthly graphs
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/admin/**").hasRole("ADMIN")
                 // Statistics for PATIENT graphs
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/patient/consultations-per-month").hasRole("PATIENT")
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/statistics/patient/exams-per-month").hasRole("PATIENT")

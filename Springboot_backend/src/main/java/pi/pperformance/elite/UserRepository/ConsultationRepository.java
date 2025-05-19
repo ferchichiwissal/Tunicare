@@ -53,6 +53,9 @@ public interface ConsultationRepository extends JpaRepository<Consultation, Long
     // For Admin statistics: Count all consultations created within a specific period
     long countByDateConsultationBetween(Date startDate, Date endDate);
 
+    // For Assistant dashboard: Count consultations by cabinet and date range
+    long countByCabinetAndDateConsultationBetween(CabinetDr cabinet, Date startDate, Date endDate);
+
     // For Patient graph: Count consultations by month for the last 12 months
     @Query("SELECT new pi.pperformance.elite.dto.MonthlyStatDTO(YEAR(c.dateConsultation), MONTH(c.dateConsultation), COUNT(c)) " +
            "FROM Consultation c " +
@@ -60,4 +63,20 @@ public interface ConsultationRepository extends JpaRepository<Consultation, Long
            "GROUP BY YEAR(c.dateConsultation), MONTH(c.dateConsultation) " +
            "ORDER BY YEAR(c.dateConsultation) DESC, MONTH(c.dateConsultation) DESC")
     List<MonthlyStatDTO> countConsultationsByMonthForPatientAndCabinet(@Param("patientId") Long patientId, @Param("cabinetId") Long cabinetId, @Param("startDate") Date startDate);
+
+   // For Doctor graph: Count consultations by month for the last 12 months for a specific doctor and cabinet
+   @Query("SELECT new pi.pperformance.elite.dto.MonthlyStatDTO(YEAR(c.dateConsultation), MONTH(c.dateConsultation), COUNT(c)) " +
+          "FROM Consultation c " +
+          "WHERE c.doctor.id = :doctorId AND c.cabinet.idSite = :cabinetId AND c.dateConsultation >= :startDate " +
+          "GROUP BY YEAR(c.dateConsultation), MONTH(c.dateConsultation) " +
+          "ORDER BY YEAR(c.dateConsultation) DESC, MONTH(c.dateConsultation) DESC")
+   List<MonthlyStatDTO> countConsultationsByMonthForDoctorAndCabinet(@Param("doctorId") Long doctorId, @Param("cabinetId") Long cabinetId, @Param("startDate") Date startDate);
+
+   // For Admin global graph: Count all consultations by month for the last 12 months
+   @Query("SELECT new pi.pperformance.elite.dto.MonthlyStatDTO(YEAR(c.dateConsultation), MONTH(c.dateConsultation), COUNT(c)) " +
+          "FROM Consultation c " +
+          "WHERE c.dateConsultation >= :startDate " +
+          "GROUP BY YEAR(c.dateConsultation), MONTH(c.dateConsultation) " +
+          "ORDER BY YEAR(c.dateConsultation) DESC, MONTH(c.dateConsultation) DESC")
+   List<MonthlyStatDTO> countGlobalConsultationsByMonth(@Param("startDate") Date startDate);
 }

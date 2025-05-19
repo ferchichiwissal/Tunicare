@@ -1605,4 +1605,10 @@ private Patient addPatient(Patient patient, Long targetCabinetId, boolean passwo
     // --- End Implementation for findActivePatientByCabinetAndName ---
 // The updateUserProfilePicture method is now integrated into updateUserAndPhoto
 // and can be removed if no longer called directly.
+
+	@Override
+	public User updateUser(Long id, UserUpdateDTO userDetailsDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

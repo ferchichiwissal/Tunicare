@@ -1,3 +1,7 @@
+
+
+
+
 {
   "welcome": "Welcome",
   "call": "Call : + 123455678990",
@@ -594,64 +598,16 @@
       "activateDoctor": "Are you sure you want to activate this doctor?"
     }
   },
-  "changeRole": {
-    "title": "User Role Management",
-    "searchPlaceholder": "Search by first name and last name",
-    "loading": "Loading...",
-    "errorPrefix": "Error",
-    "tableHeaders": {
-      "name": "Name",
-      "email": "Email",
-      "role": "Role",
-      "transfer": "Transfer"
-    },
-    "noUsersFound": "No users found",
-    "noEmail": "This patient does not have an email",
-    "noRegistrations": "No cabinet registrations",
-    "roleOptions": {
-      "select": "-- Select Role --",
-      "doctor": "DOCTOR",
-      "assistant": "ASSISTANT"
-    },
-    "cabinetOptions": {
-      "select": "-- Select Cabinet --",
-      "cabinetId": "Cabinet ID: {{id}}"
-    },
-    "buttons": {
-      "changeToAssistant": "Change to Assistant",
-      "changeToDoctor": "Change to Doctor"
-    },
-    "tooltips": {
-      "selectCabinetFirst": "Select a target cabinet first",
-      "missingCabinetInfo": "Your cabinet information is missing"
-    },
-    "alerts": {
-      "sessionExpired": "Session expired or logged out. Redirecting to login.",
-      "transferFailed": {
-        "permissionDeniedAction": "You do not have permission to perform this action.",
-        "wrongCabinet": "You can only transfer patients within your own cabinet."
-      },
-      "transferSuccess": "Patient successfully transferred to {{role}}."
-    },
-    "errors": {
-      "fetch": {
-        "permissionDeniedView": "You do not have permission to view patient data.",
-        "auth": "Access Denied or Session Expired.",
-        "generic": "Failed to load patient data. Please try again later."
-      },
-      "transfer": {
-        "generic": "Failed to transfer patient to {{role}}. Please try again later.",
-        "authWithMessage": "Permission Denied or Session Expired: {{message}}",
-        "notFoundWithMessage": "Not Found: {{message}}",
-        "badRequestWithMessage": "Bad Request: {{message}}",
-        "conflictWithMessage": "Conflict: {{message}}",
-        "otherErrorWithMessage": "Error ({{status}}): {{message}}"
-      }
-    },
-    "confirmations": {
-      "transfer": "Are you sure you want to transfer patient {{firstName}} {{lastName}} to the {{role}} role in cabinet ID {{cabinetId}}?"
-    }
-  },
+
+
+
+
+
+ 
+
+
+
+
   "changePassword": {
     "title": "Change Password",
     "labels": {
@@ -1556,7 +1512,8 @@
     "locale": "en-US",
     "unknownError": "An unknown error occurred.",
     "saving": "Saving...",
-    "saved": "Saved"
+    "saved": "Saved",
+    "closeButton": "Close"
   },
   "doctorExaminationsDashboard": {
     "title": "Exam Requests Dashboard",
@@ -2032,7 +1989,13 @@
       "prescribingDoctor": "Prescribing Doctor",
       "cabinetName": "Cabinet Name",
       "numberOfExaminations": "Number of Examinations"
-    }
+    },
+    "printButton": "Print",
+    "printReportTitle": "Center Statistics Report",
+    "printSelectedPeriod": "Selected Period",
+    "printYear": "Year",
+    "printMonth": "Month",
+    "doctorSignature": "Doctor's Signature"
   },
   "centreExaminationsDashboard": {
     "errors": {
@@ -2325,15 +2288,84 @@
 "common": {
     "back": "Back",
     "BACK": "Back"
+  },
+
+
+
+  "loginScreen": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign In",
+    "loggingIn": "Signing in...",
+    "forgotPassword": "Forgot password?",
+    "selectRole": "Select your role",
+    "selectRoleOption": "-- Choose a role --"
+  },
+
+
+  "changeRole": {
+    "title": "User Management",
+    "loading": "Loading...",
+    "errorPrefix": "Error",
+    "noUsersFound": "No users found",
+    "noEmail": "No email",
+    "noRegistrations": "No registrations",
+    "searchPlaceholder": "Search by name...",
+    "viewMode": {
+      "doctors": "View Patients",
+      "doctorsCentre": "View Centre Doctors"
+    },
+    "tableHeaders": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "transfer": "Transfer",
+      "actions": "Actions"
+    },
+    "buttons": {
+      "changeToDoctor": "Promote to Doctor",
+      "changeToAssistant": "Promote to Assistant",
+      "convertToAdmin": "Convert to Admin"
+    },
+    "tooltips": {
+      "selectCabinetFirst": "Please select a cabinet first",
+      "missingCabinetInfo": "Missing cabinet information"
+    },
+    "cabinetOptions": {
+      "select": "Select a cabinet",
+      "cabinetId": "Cabinet "
+    },
+    "confirmations": {
+      "transfer": "Do you want to transfer {{firstName}} {{lastName}}  to role {{role}} ?",
+      "convertToAdmin": "Are you sure you want to convert this doctor to administrator?"
+    },
+    "alerts": {
+      "sessionExpired": "Session expired or logged out. Redirecting to login.",
+      "transferSuccess": "Successfully transferred to {{role}}.",
+      "transferFailed": {
+        "permissionDeniedAction": "Permission denied for this action",
+        "wrongCabinet": "You can only transfer to your own cabinet"
+      },
+      "conversionSuccess": "Successfully converted to administrator",
+      "conversionError": "Error during administrator conversion"
+    },
+    "errors": {
+      "fetch": {
+        "permissionDeniedView": "Permission denied to view patients",
+        "auth": "Authentication error",
+        "generic": "Error fetching data"
+      },
+      "transfer": {
+        "generic": "Error transferring to {{role}}",
+        "authWithMessage": "Authentication error: {{message}}",
+        "notFoundWithMessage": "User not found: {{message}}",
+        "badRequestWithMessage": "Invalid request: {{message}}",
+        "conflictWithMessage": "Conflict: {{message}}",
+        "otherErrorWithMessage": "Error {{status}}: {{message}}"
+      }
+    }
   }
-
-
-
-
-
-
-
-
 
 
 

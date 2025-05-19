@@ -1,3 +1,4 @@
+
 {
   "welcome": "Bienvenue",
   "call": "Appel : 1234567890",
@@ -225,6 +226,64 @@
       "patientsActivatedToday": "Patients Activés Aujourd'hui",
       "newUsersToday": "Nouveaux Utilisateurs Aujourd'hui",
       "pendingConfirmationAppointments": "Rendez-vous en attente de confirmation"
+    },
+    "doctor": {
+      "visualStatisticsTitle": "Statistiques Visuelles",
+      "consultationsToday": "Consultations Réalisées Aujourd'hui",
+      "totalPatients": "Total Patients au Cabinet",
+      "upcomingAppointmentsTitle": "RDV à Venir Aujourd'hui",
+      "pendingPatientRegistrations": "Inscriptions de Patients en Attente",
+      "totalAppointmentsThisMonth": "Nombre de RDV(Mois en cours)",
+      "newPatientsThisMonth": "Nouveaux Patients(Mois en cours)",
+      "appointmentsToday": "RDV Acceptés Aujourd'hui",
+      "pendingConfirmationAppointments": "RDV à confirmer",
+      "pendingExaminationRequests": "Demandes d'examen en attente",
+      "unreadExaminationResults": "Résultats d'examen non lus"
+    },
+    "charts": {
+      "performanceTitle": "Performance de {{firstName}} {{lastName}}",
+      "monthAxisLabel": "Mois",
+      "countAxisLabel": "Nombre",
+      "payments": {
+        "label": "Paiements au fil du temps",
+        "title": "Aperçu des paiements mensuels",
+        "yAxisLabel": "Paiements (dt)"
+      },
+      "phoneCalls": {
+        "label": "Appels téléphoniques effectués",
+        "title": "Appels téléphoniques effectués par mois",
+        "yAxisLabel": "Appels téléphoniques"
+      },
+      "patient": {
+        "charts": {
+          "consultationsPerMonth": {
+            "label": "Consultations par mois",
+            "title": "Évolution des consultations/mois"
+          },
+          "examsPerMonth": {
+            "label": "Examens par mois",
+            "title": "Évolution des examens/mois"
+          }
+        }
+      },
+      "consultationsEvolution": {
+        "label": "Évolution des Consultations",
+        "title": "Évolution des Consultations par Mois"
+      },
+      "examsEvolution": {
+        "label": "Évolution des Examens",
+        "title": "Évolution des Examens par Mois"
+      },
+      "patientsEvolution": {
+        "label": "Évolution des Patients",
+        "title": "Évolution du Nombre de Patients par Mois"
+      },
+      "appointmentsDistribution": {
+        "title": "Distribution des Rendez-vous",
+        "accepted": "Acceptés",
+        "realized": "Réalisés",
+        "refused": "Refusés"
+      }
     }
   },
   "editUserForm": {
@@ -618,61 +677,18 @@
       "activateDoctor": "Êtes-vous sûr de vouloir activer ce médecin ?"
     }
   },
-  "changeRole": {
-    "title": "Gestion des rôles utilisateur",
-    "searchPlaceholder": "Rechercher par nom et prénom",
-    "loading": "Chargement...",
-    "errorPrefix": "Erreur",
-    "tableHeaders": {
-      "name": "Nom",
-      "email": "E-mail",
-      "role": "Rôle",
-      "transfer": "Transfert"
-    },
-    "noUsersFound": "Aucun utilisateur trouvé",
-    "noEmail": "Ce patient n'a pas d'e-mail",
-    "noRegistrations": "Aucun enregistrement de cabinet",
-    "roleOptions": {
-      "select": "-- Sélectionner le rôle --",
-      "doctor": "DOCTOR",
-      "assistant": "ASSISTANT"
-    },
-    "cabinetOptions": {
-      "select": "-- Sélectionner le cabinet --",
-      "cabinetId": "Cabinet ID : {{id}}"
-    },
-    "buttons": {
-      "changeToAssistant": "Changer en Assistant",
-      "changeToDoctor": "Changer en Médecin"
-    },
-    "tooltips": {
-      "selectCabinetFirst": "Sélectionnez d'abord un cabinet cible",
-      "missingCabinetInfo": "Vos informations de cabinet sont manquantes"
-    },
-    "alerts": {
-      "sessionExpired": "Session expirée ou déconnectée. Redirection vers la connexion.",
-      "transferFailed": {
-        "permissionDeniedAction": "Vous n'avez pas la permission d'effectuer cette action.",
-        "wrongCabinet": "Vous ne pouvez transférer des patients que dans votre propre cabinet."
-      },
-      "transferSuccess": "Patient transféré avec succès vers le rôle {{role}}."
-    },
-    "errors": {
-      "fetch": {
-        "permissionDeniedView": "Vous n'avez pas la permission de voir les données des patients.",
-        "auth": "Accès refusé ou session expirée.",
-        "generic": "Échec du chargement des données patient. Veuillez réessayer plus tard."
-      },
-      "transfer": {
-        "generic": "Échec du transfert du patient vers le rôle {{role}}. Veuillez réessayer plus tard.",
-        "authWithMessage": "Permission refusée ou session expirée : {{message}}",
-        "notFoundWithMessage": "Introuvable : {{message}}",
-        "badRequestWithMessage": "Mauvaise requête : {{message}}",
-        "conflictWithMessage": "Conflit : {{message}}",
-        "otherErrorWithMessage": "Erreur ({{status}}) : {{message}}"
-      }
-    }
-  },
+
+
+
+
+
+
+
+
+
+
+
+
   "manageReportTemplates": {
     "title": "Gérer les Modèles de Rapport",
     "loading": "Chargement des modèles...",
@@ -2172,7 +2188,13 @@
       "prescribingDoctor": "Médecin Prescripteur",
       "cabinetName": "Nom du Cabinet",
       "numberOfExaminations": "Nombre d'Examens"
-    }
+    },
+    "printButton": "Imprimer",
+    "printReportTitle": "Rapport des Statistiques du Centre",
+    "printSelectedPeriod": "Période Sélectionnée",
+    "printYear": "Année",
+    "printMonth": "Mois",
+    "doctorSignature": "Signature du médecin"
   },
   "centreExaminationsDashboard": {
     "errors": {
@@ -2462,8 +2484,93 @@
   },
 
 
-"common": {
+  "common": {
     "back": "Retour",
     "BACK": "Retour"
+  },
+
+
+
+
+  "loginScreen": {
+    "title": "Connexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "submit": "Se connecter",
+    "loggingIn": "Connexion en cours...",
+    "forgotPassword": "Mot de passe oublié ?",
+    "selectRole": "Sélectionnez votre rôle",
+    "selectRoleOption": "-- Choisir un rôle --"
+  },
+
+
+
+  "changeRole": {
+    "title": "Gestion des Utilisateurs",
+    "loading": "Chargement...",
+    "errorPrefix": "Erreur",
+    "noUsersFound": "Aucun utilisateur trouvé",
+    "noEmail": "Pas d'email",
+    "noRegistrations": "Aucune inscription",
+    "searchPlaceholder": "Rechercher par nom...",
+    "viewMode": {
+      "doctors": "Voir les Patients",
+      "doctorsCentre": "Voir les Médecins de Centre"
+    },
+    "tableHeaders": {
+      "name": "Nom",
+      "email": "Email",
+      "role": "Rôle",
+      "transfer": "Transférer",
+      "actions": "Actions"
+    },
+    "buttons": {
+      "changeToDoctor": "Promouvoir en Médecin",
+      "changeToAssistant": "Promouvoir en Assistant",
+      "convertToAdmin": "Convertir en Admin"
+    },
+    "tooltips": {
+      "selectCabinetFirst": "Veuillez d'abord sélectionner un cabinet",
+      "missingCabinetInfo": "Information du cabinet manquante"
+    },
+    "cabinetOptions": {
+      "select": "Sélectionner un cabinet",
+      "cabinetId": "Cabinet {{id}}"
+    },
+    "confirmations": {
+      "transfer": "Voulez-vous vraiment transférer {{firstName}} {{lastName}}  vers le rôle {{role}} ?",
+      "convertToAdmin": "Êtes-vous sûr de vouloir convertir ce médecin en administrateur ?"
+    },
+    "alerts": {
+      "sessionExpired": "Session expirée ou déconnecté. Redirection vers la connexion.",
+      "transferSuccess": "Transfert réussi vers {{role}}. ",
+      "transferFailed": {
+        "permissionDeniedAction": "Permission refusée pour cette action",
+        "wrongCabinet": "Vous ne pouvez transférer que vers votre propre cabinet"
+      },
+      "conversionSuccess": "Conversion en administrateur réussie",
+      "conversionError": "Erreur lors de la conversion en administrateur"
+    },
+    "errors": {
+      "fetch": {
+        "permissionDeniedView": "Permission refusée pour voir les patients",
+        "auth": "Erreur d'authentification",
+        "generic": "Erreur lors de la récupération des données"
+      },
+      "transfer": {
+        "generic": "Erreur lors du transfert vers {{role}}",
+        "authWithMessage": "Erreur d'authentification : {{message}}",
+        "notFoundWithMessage": "Utilisateur non trouvé : {{message}}",
+        "badRequestWithMessage": "Requête invalide : {{message}}",
+        "conflictWithMessage": "Conflit : {{message}}",
+        "otherErrorWithMessage": "Erreur {{status}} : {{message}}"
+      }
+    }
   }
+
+
+
+
+
+
 }

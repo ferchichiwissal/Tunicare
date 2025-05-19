@@ -89,4 +89,20 @@ public interface UserCabinetRegistrationRepository extends JpaRepository<UserCab
 
     // Compter les inscriptions au cabinet pour un rôle utilisateur spécifique et dans une plage de dates d'inscription
     long countByCabinetAndUser_RoleAndRegistrationDateBetween(CabinetDr cabinet, Role userRole, LocalDate startDate, LocalDate endDate);
+
+    // For Doctor graph: Count active patient registrations by month for the last 12 months for a specific cabinet
+    @Query("SELECT new pi.pperformance.elite.dto.MonthlyStatDTO(YEAR(r.registrationDate), MONTH(r.registrationDate), COUNT(r)) " +
+           "FROM UserCabinetRegistration r " +
+           "WHERE r.cabinet.idSite = :cabinetId AND r.isActive = true AND r.user.role = pi.pperformance.elite.entities.Role.PATIENT AND r.registrationDate >= :startDate " +
+           "GROUP BY YEAR(r.registrationDate), MONTH(r.registrationDate) " +
+           "ORDER BY YEAR(r.registrationDate) DESC, MONTH(r.registrationDate) DESC")
+    List<pi.pperformance.elite.dto.MonthlyStatDTO> countActivePatientRegistrationsByMonthForCabinet(@Param("cabinetId") Long cabinetId, @Param("startDate") LocalDate startDate);
+
+    // For Admin global graph: Count global active patient registrations by month for the last 12 months
+    @Query("SELECT new pi.pperformance.elite.dto.MonthlyStatDTO(YEAR(r.registrationDate), MONTH(r.registrationDate), COUNT(r)) " +
+           "FROM UserCabinetRegistration r " +
+           "WHERE r.isActive = true AND r.user.role = pi.pperformance.elite.entities.Role.PATIENT AND r.registrationDate >= :startDate " +
+           "GROUP BY YEAR(r.registrationDate), MONTH(r.registrationDate) " +
+           "ORDER BY YEAR(r.registrationDate) DESC, MONTH(r.registrationDate) DESC")
+    List<pi.pperformance.elite.dto.MonthlyStatDTO> countGlobalActivePatientRegistrationsByMonth(@Param("startDate") LocalDate startDate);
 }

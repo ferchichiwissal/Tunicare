@@ -94,4 +94,10 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
 
     // For Admin statistics: Count all appointments created within a specific period
     long countByCreatedAtBetween(LocalDateTime startDateTime, LocalDateTime endDateTime);
-}
+
+    // Count all appointments for a cabinet within a date range, regardless of state
+    long countByCabinetAndApptDateTimeBetween(CabinetDr cabinet, LocalDateTime startDateTime, LocalDateTime endDateTime);
+    
+    // Count appointments by Cabinet ID, State, and DateTime range
+    long countByCabinet_IdSiteAndApptStateAndApptDateTimeBetween(Long cabinetId, String apptState, LocalDateTime startDateTime, LocalDateTime endDateTime);
+    }

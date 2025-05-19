@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../utils/apiClient';
 import AuthContext from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
-// import './DoctorExaminationsDashboard.css'; // Optional: Create and import CSS
+import './DoctorExaminationsDashboard.css';
 
 const DoctorExaminationsDashboard = () => {
     const { t } = useTranslation();
@@ -204,40 +204,42 @@ const DoctorExaminationsDashboard = () => {
                                     </td>
                                     {/* Removed Status column */}
                                     <td>
-                                        {statusFilter === 'en attente' && exam.etat === 'en attente' && (
-                                            <>
-                                                <button
-                                                    className="btn btn-sm btn-info me-1 edit-button"
-                                                    onClick={() => handleModifier(exam)}
-                                                >
-                                                    {t('doctorExaminationsDashboard.buttons.modify')} ✏️
-                                                </button>
-                                                <button
-                                                    className="btn btn-sm btn-info delete-button"
-                                                    style={{ backgroundColor: '#00c6a9', borderColor: '#00c6a9' }}
-                                                    onClick={() => handleSupprimer(exam.idExam)}
-                                                >
-                                                    {t('doctorExaminationsDashboard.buttons.delete')} 🗑️
-                                                </button>
-                                            </>
-                                        )}
-                                        {statusFilter === 'terminé' && exam.etat === 'terminé' && (
-                                            <>
-                                                <button
-                                                    className="btn btn-sm btn-info me-1"
-                                                    onClick={() => handleVoirResultat(exam)}
-                                                >
-                                                    {t('doctorExaminationsDashboard.buttons.viewResult')} 📄
-                                                </button>
-                                                <button
-                                                    onClick={() => handleHideExam(exam.idExam)}
-                                                    className="btn btn-outline-secondary btn-sm"
-                                                    title={t('doctorExaminationsDashboard.tooltips.hideExam')}
-                                                >
-                                                    {t('doctorExaminationsDashboard.buttons.hideExam')} 👁️‍🗨️
-                                                </button>
-                                            </>
-                                        )}
+                                        <div className="button-group">
+                                           {exam.etat === 'en attente' && (
+                                               <>
+                                                   <button
+                                                       className="btn btn-sm btn-info me-1 edit-button"
+                                                       onClick={() => handleModifier(exam)}
+                                                   >
+                                                       {t('doctorExaminationsDashboard.buttons.modify')} ✏️
+                                                   </button>
+                                                   <button
+                                                       className="btn btn-sm btn-info delete-button"
+                                                       style={{ backgroundColor: '#00c6a9', borderColor: '#00c6a9' }}
+                                                       onClick={() => handleSupprimer(exam.idExam)}
+                                                   >
+                                                       {t('doctorExaminationsDashboard.buttons.delete')} 🗑️
+                                                   </button>
+                                               </>
+                                           )}
+                                            {exam.etat === 'terminé' && (
+                                                <>
+                                                    <button
+                                                        className="btn btn-sm btn-info me-1"
+                                                        onClick={() => handleVoirResultat(exam)}
+                                                    >
+                                                        {t('doctorExaminationsDashboard.buttons.viewResult')} 📄
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleHideExam(exam.idExam)}
+                                                        className="btn btn-outline-secondary btn-sm"
+                                                        title={t('doctorExaminationsDashboard.tooltips.hideExam')}
+                                                    >
+                                                        {t('doctorExaminationsDashboard.buttons.hideExam')} 👁️‍🗨️
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

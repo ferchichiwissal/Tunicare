@@ -33,7 +33,7 @@ public class PrescribedMedicationsService implements IPrescribedMedicationsServi
     @Override
     public List<PrescribedMedications> getPrescriptionsByPatientId(Long patientId) {
         // Find all consultations for the patient using the correct repository method name
-        List<Consultation> consultations = consultationRepository.findByPatient_IdOrderByDateConsultationDesc(patientId); // Corrected method name
+        List<Consultation> consultations = consultationRepository.findByPatient_IdAndIsHiddenForPatientFalseOrderByDateConsultationDesc(patientId); // Corrected method name
 
         if (consultations.isEmpty()) {
             return Collections.emptyList();

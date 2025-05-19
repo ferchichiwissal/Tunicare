@@ -1,8 +1,6 @@
-/* Styles for Users Management (UserTable) component - Harmonized */
+/* Global styles for the DoctorExaminationsDashboard component */
 
-/* Assuming root variables are globally available */
-
-.user-table-container { /* Assuming a container div wraps the component */
+.user-table-container {
   padding: 30px;
   margin: 40px auto;
   background-color: var(--background-color, #ffffff);
@@ -11,203 +9,109 @@
   font-family: var(--font-family, 'Roboto', sans-serif);
 }
 
-.user-table-container h2 {
-  color: var(--text-color, #0c0c0c);
-  margin-bottom: 25px;
-  border-bottom: 2px solid var(--primary-color, #00c6a9);
-  padding-bottom: 10px;
-  display: inline-block;
-}
-
-.user-table-container input[type="text"] {
-  width: 100%;
-  padding: 12px 15px;
-  margin-bottom: 25px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
-  font-size: 1rem;
-  transition: border-color 0.3s, box-shadow 0.3s; /* Added box-shadow transition */
-  background-color: var(--white, #ffffff); /* Ensure background is white */
-  /* Optional: Add padding for an icon if you plan to add one */
-  /* padding-left: 40px; */
-}
-
-.user-table-container input[type="text"]:focus {
-  border-color: var(--primary-color, #00c6a9);
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 198, 169, 0.25); /* Slightly larger focus shadow */
-}
-
-/* Optional: Style for a search icon container if added */
-/*
-.search-container {
-  position: relative;
-}
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--light-text-color, #6c757d);
-  font-size: 1.1rem;
-}
-*/
-
-.user-table-container table {
+/* Table Styles */
+.table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
 }
 
-.user-table-container th,
-.user-table-container td {
-  border: 1px solid #ddd;
-  padding: 12px 15px;
-  text-align: left;
+.table th,
+.table td {
+  padding: 1rem;
   vertical-align: middle;
+  border-top: 1px solid #dee2e6;
 }
 
-.user-table-container th {
-  background-color: var(--light-background, #f7f7f7);
-  color: var(--text-color, #0c0c0c);
-  font-weight: bold;
+/* Custom table header style */
+.custom-table thead th {
+  background-color: var(--primary-color, #00c6a9);
+  color: white;
+  border-bottom: 2px solid var(--primary-color, #00c6a9);
+  font-weight: 600;
   text-transform: uppercase;
   font-size: 0.9rem;
 }
 
-/* Add green header style for custom-table */
-.custom-table thead th {
-  background-color: var(--primary-color, #00c6a9) !important; /* Change to teal background */
-  color: var(--white, #ffffff) !important; /* Change text color to white */
-  border-bottom: 2px solid var(--primary-color, #00c6a9); /* Add a bottom border */
+/* Button group container */
+.button-group {
+  display: flex !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important; /* Prevent buttons from wrapping */
+  justify-content: flex-start !important;
+  align-items: center !important;
 }
 
-
-.user-table-container tbody tr:nth-child(even) {
-  background-color: var(--light-background, #f7f7f7);
+/* Common button styles */
+.button-group .btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.2rem 0.4rem; /* Reverted horizontal padding */
+  font-size: 0.8rem;
+  line-height: 1.5 !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.15s ease-in-out !important;
+  margin: 0 !important;
+  min-width: auto !important;
+  max-width: none; /* Ensure no max-width is set */
+  width: auto; /* Allow width to be determined by content */
 }
 
-.user-table-container tbody tr:hover {
-  background-color: #e9e9e9;
+/* Edit button styles */
+.button-group .edit-button {
+  background-color: var(--primary-color, #00c6a9) !important;
+  border-color: var(--primary-color, #00c6a9) !important;
+  color: white !important;
 }
 
-/* Styling for action buttons */
-.user-table-container td button {
-  padding: 6px 12px;
-  margin-right: 5px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: bold;
-  transition: background-color 0.3s, transform 0.1s;
+/* Delete button styles */
+.button-group .delete-button {
+  background-color: var(--primary-color, #00c6a9) !important;
+  border-color: var(--primary-color, #00c6a9) !important;
+  color: white !important;
 }
 
-.user-table-container td button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-  border-color: #ccc; /* Ensure border color is also grey when disabled */
-  color: #666; /* Darker text for disabled state */
+/* Hover effects */
+.button-group .btn:hover {
+  opacity: 0.9 !important;
+  transform: translateY(-1px) !important;
 }
 
-/* Specific styles for buttons to ensure correct color */
-.user-table-container table td .btn-primary,
-.user-table-container table td .btn-info,
-.user-table-container table td .btn-outline-secondary,
-.user-table-container table td .edit-button {
-  background-color: var(--primary-color, #00c6a9) !important; /* Vert d'eau */
-  border-color: var(--primary-color, #00c6a9) !important; /* Vert d'eau */
-  color: var(--white, #ffffff) !important; /* Texte blanc */
+/* Ensure icons in buttons are properly spaced */
+.button-group .btn i,
+.button-group .btn span {
+  margin-right: 4px !important;
 }
 
-/* Adjust hover state for these specific buttons */
-.user-table-container table td .btn-primary:hover,
-.user-table-container table td .btn-info:hover,
-.user-table-container table td .btn-outline-secondary:hover,
-.user-table-container table td .edit-button:hover {
-  background-color: darken(var(--primary-color, #00c6a9), 10%) !important; /* Nuance de vert d'eau au survol */
-  border-color: darken(var(--primary-color, #00c6a9), 10%) !important;
-  color: var(--white, #ffffff) !important;
+/* Responsive styles */
+@media (max-width: 768px) {
+  .button-group {
+    gap: 5px !important;
+  }
+  
+  .button-group .btn {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.8rem !important;
+  }
 }
 
-/* Specific styles for delete button to ensure correct color */
-.user-table-container table td .btn-danger,
-.user-table-container table td .delete-button {
-  background-color: var(--primary-color, #00c6a9) !important; /* Vert d'eau */
-  border-color: var(--primary-color, #00c6a9) !important; /* Vert d'eau */
-  color: var(--white, #ffffff) !important; /* Texte blanc */
+/* Override any conflicting Bootstrap styles */
+.btn-sm {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+  border-radius: 0.2rem !important;
 }
 
-/* Adjust hover state for delete button */
-.user-table-container table td .btn-danger:hover,
-.user-table-container table td .delete-button:hover {
-  background-color: darken(var(--primary-color, #00c6a9), 10%) !important; /* Nuance de vert d'eau au survol */
-  border-color: darken(var(--primary-color, #00c6a9), 10%) !important;
-  color: var(--white, #ffffff) !important;
+.table td .button-group {
+  margin: -0.5rem 0 !important;
+  padding: 0.5rem 0 !important;
 }
 
-/* Ensure text color is white for success badges */
-.user-table-container .badge.bg-success {
-  background-color: #ffffff !important; /* Change background to white */
-  color: #0c0c0c !important; /* Change text color to black */
-  border: 1px solid #ccc; /* Add a border to make it visible */
-}
-
-
-/* Style for warning badges (Pending) */
-.user-table-container .badge.bg-warning {
-  background-color: #ffffff !important; /* Change background to white */
-  color: #0c0c0c !important; /* Change text color to black */
-  border: 1px solid #ccc; /* Add a border to make it visible */
-}
-
-/* Message for no users */
-.user-table-container td[colSpan="6"] { /* Adjust colSpan if table changes */
-  text-align: center;
-  font-style: italic;
-  color: var(--light-text-color, #555555);
-  padding: 20px;
-}
-
-/* Loading indicator */
-.user-table-container .loading-message { /* Assuming a class might be added */
-  font-style: italic;
-  color: var(--light-text-color, #555555);
-  text-align: center;
-  padding: 20px;
-}
-/* Add a wrapper div around the table in the JS for this to work best */
-.table-responsive-wrapper {
-   display: block; /* Allow horizontal scroll */
-   width: 100%;
-   overflow-x: auto;
-   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-}
-.user-table-container table {
-   /* Remove width: 100% if using wrapper, let it size naturally */
-   /* white-space: nowrap; /* Prevent text wrapping inside table */
-}
-.user-table-container th,
-.user-table-container td {
-  white-space: nowrap; /* Ensure table cells don't wrap */
-  padding: 10px 12px; /* Adjust padding */
-  font-size: 0.9rem; /* Slightly smaller font */
-}
-
-/* Styles pour aligner les boutons radio avec la barre de recherche */
-.user-table-container .form-check-inline {
-  margin-right: 15px; /* Espacement entre les boutons radio */
-}
-
-.user-table-container .form-check-label {
-  margin-bottom: 0; /* Supprimer la marge inférieure par défaut */
-  vertical-align: middle; /* Aligner verticalement avec l'input */
-}
-
-/* Ajustement pour l'alignement vertical dans la ligne */
-.user-table-container .row.align-items-center .col-md-4 {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end; /* Aligner les éléments à droite */
+/* Style for the Actions column */
+.table th:last-child,
+.table td:last-child {
+  min-width: 150px; /* Set a minimum width for the actions column */
+  white-space: nowrap; /* Prevent text wrapping */
 }

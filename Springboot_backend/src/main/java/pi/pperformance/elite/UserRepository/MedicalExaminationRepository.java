@@ -91,7 +91,15 @@ public interface MedicalExaminationRepository extends JpaRepository<MedicalExami
            "GROUP BY YEAR(me.createdAt), MONTH(me.createdAt) " +
            "ORDER BY YEAR(me.createdAt) DESC, MONTH(me.createdAt) DESC")
     List<MonthlyStatDTO> countExamsByMonthForPatientAndCabinet(@Param("patientId") Long patientId, @Param("cabinetId") Long cabinetId, @Param("startDate") LocalDateTime startDate);
-    
+
+    // For Admin global graph: Count all medical examinations by month for the last 12 months
+    @Query("SELECT new pi.pperformance.elite.dto.MonthlyStatDTO(YEAR(me.createdAt), MONTH(me.createdAt), COUNT(me)) " +
+           "FROM MedicalExamination me " +
+           "WHERE me.createdAt >= :startDate " +
+           "GROUP BY YEAR(me.createdAt), MONTH(me.createdAt) " +
+           "ORDER BY YEAR(me.createdAt) DESC, MONTH(me.createdAt) DESC")
+    List<MonthlyStatDTO> countGlobalExamsByMonth(@Param("startDate") LocalDateTime startDate);
+
     // For Admin statistics: Count all medical examinations with a non-null and non-empty result
     long countByResultatIsNotNullAndResultatNot(String resultatExclu);
 

@@ -264,30 +264,63 @@ body {
   color: var(--secondary-color, #4e73df); /* Use secondary blue for link hover */
 }
 
+/* Doctor Charts Grid Layout */
+.doctor-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Fixed 2-column grid */
+  gap: 25px; /* Space between charts */
+  margin-top: 40px;
+}
+
+/* Admin Charts Grid Layout */
+.admin-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Fixed 2-column grid */
+  gap: 25px; /* Space between charts */
+  margin-top: 40px;
+}
+
 /* Charts Section */
 .charts-section {
   margin-top: 40px;
-  background-color: var(--white);
   padding: 25px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
-.charts-section h3 {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  color: var(--text-color);
+.chart-container {
+  margin-bottom: 0; /* Remove bottom margin from chart container itself */
+  max-width: 100%; /* Ensure charts are responsive */
+  background-color: var(--white); /* Add background color */
+  padding: 20px; /* Add padding */
+  border-radius: 8px; /* Add border radius */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+  display: flex; /* Use flexbox for content alignment */
+  flex-direction: column; /* Stack title, chart, description */
+  align-items: center; /* Center content horizontally */
 }
 
-.chart-container {
-  margin-bottom: 30px;
-  max-width: 100%; /* Ensure charts are responsive */
+/* Ensure consistent height for charts within the grids */
+.doctor-charts-grid .chart-container,
+.admin-charts-grid .chart-container {
+    min-height: 350px; /* Revert to a reasonable minimum height */
+    /* Or a fixed height if responsiveness is less critical */
+    /* height: 350px; */
+    flex-grow: 1; /* Allow chart containers to grow */
 }
+
 .chart-container h4 {
   font-size: 1.1rem;
   margin-bottom: 10px;
+  color: var(--text-color); /* Use text color for title */
+  text-align: center;
+}
+
+.chart-description {
+  font-size: 0.9rem;
   color: var(--light-text-color);
   text-align: center;
+  margin-top: 10px;
 }
 
 /* Right Sidebar (User Info) */

@@ -16,6 +16,7 @@ import pi.pperformance.elite.dto.DoctorCentreStatisticsDTO; // Ajout DTO
 import pi.pperformance.elite.dto.AdminGlobalStatisticsDTO; // Ajout DTO
 import pi.pperformance.elite.dto.AssistantStatisticsDTO; // Ajout DTO
 import pi.pperformance.elite.dto.MonthlyStatDTO; // Ajout DTO
+import pi.pperformance.elite.dto.AppointmentDistributionDTO; // New DTO for appointment distribution
 import pi.pperformance.elite.Authentif.CustomUserDetails; // Pour récupérer les infos de l'utilisateur connecté
 
 import org.springframework.security.core.Authentication; // Pour récupérer l'authentification
@@ -216,6 +217,116 @@ public class StatisticsController {
         }
 
         List<MonthlyStatDTO> stats = statisticsService.getPatientExamsPerMonth(patientId, cabinetId);
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour les données du graphique des consultations par mois du docteur
+    @GetMapping("/doctor/consultations-per-month")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<List<MonthlyStatDTO>> getDoctorConsultationsPerMonthStats() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long doctorId = userDetails.getId();
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
+        Long cabinetId = null;
+        if (authDetails != null && authDetails.get("cabinetId") != null) {
+            Object cabinetIdObj = authDetails.get("cabinetId");
+            if (cabinetIdObj instanceof Integer) {
+                cabinetId = ((Integer) cabinetIdObj).longValue();
+            } else if (cabinetIdObj instanceof Long) {
+                cabinetId = (Long) cabinetIdObj;
+            }
+        }
+
+        if (cabinetId == null) {
+            return ResponseEntity.status(400).body(null); // Bad Request
+        }
+
+        List<MonthlyStatDTO> stats = statisticsService.getDoctorConsultationsPerMonth(doctorId, cabinetId);
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour les données du graphique du nombre de patients par mois du docteur
+    @GetMapping("/doctor/patients-per-month")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<List<MonthlyStatDTO>> getDoctorPatientsPerMonthStats() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long doctorId = userDetails.getId(); // Although not strictly needed for the repository query, keep for consistency
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
+        Long cabinetId = null;
+        if (authDetails != null && authDetails.get("cabinetId") != null) {
+            Object cabinetIdObj = authDetails.get("cabinetId");
+            if (cabinetIdObj instanceof Integer) {
+                cabinetId = ((Integer) cabinetIdObj).longValue();
+            } else if (cabinetIdObj instanceof Long) {
+                cabinetId = (Long) cabinetIdObj;
+            }
+        }
+
+        if (cabinetId == null) {
+             return ResponseEntity.status(400).body(null); // Bad Request
+        }
+
+        List<MonthlyStatDTO> stats = statisticsService.getDoctorPatientsPerMonth(doctorId, cabinetId); // Pass doctorId for consistency, though service might only use cabinetId
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour la distribution des rendez-vous par statut pour un mois donné pour le docteur
+    @GetMapping("/doctor/appointment-distribution-by-month")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<AppointmentDistributionDTO> getDoctorAppointmentDistributionByMonth(
+            @RequestParam Integer year,
+            @RequestParam Integer month) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long doctorId = userDetails.getId();
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
+        Long cabinetId = null;
+        if (authDetails != null && authDetails.get("cabinetId") != null) {
+            Object cabinetIdObj = authDetails.get("cabinetId");
+            if (cabinetIdObj instanceof Integer) {
+                cabinetId = ((Integer) cabinetIdObj).longValue();
+            } else if (cabinetIdObj instanceof Long) {
+                cabinetId = (Long) cabinetIdObj;
+            }
+        }
+
+        if (cabinetId == null) {
+            return ResponseEntity.status(400).body(null); // Bad Request
+        }
+
+        AppointmentDistributionDTO stats = statisticsService.getDoctorAppointmentDistributionByMonth(cabinetId, year, month);
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour les données du graphique des consultations globales par mois pour l'admin
+    @GetMapping("/admin/global-consultations-per-month")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<MonthlyStatDTO>> getGlobalConsultationsPerMonthStats() {
+        List<MonthlyStatDTO> stats = statisticsService.getGlobalConsultationsPerMonth();
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour les données du graphique des examens globaux par mois pour l'admin
+    @GetMapping("/admin/global-exams-per-month")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<MonthlyStatDTO>> getGlobalExamsPerMonthStats() {
+        List<MonthlyStatDTO> stats = statisticsService.getGlobalExamsPerMonth();
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour les données du graphique des patients globaux par mois pour l'admin
+    @GetMapping("/admin/global-patients-per-month")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<MonthlyStatDTO>> getGlobalPatientsPerMonthStats() {
+        List<MonthlyStatDTO> stats = statisticsService.getGlobalPatientsPerMonth();
         return ResponseEntity.ok(stats);
     }
 }
