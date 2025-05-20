@@ -309,6 +309,14 @@ body {
     flex-grow: 1; /* Allow chart containers to grow */
 }
 
+/* Doctor Centre Charts Grid Layout */
+.doctor-centre-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Fixed 2-column grid */
+  gap: 25px; /* Space between charts */
+  margin-top: 40px;
+}
+
 .chart-container h4 {
   font-size: 1.1rem;
   margin-bottom: 10px;

@@ -96,6 +96,8 @@
   "dashboard": {
     "title": "Tableau de bord de {{firstName}} {{lastName}}",
     "performanceSectionTitle": "Tableau de bord des performances",
+"selectMonth": "Sélectionner Mois",
+    "selectYear": "Sélectionner Année",
     "tiles": {
       "performance": {
         "title": "Objectifs de performance",
@@ -132,6 +134,7 @@
         "label": "Paiements au fil du temps",
         "title": "Aperçu des paiements mensuels",
         "yAxisLabel": "Paiements (dt)"
+
       },
       "phoneCalls": {
         "label": "Appels téléphoniques effectués",
@@ -195,7 +198,9 @@
       "examsPerformedToday": "Examens Aujourd'hui",
       "averageProcessingTime": "Délai Traitement Moyen",
       "pendingExams": "Examens en Attente",
-      "upcomingExamsTitle": "Examens à Venir Aujourd'hui"
+      "upcomingExamsTitle": "Examens à Venir Aujourd'hui",
+      "examsPerformedTodayCount": "Examens réalisés aujourd'hui",
+      "pendingExamsCount": "Examens en attente"
     },
     "admin": {
       "totalUsers": "Total Utilisateurs",
@@ -216,7 +221,50 @@
       "examsToday": "Examens Demandés(Aujourd'hui)",
       "examsThisWeek": "Examens Demandés(Semaine en cours)",
       "examsThisMonth": "Examens Demandés(Mois en cours)",
-      "generatedMedicalReportsMonth":"rapports médicaux générés(Mois en cours)"
+      "patients": "Patients",
+      "doctors": "Médecins",
+      "assistants": "Assistants",
+      "doctorCentres": "Médecins de Centre",
+    "generatedMedicalReportsMonth":"rapports médicaux générés(Mois en cours)",
+"usersChartTitle": "Distribution des Utilisateurs",
+    "statisticsTitle": "Statistiques Visuels",
+    "charts": {
+      "consultationsEvolution": {
+        "title": "Évolution des Consultations",
+        "label": "Évolution des Consultations"
+      },
+      "examsEvolution": {
+        "title": "Évolution des Examens",
+        "label": "Évolution des Examens"
+      },
+      "patientsEvolution": {
+        "title": "Évolution des Patients",
+        "label": "Évolution des Patients"
+      },
+      "appointmentsDistribution": {
+        "title": "Distribution des Rendez-vous",
+        "realized": "Réalisés",
+        "accepted": "Acceptés",
+        "refused": "Refusés"
+      }
+    }
+    },
+    "doctorCentre": {
+      "examsPerformedToday": "Examens Aujourd'hui",
+      "averageProcessingTime": "Délai Traitement Moyen",
+      "pendingExams": "Examens en Attente",
+      "upcomingExamsTitle": "Examens à Venir Aujourd'hui",
+      "examsPerformedTodayCount": "Examens réalisés aujourd'hui",
+      "pendingExamsCount": "Examens en attente",
+      "charts": {
+        "monthlyReports": {
+          "title": "Rapports Mensuels",
+          "label": "Rapports Mensuels"
+        },
+        "reportTypes": {
+          "title": "Types de Rapport"
+        }
+      }
     },
     "assistant": {
       "appointmentsToday": "Rendez-vous Aujourd'hui",
@@ -241,9 +289,13 @@
       "unreadExaminationResults": "Résultats d'examen non lus"
     },
     "charts": {
-      "performanceTitle": "Performance de {{firstName}} {{lastName}}",
-      "monthAxisLabel": "Mois",
+      
+      "visualStatisticsTitle": "Statistiques Visuelles",
       "countAxisLabel": "Nombre",
+      "monthAxisLabel": "Mois",
+      "selectMonth": "Sélectionner Mois",
+      "selectYear": "Sélectionner Année",
+      "performanceTitle": "Performance de {{firstName}} {{lastName}}",
       "payments": {
         "label": "Paiements au fil du temps",
         "title": "Aperçu des paiements mensuels",
@@ -278,12 +330,13 @@
         "label": "Évolution des Patients",
         "title": "Évolution du Nombre de Patients par Mois"
       },
-      "appointmentsDistribution": {
+        "appointmentsDistribution": {
         "title": "Distribution des Rendez-vous",
         "accepted": "Acceptés",
         "realized": "Réalisés",
         "refused": "Refusés"
-      }
+      },
+      "visualReportsTitle": "Statistiques Visuelles des Rapports"
     }
   },
   "editUserForm": {
@@ -327,6 +380,7 @@
       },
       "validation": {
         "firstNameRequired": "Le prénom est requis",
+
         "lastNameRequired": "Le nom de famille est requis",
         "emailInvalid": "Format d'e-mail invalide",
         "birthDateRequired": "La date de naissance est requise",

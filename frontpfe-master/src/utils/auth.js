@@ -33,10 +33,46 @@ export const storeUserData = (data, remember = false) => {
   storage.setItem('accessToken', data.accessToken);
   storage.setItem('refreshToken', data.refreshToken);
   storage.setItem('roles', JSON.stringify(data.roles || []));
-  storage.setItem('user', JSON.stringify(data.user || {})); // Store original user object
+
+  // Decode JWT to extract user ID and centre ID if available
+  let userId = null;
+  let centreId = null;
+  if (data.accessToken) {
+    try {
+      const decodedToken = JSON.parse(atob(data.accessToken.split('.')[1]));
+      userId = decodedToken.id || decodedToken.userId || null; // Try common claim names
+      centreId = decodedToken.centreId || null; // Assuming 'centreId' claim name
+    } catch (error) {
+      console.error('Error decoding token for user/centre ID:', error);
+    }
+  }
+
+  // Combine original user data with extracted IDs
+  const userToStore = {
+    ...data.user, // Include original user data from login response
+    id: userId || (data.user ? data.user.id : null), // Prioritize extracted ID, fallback to original
+    centreId: centreId || (data.user ? data.user.centreId : null), // Prioritize extracted ID, fallback to original
+    // Ensure cabinetId is also included if present in original user data or token
+    cabinetId: (data.user ? data.user.cabinetId : null) || (userId ? getCabinetIdFromToken(data.accessToken) : null) // Keep existing cabinetId logic or extract from token if needed
+  };
+
+  storage.setItem('user', JSON.stringify(userToStore)); // Store combined user object
   // Store the preference itself so getUserData knows where to look first next time
   storage.setItem('rememberPreference', JSON.stringify(remember));
 };
+
+// Helper function to get cabinetId from token claims (if needed)
+const getCabinetIdFromToken = (token) => {
+    if (!token) return null;
+    try {
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        return decodedToken.cabinetId || null; // Assuming 'cabinetId' claim name
+    } catch (error) {
+        console.error('Error decoding token for cabinetId:', error);
+        return null;
+    }
+};
+
 
 // Retrieve user data, checking both storages based on preference
 export const getUserData = () => {
@@ -70,10 +106,18 @@ export const getUserData = () => {
   const user = userString ? JSON.parse(userString) : {};
   // console.log("[getUserData] Parsed user:", user); // Optional log
 
+  // Extract cabinetId and centreId directly from the stored user object
   const cabinetId = user ? user.cabinetId : null;
-  // console.log("[getUserData] Extracted cabinetId:", cabinetId); // Optional log
+  const centreId = user ? user.centreId : null; // Extract centreId
+  const userId = user ? user.id : null; // Extract user ID
 
-  return { accessToken, refreshToken, roles, cabinetId, user };
+  // console.log("[getUserData] Extracted cabinetId:", cabinetId); // Optional log
+  // console.log("[getUserData] Extracted centreId:", centreId); // Optional log
+  // console.log("[getUserData] Extracted userId:", userId); // Optional log
+
+
+  // Return all relevant data, including the full user object and extracted IDs
+  return { accessToken, refreshToken, roles, cabinetId, centreId, user, id: userId };
 };
 
 // Clear user data from both storages
@@ -108,4 +152,12 @@ export const getCabinetId = () => {
   const user = userString ? JSON.parse(userString) : {};
   const cabinetId = user ? user.cabinetId : null;
   return cabinetId;
+};
+
+// Helper to get just the centre ID, checking both storages
+export const getCentreId = () => {
+  const userString = localStorage.getItem('user') || sessionStorage.getItem('user');
+  const user = userString ? JSON.parse(userString) : {};
+  const centreId = user ? user.centreId : null;
+  return centreId;
 };

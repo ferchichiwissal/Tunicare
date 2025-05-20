@@ -99,6 +99,8 @@
   "dashboard": {
     "title": "{{firstName}} {{lastName}}'s Dashboard",
     "performanceSectionTitle": "Performance Dashboard",
+"selectMonth": "Select Month",
+    "selectYear": "Select Year",
     "doctor": {
       "appointmentsToday": "Accepted Appointments Today",
       "consultationsToday": "Consultations Realized Today",
@@ -137,7 +139,9 @@
       "examsPerformedToday": "Exams Performed Today",
       "averageProcessingTime": "Avg. Processing Time",
       "pendingExams": "Pending Exams",
-      "upcomingExamsTitle": "Upcoming Exams Today"
+      "upcomingExamsTitle": "Upcoming Exams Today",
+"examsPerformedTodayCount": "Exams Performed Today Count",
+      "pendingExamsCount": "Pending Exams Count"
     },
     "admin": {
       "totalUsers": "Total Users",
@@ -158,7 +162,36 @@
       "examsToday": "Exams Requested (Today)",
       "examsThisWeek": "Exams Requested (Current Week)",
       "examsThisMonth": "Exams Requested (Current Month)",
-      "generatedMedicalReportsMonth":"generated Medical Reports"
+      "patients": "Patients",
+      "doctors": "Doctors",
+      "assistants": "Assistants",
+      "doctorCentres": "Examination Centre Doctors",
+      "generatedMedicalReportsMonth": "generated Medical Reports",
+      "usersChartTitle": "Users Distribution",
+      "statisticsTitle": "Visual Statistics",
+      "charts": {
+        "consultationsEvolution": {
+          "title": "Consultations Evolution",
+          "label": "Consultations Evolution"
+        }
+      }
+    },
+    "doctorCentre": {
+      "examsPerformedToday": "Exams Performed Today",
+      "averageProcessingTime": "Avg. Processing Time",
+      "pendingExams": "Pending Exams",
+      "upcomingExamsTitle": "Upcoming Exams Today",
+      "examsPerformedTodayCount": "Exams Performed Today Count",
+      "pendingExamsCount": "Pending Exams Count",
+      "charts": {
+        "monthlyReports": {
+          "title": "Monthly Reports",
+          "label": "Monthly Reports"
+        },
+        "reportTypes": {
+          "title": "Report Types"
+        }
+      }
     },
     "assistant": {
       "appointmentsToday": "Appointments Today",
@@ -199,8 +232,12 @@
       "viewNotifications": "View Notifications"
     },
     "charts": {
-      "performanceTitle": "{{firstName}} {{lastName}} Performance",
+      "visualStatisticsTitle": "Visual Statistics",
+      "countAxisLabel": "Count",
       "monthAxisLabel": "Month",
+      "selectMonth": "Select Month",
+      "selectYear": "Select Year",
+      "performanceTitle": "{{firstName}} {{lastName}} Performance",
       "payments": {
         "label": "Payments Over Time",
         "title": "Monthly Payments Overview",
@@ -210,8 +247,27 @@
         "label": "Phone Calls Made",
         "title": "Phone Calls Made per Month",
         "yAxisLabel": "Phone Calls"
-      }
-    },
+      },
+      "appointmentsDistribution": {
+        "title": "Appointments Distribution",
+        "realized": "Realized",
+        "accepted": "Accepted",
+        "refused": "Refused"
+      },
+      "consultationsEvolution": {
+        "title": "Consultations Evolution by Month",
+        "label": "Consultations Evolution"
+      },
+      "examsEvolution": {
+        "title": "Exams Evolution by Month",
+        "label": "Exams Evolution"
+      },
+        "patientsEvolution": {
+          "title": "Patients Evolution by Month",
+          "label": "Patients Evolution"
+        },
+        "visualReportsTitle": "Visual Statistics of Reports"
+   },
     "tooltips": {
       "hideSidebar": "Hide Sidebar",
       "showSidebar": "Show Sidebar"

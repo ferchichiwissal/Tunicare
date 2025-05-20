@@ -36,6 +36,11 @@ const Dashboard = ({ onLogout }) => {
   const [adminMonthlyPatients, setAdminMonthlyPatients] = useState([]);
   const [adminMonthlyStatsLoading, setAdminMonthlyStatsLoading] = useState(true);
 
+  // New states for Doctor Centre monthly report statistics
+  const [doctorCentreMonthlyReports, setDoctorCentreMonthlyReports] = useState([]);
+  const [doctorCentreReportTypes, setDoctorCentreReportTypes] = useState([]);
+  const [doctorCentreReportStatsLoading, setDoctorCentreReportStatsLoading] = useState(true); // Loading state for doctor centre report statistics
+
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -132,6 +137,7 @@ const Dashboard = ({ onLogout }) => {
     if (authUser && authUser.role) {
       setStatsLoading(true);
       setAdminMonthlyStatsLoading(true); // Start loading for admin monthly stats
+      setDoctorCentreReportStatsLoading(true); // Start loading for doctor centre report stats
 
       let statsEndpoint = "";
       if (authUser.role === "DOCTOR") {
@@ -155,6 +161,7 @@ const Dashboard = ({ onLogout }) => {
           })
           .catch(error => {
             console.error("Error fetching dashboard statistics:", error);
+            setDashboardStats(null); // Clear previous data on error
             setStatsLoading(false);
             // Handle the error, maybe display a message
           });
@@ -190,6 +197,9 @@ const Dashboard = ({ onLogout }) => {
             setAdminMonthlyStatsLoading(false);
           } catch (error) {
             console.error("Error fetching admin monthly statistics:", error);
+            setAdminMonthlyConsultations([]);
+            setAdminMonthlyExams([]);
+            setAdminMonthlyPatients([]);
             setAdminMonthlyStatsLoading(false);
             // Handle error
           }
@@ -198,6 +208,36 @@ const Dashboard = ({ onLogout }) => {
       } else {
         setAdminMonthlyStatsLoading(false); // Not an admin, no monthly stats to fetch
       }
+
+      // Fetch report statistics specifically for DOCTOR_CENTRE_EXAMEN
+      if (authUser.role === "DOCTOR_CENTRE_EXAMEN" && authUser.id && authUser.centreId) { // Ensure doctorCentreId and centreId are available
+        const fetchDoctorCentreReportStats = async () => {
+          try {
+            const monthlyReportsResponse = await apiClient.get("/api/statistics/doctor-centre/reports-per-month");
+             // Sort data chronologically before setting state
+            const sortedMonthlyReports = monthlyReportsResponse.data.sort((a, b) => {
+                // Assuming month is in "YYYY-MM" format
+                return a.month.localeCompare(b.month);
+            });
+            setDoctorCentreMonthlyReports(sortedMonthlyReports);
+
+            const reportTypesResponse = await apiClient.get("/api/statistics/doctor-centre/reports-by-type");
+            setDoctorCentreReportTypes(reportTypesResponse.data);
+
+            setDoctorCentreReportStatsLoading(false);
+          } catch (error) {
+            console.error("Error fetching doctor centre report statistics:", error);
+            setDoctorCentreMonthlyReports([]);
+            setDoctorCentreReportTypes([]);
+            setDoctorCentreReportStatsLoading(false);
+            // Handle error
+          }
+        };
+        fetchDoctorCentreReportStats();
+      } else {
+         setDoctorCentreReportStatsLoading(false); // Not a doctor centre or IDs not available
+      }
+
     }
   }, [authUser, t]); // Depends on authUser and t to execute when the user is loaded and for translations
 
@@ -238,7 +278,7 @@ const Dashboard = ({ onLogout }) => {
     } else {
       setMonthlyStatsLoading(false); // Not a doctor, no monthly stats to fetch
     }
-  }, [authUser]); // Depends on authUser
+  }, [authUser, t]); // Depends on authUser and t to execute when the user is loaded and for translations
 
   // Helper function to generate month options for the selector
   const getMonthOptions = () => {
@@ -459,11 +499,92 @@ const Dashboard = ({ onLogout }) => {
         },
         beginAtZero: true,
         grid: {
-          display: true, // Enable grid lines
+          display: true,
         },
       },
     },
   };
+
+  // Data for Doctor Centre Monthly Reports Chart (Curve/Histogram)
+  const doctorCentreMonthlyReportsData = {
+    labels: doctorCentreMonthlyReports.map(stat => stat.month),
+    datasets: [
+      {
+        label: t('dashboard.doctorCentre.charts.monthlyReports.label'),
+        data: doctorCentreMonthlyReports.map(stat => stat.reportCount),
+        borderColor: 'rgba(255, 99, 132, 1)', // Red
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        tension: 0.1,
+        type: 'line', // Default to line, can be changed to 'bar' for histogram
+      },
+    ],
+  };
+
+  const doctorCentreMonthlyReportsOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: t('dashboard.doctorCentre.charts.monthlyReports.title'),
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: t('dashboard.charts.monthAxisLabel'),
+        },
+        grid: {
+          display: true,
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: t('dashboard.charts.countAxisLabel'),
+        },
+        beginAtZero: true,
+        grid: {
+          display: true,
+        },
+      },
+    },
+  };
+
+  // Data for Doctor Centre Report Types Chart (Pie Chart)
+  const doctorCentreReportTypesData = {
+    labels: doctorCentreReportTypes.map(stat => stat.reportType || t('dashboard.charts.reportTypeUnknown')), // Use reportType or a default label
+    datasets: [
+      {
+        data: doctorCentreReportTypes.map(stat => stat.reportCount),
+        backgroundColor: [
+          'rgba(54, 162, 235, 0.8)', // Blue
+          'rgba(255, 205, 86, 0.8)', // Yellow
+          'rgba(75, 192, 192, 0.8)', // Green
+          'rgba(153, 102, 255, 0.8)', // Purple
+          'rgba(255, 159, 64, 0.8)', // Orange
+          'rgba(201, 203, 207, 0.8)', // Grey
+        ],
+      },
+    ],
+  };
+
+  const doctorCentreReportTypesOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+      },
+      title: {
+        display: true,
+        text: t('dashboard.doctorCentre.charts.reportTypes.title'),
+      }
+    }
+  };
+
 
   // ---------------------------------------------------- //
 
@@ -471,7 +592,7 @@ const Dashboard = ({ onLogout }) => {
   if (sessionExpired) return null;
 
   // Display loading if the context user or statistics are loading
-  if (loading || (authUser && statsLoading) || (authUser?.role === "DOCTOR" && monthlyStatsLoading) || (authUser?.role === "DOCTOR" && monthlyAppointmentDistributionLoading) || (authUser?.role === "ADMIN" && adminMonthlyStatsLoading)) {
+  if (loading || (authUser && statsLoading) || (authUser?.role === "DOCTOR" && monthlyStatsLoading) || (authUser?.role === "DOCTOR" && monthlyAppointmentDistributionLoading) || (authUser?.role === "ADMIN" && adminMonthlyStatsLoading) || (authUser?.role === "DOCTOR_CENTRE_EXAMEN" && doctorCentreReportStatsLoading)) {
     return <div>{t('loading')}</div>;
   }
 
@@ -513,7 +634,7 @@ const Dashboard = ({ onLogout }) => {
       },
       title: {
         display: true,
-        text: t('dashboard.admin.usersDistribution'),
+        text: t('dashboard.admin.usersChartTitle'),
       }
     }
   };
@@ -1292,7 +1413,7 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
           </section>
 
           {/* Display charts based on role */}
-          {user.role === "ADMIN" && dashboardStats && (
+          {user.role === "ADMIN" && dashboardStats && (adminMonthlyConsultations.length > 0 || adminMonthlyExams.length > 0 || adminMonthlyPatients.length > 0 || (usersDistributionData && usersDistributionData.datasets && usersDistributionData.datasets[0] && usersDistributionData.datasets[0].data.some(count => count > 0))) && (
             <section className="charts-section">
               <h2>{t('dashboard.admin.statisticsTitle')}</h2>
               <div className="admin-charts-grid"> {/* Added a parent div for grid layout */}
@@ -1337,7 +1458,7 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
                   <p className="chart-description">{t('dashboard.admin.charts.patientsEvolution.description')}</p>
                 </div>
                 {/* Users Distribution Pie Chart */}
-                {usersDistributionData && (
+                {usersDistributionData && usersDistributionData.datasets && usersDistributionData.datasets[0] && usersDistributionData.datasets[0].data.some(count => count > 0) && (
                   <div className="chart-container">
                     <Pie data={usersDistributionData} options={usersDistributionOptions} />
                   </div>
@@ -1347,7 +1468,7 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
           )}
 
           {/* Add Charts Section for DOCTOR role */}
-          {user.role === "DOCTOR" && (
+          {user.role === "DOCTOR" && (doctorMonthlyConsultations.length > 0 || (monthlyAppointmentDistribution && monthlyAppointmentDistribution.datasets && monthlyAppointmentDistribution.datasets[0] && monthlyAppointmentDistribution.datasets[0].data.some(count => count > 0)) || doctorMonthlyPatients.length > 0) && (
             <section className="charts-section">
               <h2>{t('dashboard.charts.visualStatisticsTitle')}</h2> {/* Added a title for the charts section */}
               <div className="doctor-charts-grid"> {/* Added a parent div with class for grid layout */}
@@ -1362,14 +1483,16 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
 
                 {/* Doctor Exams Evolution Chart (using dummy data for now) */}
                 {/* This chart still uses dummy data as the backend method for doctor exams evolution was not implemented in the previous step */}
-                 <div className="chart-container">
+                 {/* Removed dummy data chart from conditional rendering check */}
+                 {/* <div className="chart-container">
                     <h4>{t('dashboard.charts.examsEvolution.title')}</h4>
                     <Bar data={doctorExamsEvolutionData} options={doctorExamsEvolutionOptions} />
                     <p className="chart-description">{t('dashboard.charts.examsEvolution.description')}</p>
-                  </div>
+                  </div> */}
 
 
                 {/* Month and Year Selectors for Appointment Distribution */}
+                {(monthlyAppointmentDistribution && monthlyAppointmentDistribution.datasets && monthlyAppointmentDistribution.datasets[0] && monthlyAppointmentDistribution.datasets[0].data.some(count => count > 0)) && (
                 <div className="chart-container"> {/* Wrap the pie chart and selectors in a container */}
                   <h4>{t('dashboard.charts.appointmentsDistribution.title')}</h4>
                   <div className="month-year-selector">
@@ -1403,6 +1526,7 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
                     <div>{t('dashboard.charts.appointmentsDistribution.noData')}</div>
                   )}
                 </div>
+                )}
 
                 {/* Doctor Patients Evolution Chart */}
                 {doctorMonthlyPatients.length > 0 && (
@@ -1411,6 +1535,49 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
                     <Line data={doctorPatientsEvolutionData} options={doctorPatientsEvolutionOptions} />
                     <p className="chart-description">{t('dashboard.charts.patientsEvolution.description')}</p>
                   </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Add Charts Section for DOCTOR_CENTRE_EXAMEN role */}
+          {user.role === "DOCTOR_CENTRE_EXAMEN" && (doctorCentreMonthlyReports.length > 0 || doctorCentreReportTypes.length > 0) && (
+            <section className="charts-section">
+              <h2>{t('dashboard.charts.visualReportsTitle')}</h2> {/* Title for Doctor Centre charts */}
+              <div className="doctor-centre-charts-grid"> {/* Added a parent div with class for grid layout */}
+                {/* Doctor Centre Monthly Reports Chart (Curve/Histogram) */}
+                {doctorCentreMonthlyReports.length > 0 && (
+                <div className="chart-container">
+                  <h4>{t('dashboard.doctorCentre.charts.monthlyReports.title')}</h4>
+                  {doctorCentreReportStatsLoading ? (
+                    <div>{t('loading')}</div>
+                  ) : doctorCentreMonthlyReports && doctorCentreMonthlyReports.length > 0 ? (
+                    <>
+                      {/* Render as Line chart */}
+                      <Line data={doctorCentreMonthlyReportsData} options={doctorCentreMonthlyReportsOptions} />
+                      {/* Render as Bar chart (Histogram) - can choose one or offer a toggle */}
+                      {/* <Bar data={doctorCentreMonthlyReportsData} options={doctorCentreMonthlyReportsOptions} /> */}
+                    </>
+                  ) : (
+                    <div>{t('dashboard.charts.noDataAvailable')}</div>
+                  )}
+                  <p className="chart-description">{t('dashboard.doctorCentre.charts.monthlyReports.description')}</p>
+                </div>
+                )}
+
+                {/* Doctor Centre Report Types Chart (Pie Chart) */}
+                {doctorCentreReportTypes.length > 0 && (
+                <div className="chart-container">
+                  <h4>{t('dashboard.doctorCentre.charts.reportTypes.title')}</h4>
+                  {doctorCentreReportStatsLoading ? (
+                    <div>{t('loading')}</div>
+                  ) : doctorCentreReportTypes && doctorCentreReportTypes.length > 0 ? (
+                    <Pie data={doctorCentreReportTypesData} options={doctorCentreReportTypesOptions} />
+                  ) : (
+                    <div>{t('dashboard.charts.noDataAvailable')}</div>
+                  )}
+                  <p className="chart-description">{t('dashboard.doctorCentre.charts.reportTypes.description')}</p>
+                </div>
                 )}
               </div>
             </section>
