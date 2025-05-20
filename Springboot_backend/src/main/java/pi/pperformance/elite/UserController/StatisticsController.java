@@ -17,6 +17,8 @@ import pi.pperformance.elite.dto.AdminGlobalStatisticsDTO; // Ajout DTO
 import pi.pperformance.elite.dto.AssistantStatisticsDTO; // Ajout DTO
 import pi.pperformance.elite.dto.MonthlyStatDTO; // Ajout DTO
 import pi.pperformance.elite.dto.AppointmentDistributionDTO; // New DTO for appointment distribution
+import pi.pperformance.elite.dto.MonthlyReportStatsDTO; // Import MonthlyReportStatsDTO
+import pi.pperformance.elite.dto.ReportTypeStatsDTO; // Import ReportTypeStatsDTO
 import pi.pperformance.elite.Authentif.CustomUserDetails; // Pour récupérer les infos de l'utilisateur connecté
 
 import org.springframework.security.core.Authentication; // Pour récupérer l'authentification
@@ -123,6 +125,64 @@ public class StatisticsController {
         Long doctorCentreId = userDetails.getId();
 
         DoctorCentreStatisticsDTO stats = statisticsService.getDoctorCentreDashboardStatistics(doctorCentreId);
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour les statistiques de rapports par mois pour le docteur de centre d'examen
+    @GetMapping("/doctor-centre/reports-per-month")
+    @PreAuthorize("hasRole('DOCTOR_CENTRE_EXAMEN')")
+    public ResponseEntity<List<MonthlyReportStatsDTO>> getDoctorCentreReportsPerMonthStats() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long doctorCentreId = userDetails.getId();
+
+        // Récupérer centreId depuis les détails de l'authentification
+        @SuppressWarnings("unchecked")
+        Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
+        Long centreId = null;
+        if (authDetails != null && authDetails.get("centreId") != null) {
+            Object centreIdObj = authDetails.get("centreId");
+            if (centreIdObj instanceof Integer) {
+                centreId = ((Integer) centreIdObj).longValue();
+            } else if (centreIdObj instanceof Long) {
+                centreId = (Long) centreIdObj;
+            }
+        }
+
+        if (centreId == null) {
+            return ResponseEntity.status(400).body(null); // Bad Request
+        }
+
+        List<MonthlyReportStatsDTO> stats = statisticsService.getDoctorCentreReportsPerMonth(doctorCentreId, centreId);
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour les statistiques de rapports par type pour le docteur de centre d'examen
+    @GetMapping("/doctor-centre/reports-by-type")
+    @PreAuthorize("hasRole('DOCTOR_CENTRE_EXAMEN')")
+    public ResponseEntity<List<ReportTypeStatsDTO>> getDoctorCentreReportsByTypeStats() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long doctorCentreId = userDetails.getId();
+
+        // Récupérer centreId depuis les détails de l'authentification
+        @SuppressWarnings("unchecked")
+        Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
+        Long centreId = null;
+        if (authDetails != null && authDetails.get("centreId") != null) {
+            Object centreIdObj = authDetails.get("centreId");
+            if (centreIdObj instanceof Integer) {
+                centreId = ((Integer) centreIdObj).longValue();
+            } else if (centreIdObj instanceof Long) {
+                centreId = (Long) centreIdObj;
+            }
+        }
+
+        if (centreId == null) {
+            return ResponseEntity.status(400).body(null); // Bad Request
+        }
+
+        List<ReportTypeStatsDTO> stats = statisticsService.getDoctorCentreReportsByType(doctorCentreId, centreId);
         return ResponseEntity.ok(stats);
     }
 

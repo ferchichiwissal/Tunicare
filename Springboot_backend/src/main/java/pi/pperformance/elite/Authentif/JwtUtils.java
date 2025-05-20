@@ -46,16 +46,19 @@ public class JwtUtils {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    // --- Updated generateToken to include cabinetId ---
-    public String generateToken(String email, Collection<? extends GrantedAuthority> authorities, Long cabinetId) {
+    // --- Updated generateToken to include cabinetId and centreId ---
+    public String generateToken(String email, Collection<? extends GrantedAuthority> authorities, Long cabinetId, Long centreId) {
         List<String> roleNames = authorities.stream()
                                             .map(GrantedAuthority::getAuthority)
                                             .collect(Collectors.toList());
 
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("roles", roleNames);
-        if (cabinetId != null) { // Only add cabinetId claim if it's not null (e.g., for Admins)
+        if (cabinetId != null) { // Only add cabinetId claim if it's not null
             claims.put("cabinetId", cabinetId);
+        }
+        if (centreId != null) { // Only add centreId claim if it's not null
+            claims.put("centreId", centreId);
         }
 
         return Jwts.builder()
@@ -66,8 +69,8 @@ public class JwtUtils {
                 .compact();
     }
 
-    // --- Updated generateRefreshToken to include cabinetId ---
-    public String generateRefreshToken(String email, Collection<? extends GrantedAuthority> authorities, Long cabinetId) {
+    // --- Updated generateRefreshToken to include cabinetId and centreId ---
+    public String generateRefreshToken(String email, Collection<? extends GrantedAuthority> authorities, Long cabinetId, Long centreId) {
         List<String> roleNames = authorities.stream()
                                             .map(GrantedAuthority::getAuthority)
                                             .collect(Collectors.toList());
@@ -76,6 +79,9 @@ public class JwtUtils {
         claims.put("roles", roleNames);
          if (cabinetId != null) { // Only add cabinetId claim if it's not null
             claims.put("cabinetId", cabinetId);
+        }
+        if (centreId != null) { // Only add centreId claim if it's not null
+            claims.put("centreId", centreId);
         }
 
         return Jwts.builder()
@@ -110,6 +116,24 @@ public class JwtUtils {
         } catch (Exception e) {
             // Log error or handle appropriately if needed
             System.err.println("Could not extract cabinetId from token: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // --- New method to extract centreId ---
+    public Long extractCentreId(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            Object centreIdObj = claims.get("centreId");
+            if (centreIdObj instanceof Integer) {
+                return ((Integer) centreIdObj).longValue();
+            } else if (centreIdObj instanceof Long) {
+                return (Long) centreIdObj;
+            }
+            return null; // Return null if claim doesn't exist or isn't a number
+        } catch (Exception e) {
+            // Log error or handle appropriately if needed
+            System.err.println("Could not extract centreId from token: " + e.getMessage());
             return null;
         }
     }

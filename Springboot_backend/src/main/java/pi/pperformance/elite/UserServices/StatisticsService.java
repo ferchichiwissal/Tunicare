@@ -18,6 +18,8 @@ import pi.pperformance.elite.dto.SimpleAppointmentDTO;
 import pi.pperformance.elite.dto.AssistantStatisticsDTO; // Import the new DTO
 import pi.pperformance.elite.dto.AppointmentDistributionDTO; // Import the new DTO
 import pi.pperformance.elite.dto.MonthlyStatDTO; // Import MonthlyStatDTO
+import pi.pperformance.elite.dto.MonthlyReportStatsDTO; // Import MonthlyReportStatsDTO
+import pi.pperformance.elite.dto.ReportTypeStatsDTO; // Import ReportTypeStatsDTO
 import pi.pperformance.elite.entities.*;
 import pi.pperformance.elite.enums.RendezVousStatus;
 
@@ -42,7 +44,7 @@ public class StatisticsService implements IStatisticsService {
     private final RendezVousRepository rendezVousRepository;
     private final ConsultationRepository consultationRepository;
     private final UserCabinetRegistrationRepository userCabinetRegistrationRepository;
-    private final CertificateRepository certificateRepository; 
+    private final CertificateRepository certificateRepository;
     private final CabinetRepository cabinetRepository; // Ajout
     private final CentreDexamenRepository centreDexamenRepository; // Ajout
 
@@ -369,19 +371,30 @@ public class StatisticsService implements IStatisticsService {
     @Override
     public DoctorCentreStatisticsDTO getDoctorCentreDashboardStatistics(Long doctorCentreId) {
         if (doctorCentreId == null) {
-            return new DoctorCentreStatisticsDTO(0, "N/A", 0, Collections.emptyList());
+            // Assuming the constructor is DoctorCentreStatisticsDTO(long, String, long, List, long, List, List)
+            return new DoctorCentreStatisticsDTO(0, "N/A", 0, Collections.emptyList(), 0, Collections.emptyList(), Collections.emptyList());
         }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long authenticatedDoctorCentreId = userDetails.getId();
+
+        if (!authenticatedDoctorCentreId.equals(doctorCentreId)) {
+             // Return empty stats if the requested ID doesn't match the authenticated user's ID
+             return new DoctorCentreStatisticsDTO(0, "N/A", 0, Collections.emptyList(), 0, Collections.emptyList(), Collections.emptyList());
+        }
+
 
         DoctorCentreDexamen doctorCentreUser = doctorCentreDexamenRepository.findById(doctorCentreId).orElse(null);
         if (doctorCentreUser == null || doctorCentreUser.getCentreDexamen() == null) {
             // Si l'utilisateur docteur du centre ou son centre associé n'est pas trouvé, retourner des stats vides.
-            return new DoctorCentreStatisticsDTO(0, "N/A", 0, Collections.emptyList());
+            return new DoctorCentreStatisticsDTO(0, "N/A", 0, Collections.emptyList(), 0, Collections.emptyList(), Collections.emptyList());
         }
 
         String centreName = doctorCentreUser.getCentreDexamen().getName();
         if (centreName == null || centreName.isEmpty()) {
             // Si le nom du centre est invalide, retourner des stats vides.
-            return new DoctorCentreStatisticsDTO(0, "N/A", 0, Collections.emptyList());
+            return new DoctorCentreStatisticsDTO(0, "N/A", 0, Collections.emptyList(), 0, Collections.emptyList(), Collections.emptyList());
         }
 
         LocalDate today = LocalDate.now();
@@ -411,7 +424,21 @@ public class StatisticsService implements IStatisticsService {
             ))
             .collect(Collectors.toList());
 
-        return new DoctorCentreStatisticsDTO(examsPerformedTodayCount, averageExamProcessingTime, pendingExamsCount, upcomingExamsToday);
+        // Calculate total reports count for the doctor centre in their centre
+        long totalReportsCount = medicalExaminationRepository.countByDoctorCentreDexamenAndCentreNameAndResultatIsNotNullAndResultatNot(doctorCentreUser, centreName, "");
+
+        // Fetch monthly report statistics for the doctor centre in their centre
+        LocalDate todayForMonthly = LocalDate.now();
+        LocalDateTime twelveMonthsAgoDateTime = todayForMonthly.minusMonths(12).withDayOfMonth(1).atStartOfDay();
+        List<MonthlyReportStatsDTO> monthlyReportStats = medicalExaminationRepository.countReportsMonthlyByDoctorCentreAndCentre(doctorCentreUser, centreName, twelveMonthsAgoDateTime);
+
+        // Fetch report type statistics for the doctor centre in their centre
+        List<ReportTypeStatsDTO> reportTypeStats = medicalExaminationRepository.countReportsByTypeByDoctorCentreAndCentre(doctorCentreUser, centreName);
+
+
+        // Return the DTO with all calculated statistics
+        return new DoctorCentreStatisticsDTO(examsPerformedTodayCount, averageExamProcessingTime, pendingExamsCount, upcomingExamsToday,
+                                             totalReportsCount, monthlyReportStats, reportTypeStats);
     }
 
     @Override
@@ -476,6 +503,35 @@ public class StatisticsService implements IStatisticsService {
         return medicalExaminationRepository.countExamsByMonthForPatientAndCabinet(patientId, cabinetId, twelveMonthsAgoDateTime);
     }
 
+    // --- Start of Doctor Centre Statistics Methods ---
+
+    @Override
+    public List<MonthlyReportStatsDTO> getDoctorCentreReportsPerMonth(Long doctorCentreId, Long centreId) {
+        // We only need doctorCentreId for filtering reports written by this doctor centre user.
+        // The centreId is not needed for this specific report statistic based on the database structure.
+        DoctorCentreDexamen doctorCentreUser = doctorCentreDexamenRepository.findById(doctorCentreId).orElse(null);
+        if (doctorCentreUser == null) {
+            return Collections.emptyList();
+        }
+        LocalDate today = LocalDate.now();
+        LocalDateTime twelveMonthsAgoDateTime = today.minusMonths(12).withDayOfMonth(1).atStartOfDay();
+        // Use the repository method that filters by doctorCentreDexamen and checks for non-empty result
+        return medicalExaminationRepository.countReportsMonthlyByDoctorCentreAndResultatIsNotNullAndResultatNot(doctorCentreUser, twelveMonthsAgoDateTime);
+    }
+
+    @Override
+    public List<ReportTypeStatsDTO> getDoctorCentreReportsByType(Long doctorCentreId, Long centreId) {
+        // We only need doctorCentreId for filtering reports written by this doctor centre user.
+        // The centreId is not needed for this specific report statistic based on the database structure.
+        DoctorCentreDexamen doctorCentreUser = doctorCentreDexamenRepository.findById(doctorCentreId).orElse(null);
+         if (doctorCentreUser == null) {
+            return Collections.emptyList();
+        }
+        // Use the repository method that filters by doctorCentreDexamen and checks for non-empty result
+        return medicalExaminationRepository.countReportsByTypeByDoctorCentreAndResultatIsNotNullAndResultatNot(doctorCentreUser);
+    }
+
+    // --- End of Doctor Centre Statistics Methods ---
 
 
     @Override

@@ -230,10 +230,20 @@ public class AuthController {
              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Login failed due to unexpected user role."));
         }
 
-        // 4. Generate Tokens and Respond (Simplified)
+        // 4. Generate Tokens and Respond
         Collection<GrantedAuthority> authorities = List.of(() -> "ROLE_" + baseUser.getRole().name());
-        final String accessToken = jwtUtil.generateToken(baseUser.getEmail(), authorities, cabinetIdForToken);
-        final String refreshToken = jwtUtil.generateRefreshToken(baseUser.getEmail(), authorities, cabinetIdForToken);
+
+        // Determine centreId for the token if the user is DOCTOR_CENTRE_EXAMEN
+        Long centreIdForToken = null;
+        if (baseUser instanceof DoctorCentreDexamen) {
+            CentreDexamen centre = ((DoctorCentreDexamen) baseUser).getCentreDexamen();
+            if (centre != null) {
+                centreIdForToken = centre.getIdCentre();
+            }
+        }
+
+        final String accessToken = jwtUtil.generateToken(baseUser.getEmail(), authorities, cabinetIdForToken, centreIdForToken);
+        final String refreshToken = jwtUtil.generateRefreshToken(baseUser.getEmail(), authorities, cabinetIdForToken, centreIdForToken);
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("accessToken", accessToken);
@@ -334,9 +344,11 @@ public class AuthController {
 
         String email;
         Long cabinetIdFromToken = null;
+        Long centreIdFromToken = null; // Extract centreId as well
         try {
             email = jwtUtil.extractEmail(refreshToken);
-             cabinetIdFromToken = jwtUtil.extractCabinetId(refreshToken);
+            cabinetIdFromToken = jwtUtil.extractCabinetId(refreshToken);
+            centreIdFromToken = jwtUtil.extractCentreId(refreshToken); // Extract centreId
         } catch (Exception e) {
             log.error("Error extracting data from refresh token: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid refresh token format!", "errorCode", "AUTH004"));
@@ -362,7 +374,7 @@ public class AuthController {
         }
 
         Collection<GrantedAuthority> authorities = List.of(() -> "ROLE_" + baseUser.getRole().name());
-        String newAccessToken = jwtUtil.generateToken(email, authorities, cabinetIdFromToken);
+        String newAccessToken = jwtUtil.generateToken(email, authorities, cabinetIdFromToken, centreIdFromToken); // Pass centreIdFromToken
 
         return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }

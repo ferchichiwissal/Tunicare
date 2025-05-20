@@ -100,4 +100,13 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
     
     // Count appointments by Cabinet ID, State, and DateTime range
     long countByCabinet_IdSiteAndApptStateAndApptDateTimeBetween(Long cabinetId, String apptState, LocalDateTime startDateTime, LocalDateTime endDateTime);
-    }
+
+    // For Doctor graph: Count appointments by status for a specific cabinet and month/year
+    @Query("SELECT new pi.pperformance.elite.dto.AppointmentDistributionDTO(" +
+           "SUM(CASE WHEN r.apptState = 'accepté' THEN 1 ELSE 0 END), " +
+           "SUM(CASE WHEN r.apptState = 'réalisé' THEN 1 ELSE 0 END), " +
+           "SUM(CASE WHEN r.apptState = 'refusé' THEN 1 ELSE 0 END)) " +
+           "FROM RendezVous r " +
+           "WHERE r.cabinet.idSite = :cabinetId AND YEAR(r.apptDateTime) = :year AND MONTH(r.apptDateTime) = :month")
+    pi.pperformance.elite.dto.AppointmentDistributionDTO countAppointmentsByDayOfWeekForDoctorAndMonth(@Param("cabinetId") Long cabinetId, @Param("year") Integer year, @Param("month") Integer month);
+}

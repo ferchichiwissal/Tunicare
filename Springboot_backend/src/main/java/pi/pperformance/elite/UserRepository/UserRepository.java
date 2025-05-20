@@ -118,4 +118,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // For Admin statistics: Count all users created within a specific period
     long countByCreatedAtBetween(LocalDate startDateTime, LocalDate endDateTime);
+
+    // For Admin global graph: Count global patients by month for the last 12 months
+    @Query("SELECT new pi.pperformance.elite.dto.MonthlyStatDTO(YEAR(u.createdAt), MONTH(u.createdAt), COUNT(u)) " +
+           "FROM User u " +
+           "WHERE u.role = pi.pperformance.elite.entities.Role.PATIENT AND u.createdAt >= :startDate " +
+           "GROUP BY YEAR(u.createdAt), MONTH(u.createdAt) " +
+           "ORDER BY YEAR(u.createdAt) DESC, MONTH(u.createdAt) DESC")
+    List<pi.pperformance.elite.dto.MonthlyStatDTO> countPatientsByMonth(@Param("startDate") LocalDate startDate);
 }

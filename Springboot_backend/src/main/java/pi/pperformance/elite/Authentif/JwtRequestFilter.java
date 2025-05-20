@@ -88,10 +88,26 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         logger.warn("Claim 'cabinetId' not found in JWT for user: {}", email);
                         // Decide if this is acceptable or an error state
                     }
+
+                    Object centreIdObj = claims.get("centreId"); // Use claim name from JWT for centreId
+                    if (centreIdObj != null) {
+                        if (centreIdObj instanceof Integer || centreIdObj instanceof Long) {
+                            customDetails.put("centreId", centreIdObj);
+                            logger.debug("Successfully extracted centreId {} for user {}", centreIdObj, email);
+                        } else {
+                            logger.warn("Centre ID claim ('centreId') is not an Integer or Long: {} for user {}",
+                                    centreIdObj.getClass().getName(), email);
+                            // Optionally try parsing if it's a String, etc.
+                        }
+                    } else {
+                        logger.warn("Claim 'centreId' not found in JWT for user: {}", email);
+                        // Decide if this is acceptable or an error state
+                    }
+
                     // Add other claims to details if needed
                     // customDetails.put("roles", claims.get("roles"));
                 } else {
-                     logger.warn("Could not extract any claims for user {}, cannot add cabinetId to details.", email);
+                     logger.warn("Could not extract any claims for user {}, cannot add cabinetId or centreId to details.", email);
                 }
 
 

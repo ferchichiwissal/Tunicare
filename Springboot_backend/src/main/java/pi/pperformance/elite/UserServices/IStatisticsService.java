@@ -9,6 +9,8 @@ import pi.pperformance.elite.dto.AdminGlobalStatisticsDTO; // Ajout de l'import
 import pi.pperformance.elite.dto.AssistantStatisticsDTO; // Ajout de l'import
 import pi.pperformance.elite.dto.MonthlyStatDTO; // Ajout de l'import
 import pi.pperformance.elite.dto.AppointmentDistributionDTO; // Import the new DTO
+import pi.pperformance.elite.dto.MonthlyReportStatsDTO; // Import MonthlyReportStatsDTO
+import pi.pperformance.elite.dto.ReportTypeStatsDTO; // Import ReportTypeStatsDTO
 
 import java.util.List;
 
@@ -38,4 +40,8 @@ public interface IStatisticsService {
     List<MonthlyStatDTO> getGlobalConsultationsPerMonth();
     List<MonthlyStatDTO> getGlobalExamsPerMonth();
     List<MonthlyStatDTO> getGlobalPatientsPerMonth();
+
+    // Nouvelles méthodes pour les statistiques de rapports du docteur de centre d'examen
+    List<MonthlyReportStatsDTO> getDoctorCentreReportsPerMonth(Long doctorCentreId, Long centreId);
+    List<ReportTypeStatsDTO> getDoctorCentreReportsByType(Long doctorCentreId, Long centreId);
 }

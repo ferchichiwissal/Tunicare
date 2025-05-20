@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import pi.pperformance.elite.entities.MedicalExamination;
 import pi.pperformance.elite.entities.Patient; // Import Patient
 import pi.pperformance.elite.dto.MonthlyStatDTO; // Ajout pour les graphiques
+import pi.pperformance.elite.dto.MonthlyReportStatsDTO; // Import MonthlyReportStatsDTO
+import pi.pperformance.elite.dto.ReportTypeStatsDTO; // Import ReportTypeStatsDTO
 
 import java.util.List;
 import java.time.LocalDateTime; // Ajout de l'import manquant
@@ -112,6 +114,50 @@ public interface MedicalExaminationRepository extends JpaRepository<MedicalExami
     long countByCentreNameAndEtatAndUpdatedAtBetween(String centreName, String etat, java.util.Date startDate, java.util.Date endDate);
 
     List<MedicalExamination> findByCentreNameAndEtatAndRendezVous_ApptDateTimeBetweenOrderByRendezVous_ApptDateTimeAsc(String centreName, String etat, LocalDateTime startOfDay, LocalDateTime endOfDay);
+
+    // Nouvelles méthodes pour les statistiques de rapports du docteur de centre d'examen
+
+    // Méthode pour compter le nombre total de rapports rédigés par un docteur de centre dans un centre spécifique
+    long countByDoctorCentreDexamenAndCentreNameAndResultatIsNotNullAndResultatNot(DoctorCentreDexamen doctorCentreDexamen, String centreName, String resultatExclu);
+
+
+    // Méthode pour obtenir les statistiques mensuelles des rapports pour un docteur de centre d'examen et son centre
+    @Query("SELECT new pi.pperformance.elite.dto.MonthlyReportStatsDTO(CAST(FUNCTION('DATE_FORMAT', me.updatedAt, '%Y-%m') AS string), COUNT(me)) " +
+           "FROM MedicalExamination me " +
+           "WHERE me.doctorCentreDexamen = :doctorCentreUser " + // Utiliser l'entité directement
+           "AND me.centreName = :centreName " + // Utiliser le nom du centre
+           "AND me.resultat IS NOT NULL AND me.resultat <> '' " +
+           "AND me.updatedAt >= :startDate " +
+           "GROUP BY FUNCTION('DATE_FORMAT', me.updatedAt, '%Y-%m') " +
+           "ORDER BY FUNCTION('DATE_FORMAT', me.updatedAt, '%Y-%m') DESC")
+    List<MonthlyReportStatsDTO> countReportsMonthlyByDoctorCentreAndCentre(@Param("doctorCentreUser") DoctorCentreDexamen doctorCentreUser, @Param("centreName") String centreName, @Param("startDate") LocalDateTime startDate);
+
+    // Méthode pour obtenir les statistiques des rapports par type pour un docteur de centre d'examen et son centre
+    @Query("SELECT new pi.pperformance.elite.dto.ReportTypeStatsDTO(me.act AS reportType, COUNT(me) AS reportCount) " +
+           "FROM MedicalExamination me " +
+           "WHERE me.doctorCentreDexamen = :doctorCentreUser " + // Utiliser l'entité directement
+           "AND me.centreName = :centreName " + // Utiliser le nom du centre
+           "AND me.resultat IS NOT NULL AND me.resultat <> '' " +
+           "GROUP BY me.act")
+    List<ReportTypeStatsDTO> countReportsByTypeByDoctorCentreAndCentre(@Param("doctorCentreUser") DoctorCentreDexamen doctorCentreUser, @Param("centreName") String centreName);
+
+    // Nouvelles méthodes pour les statistiques de rapports du docteur de centre d'examen filtrées par doctorCentreDexamen
+    @Query("SELECT new pi.pperformance.elite.dto.MonthlyReportStatsDTO(CAST(FUNCTION('DATE_FORMAT', me.updatedAt, '%Y-%m') AS string), COUNT(me)) " +
+           "FROM MedicalExamination me " +
+           "WHERE me.doctorCentreDexamen = :doctorCentreUser " + // Filtrer par l'entité DoctorCentreDexamen
+           "AND me.resultat IS NOT NULL AND me.resultat <> '' " +
+           "AND me.updatedAt >= :startDate " +
+           "GROUP BY FUNCTION('DATE_FORMAT', me.updatedAt, '%Y-%m') " +
+           "ORDER BY FUNCTION('DATE_FORMAT', me.updatedAt, '%Y-%m') DESC")
+    List<MonthlyReportStatsDTO> countReportsMonthlyByDoctorCentreAndResultatIsNotNullAndResultatNot(@Param("doctorCentreUser") DoctorCentreDexamen doctorCentreUser, @Param("startDate") LocalDateTime startDate);
+
+    @Query("SELECT new pi.pperformance.elite.dto.ReportTypeStatsDTO(me.act AS reportType, COUNT(me) AS reportCount) " +
+           "FROM MedicalExamination me " +
+           "WHERE me.doctorCentreDexamen = :doctorCentreUser " + // Filtrer par l'entité DoctorCentreDexamen
+           "AND me.resultat IS NOT NULL AND me.resultat <> '' " +
+           "GROUP BY me.act")
+    List<ReportTypeStatsDTO> countReportsByTypeByDoctorCentreAndResultatIsNotNullAndResultatNot(@Param("doctorCentreUser") DoctorCentreDexamen doctorCentreUser);
+
 
     // Add other custom query methods if needed later
 }

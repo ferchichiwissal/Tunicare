@@ -105,4 +105,13 @@ public interface UserCabinetRegistrationRepository extends JpaRepository<UserCab
            "GROUP BY YEAR(r.registrationDate), MONTH(r.registrationDate) " +
            "ORDER BY YEAR(r.registrationDate) DESC, MONTH(r.registrationDate) DESC")
     List<pi.pperformance.elite.dto.MonthlyStatDTO> countGlobalActivePatientRegistrationsByMonth(@Param("startDate") LocalDate startDate);
+
+    // For Doctor graph: Count new patients by month for the last 12 months for a specific doctor and cabinet
+    @Query("SELECT new pi.pperformance.elite.dto.MonthlyStatDTO(YEAR(ucr.registrationDate), MONTH(ucr.registrationDate), COUNT(ucr)) " +
+           "FROM UserCabinetRegistration ucr JOIN ucr.cabinet c JOIN ucr.user u " +
+           "WHERE c.idSite = :cabinetId AND ucr.isActive = true AND u.role = pi.pperformance.elite.entities.Role.PATIENT " +
+           "AND ucr.registrationDate >= :startDate AND c.doctor.id = :doctorId " + // Assuming CabinetDr has a direct link to Doctor
+           "GROUP BY YEAR(ucr.registrationDate), MONTH(ucr.registrationDate) " +
+           "ORDER BY YEAR(ucr.registrationDate) DESC, MONTH(ucr.registrationDate) DESC")
+    List<pi.pperformance.elite.dto.MonthlyStatDTO> countNewPatientsByMonthForDoctorAndCabinet(@Param("doctorId") Long doctorId, @Param("cabinetId") Long cabinetId, @Param("startDate") LocalDate startDate);
 }
