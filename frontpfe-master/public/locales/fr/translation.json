@@ -96,8 +96,8 @@
   "dashboard": {
     "title": "Tableau de bord de {{firstName}} {{lastName}}",
     "performanceSectionTitle": "Tableau de bord des performances",
-"selectMonth": "Sélectionner Mois",
-    "selectYear": "Sélectionner Année",
+"selectMonth": "Mois Sélectionner",
+    "selectYear": "Année Sélectionner",
     "tiles": {
       "performance": {
         "title": "Objectifs de performance",

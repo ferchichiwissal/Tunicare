@@ -96,195 +96,149 @@
     "archivedExaminations": "Archived Examinations",
     "manageMySignature": "Manage My Signature"
   },
-  "dashboard": {
-    "title": "{{firstName}} {{lastName}}'s Dashboard",
-    "performanceSectionTitle": "Performance Dashboard",
-"selectMonth": "Select Month",
+
+
+"dashboard": {
+  "selectMonth": "Select Month",
     "selectYear": "Select Year",
+    "numericalStatisticsTitle": "Numerical Statistics",
     "doctor": {
-      "appointmentsToday": "Accepted Appointments Today",
-      "consultationsToday": "Consultations Realized Today",
-      "totalPatients": "Total Patients in Cabinet",
-      "upcomingAppointmentsTitle": "Upcoming Appointments Today",
-      "pendingConfirmationAppointments": "Appointments to Confirm",
+      "appointmentsToday": "Appointments Today",
+      "consultationsToday": "Consultations Today",
+      "totalPatients": "Total Patients",
+      "pendingConfirmationAppointments": "Pending Confirmation Appointments",
       "pendingExaminationRequests": "Pending Examination Requests",
       "unreadExaminationResults": "Unread Examination Results",
-      "appointmentCompletionRateWeek": "Appt. Rate (Current Week)",
-      "appointmentCompletionRateMonth": "Appt. Rate(Current Month)",
+      "totalAppointmentsThisMonth": "Appointments This Month",
+      "newPatientsThisMonth": "New Patients This Month",
       "pendingPatientRegistrations": "Pending Patient Registrations",
-      "totalAppointmentsThisMonth": "Number of Appointments(Current Month)",
-      "newPatientsThisMonth": "New Patients(Current Month)"
+      "upcomingAppointmentsTitle": "Upcoming Appointments Today"
     },
     "patient": {
       "totalConsultations": "Total Consultations",
       "totalExams": "Total Exams",
-      "nextAppointmentReminder": "Next Accepted Appointment",
-      "appointmentDetails": "On {{date}} at {{time}} with Dr. {{doctor}} ({{cabinet}})",
       "pendingAppointments": "Pending Appointments",
       "availableCertificates": "Available Certificates",
-      "refusedAppointmentWithProposal": "Refused Appointment ",
+      "nextAppointmentReminder": "Next Appointment Reminder",
+      "noAppointmentFound": "No appointment found",
+      "refusedAppointmentWithProposal": "Refused Appointment with Proposal",
       "proposedDate": "Proposed Date: {{date}} at {{time}}",
-      "charts": {
-        "consultationsPerMonth": {
-          "label": "Consultations per Month",
-          "title": "Consultations Trend/Month"
-        },
-        "examsPerMonth": {
-          "label": "Exams per Month",
-          "title": "Exams Trend/Month"
-        }
-      }
-    },
-    "doctorCentre": {
-      "examsPerformedToday": "Exams Performed Today",
-      "averageProcessingTime": "Avg. Processing Time",
-      "pendingExams": "Pending Exams",
-      "upcomingExamsTitle": "Upcoming Exams Today",
-"examsPerformedTodayCount": "Exams Performed Today Count",
-      "pendingExamsCount": "Pending Exams Count"
-    },
-    "admin": {
-      "totalUsers": "Total Users",
-      "totalPatients": "Total Patients",
-      "totalDoctors": "Total Doctors",
-      "totalAssistants": "Total Assistants",
-      "totalDoctorCentres": "Total Centre Doctors",
-      "totalCabinets": "Total Cabinets",
-      "totalExamCentres": "Total Exam Centres",
-      "newUsersThisWeek": "New Users( Current Week)",
-      "newUsersThisMonth": "New Users (Current Month)",
-      "appointmentsToday": "Appointments Created (Today)",
-      "appointmentsThisWeek": "Appointments Created (Current Week)",
-      "appointmentsThisMonth": "Appointments Created (Current Month)",
-      "consultationsToday": "Consultations (Today)",
-      "consultationsThisWeek": "Consultations (Current Week)",
-      "consultationsThisMonth": "Consultations (Current Month)",
-      "examsToday": "Exams Requested (Today)",
-      "examsThisWeek": "Exams Requested (Current Week)",
-      "examsThisMonth": "Exams Requested (Current Month)",
-      "patients": "Patients",
-      "doctors": "Doctors",
-      "assistants": "Assistants",
-      "doctorCentres": "Examination Centre Doctors",
-      "generatedMedicalReportsMonth": "generated Medical Reports",
-      "usersChartTitle": "Users Distribution",
-      "statisticsTitle": "Visual Statistics",
-      "charts": {
-        "consultationsEvolution": {
-          "title": "Consultations Evolution",
-          "label": "Consultations Evolution"
-        }
-      }
-    },
-    "doctorCentre": {
-      "examsPerformedToday": "Exams Performed Today",
-      "averageProcessingTime": "Avg. Processing Time",
-      "pendingExams": "Pending Exams",
-      "upcomingExamsTitle": "Upcoming Exams Today",
-      "examsPerformedTodayCount": "Exams Performed Today Count",
-      "pendingExamsCount": "Pending Exams Count",
-      "charts": {
-        "monthlyReports": {
-          "title": "Monthly Reports",
-          "label": "Monthly Reports"
-        },
-        "reportTypes": {
-          "title": "Report Types"
-        }
-      }
+      "noRefusedAppointmentWithProposal": "No refused appointment with proposal found"
     },
     "assistant": {
       "appointmentsToday": "Appointments Today",
-      "pendingConfirmation": "Pending Confirmation",
+      "pendingConfirmationAppointments": "Pending Confirmation Appointments",
       "pendingPatientRegistrations": "Pending Patient Registrations",
       "totalPatientsInCabinet": "Total Patients in Cabinet",
       "patientsActivatedToday": "Patients Activated Today",
-      "newUsersToday": "New Users Today",
-      "pendingConfirmationAppointments": "Pending Confirmation Appointments"
+      "newUsersToday": "New Users Today"
     },
-    "tiles": {
-      "performance": {
-        "title": "Performance Objectives",
-        "subtitle": "Revenue Target Achievement:"
-      },
-      "sales": {
-        "title": "Monthly Sales",
-        "subtitle": "Target Reached: {{percentage}}%"
-      },
-      "teamPerformance": {
-        "title": "Team Performance",
-        "subtitle": "Team {{team}}: {{percentage}}% of the target"
-      },
-      "projectTracking": {
-        "title": "Project Tracking",
-        "subtitle": "Ongoing Projects: {{count}}"
-      },
-      "teamObjectives": {
-        "title": "Team Objectives",
-        "subtitle": "Completion Rate: {{percentage}}%"
-      },
-      "notifications": {
-        "title": "Notifications",
-        "subtitle": "Upcoming Meetings: {{count}}"
-      },
-      "viewDetails": "View Details",
-      "analyzeProgress": "Analyze Progress",
-      "viewNotifications": "View Notifications"
+    "doctorCentre": {
+      "examsPerformedToday": "Exams Performed Today",
+      "pendingExams": "Pending Exams",
+      "charts": {
+        "monthlyReports": {
+          "label": "Monthly Reports",
+          "title": "Monthly Reports Evolution",
+          "description": "Evolution of the number of reports generated per month."
+        },
+        "reportTypes": {
+          "title": "Reports Distribution by Type",
+          "description": "Distribution of generated reports by type."
+        }
+      }
+    },
+    "admin": {
+      "totalUsers": "Total Users",
+      "totalPatients":"Total Patients",
+      "totalDoctors":"total Doctors",
+      "totalAssistants":"total Assistants",
+      "totalDoctorCentres":"total Doctor Centres",
+
+      "totalCabinets": "Total Cabinets",
+      "totalExamCentres": "Total Exam Centres",
+      "newUsersThisMonth": "New Users This Month",
+      "appointmentsThisMonth": "Appointments This Month",
+      "consultationsThisMonth": "Consultations This Month",
+      "generatedMedicalReportsMonth": "Generated Medical Reports This Month",
+      "statisticsTitle": "Admin Statistics",
+      "patients": "Patients",
+      "doctors": "Doctors",
+      "assistants": "Assistants",
+      "doctorCentres": "Doctor Centres",
+      "usersChartTitle": "Users Distribution by Role",
+      "charts": {
+        "consultationsEvolution": {
+          "label": "Number of Consultations",
+          "title": "Global Consultations Evolution"
+        },
+        "examsEvolution": {
+          "label": "Number of Exams",
+          "title": "Global Exams Evolution"
+        },
+        "patientsEvolution": {
+          "label": "Number of Patients",
+          "title": "Global Patients Evolution"
+        }
+      }
     },
     "charts": {
+      "noDataAvailable": "No data available for this chart.",
       "visualStatisticsTitle": "Visual Statistics",
-      "countAxisLabel": "Count",
-      "monthAxisLabel": "Month",
       "selectMonth": "Select Month",
       "selectYear": "Select Year",
-      "performanceTitle": "{{firstName}} {{lastName}} Performance",
-      "payments": {
-        "label": "Payments Over Time",
-        "title": "Monthly Payments Overview",
-        "yAxisLabel": "Payments (dt)"
-      },
-      "phoneCalls": {
-        "label": "Phone Calls Made",
-        "title": "Phone Calls Made per Month",
-        "yAxisLabel": "Phone Calls"
-      },
       "appointmentsDistribution": {
-        "title": "Appointments Distribution",
-        "realized": "Realized",
+        "noData": "No appointment distribution data available for the selected period.",
         "accepted": "Accepted",
-        "refused": "Refused"
+        "realized": "Realized",
+        "refused": "Refused",
+        "title": "Appointments Distribution by Status"
       },
       "consultationsEvolution": {
-        "title": "Consultations Evolution by Month",
-        "label": "Consultations Evolution"
+        "label": "Number of Consultations",
+        "title": "Consultations Evolution"
       },
+      "monthAxisLabel": "Month/Year",
+      "countAxisLabel": "Count",
       "examsEvolution": {
-        "title": "Exams Evolution by Month",
-        "label": "Exams Evolution"
+        "label": "Number of Exams",
+        "title": "Exams Evolution"
       },
-        "patientsEvolution": {
-          "title": "Patients Evolution by Month",
-          "label": "Patients Evolution"
-        },
-        "visualReportsTitle": "Visual Statistics of Reports"
-   },
+      "patientsEvolution": {
+        "label": "Number of Patients",
+        "title": "Patients Evolution"
+      },
+      "visualReportsTitle": "Visual Reports Statistics",
+      "performanceTitle": "Performance Statistics for {{firstName}} {{lastName}}"
+    },
     "tooltips": {
       "hideSidebar": "Hide Sidebar",
       "showSidebar": "Show Sidebar"
     },
     "sidebar": {
+      "profileAlt": "User Profile Picture",
       "emailLabel": "Email",
       "birthDateLabel": "Birth Date",
+      "notProvided": "Not Provided",
       "roleLabel": "Role",
       "genderLabel": "Gender",
       "addressLabel": "Address",
       "phoneLabel": "Phone",
       "ageLabel": "Age",
-      "notProvided": "Not provided",
-      "notAvailable": "N/A",
+      "notAvailable": "Not Available",
       "specialtyLabel": "Specialty"
     }
-  },
+  }
+,
+
+
+
+
+
+
+
+
+
   "editUserForm": {
     "title": "Edit User Profile",
     "loading": "Loading user data...",
