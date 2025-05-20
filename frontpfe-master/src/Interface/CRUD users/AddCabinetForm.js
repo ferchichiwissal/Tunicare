@@ -129,6 +129,7 @@ const AddCabinetForm = () => {
                 alert(t('addCabinet.alerts.success'));
                 setCabinetData({ name: '', address: '', fax: '', tel: '', taxNumber: '' }); // Reset form
                 setErrors({}); // Clear errors on success
+                navigate('/manage-cabinets'); // Redirect after successful addition
             } else {
                 // This case might not be reached if backend throws errors for non-201 success
                 throw new Error(`Unexpected server response: ${response.status}`);

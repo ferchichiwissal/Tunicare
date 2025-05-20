@@ -61,6 +61,17 @@ const PrescribeReportPage = () => {
         return () => clearTimeout(successTimer);
     }, [successMessage]);
 
+    // Effect to handle redirection after success message
+    useEffect(() => {
+        let redirectTimer;
+        if (successMessage) {
+            redirectTimer = setTimeout(() => {
+                navigate('/centre-examinations');
+            }, 2000); // Redirect after 2 seconds
+        }
+        return () => clearTimeout(redirectTimer);
+    }, [successMessage, navigate]); // Add navigate to dependencies
+
     useEffect(() => {
         let errorTimer;
         if (error) {

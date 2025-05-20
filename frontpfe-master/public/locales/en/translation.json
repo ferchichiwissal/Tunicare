@@ -1026,7 +1026,7 @@
     "typeOptionNew": "New Consultation",
     "typeOptionControl": "Follow-up Session",
     "fillFieldsError": "Please fill in the date, time, and type.",
-    "successMessage": "Appointment requested successfully for {{dateTime}}! Status: {{status}}",
+    "successMessage": "Appointment requested successfully ",
     "failureMessage": "Failed to create appointment. Please try again.",
     "addingButton": "Requesting...",
     "addButton": "Request Appointment",

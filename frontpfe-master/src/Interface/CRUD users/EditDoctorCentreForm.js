@@ -282,16 +282,18 @@ const EditDoctorCentreForm = () => {
                 };
 
                 const rememberPreference = localStorage.getItem('rememberPreference') === 'true' || sessionStorage.getItem('rememberPreference') === 'true';
-                storeUserData(newAuthData, rememberPreference); // From utils/auth.js
-                refreshUser(); // Explicitly refresh the context state
+                // The Admin's user data in storage should not be modified when editing another user.
+                // Removing storeUserData and refreshUser calls here.
+                // storeUserData(newAuthData, rememberPreference); // From utils/auth.js
+                // refreshUser(); // Explicitly refresh the context state
 
-                // Update the form's own state
-                setDoctorData(prev => ({
-                    ...prev,
-                    photoProfil: updatedUser.photoProfil,
-                    // Update other fields if necessary
-                }));
-                setInitialData(updatedUser);
+                // Update the form's own state if needed, though navigation often makes this redundant
+                // setDoctorData(prev => ({
+                //     ...prev,
+                //     photoProfil: updatedUser.photoProfil,
+                //     // Update other fields if necessary
+                // }));
+                // setInitialData(updatedUser); // Update initial data for comparison
 
 
             } catch (fetchError) {
@@ -308,13 +310,8 @@ const EditDoctorCentreForm = () => {
             setUploadError(null); // Clear upload error on success
             setUploadSuccess(true); // Indicate success for file upload part if any
 
-            // Navigate after successful update and data refresh
-             const { user } = getUserData(); // Re-fetch user data to get the role for navigation
-             if (user && user.role === 'DOCTOR_CENTRE_EXAMEN') {
-                 navigate('/dashboard');
-             } else {
-                 navigate('/users'); // Or '/manage-centres' or other relevant page
-             }
+            // Navigate after successful update
+            // Removed conditional navigation based on edited user role
 
         } catch (err) {
             console.error("Error updating doctor:", err);

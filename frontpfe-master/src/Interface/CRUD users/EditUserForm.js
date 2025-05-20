@@ -303,19 +303,21 @@ const EditUserForm = () => {
 
         // Determine the 'remember' preference
         const rememberPreference = localStorage.getItem('rememberPreference') === 'true' || sessionStorage.getItem('rememberPreference') === 'true';
-        storeUserData(newAuthData, rememberPreference); // From utils/auth.js
-        refreshUser(); // Explicitly refresh the context state
+        // The Admin's user data in storage should not be modified when editing another user.
+        // Removing storeUserData and refreshUser calls here.
+        // storeUserData(newAuthData, rememberPreference); // From utils/auth.js
+        // refreshUser(); // Explicitly refresh the context state
 
         // Optionally, if using AuthContext, update it here
         // authContext.login(newAuthData, rememberPreference); // Example if you have a login method in context
 
         // Update the form's own state if needed, though navigation often makes this redundant
-        setFormData(prev => ({
-            ...prev,
-            photoProfil: updatedUser.photoProfil, // Update photo in form if displayed directly
-            // Update other fields if they are derived or need refresh
-        }));
-        setInitialData(updatedUser); // Update initial data to prevent "no changes" on immediate re-edit
+        // setFormData(prev => ({
+        //     ...prev,
+        //     photoProfil: updatedUser.photoProfil, // Update photo in form if displayed directly
+        //     // Update other fields if they are derived or need refresh
+        // }));
+        // setInitialData(updatedUser); // Update initial data to prevent "no changes" on immediate re-edit
 
 
       } catch (fetchError) {
@@ -329,37 +331,13 @@ const EditUserForm = () => {
       // Clear selection and preview after successful combined upload
       setSelectedFile(null);
       if (previewUrl) {
-          URL.revokeObjectURL(previewUrl);
+        URL.revokeObjectURL(previewUrl);
       }
       setPreviewUrl(null);
       setUploadSuccess(null); // Clear any previous upload-specific success
       setUploadError(null); // Clear any previous upload-specific error
 
-      // Get the current logged-in user's role
-      const currentUserData = getUserData(); // Assuming getUserData returns the full user object with roles
-      const currentUserRoles = currentUserData?.roles || [];
-
-      console.log('Current User Data:', currentUserData); // Log current user data
-      console.log('Current User Roles:', currentUserRoles); // Log current user roles
-
-      // Determine redirection path based on the current user's role
-      let redirectPath = '/dashboard'; // Default redirection
-
-      // Check roles using string comparison, assuming roles are strings like 'ROLE_ADMIN'
-      if (currentUserRoles.includes('ROLE_ADMIN')) {
-          redirectPath = '/users'; // Redirect Admin to user management page
-      } else if (currentUserRoles.includes('ROLE_DOCTOR') || currentUserRoles.includes('ROLE_DOCTOR_CENTRE_EXAMEN') || currentUserRoles.includes('ROLE_ASSISTANT')) {
-          // Doctors, Doctor_Centre_Examen, and Assistants might go back to a dashboard or user list
-          // Assuming they should also go back to /users if they were managing users
-           redirectPath = '/users'; // Redirect to user management page
-      }
-       // Patients modifying their own profile might still go to their dashboard,
-       // but this form is likely used by admins/doctors/assistants to edit others.
-       // If a patient uses this form, the default '/dashboard' might be appropriate,
-       // or we could add a check if the edited ID matches the current user ID.
-
-      console.log('Redirecting to:', redirectPath); // Log redirection path
-      window.location.href = redirectPath; // Redirect and refresh
+      // Navigate back to the users list after successful update
 
     } catch (error) {
       console.error("Error updating user:", error);
@@ -553,4 +531,3 @@ const EditUserForm = () => {
 };
 
 export default EditUserForm;
-

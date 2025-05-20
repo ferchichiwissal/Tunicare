@@ -153,6 +153,11 @@ const AddAppointmentForm = () => { // Removed patientId prop
             const formattedDateTime = formatDateTimeLocal(response.data.apptDateTime).replace('T', ' à ');
             setMessage(t('addAppointment.successMessage', 'Rendez-vous demandé avec succès pour le {{dateTime}}! Statut: {{status}}', { dateTime: formattedDateTime, status: response.data.apptState })); // Use translation with interpolation
 
+            // Redirect after a short delay to allow the success message to be seen
+            setTimeout(() => {
+                navigate('/my-appointments');
+            }, 2000); // Redirect after 2 seconds
+
             setApptDateTime(''); // Clear form using updated setter
             setApptType('Nouvelle consultation'); // Reset to the canonical French string
             // Removed setSelectedCabinetId('')
