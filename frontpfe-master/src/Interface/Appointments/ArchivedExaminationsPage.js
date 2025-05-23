@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // Importer Link pour la navigation
+import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
+import { Link, useNavigate } from 'react-router-dom'; // Importer Link pour la navigation, Added useNavigate
 import apiClient from '../../utils/apiClient';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { clearUserData, getToken, isTokenExpired } from '../../utils/auth'; // Import auth utils
 import './ConsultationDashboard.css'; // Import ConsultationDashboard CSS
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const ArchivedExaminationsPage = () => {
     const { t } = useTranslation(); // Initialize useTranslation
@@ -12,6 +15,55 @@ const ArchivedExaminationsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { user } = useAuth(); // Utiliser le hook useAuth
+    const navigate = useNavigate(); // Initialize useNavigate
+
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('archivedExaminationsPage.alerts.sessionExpired')); // Add translation key
+        navigate("/sign-in");
+    }, [navigate, t]);
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
 
     useEffect(() => {
         const fetchArchivedExams = async () => {

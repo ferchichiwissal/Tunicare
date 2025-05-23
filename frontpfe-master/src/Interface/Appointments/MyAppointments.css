@@ -111,14 +111,19 @@
 }
 
 /* Ensure text color is appropriate for badges (Bootstrap usually handles this) */
-.my-appointments-container .badge.bg-success {
-  color: #ffffff !important; /* White text for green badge */
-}
-.my-appointments-container .badge.bg-warning {
-  color: #000000 !important; /* Black text for yellow badge */
-}
-.my-appointments-container .badge.bg-info {
-  color: #000000 !important; /* Black text for info badge */
+.my-appointments-container .badge.bg-success,
+.my-appointments-container .badge.bg-warning,
+.my-appointments-container .badge.bg-danger, /* Assuming bg-danger is used for red */
+.my-appointments-container .badge.bg-info { /* Keep info just in case */
+  background-color: #e0e0e0 !important; /* Light grey background */
+  color: #333333 !important; /* Dark grey text color */
+  padding: 4px 8px !important; /* Add padding for button shape */
+  border: none !important; /* Remove border */
+  border-radius: 4px !important; /* Add border radius */
+  font-weight: normal !important; /* Reset font weight if needed */
+  display: inline-block; /* Ensure it behaves like a block element for padding/border */
+  text-align: center; /* Center the text */
+  min-width: 80px; /* Give it a minimum width to look more like the image */
 }
 
 

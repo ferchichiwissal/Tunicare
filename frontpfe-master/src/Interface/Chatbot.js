@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react'; // Added useCallback
 import axios from 'axios'; // Import axios
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { clearUserData, getToken, isTokenExpired } from '../utils/auth'; // Import auth utils
 import './Chatbot.css';
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 // Backend API endpoint for the chatbot
 const BACKEND_API_URL = 'http://localhost:6952/api/chatbot/query'; // Assuming backend runs on port 6952
@@ -14,6 +18,55 @@ const Chatbot = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false); // To show loading state
   const messagesEndRef = useRef(null); // Ref to scroll to bottom
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  // --- Logout Function ---
+  const performLogout = useCallback(() => {
+    clearUserData();
+    alert(t('chatbot.alerts.sessionExpired')); // Add translation key
+    navigate("/sign-in");
+  }, [navigate, t]);
+
+  // --- Token Expiry & Inactivity Checks ---
+  useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+      performLogout();
+      return;
+    }
+    let expiryTimer;
+    try {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const expiryTime = decodedToken.exp * 1000;
+      const currentTime = Date.now();
+      const timeToExpire = expiryTime - currentTime;
+      if (timeToExpire > 0) {
+        expiryTimer = setTimeout(performLogout, timeToExpire);
+      } else {
+        performLogout();
+        return;
+      }
+    } catch (err) {
+      console.error("Error decoding token for expiry check:", err);
+      performLogout();
+      return;
+    }
+    let inactivityTimer;
+    const resetTimer = () => {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+    };
+    const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+    activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+    resetTimer();
+
+    return () => {
+      clearTimeout(expiryTimer);
+      clearTimeout(inactivityTimer);
+      activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+    };
+  }, [performLogout]);
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

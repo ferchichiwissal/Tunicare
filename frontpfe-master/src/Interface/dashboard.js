@@ -44,6 +44,24 @@ const Dashboard = ({ onLogout }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  // Helper function to get the translation key for exam types
+  const getExamTypeTranslationKey = (reportType) => {
+    switch (reportType) {
+      case "IRM":
+        return "medicalExaminationForm.examTypes.irm";
+      case "Radio":
+        return "medicalExaminationForm.examTypes.radio";
+      case "Blood Test":
+        return "medicalExaminationForm.examTypes.analysesanguine";
+      case "Scanner":
+        return "medicalExaminationForm.examTypes.scanner";
+      case "Ultrasound":
+        return "medicalExaminationForm.examTypes.echographie";
+      default:
+        return ""; // No translation for unknown types as per requirement
+    }
+  };
+
   // Perform logout and redirect
   const performLogout = () => {
     localStorage.removeItem("accessToken");
@@ -556,7 +574,7 @@ const Dashboard = ({ onLogout }) => {
 
   // Data for Doctor Centre Report Types Chart (Pie Chart)
   const doctorCentreReportTypesData = {
-    labels: doctorCentreReportTypes.map(stat => stat.reportType || t('dashboard.charts.reportTypeUnknown')), // Use reportType or a default label
+    labels: doctorCentreReportTypes.map(stat => t(getExamTypeTranslationKey(stat.reportType)) || stat.reportType || t('dashboard.charts.reportTypeUnknown')), // Use the translation function
     datasets: [
       {
         data: doctorCentreReportTypes.map(stat => stat.reportCount),

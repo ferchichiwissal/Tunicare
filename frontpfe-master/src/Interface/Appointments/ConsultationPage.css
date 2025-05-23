@@ -11,3 +11,50 @@
 
 /* The history button uses btn-secondary, which is typically grey by default. */
 /* No specific style needed here unless a different grey is required. */
+
+/* Dark mode styles for ReactQuill editors */
+.consultation-page-container.dark .ql-editor {
+    background-color: #1e1e1e; /* Dark background for editor content */
+    color: #e0e0e0; /* Light text color */
+}
+
+.consultation-page-container.dark .ql-toolbar {
+    background-color: #3a3a3a; /* Darker background for toolbar */
+    border-color: #555; /* Darker border */
+}
+
+.consultation-page-container.dark .ql-container {
+    border-color: #555; /* Darker border for the container */
+}
+
+/* Adjustments for toolbar icons/buttons in dark mode */
+.consultation-page-container.dark .ql-toolbar .ql-stroke {
+    stroke: #e0e0e0; /* Light color for icons */
+}
+
+.consultation-page-container.dark .ql-toolbar .ql-fill {
+    fill: #e0e0e0; /* Light color for filled icons */
+}
+
+.consultation-page-container.dark .ql-toolbar .ql-picker {
+    color: #e0e0e0; /* Light color for picker text */
+}
+
+.consultation-page-container.dark .ql-toolbar .ql-picker-label::before,
+.consultation-page-container.dark .ql-toolbar .ql-picker-item::before {
+    color: #e0e0e0; /* Light color for picker options */
+}
+
+/* Style for active/selected toolbar buttons */
+.consultation-page-container.dark .ql-toolbar button:hover .ql-stroke,
+.consultation-page-container.dark .ql-toolbar button:hover .ql-fill,
+.consultation-page-container.dark .ql-toolbar button.ql-active .ql-stroke,
+.consultation-page-container.dark .ql-toolbar button.ql-active .ql-fill,
+.consultation-page-container.dark .ql-toolbar .ql-picker-label:hover .ql-stroke,
+.consultation-page-container.dark .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+.consultation-page-container.dark .ql-toolbar .ql-picker-item:hover::before,
+.consultation-page-container.dark .ql-toolbar .ql-picker-item.ql-selected::before {
+    stroke: #20c997; /* Teal color for hover/active */
+    fill: #20c997; /* Teal color for hover/active */
+    color: #20c997; /* Teal color for hover/active text */
+}

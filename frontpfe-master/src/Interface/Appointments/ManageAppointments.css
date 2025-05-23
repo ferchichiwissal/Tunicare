@@ -1,6 +1,6 @@
 /* Light Mode Styles (Default) */
 .manage-appointments-container {
-    max-width: 900px; /* Wider container for table */
+    max-width: 1200px; /* Wider container for table */
     margin: 2rem auto;
     padding: 2rem;
     border: 1px solid #ccc;
@@ -48,6 +48,12 @@
 
 .radio-group input[type="radio"] {
     margin-right: 0.2rem;
+}
+
+/* Specific styles for the date filter group */
+.filters .filter-group:nth-child(2) label {
+    flex-shrink: 0; /* Prevent label from shrinking */
+    margin-right: 0.5rem; /* Add space between label and input */
 }
 
 .filter-group .form-control {

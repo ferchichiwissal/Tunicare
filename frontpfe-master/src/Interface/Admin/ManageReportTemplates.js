@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react'; // Added useCallback
 import apiClient from '../../utils/apiClient';
 import AuthContext from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { clearUserData, getToken, isTokenExpired } from '../../utils/auth'; // Import auth utils
 import './ManageReportTemplates.css'; // Optional CSS
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const ManageReportTemplates = () => {
     const { t } = useTranslation();
@@ -12,12 +16,61 @@ const ManageReportTemplates = () => {
     const [isSaving, setIsSaving] = useState(false); // For form saving state
     const [error, setError] = useState('');
     const [formError, setFormError] = useState(''); // Error specific to the form
+    const navigate = useNavigate(); // Initialize useNavigate
 
     // State for Add/Edit Form
     const [showForm, setShowForm] = useState(false); // Initialize to false to show button and table by default
     const [isEditing, setIsEditing] = useState(false);
     const [currentTemplate, setCurrentTemplate] = useState({ id: null, nomModele: '', typeModele: '', contenuModele: '' });
     const [previewImageFile, setPreviewImageFile] = useState(null); // For storing the selected image file
+
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('manageReportTemplates.alerts.sessionExpired')); // Add translation key
+        navigate("/sign-in");
+    }, [navigate, t]);
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
 
     // Function to fetch templates
     const fetchTemplates = async () => {
@@ -150,7 +203,7 @@ const handleSaveTemplate = async (event) => {
     }
 
     return (
-        <div className="container mt-5">
+        <div className="manage-report-templates-container container mt-5">
             <h2>{t('manageReportTemplates.title')}</h2>
             {error && <div className="alert alert-danger mt-3">{error}</div>}
 

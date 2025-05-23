@@ -3,6 +3,9 @@ import apiClient from '../../utils/apiClient'; // Import the shared apiClient
 import { useNavigate, useParams } from 'react-router-dom';
 import './EditCentreDexamenForm.css'; // Import the CSS file
 import { useTranslation } from 'react-i18next';
+import { clearUserData, getToken, isTokenExpired } from '../../utils/auth'; // Import auth utils
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const EditCentreDexamenForm = () => { // Renamed from EditCabinetForm for clarity if this is for a centre doctor
     const { t } = useTranslation();
@@ -23,6 +26,54 @@ const EditCentreDexamenForm = () => { // Renamed from EditCabinetForm for clarit
     const [uploadError, setUploadError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
+
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('editCentreForm.alerts.sessionExpired', 'Session expired. Please log in again.')); // Add translation key
+        navigate("/sign-in");
+    }, [navigate, t]);
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
 
     // --- Fetch Centre Data ---
     useEffect(() => {

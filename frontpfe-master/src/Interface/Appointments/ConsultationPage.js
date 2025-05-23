@@ -1,13 +1,17 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react'; // Import useCallback
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../../utils/apiClient';
 import ReactQuill from 'react-quill';
 import AuthContext from '../../context/AuthContext';
 import 'react-quill/dist/quill.snow.css';
+import { clearUserData, getToken, isTokenExpired } from '../../utils/auth'; // Import auth utils
+import { jwtDecode } from 'jwt-decode'; // Import jwt-decode
 // Removed CertificateModal import
 import './ConsultationPage.css';
- 
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
 const ConsultationPage = () => {
     const { t, i18n } = useTranslation(); // Initialize useTranslation hook and get i18n instance
     // Get EITHER appointmentId OR consultationId from URL params
@@ -36,10 +40,62 @@ const ConsultationPage = () => {
     const [saveStatus, setSaveStatus] = useState('');
     const isSavingRef = useRef(false);
     // Removed showCertificateModal state
- 
+
     // Get user details from AuthContext
     // Ensure AuthContext provides user object with name, languagePreference, activeCabinet { address, tel }
     const { user } = useContext(AuthContext); // Corrected: use 'user' instead of 'userDetails'
+
+    // --- Logout Function ---
+    const performLogout = useCallback(() => { // Wrap in useCallback
+        clearUserData();
+        alert(t('tovalidate.alerts.sessionExpired'));
+        navigate("/sign-in");
+    }, [navigate, t]); // Add navigate and t dependency
+
+    // --- Token Expiry Check ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+        } else {
+            try {
+                const decodedToken = JSON.parse(atob(token.split('.')[1]));
+                const expiryTime = decodedToken.exp * 1000;
+                const currentTime = Date.now();
+                const timeToExpire = expiryTime - currentTime;
+                if (timeToExpire > 0) {
+                    const expiryTimer = setTimeout(performLogout, timeToExpire);
+                    return () => clearTimeout(expiryTimer);
+                } else {
+                    performLogout();
+                }
+            } catch (error) {
+                console.error("Error decoding token for expiry check:", error);
+                performLogout();
+            }
+        }
+    }, [performLogout]); // Use performLogout dependency
+
+    // --- Inactivity Logout Logic ---
+    useEffect(() => {
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                console.log("Inactivity timeout reached.");
+                // setSessionExpired(true); // This state is not used in this component
+                performLogout();
+            }, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+        return () => {
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]); // Use performLogout dependency
+
 
     // Log the user object received from context for debugging
     useEffect(() => {
@@ -83,16 +139,16 @@ const ConsultationPage = () => {
                             if (!patientResponse.data) {
                                 setError(t('consultation.error.patientDetailsNotFound'));
                             }
-                        } catch (patientErr) {
-                            console.error("Error fetching full patient details:", patientErr);
-                            // Check specifically for 404 on the new endpoint
-                            if (patientErr.response && patientErr.response.status === 404) {
-                                setError(t('consultation.error.patientNotFoundById', { id: consultData.patientId }));
-                            } else {
-                                setError(patientErr.response?.data?.message || t('consultation.error.fetchPatientDetailsFailed', { id: consultData.patientId }));
-                            }
-                            setPatient(null); // Clear patient on error
-                        }
+                         } catch (patientErr) {
+                             console.error("Error fetching full patient details:", patientErr);
+                             // Check specifically for 404 on the new endpoint
+                             if (patientErr.response && patientErr.response.status === 404) {
+                                 setError(t('consultation.error.patientNotFoundById', { id: consultData.patientId }));
+                             } else {
+                                 setError(patientErr.response?.data?.message || t('consultation.error.fetchPatientDetailsFailed', { id: consultData.patientId }));
+                             }
+                             setPatient(null); // Clear patient on error
+                         }
                     } else {
                         setError(t('consultation.error.patientIdMissing'));
                         setPatient(null);
