@@ -13,22 +13,36 @@
 /* No specific style needed here unless a different grey is required. */
 
 /* Dark mode styles for ReactQuill editors */
+<<<<<<< HEAD
 body.dark-mode .consultation-page-container .ql-editor {
     background-color: #000000; /* Dark background for editor content */
     color: #e0e0e0; /* Light text color */
 }
 
 body.dark-mode .consultation-page-container .ql-toolbar {
+=======
+.consultation-page-container.dark .ql-editor {
+    background-color: #1e1e1e; /* Dark background for editor content */
+    color: #e0e0e0; /* Light text color */
+}
+
+.consultation-page-container.dark .ql-toolbar {
+>>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
     background-color: #3a3a3a; /* Darker background for toolbar */
     border-color: #555; /* Darker border */
 }
 
+<<<<<<< HEAD
 body.dark-mode .consultation-page-container .ql-container {
     background-color: #000000; /* Dark background for the container */
+=======
+.consultation-page-container.dark .ql-container {
+>>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
     border-color: #555; /* Darker border for the container */
 }
 
 /* Adjustments for toolbar icons/buttons in dark mode */
+<<<<<<< HEAD
 body.dark-mode .consultation-page-container .ql-toolbar .ql-stroke {
     stroke: #e0e0e0; /* Light color for icons */
 }
@@ -43,10 +57,27 @@ body.dark-mode .consultation-page-container .ql-toolbar .ql-picker {
 
 body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-label::before,
 body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-item::before {
+=======
+.consultation-page-container.dark .ql-toolbar .ql-stroke {
+    stroke: #e0e0e0; /* Light color for icons */
+}
+
+.consultation-page-container.dark .ql-toolbar .ql-fill {
+    fill: #e0e0e0; /* Light color for filled icons */
+}
+
+.consultation-page-container.dark .ql-toolbar .ql-picker {
+    color: #e0e0e0; /* Light color for picker text */
+}
+
+.consultation-page-container.dark .ql-toolbar .ql-picker-label::before,
+.consultation-page-container.dark .ql-toolbar .ql-picker-item::before {
+>>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
     color: #e0e0e0; /* Light color for picker options */
 }
 
 /* Style for active/selected toolbar buttons */
+<<<<<<< HEAD
 body.dark-mode .consultation-page-container .ql-toolbar button:hover .ql-stroke,
 body.dark-mode .consultation-page-container .ql-toolbar button:hover .ql-fill,
 body.dark-mode .consultation-page-container .ql-toolbar button.ql-active .ql-stroke,
@@ -55,10 +86,21 @@ body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-label:hover .
 body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
 body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-item:hover::before,
 body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-item.ql-selected::before {
+=======
+.consultation-page-container.dark .ql-toolbar button:hover .ql-stroke,
+.consultation-page-container.dark .ql-toolbar button:hover .ql-fill,
+.consultation-page-container.dark .ql-toolbar button.ql-active .ql-stroke,
+.consultation-page-container.dark .ql-toolbar button.ql-active .ql-fill,
+.consultation-page-container.dark .ql-toolbar .ql-picker-label:hover .ql-stroke,
+.consultation-page-container.dark .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+.consultation-page-container.dark .ql-toolbar .ql-picker-item:hover::before,
+.consultation-page-container.dark .ql-toolbar .ql-picker-item.ql-selected::before {
+>>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
     stroke: #20c997; /* Teal color for hover/active */
     fill: #20c997; /* Teal color for hover/active */
     color: #20c997; /* Teal color for hover/active text */
 }
+<<<<<<< HEAD
 
 /* Dark mode styles for history section */
 body.dark-mode .consultation-page-container .history-section {
@@ -78,3 +120,5 @@ body.dark-mode .consultation-page-container .history-section div {
 body.dark-mode .consultation-page-container .history-section strong {
     color: #e0e0e0; /* Light color for strong text in history */
 }
+=======
+>>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a

@@ -46,6 +46,7 @@ const Dashboard = ({ onLogout }) => {
 
   // Helper function to get the translation key for exam types
   const getExamTypeTranslationKey = (reportType) => {
+<<<<<<< HEAD
     // Normalize the report type to handle variations from the backend
     const normalizedReportType = reportType ? reportType.toLowerCase().trim() : '';
 
@@ -67,6 +68,21 @@ const Dashboard = ({ onLogout }) => {
         return "medicalExaminationForm.examTypes.autre"; // Use 'autre' key for both
       default:
         return ""; // No translation for unknown types
+=======
+    switch (reportType) {
+      case "IRM":
+        return "medicalExaminationForm.examTypes.irm";
+      case "Radio":
+        return "medicalExaminationForm.examTypes.radio";
+      case "Blood Test":
+        return "medicalExaminationForm.examTypes.analysesanguine";
+      case "Scanner":
+        return "medicalExaminationForm.examTypes.scanner";
+      case "Ultrasound":
+        return "medicalExaminationForm.examTypes.echographie";
+      default:
+        return ""; // No translation for unknown types as per requirement
+>>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
     }
   };
 

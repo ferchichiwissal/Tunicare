@@ -118,12 +118,18 @@
 }
 
 /* Dark mode styles */
+<<<<<<< HEAD
 body.dark-mode .user-table-container {
     background-color: #000000; /* Dark background */
+=======
+.dark .user-table-container {
+    background-color: #1e1e1e; /* Dark background */
+>>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
     color: #e0e0e0; /* Light text */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Darker shadow */
 }
 
+<<<<<<< HEAD
 body.dark-mode .user-table-container h2 {
     color: #ffffff !important; /* White color for the main heading */
 }
@@ -138,11 +144,28 @@ body.dark-mode .table td {
 }
 
 body.dark-mode .custom-table thead th {
+=======
+.dark .user-table-container h2 {
+    color: #ffffff !important; /* White color for the main heading */
+}
+
+.dark .table {
+    color: #e0e0e0; /* Light text for table content */
+}
+
+.dark .table th,
+.dark .table td {
+    border-top-color: #555; /* Darker border */
+}
+
+.dark .custom-table thead th {
+>>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
     background-color: #3a3a3a; /* Darker header background */
     border-bottom-color: #555; /* Darker border */
     color: #f1f1f1; /* Lighter header text */
 }
 
+<<<<<<< HEAD
 body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
     background-color: #2c3034; /* Slightly darker odd rows */
 }
@@ -156,20 +179,44 @@ body.dark-mode .form-check-label {
 }
 
 body.dark-mode .form-control {
+=======
+.dark .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #2c3034; /* Slightly darker odd rows */
+}
+
+.dark .table-hover tbody tr:hover {
+    background-color: #4a4f54; /* Darker hover */
+}
+
+.dark .form-check-label {
+    color: #ffffff !important; /* White text for radio button labels */
+}
+
+.dark .form-control {
+>>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
     background-color: #3a3f44; /* Darker input background */
     color: #e0e0e0; /* Light input text */
     border-color: #555; /* Darker border */
 }
 
+<<<<<<< HEAD
 body.dark-mode .form-control::placeholder {
     color: #cccccc !important; /* Lighter grey for placeholder text */
 }
 
 body.dark-mode .alert-danger {
+=======
+.dark .form-control::placeholder {
+    color: #cccccc !important; /* Lighter grey for placeholder text */
+}
+
+.dark .alert-danger {
+>>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
     background-color: #5a2a2a; /* Darker red background for errors */
     color: #f5c6cb; /* Lighter red text */
     border-color: #8b3d3d; /* Darker border */
 }
+<<<<<<< HEAD
 
 /* Style for the search bar input in dark mode */
 body.dark-mode .user-table-container input[type="text"],
@@ -204,3 +251,5 @@ body.dark-mode .btn-outline-secondary {
 .form-check-label {
   color: black; /* Changer la couleur du texte des labels en noir en mode jour */
 }
+=======
+>>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
