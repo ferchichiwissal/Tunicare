@@ -44,6 +44,32 @@ const Dashboard = ({ onLogout }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  // Helper function to get the translation key for exam types
+  const getExamTypeTranslationKey = (reportType) => {
+    // Normalize the report type to handle variations from the backend
+    const normalizedReportType = reportType ? reportType.toLowerCase().trim() : '';
+
+    switch (normalizedReportType) {
+      case "irm":
+        return "medicalExaminationForm.examTypes.irm";
+      case "radio":
+        return "medicalExaminationForm.examTypes.radio";
+      case "blood test":
+      case "analyse sanguine": // Handle French name from backend
+        return "medicalExaminationForm.examTypes.analysesanguine";
+      case "scanner":
+        return "medicalExaminationForm.examTypes.scanner";
+      case "ultrasound":
+      case "échographie": // Handle French name from backend
+        return "medicalExaminationForm.examTypes.echographie";
+      case "autre": // Handle French name from backend
+      case "other":
+        return "medicalExaminationForm.examTypes.autre"; // Use 'autre' key for both
+      default:
+        return ""; // No translation for unknown types
+    }
+  };
+
   // Perform logout and redirect
   const performLogout = () => {
     localStorage.removeItem("accessToken");
@@ -556,16 +582,16 @@ const Dashboard = ({ onLogout }) => {
 
   // Data for Doctor Centre Report Types Chart (Pie Chart)
   const doctorCentreReportTypesData = {
-    labels: doctorCentreReportTypes.map(stat => stat.reportType || t('dashboard.charts.reportTypeUnknown')), // Use reportType or a default label
+    labels: doctorCentreReportTypes.map(stat => t(getExamTypeTranslationKey(stat.reportType)) || stat.reportType || t('dashboard.charts.reportTypeUnknown')), // Use the translation function
     datasets: [
       {
         data: doctorCentreReportTypes.map(stat => stat.reportCount),
         backgroundColor: [
           'rgba(54, 162, 235, 0.8)', // Blue
-          'rgba(255, 205, 86, 0.8)', // Yellow
+          'rgba(127, 247, 247, 0.8)', // Yellow
           'rgba(75, 192, 192, 0.8)', // Green
           'rgba(153, 102, 255, 0.8)', // Purple
-          'rgba(255, 159, 64, 0.8)', // Orange
+          'rgba(60, 246, 63, 0.8)', // Orange
           'rgba(201, 203, 207, 0.8)', // Grey
         ],
       },

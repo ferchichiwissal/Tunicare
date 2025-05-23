@@ -304,7 +304,7 @@ const MyAppointments = () => {
             ) : (
                  // Add Bootstrap table classes (including table-bordered) and responsive wrapper
                  <div className="table-responsive">
-                     <table className="table table-striped table-hover table-bordered appointments-table"> {/* Added table-bordered */}
+                     <table className="table table-hover table-bordered appointments-table"> {/* Removed table-striped */}
                          <thead>
                              <tr>
                                  <th>📅 {t('myAppointments.tableHeaderDate', 'Date and Time')}</th>

@@ -13,6 +13,35 @@
   font-family: var(--font-family, 'Roboto', sans-serif);
 }
 
+body.dark-mode .add-cabinet-container {
+  background-color: var(--dark-background-color, #1e1e1e);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .add-cabinet-container h2 {
+  color: var(--dark-text-color, #ffffff);
+  border-bottom-color: var(--dark-primary-color, #00c6a9);
+}
+
+body.dark-mode .add-cabinet-container label {
+  color: var(--dark-text-color, #ffffff);
+}
+
+body.dark-mode .add-cabinet-container label.required::after {
+  color: var(--dark-error-color, #e60f0f);
+}
+
+body.dark-mode .add-cabinet-container input[type="text"] {
+  background-color: var(--dark-input-bg-color, #333333);
+  color: var(--dark-input-text-color, #ffffff);
+  border-color: var(--dark-input-border-color, #555555);
+}
+
+body.dark-mode .add-cabinet-container input[type="text"]:focus {
+  border-color: var(--dark-primary-color, #00c6a9);
+  box-shadow: 0 0 0 2px rgba(0, 198, 169, 0.4);
+}
+
 .add-cabinet-container h2 {
   color: var(--text-color, #0c0c0c);
   text-align: center;

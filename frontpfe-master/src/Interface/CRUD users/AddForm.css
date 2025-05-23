@@ -12,6 +12,11 @@
   font-family: var(--font-family, 'Roboto', sans-serif);
 }
 
+body.dark-mode .registration-form {
+  background-color: var(--dark-background-color, #1e1e1e);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
 .registration-form .form-title { /* Target specific h2 */
   color: var(--text-color, #0c0c0c);
   text-align: center;

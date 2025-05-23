@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react'; // Added useMemo
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react'; // Added useMemo, useCallback
 import apiClient from '../../utils/apiClient';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { clearUserData, getToken, isTokenExpired } from '../../utils/auth'; // Import auth utils
 import './Statistics.css';
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const DoctorStatistics = () => {
     const { t, i18n } = useTranslation(); // Initialize useTranslation and get i18n instance
@@ -17,6 +20,54 @@ const DoctorStatistics = () => {
     const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 
     const years = Array.from({ length: 10 }, (_, i) => currentYear - i); // Last 10 years
+
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('doctorStatistics.alerts.sessionExpired', 'Session expired. Please log in again.')); // Add translation key
+        // Assuming the login route is /sign-in
+        window.location.href = "/sign-in"; // Use window.location.href for full page reload
+    }, [t]); // Add t dependency
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(performLogout, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]); // Dependency array includes performLogout
 
     // Month options using t() for labels
     const monthOptions = useMemo(() => {

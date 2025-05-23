@@ -7,10 +7,12 @@
 }
 
 .statistics-container h2 {
-    color: #333;
-    margin-bottom: 20px;
-    text-align: center;
-    font-size: 1.8em;
+    color: #333; /* Default color for light mode */
+    margin-bottom: 25px; /* Consistent margin */
+    border-bottom: 2px solid #00c6a9; /* Teal underline */
+    padding-bottom: 10px; /* Space between text and underline */
+    display: inline-block; /* Ensures border only spans the text width */
+    font-size: 1.8em; /* Keep the font size */
 }
 
 .statistics-table {
@@ -50,9 +52,19 @@
     margin-top: 10px;
 }
 
+body.dark-mode .error-message p {
+    color: #bbb !important; /* Changer la couleur du texte en blanc foncé en mode nuit */
+    background-color: #333 !important; /* Changer le fond en gris foncé pour le contraste */
+    border-color: #555 !important; /* Ajuster la couleur de la bordure */
+}
+
 .statistics-container p {
     font-size: 1.1em;
     color: #555;
+}
+
+body.dark-mode .statistics-container p {
+    color: white !important; /* Assurer que le texte du paragraphe est blanc en mode nuit */
 }
 
 .filters-container {
@@ -63,6 +75,11 @@
     display: flex;
     gap: 15px;
     align-items: center;
+}
+
+body.dark-mode .filters-container {
+    background-color: black !important;
+    color: white !important;
 }
 
 .filters-container label {
@@ -77,12 +94,30 @@
     min-width: 150px; /* Adjust as needed */
 }
 
+body.dark-mode .filters-container select {
+    background-color: black !important;
+    color: white !important;
+    border-color: #555 !important; /* Ajuster la couleur de la bordure pour la visibilité */
+}
+
+body.dark-mode .total-exams-month {
+    background-color: black !important; /* Changer le fond du bouton total en noir */
+    color: white !important;
+    border-color: #555 !important;
+}
+
+
 .center-stat-block { /* Style for each center's/referrer's block (used in older version of DoctorStatistics) */
     margin-bottom: 30px;
     padding: 15px;
     border: 1px solid #e0e0e0;
     border-radius: 5px;
     background-color: #fff;
+}
+
+body.dark-mode .center-stat-block {
+    background-color: black !important;
+    color: white !important;
 }
 
 .center-stat-block h3 {
@@ -104,4 +139,25 @@
 
 .total-exams-month strong {
     font-weight: 600; /* Slightly bolder than normal but not overly so */
+}
+
+html body.dark-mode .statistics-container {
+  background-color: black !important; /* Changer le fond en noir en mode nuit avec très haute priorité */
+  color: white !important; /* Changer la couleur du texte en blanc en mode nuit */
+}
+
+body.dark-mode .statistics-container h2 {
+  color: white !important; /* Changer la couleur du titre en blanc en mode nuit */
+}
+
+body.dark-mode .statistics-table th {
+  color: white !important; /* Changer la couleur du texte des en-têtes de tableau en blanc en mode nuit */
+}
+
+body.dark-mode .filters-container label {
+  color: white !important; /* Changer la couleur des labels de filtre en blanc en mode nuit */
+}
+
+body.dark-mode .total-exams-month {
+  color: white !important; /* Changer la couleur du texte du total en blanc en mode nuit */
 }

@@ -144,3 +144,86 @@
 .examination-result-container .text-muted {
     color: #555 !important; /* Couleur de texte par défaut pour le texte muted */
 }
+
+/* Dark mode styles for Examination Result Page */
+body.dark-mode .examination-result-container.container {
+    background-color: #1e1e1e; /* Dark background */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Darker shadow */
+    border: none; /* Remove border */
+}
+
+body.dark-mode .examination-result-container .card {
+    background-color: #1e1e1e; /* Dark background for card */
+    border: none; /* Remove card border */
+}
+
+body.dark-mode .examination-result-container .card-header {
+    background-color: #2d2d2d; /* Darker grey background for header */
+    border-bottom-color: #444;
+    color: #ffffff; /* White text for header */
+}
+
+body.dark-mode .examination-result-container .card-header h4 {
+    color: #ffffff; /* White text */
+}
+
+body.dark-mode .examination-result-container .card-header p {
+    color: #bbbbbb; /* Lighter grey text */
+}
+
+body.dark-mode .examination-result-container .card-body {
+    background-color: #1e1e1e; /* Dark background for body */
+    color: #eeeeee; /* Light text for body */
+}
+
+body.dark-mode .examination-result-container .card-body h3.text-center.mb-4 {
+    color: #ffffff !important; /* White color for title */
+}
+
+body.dark-mode .examination-result-container .patient-info p,
+body.dark-mode .examination-result-container .doctor-centre-info p {
+    color: #eeeeee; /* Light text */
+}
+
+body.dark-mode .examination-result-container .patient-info strong {
+    color: #ffffff; /* White text for labels */
+}
+
+body.dark-mode .examination-result-container .result-content {
+    border-color: #444;
+    background-color: #282828; /* Darker background for content area */
+    color: #eeeeee; /* Light text for content area */
+}
+
+body.dark-mode .examination-result-container .result-content div {
+    color: #eeeeee !important; /* Light text for content */
+}
+
+body.dark-mode .examination-result-container .card-footer {
+    background-color: #2d2d2d; /* Darker background for footer */
+    border-top-color: #444;
+    color: #eeeeee; /* Light text for footer */
+}
+
+body.dark-mode .examination-result-container h4,
+body.dark-mode .examination-result-container p,
+body.dark-mode .examination-result-container strong {
+    color: #eeeeee !important; /* Light text for default elements */
+}
+
+body.dark-mode .examination-result-container .text-muted {
+    color: #bbbbbb !important; /* Lighter grey for muted text */
+}
+
+/* Ensure buttons are visible in dark mode */
+body.dark-mode .examination-result-container .btn-secondary {
+    background-color: #00c6a9 !important; /* Vert d'eau */
+    border-color: #00c6a9 !important; /* Vert d'eau */
+    color: #ffffff !important; /* Texte blanc */
+}
+
+body.dark-mode .examination-result-container .btn-primary {
+     background-color: #00c6a9 !important; /* Keep theme color */
+     border-color: #00c6a9 !important;
+     color: #ffffff !important;
+}

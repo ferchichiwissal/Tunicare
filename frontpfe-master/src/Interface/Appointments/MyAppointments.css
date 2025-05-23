@@ -111,14 +111,19 @@
 }
 
 /* Ensure text color is appropriate for badges (Bootstrap usually handles this) */
-.my-appointments-container .badge.bg-success {
-  color: #ffffff !important; /* White text for green badge */
-}
-.my-appointments-container .badge.bg-warning {
-  color: #000000 !important; /* Black text for yellow badge */
-}
-.my-appointments-container .badge.bg-info {
-  color: #000000 !important; /* Black text for info badge */
+.my-appointments-container .badge.bg-success,
+.my-appointments-container .badge.bg-warning,
+.my-appointments-container .badge.bg-danger, /* Assuming bg-danger is used for red */
+.my-appointments-container .badge.bg-info { /* Keep info just in case */
+  background-color: #e0e0e0 !important; /* Light grey background */
+  color: #333333 !important; /* Dark grey text color */
+  padding: 4px 8px !important; /* Add padding for button shape */
+  border: none !important; /* Remove border */
+  border-radius: 4px !important; /* Add border radius */
+  font-weight: normal !important; /* Reset font weight if needed */
+  display: inline-block; /* Ensure it behaves like a block element for padding/border */
+  text-align: center; /* Center the text */
+  min-width: 80px; /* Give it a minimum width to look more like the image */
 }
 
 
@@ -172,6 +177,91 @@ body.dark-mode .modal-body .form-select {
 }
 
 
+/* Dark mode styles */
+body.dark-mode .my-appointments-container {
+    background-color: #000000; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Darker shadow */
+}
+
+body.dark-mode .my-appointments-container h2 {
+    color: #ffffff !important; /* White color for the main heading */
+}
+
+body.dark-mode .my-appointments-container .appointments-table {
+    color: #e0e0e0; /* Light text for table content */
+}
+
+body.dark-mode .my-appointments-container .appointments-table th,
+body.dark-mode .my-appointments-container .appointments-table td {
+    border-color: #3a3a3a; /* Adjusted border color for dark mode */
+}
+
+body.dark-mode .my-appointments-container .appointments-table tbody tr:nth-of-type(odd) {
+    background-color: #212121; /* Darker grey for odd rows in dark mode */
+}
+
+body.dark-mode .my-appointments-container .appointments-table tbody tr:nth-of-type(even) {
+    background-color: #2a2a2a; /* Lighter grey for even rows in dark mode */
+}
+
+body.dark-mode .my-appointments-container .appointments-table th {
+    background-color: #3a3a3a; /* Darker header background */
+    border-bottom-color: #555; /* Darker border */
+    color: #f1f1f1; /* Lighter header text */
+}
+
+
+body.dark-mode .my-appointments-container .table-hover > tbody > tr:hover > * {
+    background-color: #4a4f54; /* Darker hover */
+}
+
+body.dark-mode .my-appointments-container .form-check-label {
+    color: #e0e0e0 !important; /* Light text for radio button labels */
+}
+
+body.dark-mode .my-appointments-container .form-control {
+    background-color: #3a3f44; /* Darker input background */
+    color: #e0e0e0; /* Light input text */
+    border-color: #555; /* Darker border */
+}
+
+body.dark-mode .my-appointments-container .form-control::placeholder {
+    color: #cccccc !important; /* Lighter grey for placeholder text */
+}
+
+body.dark-mode .my-appointments-container .alert-danger {
+    background-color: #5a2a2a; /* Darker red background for errors */
+    color: #f5c6cb; /* Lighter red text */
+    border-color: #8b3d3d; /* Darker border */
+}
+
+/* Style for the search bar input in dark mode */
+body.dark-mode .my-appointments-container input[type="text"],
+body.dark-mode .my-appointments-container input[type="search"] {
+    background-color: #3a3f44; /* Darker input background */
+    color: #e0e0e0; /* Light input text */
+    border-color: #555; /* Darker border */
+}
+
+/* Default dark mode styles for the body */
+body.dark-mode {
+    background-color: #121212; /* Very dark grey background */
+    color: #e0e0e0; /* Light grey text color */
+}
+
+/* Style for filter options and potentially the "Masquer" button in dark mode */
+body.dark-mode .my-appointments-container label,
+body.dark-mode .my-appointments-container a {
+    color: #ffffff !important; /* White text color */
+}
+
+/* Style for the "Masquer" button in dark mode */
+body.dark-mode .btn-outline-secondary {
+    color: #ffffff !important; /* White text color */
+    border-color: #6c757d !important; /* Optional: adjust border color for dark mode */
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .my-appointments-container {
@@ -213,6 +303,9 @@ body.dark-mode .modal-body .form-select {
 .my-appointments-container .btn-danger:hover,
 .my-appointments-container .btn-info:hover,
 .my-appointments-container .btn-primary:hover {
+  background-color: #00937d !important; /* Darker shade of teal on hover */
+  border-color: #00937d !important;
+  color: var(--white) !important;
   background-color: #00937d !important; /* Darker shade of teal on hover */
   border-color: #00937d !important;
   color: var(--white) !important;

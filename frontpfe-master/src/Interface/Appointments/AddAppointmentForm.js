@@ -176,31 +176,33 @@ const AddAppointmentForm = () => { // Removed patientId prop
             <form onSubmit={handleSubmit} className="add-appointment-form">
                 {/* Cabinet Selection Dropdown Removed */}
 
-                <div className="form-group">
-                    <label htmlFor="appt_datetime" className="required">📅 {t('addAppointment.dateLabel', 'Date et Heure du rendez-vous')}</label> {/* Added required class, removed colon from fallback */}
-                    <input
-                        type="datetime-local" /* Updated type */
-                        id="appt_datetime" /* Updated id */
-                        value={apptDateTime} /* Updated state variable */
-                        onChange={(e) => setApptDateTime(e.target.value)} /* Updated setter */
-                        required
-                        className="form-control"
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="appt_type" className="required">📄 {t('addAppointment.typeLabel', 'Type de rendez-vous')}</label> {/* Added required class, removed colon from fallback */}
-                    <select
-                        id="appt_type"
-                        value={apptType}
-                        onChange={(e) => setApptType(e.target.value)}
-                        required
-                        className="form-control"
-                    >
-                        {/* Use canonical French strings for value, translate display text */}
-                        <option value="Nouvelle consultation">{t('addAppointment.typeOptionNew', 'Nouvelle consultation')}</option>
-                        <option value="Séance de contrôle">{t('addAppointment.typeOptionControl', 'Séance de contrôle')}</option>
-                        {/* Add other types if needed, ensuring they have corresponding translation keys and use the canonical value */}
-                    </select>
+                <div className="form-row">
+                    <div className="form-group">
+                        <label htmlFor="appt_datetime" className="required">📅 {t('addAppointment.dateLabel', 'Date et Heure du rendez-vous')}</label> {/* Added required class, removed colon from fallback */}
+                        <input
+                            type="datetime-local" /* Updated type */
+                            id="appt_datetime" /* Updated id */
+                            value={apptDateTime} /* Updated state variable */
+                            onChange={(e) => setApptDateTime(e.target.value)} /* Updated setter */
+                            required
+                            className="form-control"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="appt_type" className="required">📄 {t('addAppointment.typeLabel', 'Type de rendez-vous')}</label> {/* Added required class, removed colon from fallback */}
+                        <select
+                            id="appt_type"
+                            value={apptType}
+                            onChange={(e) => setApptType(e.target.value)}
+                            required
+                            className="form-control"
+                        >
+                            {/* Use canonical French strings for value, translate display text */}
+                            <option value="Nouvelle consultation">{t('addAppointment.typeOptionNew', 'Nouvelle consultation')}</option>
+                            <option value="Séance de contrôle">{t('addAppointment.typeOptionControl', 'Séance de contrôle')}</option>
+                            {/* Add other types if needed, ensuring they have corresponding translation keys and use the canonical value */}
+                        </select>
+                    </div>
                 </div>
                  {/* Input for Cabinet ID Removed */}
 

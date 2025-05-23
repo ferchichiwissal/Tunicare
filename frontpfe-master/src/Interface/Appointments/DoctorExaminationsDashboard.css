@@ -3,9 +3,10 @@
 .user-table-container {
   padding: 30px;
   margin: 40px auto;
-  background-color: var(--background-color, #ffffff);
+  background-color: #2c3034; /* Dark grey background */
+  color: #e0e0e0; /* Light text color */
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Darker shadow */
   font-family: var(--font-family, 'Roboto', sans-serif);
 }
 
@@ -20,14 +21,14 @@
 .table td {
   padding: 1rem;
   vertical-align: middle;
-  border-top: 1px solid #dee2e6;
+  border-top: 1px solid #555; /* Darker border */
 }
 
 /* Custom table header style */
 .custom-table thead th {
-  background-color: var(--primary-color, #00c6a9);
-  color: white;
-  border-bottom: 2px solid var(--primary-color, #00c6a9);
+  background-color: #3a3a3a; /* Darker header background */
+  color: #f1f1f1; /* Lighter header text */
+  border-bottom: 2px solid #555; /* Darker border */
   font-weight: 600;
   text-transform: uppercase;
   font-size: 0.9rem;
@@ -114,4 +115,92 @@
 .table td:last-child {
   min-width: 150px; /* Set a minimum width for the actions column */
   white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Dark mode styles */
+body.dark-mode .user-table-container {
+    background-color: #000000; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Darker shadow */
+}
+
+body.dark-mode .user-table-container h2 {
+    color: #ffffff !important; /* White color for the main heading */
+}
+
+body.dark-mode .table {
+    color: #e0e0e0; /* Light text for table content */
+}
+
+body.dark-mode .table th,
+body.dark-mode .table td {
+    border-top-color: #555; /* Darker border */
+}
+
+body.dark-mode .custom-table thead th {
+    background-color: #3a3a3a; /* Darker header background */
+    border-bottom-color: #555; /* Darker border */
+    color: #f1f1f1; /* Lighter header text */
+}
+
+body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #2c3034; /* Slightly darker odd rows */
+}
+
+body.dark-mode .table-hover tbody tr:hover {
+    background-color: #4a4f54; /* Darker hover */
+}
+
+body.dark-mode .form-check-label {
+    color: #e0e0e0 !important; /* Light text for radio button labels */
+}
+
+body.dark-mode .form-control {
+    background-color: #3a3f44; /* Darker input background */
+    color: #e0e0e0; /* Light input text */
+    border-color: #555; /* Darker border */
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #cccccc !important; /* Lighter grey for placeholder text */
+}
+
+body.dark-mode .alert-danger {
+    background-color: #5a2a2a; /* Darker red background for errors */
+    color: #f5c6cb; /* Lighter red text */
+    border-color: #8b3d3d; /* Darker border */
+}
+
+/* Style for the search bar input in dark mode */
+body.dark-mode .user-table-container input[type="text"],
+body.dark-mode .user-table-container input[type="search"] {
+    background-color: #3a3f44; /* Darker input background */
+    color: #e0e0e0; /* Light input text */
+    border-color: #555; /* Darker border */
+}
+
+/* Default dark mode styles for the body */
+body.dark-mode {
+    background-color: #121212; /* Very dark grey background */
+    color: #e0e0e0; /* Light grey text color */
+}
+
+/* Style for filter options and potentially the "Masquer" button in dark mode */
+body.dark-mode .user-table-container label,
+body.dark-mode .user-table-container a {
+    color: #ffffff !important; /* White text color */
+}
+
+/* Style for the "Masquer" button in dark mode */
+body.dark-mode .btn-outline-secondary {
+    color: #ffffff !important; /* White text color */
+    border-color: #6c757d !important; /* Optional: adjust border color for dark mode */
+}
+
+.user-table-container td {
+  color: black; /* Changer la couleur du texte des cellules en noir en mode jour */
+}
+
+.form-check-label {
+  color: black; /* Changer la couleur du texte des labels en noir en mode jour */
 }

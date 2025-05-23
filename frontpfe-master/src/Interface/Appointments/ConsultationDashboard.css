@@ -39,6 +39,14 @@
   border-color: #008670;
 }
 
+/* Style for the table container to control width and centering */
+.consultation-dashboard-table-container {
+  max-width: 1300px; /* Adjust this value as needed to match the desired width */
+  margin: 20px auto; /* Center the container and add vertical margin */
+  padding: 0 15px; /* Add some horizontal padding */
+}
+
+
 /* Optional: Style the search input focus like UserManagement */
 .consultation-dashboard-container input[type="text"].form-control:focus {
   border-color: var(--primary-color, #00c6a9);

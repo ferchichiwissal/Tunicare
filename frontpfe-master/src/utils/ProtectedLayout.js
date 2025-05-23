@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 import { clearUserData } from './auth'; // Import clearUserData
 
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const ProtectedLayout = ({ requiredRole, children  }) => {
     const { t } = useTranslation(); // Initialize t function
@@ -22,6 +23,25 @@ const ProtectedLayout = ({ requiredRole, children  }) => {
       navigate("/sign-in");
   }, [navigate, t]); // Add t to dependencies
 
+// --- Inactivity Logout Logic ---
+  useEffect(() => {
+    let inactivityTimer;
+    const resetTimer = () => {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        console.log("Inactivity timeout reached in ProtectedLayout.");
+        // setSessionExpired(true); // This state is not used in this component
+        performLogout();
+      }, INACTIVITY_TIMEOUT);
+    };
+    const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+    activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+    resetTimer();
+    return () => {
+      clearTimeout(inactivityTimer);
+      activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+    };
+  }, [performLogout]); // Use performLogout dependency
 // useEffect(() => {
 //   // Handle logout if token becomes invalid after initial check (less likely but for completeness)
 //   if (!isAuthenticated) {

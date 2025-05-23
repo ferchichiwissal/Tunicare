@@ -11,3 +11,70 @@
 
 /* The history button uses btn-secondary, which is typically grey by default. */
 /* No specific style needed here unless a different grey is required. */
+
+/* Dark mode styles for ReactQuill editors */
+body.dark-mode .consultation-page-container .ql-editor {
+    background-color: #000000; /* Dark background for editor content */
+    color: #e0e0e0; /* Light text color */
+}
+
+body.dark-mode .consultation-page-container .ql-toolbar {
+    background-color: #3a3a3a; /* Darker background for toolbar */
+    border-color: #555; /* Darker border */
+}
+
+body.dark-mode .consultation-page-container .ql-container {
+    background-color: #000000; /* Dark background for the container */
+    border-color: #555; /* Darker border for the container */
+}
+
+/* Adjustments for toolbar icons/buttons in dark mode */
+body.dark-mode .consultation-page-container .ql-toolbar .ql-stroke {
+    stroke: #e0e0e0; /* Light color for icons */
+}
+
+body.dark-mode .consultation-page-container .ql-toolbar .ql-fill {
+    fill: #e0e0e0; /* Light color for filled icons */
+}
+
+body.dark-mode .consultation-page-container .ql-toolbar .ql-picker {
+    color: #e0e0e0; /* Light color for picker text */
+}
+
+body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-label::before,
+body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-item::before {
+    color: #e0e0e0; /* Light color for picker options */
+}
+
+/* Style for active/selected toolbar buttons */
+body.dark-mode .consultation-page-container .ql-toolbar button:hover .ql-stroke,
+body.dark-mode .consultation-page-container .ql-toolbar button:hover .ql-fill,
+body.dark-mode .consultation-page-container .ql-toolbar button.ql-active .ql-stroke,
+body.dark-mode .consultation-page-container .ql-toolbar button.ql-active .ql-fill,
+body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-label:hover .ql-stroke,
+body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-item:hover::before,
+body.dark-mode .consultation-page-container .ql-toolbar .ql-picker-item.ql-selected::before {
+    stroke: #20c997; /* Teal color for hover/active */
+    fill: #20c997; /* Teal color for hover/active */
+    color: #20c997; /* Teal color for hover/active text */
+}
+
+/* Dark mode styles for history section */
+body.dark-mode .consultation-page-container .history-section {
+    background-color: #1e1e1e; /* Dark background for history section */
+    color: #e0e0e0; /* Light text color */
+    border-color: #555 !important; /* Darker border */
+}
+
+body.dark-mode .consultation-page-container .history-section h4 {
+    color: #e0e0e0; /* Light color for history title */
+}
+
+body.dark-mode .consultation-page-container .history-section div {
+    border-bottom-color: #555 !important; /* Darker border between history items */
+}
+
+body.dark-mode .consultation-page-container .history-section strong {
+    color: #e0e0e0; /* Light color for strong text in history */
+}

@@ -399,7 +399,7 @@ const UserTable = () => {
 
   return (
     <div>
-      <h2>{t('userManagement.title')}</h2>
+      <h2 className="users-list-title">{t('userManagement.title')}</h2>
 
       {/* Radio Buttons for Admins */}
       {isAdmin && (

@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react'; // Ajout de useContext
+import React, { useState, useEffect, useContext, useCallback } from 'react'; // Ajout de useContext, useCallback
 import apiClient from '../../utils/apiClient';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext'; // Importer useAuth
 import { useTranslation } from 'react-i18next'; // Importer useTranslation
+import { clearUserData, getToken, isTokenExpired } from '../../utils/auth'; // Import auth utils
 import './UploadDoctorCentreSignaturePage.css';
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 function UploadDoctorCentreSignaturePage() {
     const { t } = useTranslation(); // Initialiser useTranslation
@@ -13,6 +16,59 @@ function UploadDoctorCentreSignaturePage() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+
+    // --- Logout Function ---
+    const performLogout = useCallback(() => {
+        clearUserData();
+        alert(t('tovalidate.alerts.sessionExpired'));
+        navigate("/sign-in");
+    }, [navigate, t]);
+
+    // --- Token Expiry & Inactivity Checks ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+            return;
+        }
+        let expiryTimer;
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                expiryTimer = setTimeout(performLogout, timeToExpire);
+                return () => clearTimeout(expiryTimer);
+            } else {
+                performLogout();
+                return;
+            }
+        } catch (err) {
+            console.error("Error decoding token for expiry check:", err);
+            performLogout();
+            return;
+        }
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                console.log("Inactivity timeout reached.");
+                // setSessionExpired(true); // This state is not used in this component
+                performLogout();
+            }, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+
+        return () => {
+            clearTimeout(expiryTimer);
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
 
     // Vérifier si l'utilisateur est connecté et a le bon rôle en utilisant AuthContext
     useEffect(() => {

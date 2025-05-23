@@ -14,7 +14,7 @@
 .user-table-container h2 {
   color: var(--text-color, #0c0c0c);
   margin-bottom: 25px;
-  border-bottom: 2px solid var(--primary-color, #00c6a9);
+  border-bottom: 2px solid #00c6a9 !important; /* Soulignement vert d'eau avec !important pour priorité */
   padding-bottom: 10px;
   display: inline-block;
 }
@@ -223,4 +223,10 @@
     padding: 6px 10px; /* Smaller buttons */
     font-size: 0.8rem;
   }
+}
+
+.users-list-title {
+  border-bottom: 2px solid #00c6a9 !important; /* Soulignement vert d'eau avec !important pour priorité */
+  padding-bottom: 10px;
+  display: inline-block;
 }

@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useContext } from 'react'; // Import useContext
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext, useCallback } from 'react'; // Import useContext, useCallback
+import { useLocation, useNavigate } from 'react-router-dom'; // Added useNavigate
 import ReactQuill from 'react-quill'; // Import ReactQuill
 import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 import apiClient from '../../utils/apiClient'; // Import apiClient instead of axios
 import AuthContext from '../../context/AuthContext'; // Import AuthContext
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { clearUserData, getToken, isTokenExpired } from '../../utils/auth'; // Import auth utils
 import './MedicalExaminationForm.css'; // Optional CSS
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const MedicalExaminationForm = () => {
     const { t } = useTranslation(); // Initialize translation function
@@ -33,6 +36,58 @@ const MedicalExaminationForm = () => {
     const [currentExamStatus, setCurrentExamStatus] = useState(''); // To store the status of the exam being edited
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
+
+    // --- Logout Function ---
+    const performLogout = useCallback(() => { // Wrap in useCallback
+        clearUserData();
+        alert(t('tovalidate.alerts.sessionExpired'));
+        navigate("/sign-in");
+    }, [navigate, t]); // Add navigate and t dependency
+
+    // --- Token Expiry Check ---
+    useEffect(() => {
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            performLogout();
+        } else {
+            try {
+                const decodedToken = JSON.parse(atob(token.split('.')[1]));
+                const expiryTime = decodedToken.exp * 1000;
+                const currentTime = Date.now();
+                const timeToExpire = expiryTime - currentTime;
+                if (timeToExpire > 0) {
+                    const expiryTimer = setTimeout(performLogout, timeToExpire);
+                    return () => clearTimeout(expiryTimer);
+                } else {
+                    performLogout();
+                }
+            } catch (error) {
+                console.error("Error decoding token for expiry check:", error);
+                performLogout();
+            }
+        }
+    }, [performLogout]); // Use performLogout dependency
+
+    // --- Inactivity Logout Logic ---
+    useEffect(() => {
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                console.log("Inactivity timeout reached.");
+                // setSessionExpired(true); // This state is not used in this component
+                performLogout();
+            }, INACTIVITY_TIMEOUT);
+        };
+        const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+        activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+        resetTimer();
+        return () => {
+            clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+        };
+    }, [performLogout]);
+
 
     // Fetch Patient Details, Centres, and existing Exam Data if in edit mode
     useEffect(() => {

@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import apiClient from '../../utils/apiClient';
 import { useAuth } from '../../context/AuthContext'; // Importer useAuth
 import { useTranslation } from 'react-i18next';
+import { clearUserData, getToken, isTokenExpired } from '../../utils/auth'; // Import auth utils
+import { jwtDecode } from 'jwt-decode'; // Import jwt-decode
 import './ExaminationResultPage.css';
 
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 const ExaminationResultPage = () => {
     const { t, i18n } = useTranslation(); // Initialize useTranslation and get i18n instance
     const { examinationId } = useParams();
@@ -14,6 +17,56 @@ const ExaminationResultPage = () => {
     const [examinationDetails, setExaminationDetails] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+// --- Logout Function ---
+const performLogout = useCallback(() => { // Wrap in useCallback
+    clearUserData();
+    alert(t('tovalidate.alerts.sessionExpired'));
+    navigate("/sign-in");
+}, [navigate, t]); // Add navigate and t dependency
+
+// --- Token Expiry Check ---
+useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+        performLogout();
+    } else {
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+            const timeToExpire = expiryTime - currentTime;
+            if (timeToExpire > 0) {
+                const expiryTimer = setTimeout(performLogout, timeToExpire);
+                return () => clearTimeout(expiryTimer);
+            } else {
+                performLogout();
+            }
+        } catch (error) {
+            console.error("Error decoding token for expiry check:", error);
+            performLogout();
+        }
+    }
+}, [performLogout]); // Use performLogout dependency
+
+// --- Inactivity Logout Logic ---
+useEffect(() => {
+    let inactivityTimer;
+    const resetTimer = () => {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            console.log("Inactivity timeout reached.");
+            // setSessionExpired(true); // This state is not used in this component
+            performLogout();
+        }, INACTIVITY_TIMEOUT);
+    };
+    const activityEvents = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+    activityEvents.forEach(event => window.addEventListener(event, resetTimer));
+    resetTimer();
+    return () => {
+        clearTimeout(inactivityTimer);
+        activityEvents.forEach(event => window.removeEventListener(event, resetTimer));
+    };
+}, [performLogout]); // Use performLogout dependency
 
     useEffect(() => {
         const fetchExaminationDetails = async () => {

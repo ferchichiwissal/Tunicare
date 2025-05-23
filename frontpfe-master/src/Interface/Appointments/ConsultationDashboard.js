@@ -172,7 +172,7 @@ const ConsultationDashboard = () => {
 
     return (
         // Use Bootstrap container/padding classes
-        <div className="container mt-4 consultation-dashboard-container">
+        <div className="mt-4 consultation-dashboard-container">
             <h2>{t('consultationDashboard.title')}</h2>
 
             {/* Use Bootstrap alert for errors */}
@@ -190,7 +190,7 @@ const ConsultationDashboard = () => {
             </div>
 
             {/* Consultations List/Table - Add responsive wrapper, hover effect, and custom class */}
-            <div className="table-responsive">
+            <div className="table-responsive consultation-dashboard-table-container">
                 <table className="table table-striped table-bordered table-hover custom-table"> {/* Added custom-table */}
                     <thead>
                         <tr>

@@ -1,19 +1,237 @@
-/* Styles for ManageReportTemplates component */
+/* Styles for ManageReportTemplates component - Harmonized */
 
-/* Target all buttons within the component */
-.container.mt-5 .btn {
-    background-color: #00c6a9 !important; /* Vert d'eau basé sur dashboard.css */
-    border-color: #00c6a9 !important; /* Vert d'eau basé sur dashboard.css */
-    color: #fff !important; /* Texte blanc pour la lisibilité */
+/* Use root variables defined in a more global scope (e.g., index.css or App.css)
+   or redefine them here if necessary. Assuming they are globally available. */
+
+.manage-report-templates-container {
+  padding: 30px;
+  max-width: 800px; /* Adjusted max-width slightly */
+  margin: 40px auto;
+  background-color: var(--background-color, #ffffff); /* Default white */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-family, 'Roboto', sans-serif);
+  color: var(--text-color, #0c0c0c); /* Apply text color to container */
 }
 
-/* Optional: Hover and active states */
-.container.mt-5 .btn:hover {
-    background-color: #00a38a !important; /* Une nuance légèrement différente au survol */
-    border-color: #00a38a !important;
+.manage-report-templates-container h2 {
+  color: var(--text-color, #0c0c0c);
+  text-align: center;
+  margin-bottom: 25px;
+  border-bottom: 2px solid var(--primary-color, #00c6a9);
+  padding-bottom: 10px;
+  display: inline-block;
 }
 
-.container.mt-5 .btn:active {
-    background-color: #00806b !important; /* Une autre nuance pour l'état actif */
-    border-color: #00806b !important;
+.manage-report-templates-container label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: var(--text-color, #0c0c0c);
+}
+
+/* Style for required labels */
+.manage-report-templates-container label.required::after {
+  content: '*';
+  color: var(--error-color, #e60f0f);
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.manage-report-templates-container input[type="text"],
+.manage-report-templates-container input[type="file"],
+.manage-report-templates-container textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--border-color, #ccc); /* Use variable for border */
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  background-color: var(--input-background-color, #ffffff); /* Use variable for input background */
+  color: var(--text-color, #0c0c0c); /* Use variable for input text color */
+}
+
+.manage-report-templates-container input[type="text"]:focus,
+.manage-report-templates-container input[type="file"]:focus,
+.manage-report-templates-container textarea:focus {
+  border-color: var(--primary-color, #00c6a9);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 198, 169, 0.2); /* Subtle focus ring */
+}
+
+.manage-report-templates-container button[type="submit"],
+.manage-report-templates-container .btn { /* Also target generic btn class */
+  display: inline-block;
+  padding: 12px 30px;
+  background-color: var(--primary-color, #00c6a9) !important; /* Use variable and important */
+  color: var(--white, #ffffff) !important; /* Use variable and important */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s, transform 0.1s;
+  border-color: var(--primary-color, #00c6a9) !important; /* Use variable and important */
+}
+
+.manage-report-templates-container button[type="submit"]:hover,
+.manage-report-templates-container .btn:hover {
+  background-color: var(--primary-color-dark, #00937d) !important; /* Use variable and important */
+  border-color: var(--primary-color-dark, #00937d) !important; /* Use variable and important */
+  transform: translateY(-1px);
+}
+
+.manage-report-templates-container button[type="submit"]:disabled,
+.manage-report-templates-container .btn:disabled {
+  background-color: var(--disabled-color, #ccc) !important; /* Use variable and important */
+  cursor: not-allowed;
+}
+
+/* Error message styling */
+.manage-report-templates-container .error-message {
+  color: var(--error-color, #e60f0f);
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: var(--error-background-color, rgba(230, 15, 15, 0.1)); /* Use variable */
+  border: 1px solid var(--error-color, #e60f0f);
+  border-radius: 5px;
+  text-align: center;
+}
+
+/* Styles for the form within the container */
+.manage-report-templates-container .card {
+    background-color: var(--background-color, #ffffff) !important; /* Use background variable for card */
+    border-color: var(--border-color, #ddd) !important; /* Use border variable for card */
+    color: var(--text-color, #0c0c0c) !important; /* Ensure text color is applied to card content */
+}
+
+.manage-report-templates-container .card-header {
+    background-color: var(--table-header-background, #f2f2f2) !important; /* Use a variable for header background */
+    color: var(--text-color, #0c0c0c) !important; /* Use text color variable for header text */
+    border-bottom: 1px solid var(--border-color, #ddd) !important; /* Use border variable */
+}
+
+.manage-report-templates-container .form-label {
+    color: var(--text-color, #0c0c0c) !important; /* Ensure label text color is correct */
+}
+
+.manage-report-templates-container .form-control {
+    background-color: var(--input-background-color, #ffffff) !important; /* Use input background variable */
+    color: var(--text-color, #0c0c0c) !important; /* Use text color variable for input text */
+    border-color: var(--border-color, #ccc) !important; /* Use border variable for input border */
+}
+
+.manage-report-templates-container .form-control:focus {
+    border-color: var(--primary-color, #00c6a9);
+    box-shadow: 0 0 0 0.25rem rgba(0, 198, 169, 0.25); /* Adjust focus shadow if needed */
+}
+
+/* Table styling for report templates list */
+.manage-report-templates-container table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.manage-report-templates-container th,
+.manage-report-templates-container td {
+    border: 1px solid var(--border-color, #ddd); /* Use variable for border */
+    padding: 10px;
+    text-align: left;
+    color: var(--text-color, #0c0c0c); /* Use variable for text color */
+}
+
+.manage-report-templates-container th {
+    background-color: var(--table-header-background, #f2f2f2); /* Use variable */
+    font-weight: bold;
+}
+
+.manage-report-templates-container tr:nth-child(even) {
+    background-color: var(--table-row-even-background, #f9f9f9); /* Use variable */
+}
+
+.manage-report-templates-container tr:hover {
+    background-color: var(--table-row-hover-background, #e9e9e9); /* Use variable */
+}
+
+.manage-report-templates-container .action-buttons button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+}
+
+/* Specific styles for dark mode */
+.dark-mode .manage-report-templates-container {
+    background-color: #1e1e1e !important; /* Dark background for container */
+    color: #f2f2f2 !important; /* Light text color for container */
+}
+
+.dark-mode .manage-report-templates-container .card {
+    background-color: #333 !important; /* Dark background for card */
+    border-color: #555 !important;
+    color: #f2f2f2 !important; /* Light text color for card content */
+}
+
+.dark-mode .manage-report-templates-container .card-header {
+    background-color: #444 !important; /* Dark background for header */
+    color: #f2f2f2 !important; /* Light text color for header */
+    border-bottom: 1px solid #555 !important;
+}
+
+.dark-mode .manage-report-templates-container .form-label {
+    color: #f2f2f2 !important; /* Explicit light text */
+}
+
+.dark-mode .manage-report-templates-container .form-control {
+    background-color: #444 !important; /* Dark background for input */
+    color: #f2f2f2 !important; /* Light text color for input */
+    border-color: #555 !important; /* Dark border for input */
+}
+
+.dark-mode .manage-report-templates-container th,
+.dark-mode .manage-report-templates-container td {
+    border: 1px solid #555 !important; /* Dark border for table cells */
+    color: #f2f2f2 !important; /* Light text color for table cells */
+}
+
+.dark-mode .manage-report-templates-container th {
+    background-color: #444 !important; /* Dark background for table headers */
+}
+
+.dark-mode .manage-report-templates-container tr:nth-child(even) {
+    background-color: #2a2a2a !important; /* Slightly lighter dark for even rows */
+}
+
+.dark-mode .manage-report-templates-container tr:hover {
+    background-color: #3a3a3a !important; /* Darker hover background */
+}
+
+.dark-mode .manage-report-templates-container .card-header {
+    background-color: var(--table-header-background, #444) !important; /* Use a variable for header background */
+    color: var(--text-color, #f2f2f2) !important; /* Use text color variable for header text */
+    border-bottom: 1px solid var(--border-color, #555) !important;
+}
+
+.dark-mode .manage-report-templates-container .form-label {
+    color: var(--text-color, #f2f2f2) !important; /* Explicit light text */
+}
+
+.dark-mode .manage-report-templates-container .form-control {
+    background-color: var(--input-background-color, #444) !important; /* Use input background variable */
+    color: var(--text-color, #f2f2f2) !important; /* Use text color variable for input text */
+    border-color: var(--border-color, #555) !important; /* Use border variable for input border */
+}
+
+.add-template-button {
+    display: block; /* Ensure the button is on its own line */
+    margin-bottom: 30px; /* Keep margin on button, but container will also add space */
+}
+
+.add-template-button-container {
+    display: block; /* Ensure the container is on its own line */
+    margin-bottom: 20px; /* Add space below the container */
 }
