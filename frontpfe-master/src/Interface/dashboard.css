@@ -21,6 +21,21 @@
   --sidebar-transition: width 0.3s ease-in-out, padding 0.3s ease-in-out, transform 0.3s ease-in-out; /* Added width/padding */
 }
 
+/* Dark Mode Styles */
+body.dark-mode {
+  --text-color: #ffffff; /* White text */
+  --light-text-color: #cccccc; /* Very light gray for secondary text */
+  --background-color: #121212; /* Very dark background */
+  --light-background: #1e1e1e; /* Slightly lighter dark background */
+  --white: #1e1e1e; /* Dark background for elements that were white */
+  --tile-background: #2a2a2a; /* Darker background for tiles */
+  --chart-background: #2a2a2a; /* Darker background for charts */
+  --border-color: #444; /* Darker border color */
+  --primary-color: #00a88a; /* Slightly adjusted primary color for contrast */
+  --secondary-color: #00a88a; /* Slightly adjusted secondary color */
+  --light-blue: #005f4d; /* Darker light blue */
+}
+
 body {
   font-family: var(--font-family);
   color: var(--text-color);
@@ -46,6 +61,11 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+body.dark-mode .app-header {
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+
 .app-header-logo {
   display: flex;
   align-items: center;
@@ -58,6 +78,11 @@ body {
   padding: 10px 20px; /* Adjusted padding */
   margin-right: 20px;
 }
+
+body.dark-mode .logo {
+  background-color: var(--tile-background);
+}
+
 
 .logo-icon img {
   height: 40px; /* Adjust size */
@@ -109,6 +134,12 @@ body {
   transition: width 0.3s ease-in-out; /* Add transition */
 }
 
+body.dark-mode .app-body-navigation {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+
+
 .navigation {
   flex-grow: 1;
   overflow-y: auto; /* Allow scrolling if links overflow */
@@ -125,10 +156,21 @@ body {
   border-left: 3px solid transparent; /* Indicator for active link */
 }
 
+body.dark-mode .navigation a {
+  color: var(--light-text-color);
+}
+
+
 .navigation a:hover {
   background-color: rgba(255, 255, 255, 0.1); /* Subtle hover */
   color: #000000; /* Black text on hover */
 }
+
+body.dark-mode .navigation a:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-color);
+}
+
 
 .navigation a.active { /* Example active state */
   background-color: rgba(255, 255, 255, 0.15); /* Slightly stronger active background */
@@ -137,11 +179,12 @@ body {
   border-left-color: var(--primary-color);
 }
 
-.navigation a i { /* Assuming icons are used */
-  margin-right: 1rem;
-  width: 20px; /* Fixed width for alignment */
-  text-align: center;
+body.dark-mode .navigation a.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+  border-left-color: var(--primary-color);
 }
+
 
 .footer {
   text-align: center;
@@ -152,11 +195,22 @@ body {
   color: rgba(255, 255, 255, 0.7); /* Lighter footer text */
 }
 
+body.dark-mode .footer {
+  background-color: var(--secondary-color);
+  border-top-color: rgba(255, 255, 255, 0.1);
+  color: var(--light-text-color);
+}
+
+
 .footer h1 {
   font-size: 1rem;
   margin-bottom: 5px;
   color: var(--white);
 }
+body.dark-mode .footer h1 {
+  color: var(--text-color);
+}
+
 .footer small {
   font-size: 0.8em; /* Make copyright symbol smaller */
   vertical-align: super; /* Align copyright symbol */
@@ -169,6 +223,11 @@ body {
   background-color: var(--light-background, #f8f9fa); /* Use light gray */
   overflow-y: auto; /* Allow scrolling for main content */
 }
+
+body.dark-mode .app-body-main-content {
+  background-color: var(--light-background);
+}
+
 
 .service-section {
   margin-bottom: 40px; /* More space between sections */
@@ -183,6 +242,12 @@ body {
   padding-bottom: 10px;
   display: inline-block; /* Keep border only under text */
 }
+
+body.dark-mode .service-section h2 {
+  color: var(--text-color);
+  border-bottom-color: var(--primary-color);
+}
+
 
 .tiles {
   display: grid; /* Use grid for better alignment */
@@ -202,12 +267,26 @@ body {
   border: 1px solid var(--primary-color, #00c6a9); /* Bordure vert d'eau par défaut */
 }
 
+body.dark-mode .tile {
+  background: var(--tile-background);
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.05);
+  border-color: var(--primary-color);
+}
+
+
 .tile:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   border-color: var(--primary-color); /* Accent border on hover */
   background-color: var(--light-blue, #e0f7f4); /* Arrière-plan vert d'eau clair au survol */
 }
+
+body.dark-mode .tile:hover {
+  box-shadow: 0 6px 12px rgba(255, 255, 255, 0.1);
+  border-color: var(--primary-color);
+  background-color: var(--light-blue);
+}
+
 
 .tile-header {
   display: flex;
@@ -223,6 +302,11 @@ body {
   text-align: center;
 }
 
+body.dark-mode .tile-header i {
+  color: var(--primary-color);
+}
+
+
 .tile-header h3 {
   font-size: 1rem;
   font-weight: bold;
@@ -235,17 +319,28 @@ body {
   font-weight: normal;
   color: var(--light-text-color); /* Default for spans */
 }
+body.dark-mode .tile-header h3 span {
+  color: var(--light-text-color);
+}
+
 .tile-header h3 span:nth-child(2) { /* Target the second span specifically */
     color: var(--text-color, #000000); /* Make the second span black */
     font-weight: bold; /* Mettre en gras */
     text-align: center; /* Centrer le texte */
     font-size: 1.1rem; /* Diminuer un peu la taille de la police */
 }
+body.dark-mode .tile-header h3 span:nth-child(2) {
+  color: var(--text-color); /* Should be white in dark mode */
+}
+
 .tile-header h3 span:first-child { /* Style first span as title */
   font-size: 1rem;
   font-weight: bold;
   color: var(--text-color);
   margin-bottom: 5px;
+}
+body.dark-mode .tile-header h3 span:first-child {
+  color: var(--text-color);
 }
 
 
@@ -259,10 +354,20 @@ body {
   align-self: flex-start; /* Align link to the start */
 }
 
+body.dark-mode .tile a {
+  color: var(--primary-color);
+}
+
+
 .tile a:hover {
   text-decoration: underline;
   color: var(--secondary-color, #4e73df); /* Use secondary blue for link hover */
 }
+
+body.dark-mode .tile a:hover {
+  color: var(--secondary-color);
+}
+
 
 /* Doctor Charts Grid Layout */
 .doctor-charts-grid {
@@ -288,6 +393,11 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
+body.dark-mode .charts-section {
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.05);
+}
+
+
 .chart-container {
   margin-bottom: 0; /* Remove bottom margin from chart container itself */
   max-width: 100%; /* Ensure charts are responsive */
@@ -295,10 +405,17 @@ body {
   padding: 20px; /* Add padding */
   border-radius: 8px; /* Add border radius */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+  border: 1px solid var(--primary-color); /* Add primary color border */
   display: flex; /* Use flexbox for content alignment */
   flex-direction: column; /* Stack title, chart, description */
   align-items: center; /* Center content horizontally */
 }
+
+body.dark-mode .chart-container {
+  background-color: var(--chart-background);
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
 
 /* Ensure consistent height for charts within the grids */
 .doctor-charts-grid .chart-container,
@@ -324,12 +441,34 @@ body {
   text-align: center;
 }
 
+body.dark-mode .chart-container h4 {
+  color: var(--text-color);
+}
+
+
 .chart-description {
   font-size: 0.9rem;
   color: var(--light-text-color);
   text-align: center;
   margin-top: 10px;
 }
+
+body.dark-mode .chart-description {
+  color: var(--light-text-color);
+}
+
+/* Styles for Month/Year Selectors in Dark Mode */
+body.dark-mode .month-year-selector select {
+  color: #000000 !important; /* Black text color */
+  background-color: #ffffff !important; /* White background for the select box itself */
+  border-color: var(--border-color); /* Darker border */
+}
+
+body.dark-mode .month-year-selector select option {
+    color: #000000 !important; /* Black text color for options */
+    background-color: #ffffff !important; /* White background for options */
+}
+
 
 /* Right Sidebar (User Info) */
 .sidebar {
@@ -344,6 +483,12 @@ body {
   transform: translateX(0); /* Default state: visible */
   width: var(--sidebar-width); /* Ensure width is set */
 }
+
+body.dark-mode .sidebar {
+  background-color: var(--tile-background);
+  border-left-color: var(--border-color);
+}
+
 
 .sidebar-closed {
   width: 0 !important; /* Collapse width */
@@ -361,6 +506,11 @@ body {
   border-bottom: 1px solid #e0e0e0;
 }
 
+body.dark-mode .sidebar-header {
+  border-bottom-color: var(--border-color);
+}
+
+
 .sidebar-header img {
   width: 100px;
   height: 100px;
@@ -370,12 +520,22 @@ body {
   object-fit: cover; /* Ensure image covers the area */
 }
 
+body.dark-mode .sidebar-header img {
+  border-color: var(--primary-color);
+}
+
+
 .sidebar-header h3 {
   font-size: 1.3rem;
   font-weight: bold;
   color: var(--text-color);
   margin: 0;
 }
+
+body.dark-mode .sidebar-header h3 {
+  color: var(--text-color);
+}
+
 
 .sidebar-content {
   flex-grow: 1;
@@ -392,6 +552,11 @@ body {
   line-height: 1.5;
 }
 
+body.dark-mode .user-info-item p {
+  color: var(--light-text-color);
+}
+
+
 .user-info-item p strong {
   color: var(--text-color, #333); /* Darker color for labels */
   font-weight: bold;
@@ -400,9 +565,19 @@ body {
   margin-right: 5px;
 }
 
+body.dark-mode .user-info-item p strong {
+  color: var(--text-color);
+}
+
+
 .user-info-item p span {
   color: #000000; /* Black color for values */
 }
+
+body.dark-mode .user-info-item p span {
+  color: var(--text-color);
+}
+
 
 /* Utility Classes */
 .error-message {
@@ -416,6 +591,12 @@ body {
   font-weight: bold;
   text-align: center;
 }
+
+body.dark-mode .error-message {
+  background-color: rgba(231, 74, 59, 0.2);
+  border-color: var(--error-color);
+}
+
 
 label.required::after {
   content: '*';
@@ -456,6 +637,10 @@ label.required::after {
     position: relative; /* Needed for potential absolute positioning inside */
     z-index: 10; /* Ensure nav is above content */
   }
+  body.dark-mode .app-body-navigation {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
   .navigation {
     display: flex;
     flex-direction: row;
@@ -488,8 +673,13 @@ label.required::after {
     transition: transform 0.3s ease-in-out; /* Only transition transform */
     width: var(--sidebar-width); /* Keep width */
     border-left: 1px solid #e0e0e0;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.1); /* Add shadow */
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
   }
+  body.dark-mode .sidebar {
+    border-left-color: var(--border-color);
+    box-shadow: -2px 0 5px rgba(255,255,255,0.1);
+  }
+
   .sidebar:not(.sidebar-closed) { /* When open */
       transform: translateX(0);
   }
@@ -536,10 +726,22 @@ label.required::after {
   transition: background-color 0.3s, transform 0.2s;
 }
 
+body.dark-mode .sidebar-toggle-button-main {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  box-shadow: 0 2px 5px rgba(255, 255, 255, 0.2);
+}
+
+
 .sidebar-toggle-button-main:hover {
   background-color: #00937d; /* Darker theme color on hover */
   transform: translateY(-50%) scale(1.1); /* Slight scale effect on hover */
 }
+
+body.dark-mode .sidebar-toggle-button-main:hover {
+  background-color: var(--light-blue);
+}
+
 
 /* Adjust position when sidebar is closed if needed (optional) */
 /* If the main content area expands when sidebar closes, this might not be necessary */

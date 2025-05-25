@@ -100,3 +100,39 @@
 .chatbot-container:not(.open) .chatbot-window {
   display: none;
 }
+
+/* Dark mode styles */
+.dark-mode .chatbot-window {
+  background-color: #333;
+  border-color: #555;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .chatbot-messages {
+  background-color: #444;
+}
+
+.dark-mode .message.user {
+  background-color: #0056b3; /* Darker blue for user messages in dark mode */
+  color: white;
+}
+
+.dark-mode .message.bot {
+  background-color: #555; /* Darker grey for bot messages in dark mode */
+  color: white;
+}
+
+.dark-mode .chatbot-input {
+  border-top-color: #555;
+  background-color: #333;
+}
+
+.dark-mode .chatbot-input input {
+  background-color: #444;
+  color: white;
+  border-color: #555;
+}
+
+.dark-mode .chatbot-input input::placeholder {
+  color: #ccc;
+}

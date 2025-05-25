@@ -164,7 +164,6 @@
     font-size: 0.9rem;
 }
 
-<<<<<<< HEAD
 /* Specific styles for dark mode */
 .dark-mode .manage-report-templates-container {
     background-color: #1e1e1e !important; /* Dark background for container */
@@ -209,13 +208,6 @@
 
 .dark-mode .manage-report-templates-container tr:hover {
     background-color: #3a3a3a !important; /* Darker hover background */
-=======
-/* Specific styles for dark mode - keeping this block just in case .dark-mode is used */
-.dark-mode .manage-report-templates-container .card {
-    background-color: var(--background-color, #333) !important; /* Use background variable for card */
-    border-color: var(--border-color, #555) !important;
-    color: var(--text-color, #f2f2f2) !important; /* Ensure text color is applied to card content */
->>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
 }
 
 .dark-mode .manage-report-templates-container .card-header {
@@ -232,8 +224,53 @@
     background-color: var(--input-background-color, #444) !important; /* Use input background variable */
     color: var(--text-color, #f2f2f2) !important; /* Use text color variable for input text */
     border-color: var(--border-color, #555) !important; /* Use border variable for input border */
-<<<<<<< HEAD
 }
+
+/* Dark mode styles for ReactQuill editor */
+.dark-mode .ql-toolbar.ql-snow {
+    border-color: #555 !important; /* Darker border for toolbar */
+    background-color: #444 !important; /* Dark background for toolbar */
+}
+
+.dark-mode .ql-container.ql-snow {
+    border-color: #555 !important; /* Darker border for container */
+}
+
+.dark-mode .ql-editor {
+    color: #f2f2f2 !important; /* Light text color for editor content */
+    background-color: #333 !important; /* Dark background for editor content */
+}
+
+.dark-mode .ql-stroke {
+    stroke: #f2f2f2 !important; /* Light color for icons (strokes) */
+}
+
+.dark-mode .ql-fill {
+    fill: #f2f2f2 !important; /* Light color for icons (fills) */
+}
+
+.dark-mode .ql-picker-label {
+    color: #f2f2f2 !important; /* Light color for dropdown labels */
+}
+
+.dark-mode .ql-picker-label .ql-stroke {
+     stroke: #f2f2f2 !important; /* Ensure dropdown arrows are light */
+}
+
+.dark-mode .ql-picker.ql-expanded .ql-picker-options {
+    background-color: #444 !important; /* Dark background for dropdown options */
+    border-color: #555 !important; /* Dark border for dropdown options */
+}
+
+.dark-mode .ql-picker.ql-expanded .ql-picker-item {
+    color: #f2f2f2 !important; /* Light text color for dropdown items */
+}
+
+.dark-mode .ql-picker.ql-expanded .ql-picker-item:hover {
+    background-color: #555 !important; /* Darker background on hover for dropdown items */
+    color: #f2f2f2 !important; /* Ensure text remains light on hover */
+}
+
 
 .add-template-button {
     display: block; /* Ensure the button is on its own line */
@@ -243,6 +280,4 @@
 .add-template-button-container {
     display: block; /* Ensure the container is on its own line */
     margin-bottom: 20px; /* Add space below the container */
-=======
->>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
 }

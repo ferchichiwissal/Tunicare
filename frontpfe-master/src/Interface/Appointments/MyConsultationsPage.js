@@ -18,7 +18,9 @@ const MyConsultationsPage = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate(); // Initialize useNavigate
     const [certificateStatusMap, setCertificateStatusMap] = useState({}); // { consultationId: 'exists' | 'not_found' | 'loading' }
+    const [prescriptionStatusMap, setPrescriptionStatusMap] = useState({}); // { consultationId: 'exists' | 'not_found' | 'loading' } // New state
     const [isCheckingCertificates, setIsCheckingCertificates] = useState(false); // Track certificate check loading state
+    const [isCheckingPrescriptions, setIsCheckingPrescriptions] = useState(false); // Track prescription check loading state // New state
 
     // Revert API_URL definition
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6952';
@@ -94,6 +96,7 @@ const MyConsultationsPage = () => {
 
             setIsLoading(true);
             setIsCheckingCertificates(true); // Start checking certificates as well
+            setIsCheckingPrescriptions(true); // Start checking prescriptions as well // New line
             setError('');
             let fetchedConsultations = []; // Temporary variable
             try {
@@ -125,17 +128,26 @@ const MyConsultationsPage = () => {
                 setConsultations([]);
             } finally {
                 setIsLoading(false); // Stop main loading here
-                // Don't stop certificate checking here
+                // Don't stop certificate or prescription checking here
             }
-            // --- Check for certificates after fetching consultations ---
+            // --- Check for certificates and prescriptions after fetching consultations --- // Modified comment
             if (fetchedConsultations.length > 0 && userData.accessToken) {
-                const initialStatusMap = fetchedConsultations.reduce((acc, consult) => {
+                // Initialize status maps
+                const initialCertificateStatusMap = fetchedConsultations.reduce((acc, consult) => {
                     acc[consult.idConsultation] = 'loading';
                     return acc;
                 }, {});
-                setCertificateStatusMap(initialStatusMap);
+                setCertificateStatusMap(initialCertificateStatusMap);
 
-                const checkPromises = fetchedConsultations.map(async (consult) => {
+                 const initialPrescriptionStatusMap = fetchedConsultations.reduce((acc, consult) => { // New
+                    acc[consult.idConsultation] = 'loading'; // New
+                    return acc; // New
+                }, {}); // New
+                setPrescriptionStatusMap(initialPrescriptionStatusMap); // New
+
+
+                // Check certificates
+                const checkCertificatePromises = fetchedConsultations.map(async (consult) => {
                     try {
                         // Use the details endpoint which is more lightweight
                         await axios.get(`${API_URL}/api/certificates/details/consultation/${consult.idConsultation}`, {
@@ -152,17 +164,52 @@ const MyConsultationsPage = () => {
                     }
                 });
 
-                const results = await Promise.all(checkPromises);
+                // Check prescriptions // New section
+                 const checkPrescriptionPromises = fetchedConsultations.map(async (consult) => { // New
+                    try { // New
+                        // Use the download endpoint and check for 200 status // New
+                        const response = await axios.head(`${API_URL}/api/ordonnances/consultation/${consult.idConsultation}/download`, { // Use HEAD request for efficiency // New
+                            headers: { 'Authorization': `Bearer ${userData.accessToken}` } // New
+                        }); // New
+                         if (response.status === 200) { // New
+                            return { id: consult.idConsultation, status: 'exists' }; // New
+                        } else { // New
+                             return { id: consult.idConsultation, status: 'not_found' }; // New
+                        } // New
+                    } catch (presErr) { // New
+                        if (presErr.response?.status === 404) { // New
+                            return { id: consult.idConsultation, status: 'not_found' }; // New
+                        } else { // New
+                            console.error(`Error checking prescription for consultation ${consult.idConsultation}:`, presErr); // New
+                            return { id: consult.idConsultation, status: 'error' }; // Mark as error // New
+                        } // New
+                    } // New
+                }); // New
+
+
+                const certificateResults = await Promise.all(checkCertificatePromises);
                 setCertificateStatusMap(prevMap => {
                     const newMap = { ...prevMap };
-                    results.forEach(result => {
+                    certificateResults.forEach(result => {
                         newMap[result.id] = result.status;
                     });
                     return newMap;
                 });
                  setIsCheckingCertificates(false); // Finish checking certificates
+
+                 const prescriptionResults = await Promise.all(checkPrescriptionPromises); // New
+                setPrescriptionStatusMap(prevMap => { // New
+                    const newMap = { ...prevMap }; // New
+                    prescriptionResults.forEach(result => { // New
+                        newMap[result.id] = result.status; // New
+                    }); // New
+                    return newMap; // New
+                }); // New
+                 setIsCheckingPrescriptions(false); // Finish checking prescriptions // New
+
             } else {
                  setIsCheckingCertificates(false); // Also finish if no consultations or no token
+                 setIsCheckingPrescriptions(false); // Also finish if no consultations or no token // New
             }
         };
 
@@ -340,7 +387,7 @@ const MyConsultationsPage = () => {
     };
 
     // Combined loading state
-    const showLoading = isLoading || isCheckingCertificates;
+    const showLoading = isLoading || isCheckingCertificates || isCheckingPrescriptions; // Added isCheckingPrescriptions
 
     if (showLoading) {
         // Keep Bootstrap spinner and use translation
@@ -363,9 +410,7 @@ const MyConsultationsPage = () => {
                             {/* Use translated table headers */}
                             <th>{t('myConsultationsPage.table.date')}</th>
                             <th>{t('myConsultationsPage.table.type')}</th>
-                            <th>{t('myConsultationsPage.table.prescription')}</th>
-                            <th>{t('myConsultationsPage.table.certificate', 'Certificat')}</th> {/* New Header */}
-                            <th>{t('myConsultationsPage.table.actions', 'Actions')}</th> {/* New Header for Actions */}
+                            <th>{t('myConsultationsPage.table.actions', 'Actions')}</th> {/* Combined Actions Header */}
                         </tr>
                     </thead>
                     <tbody>
@@ -375,51 +420,53 @@ const MyConsultationsPage = () => {
                                     <td>{formatDate(consult.dateConsultation)}</td>
                                     {/* Use translation for default type */}
                                     <td>{consult.type || t('myConsultationsPage.table.defaultType')}</td>
-                                    <td>
-                                        <button
-                                            className="btn btn-sm btn-primary" // Change to btn-primary for teal color
-                                            onClick={() => handleDownload(consult.idConsultation)}
-                                        >
-                                            {t('myConsultationsPage.buttons.download')} {/* Use translation */}
-                                        </button>
-                                    </td>
-                                    <td> {/* New Cell for Certificate Button */}
-                                        {certificateStatusMap[consult.idConsultation] === 'exists' ? (
-                                            <button
-                                                className="btn btn-sm btn-primary" // Changed to primary for teal color
-                                                onClick={() => handleDownloadCertificate(consult.idConsultation)}
-                                            >
-                                                {t('myConsultationsPage.buttons.downloadedCertificate', 'Téléchargé')} {/* Changed text */}
-                                            </button>
-                                        ) : certificateStatusMap[consult.idConsultation] === 'loading' ? (
-                                            <span className="text-muted small">{t('myConsultationsPage.checking', 'Vérification...')}</span>
+                                    <td className="actions-cell"> {/* Combined Actions Cell */}
+                                        {prescriptionStatusMap[consult.idConsultation] === 'loading' ? ( // Check prescription loading state
+                                             <span className="text-muted small me-2">{t('myConsultationsPage.checking', 'Vérification...')}</span> // Added me-2
                                         ) : (
-                                            <span>-</span> // Display dash if not found or error during check
-                                        )}
-                                    </td>
-                                    <td> {/* New Cell for Hide Button */}
-                                        <button
-                                            className="btn btn-sm btn-primary"
-                                            onClick={() => handleHideConsultation(consult.idConsultation)}
-                                        >
-                                            {t('myConsultationsPage.buttons.hideConsultation')}
-                                        </button>
+                                            <button
+                                                className="btn btn-primary btn-sm me-2" // Change to btn-primary for teal color, added me-2
+                                                onClick={() => handleDownload(consult.idConsultation)}
+                                                disabled={prescriptionStatusMap[consult.idConsultation] !== 'exists'} // Disable if not 'exists'
+                                                title={prescriptionStatusMap[consult.idConsultation] !== 'exists' ? t('myConsultationsPage.tooltips.prescriptionNotAvailable', 'Ordonnance non disponible') : t('myConsultationsPage.buttons.download')} // Add tooltip
+                                            >
+                                                {t('myConsultationsPage.buttons.downloadPrescription')} {/* Use translation key */}
+                                            </button>
+                                            )}
+                                            {certificateStatusMap[consult.idConsultation] === 'loading' ? (
+                                                <span className="text-muted small me-2">{t('myConsultationsPage.checking')}</span> // Use translation key
+                                            ) : (
+                                                 <button
+                                                    className="btn btn-primary btn-sm me-2" // Changed to primary for teal color, added me-2
+                                                    onClick={() => handleDownloadCertificate(consult.idConsultation)}
+                                                    disabled={certificateStatusMap[consult.idConsultation] !== 'exists'} // Disable if not 'exists'
+                                                    title={certificateStatusMap[consult.idConsultation] !== 'exists' ? t('myConsultationsPage.tooltips.certificateNotAvailable') : t('myConsultationsPage.buttons.downloadedCertificate')} // Use translation keys
+                                                >
+                                                    {t('myConsultationsPage.buttons.downloadCertificate')} {/* Use translation key */}
+                                                </button>
+                                            )}
+                                            <button
+                                                className="btn btn-primary btn-sm" // Removed ms-2, will be handled by me-2 on previous buttons
+                                                onClick={() => handleHideConsultation(consult.idConsultation)}
+                                            >
+                                                {t('myConsultationsPage.buttons.hideConsultation')} {/* Use translation key */}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    {/* Use translated no consultations message, adjust colspan */}
+                                    <td colSpan={3} className="text-center"> {/* Adjusted colspan to 3 */}
+                                        {t('myConsultationsPage.table.noConsultations')}
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                {/* Use translated no consultations message, adjust colspan */}
-                                <td colSpan={5} className="text-center"> {/* Adjusted colspan to 5 */}
-                                    {t('myConsultationsPage.table.noConsultations')}
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div> {/* Close table-responsive wrapper */}
-        </div>
-    );
-};
-
-export default MyConsultationsPage;
+                            )}
+                        </tbody>
+                    </table>
+                </div> {/* Close table-responsive wrapper */}
+            </div>
+        );
+    };
+    
+    export default MyConsultationsPage;

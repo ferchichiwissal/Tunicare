@@ -19,6 +19,11 @@
   display: inline-block;
 }
 
+/* Style spécifique pour le titre "Filtrer par Acte :" */
+.user-table-container h5 {
+  color: #000000; /* Couleur noire */
+}
+
 .user-table-container input[type="text"] {
   width: 100%;
   padding: 12px 15px;

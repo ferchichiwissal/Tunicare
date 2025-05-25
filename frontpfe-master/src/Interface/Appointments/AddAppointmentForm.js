@@ -26,7 +26,7 @@ const AddAppointmentForm = () => { // Removed patientId prop
 
     const [apptDateTime, setApptDateTime] = useState(formatDateTimeLocal(proposedDateTime) || ''); // Updated state name and initial value
     // Use the canonical French string for the state, translate only for display
-    const [apptType, setApptType] = useState('Nouvelle consultation');
+    const [apptType, setApptType] = useState(''); // Changed initial state to empty string
     // Removed cabinetId state and cabinets state
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
@@ -198,6 +198,7 @@ const AddAppointmentForm = () => { // Removed patientId prop
                             className="form-control"
                         >
                             {/* Use canonical French strings for value, translate display text */}
+                            <option value="">{t('addAppointment.typeOptionSelect', 'Sélectionner le type de rendez-vous...')}</option>
                             <option value="Nouvelle consultation">{t('addAppointment.typeOptionNew', 'Nouvelle consultation')}</option>
                             <option value="Séance de contrôle">{t('addAppointment.typeOptionControl', 'Séance de contrôle')}</option>
                             {/* Add other types if needed, ensuring they have corresponding translation keys and use the canonical value */}

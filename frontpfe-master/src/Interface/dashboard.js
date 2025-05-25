@@ -9,6 +9,7 @@ import Chatbot from './Chatbot';
 import './Chatbot.css';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
 import apiClient from '../utils/apiClient'; // Import apiClient
+import ThemeContext from '../utils/ThemeContext'; // Import ThemeContext
 
 // Register chart elements
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineElement, PointElement, ArcElement); // Added ArcElement
@@ -17,6 +18,7 @@ const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 const Dashboard = ({ onLogout }) => {
   // const [user, setUser] = useState(null); // Will be replaced by useAuth()
   const { user: authUser, token } = useAuth(); // Use user from AuthContext
+  const { theme, toggleTheme } = useContext(ThemeContext); // Use theme context
   const [loading, setLoading] = useState(true);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -46,7 +48,6 @@ const Dashboard = ({ onLogout }) => {
 
   // Helper function to get the translation key for exam types
   const getExamTypeTranslationKey = (reportType) => {
-<<<<<<< HEAD
     // Normalize the report type to handle variations from the backend
     const normalizedReportType = reportType ? reportType.toLowerCase().trim() : '';
 
@@ -68,21 +69,6 @@ const Dashboard = ({ onLogout }) => {
         return "medicalExaminationForm.examTypes.autre"; // Use 'autre' key for both
       default:
         return ""; // No translation for unknown types
-=======
-    switch (reportType) {
-      case "IRM":
-        return "medicalExaminationForm.examTypes.irm";
-      case "Radio":
-        return "medicalExaminationForm.examTypes.radio";
-      case "Blood Test":
-        return "medicalExaminationForm.examTypes.analysesanguine";
-      case "Scanner":
-        return "medicalExaminationForm.examTypes.scanner";
-      case "Ultrasound":
-        return "medicalExaminationForm.examTypes.echographie";
-      default:
-        return ""; // No translation for unknown types as per requirement
->>>>>>> 8c760cf73f8a4cfffb63b922526d7b2e51469b9a
     }
   };
 
@@ -366,8 +352,8 @@ const Dashboard = ({ onLogout }) => {
                 data: [response.data.acceptedCount, response.data.realizedCount, response.data.refusedCount],
                 backgroundColor: [
                   'rgba(75, 192, 192, 0.8)', // Couleur pour "Accepté"
-                  'rgba(54, 162, 235, 0.8)', // Nouvelle couleur pour "Réalisé"
-                  'rgba(255, 99, 132, 0.8)', // Couleur pour "Refusé"
+                  'rgb(64, 214, 255)', // Nouvelle couleur pour "Réalisé"
+                  'rgb(64, 249, 255)', // Couleur pour "Refusé"
                 ],
               },
             ],
@@ -391,15 +377,21 @@ const Dashboard = ({ onLogout }) => {
   // Data and Options for Doctor Appointments Distribution Chart (Pie Chart)
   const doctorAppointmentsDistributionData = monthlyAppointmentDistribution; // Use the fetched data directly
 
+  const chartTextColor = theme === 'dark' ? '#ffffff' : '#333'; // White in dark mode, dark gray in light mode
+
   const doctorAppointmentsDistributionOptions = {
     responsive: true,
     plugins: {
       legend: {
         position: 'bottom',
+        labels: {
+          color: chartTextColor, // Set legend text color
+        },
       },
       title: {
         display: true,
         text: t('dashboard.charts.appointmentsDistribution.title'),
+        color: chartTextColor, // Set title text color
       }
     }
   };
@@ -423,10 +415,14 @@ const Dashboard = ({ onLogout }) => {
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          color: chartTextColor, // Set legend text color
+        },
       },
       title: {
         display: true,
         text: t('dashboard.charts.consultationsEvolution.title'),
+        color: chartTextColor, // Set title text color
       },
     },
     scales: {
@@ -434,19 +430,29 @@ const Dashboard = ({ onLogout }) => {
         title: {
           display: true,
           text: t('dashboard.charts.monthAxisLabel'),
+          color: chartTextColor, // Set x-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set x-axis tick color
         },
         grid: {
           display: true, // Enable grid lines
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
       y: {
         title: {
           display: true,
           text: t('dashboard.charts.countAxisLabel'), // Assuming a generic count label
+          color: chartTextColor, // Set y-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set y-axis tick color
         },
         beginAtZero: true,
         grid: {
           display: true, // Enable grid lines
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
     },
@@ -470,10 +476,14 @@ const Dashboard = ({ onLogout }) => {
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          color: chartTextColor, // Set legend text color
+        },
       },
       title: {
         display: true,
         text: t('dashboard.charts.examsEvolution.title'),
+        color: chartTextColor, // Set title text color
       },
     },
     scales: {
@@ -481,19 +491,29 @@ const Dashboard = ({ onLogout }) => {
         title: {
           display: true,
           text: t('dashboard.charts.monthAxisLabel'),
+          color: chartTextColor, // Set x-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set x-axis tick color
         },
         grid: {
           display: false, // Keep grid lines disabled for this dummy data chart
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
       y: {
         title: {
           display: true,
           text: t('dashboard.charts.countAxisLabel'),
+          color: chartTextColor, // Set y-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set y-axis tick color
         },
         beginAtZero: true,
         grid: {
           display: false, // Keep grid lines disabled for this dummy data chart
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
     },
@@ -506,8 +526,8 @@ const Dashboard = ({ onLogout }) => {
       {
         label: t('dashboard.charts.patientsEvolution.label'),
         data: doctorMonthlyPatients.map(stat => stat.count),
-        borderColor: 'rgba(255, 159, 64, 1)',
-        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+        borderColor: 'rgb(64, 249, 255)',
+        backgroundColor: 'rgb(64, 249, 255)',
         tension: 0.1,
       },
     ],
@@ -518,10 +538,14 @@ const Dashboard = ({ onLogout }) => {
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          color: chartTextColor, // Set legend text color
+        },
       },
       title: {
         display: true,
         text: t('dashboard.charts.patientsEvolution.title'),
+        color: chartTextColor, // Set title text color
       },
     },
     scales: {
@@ -529,19 +553,29 @@ const Dashboard = ({ onLogout }) => {
         title: {
           display: true,
           text: t('dashboard.charts.monthAxisLabel'),
+          color: chartTextColor, // Set x-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set x-axis tick color
         },
         grid: {
           display: true, // Enable grid lines
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
       y: {
         title: {
           display: true,
           text: t('dashboard.charts.countAxisLabel'),
+          color: chartTextColor, // Set y-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set y-axis tick color
         },
         beginAtZero: true,
         grid: {
           display: true,
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
     },
@@ -554,8 +588,8 @@ const Dashboard = ({ onLogout }) => {
       {
         label: t('dashboard.doctorCentre.charts.monthlyReports.label'),
         data: doctorCentreMonthlyReports.map(stat => stat.reportCount),
-        borderColor: 'rgba(255, 99, 132, 1)', // Red
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgb(64, 249, 255)', // Red
+        backgroundColor: 'rgb(64, 249, 255)',
         tension: 0.1,
         type: 'line', // Default to line, can be changed to 'bar' for histogram
       },
@@ -567,10 +601,14 @@ const Dashboard = ({ onLogout }) => {
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          color: chartTextColor, // Set legend text color
+        },
       },
       title: {
         display: true,
         text: t('dashboard.doctorCentre.charts.monthlyReports.title'),
+        color: chartTextColor, // Set title text color
       },
     },
     scales: {
@@ -578,19 +616,29 @@ const Dashboard = ({ onLogout }) => {
         title: {
           display: true,
           text: t('dashboard.charts.monthAxisLabel'),
+          color: chartTextColor, // Set x-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set x-axis tick color
         },
         grid: {
           display: true,
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
       y: {
         title: {
           display: true,
           text: t('dashboard.charts.countAxisLabel'),
+          color: chartTextColor, // Set y-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set y-axis tick color
         },
         beginAtZero: true,
         grid: {
           display: true,
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
     },
@@ -603,12 +651,12 @@ const Dashboard = ({ onLogout }) => {
       {
         data: doctorCentreReportTypes.map(stat => stat.reportCount),
         backgroundColor: [
-          'rgba(54, 162, 235, 0.8)', // Blue
+          'rgba(54, 214, 235, 0.8)', // Blue
           'rgba(127, 247, 247, 0.8)', // Yellow
           'rgba(75, 192, 192, 0.8)', // Green
-          'rgba(153, 102, 255, 0.8)', // Purple
+          'rgb(64, 249, 255)', // Purple
           'rgba(60, 246, 63, 0.8)', // Orange
-          'rgba(201, 203, 207, 0.8)', // Grey
+          'rgba(7, 166, 161, 0.8)', // Grey
         ],
       },
     ],
@@ -619,10 +667,14 @@ const Dashboard = ({ onLogout }) => {
     plugins: {
       legend: {
         position: 'bottom',
+        labels: {
+          color: chartTextColor, // Set legend text color
+        },
       },
       title: {
         display: true,
         text: t('dashboard.doctorCentre.charts.reportTypes.title'),
+        color: chartTextColor, // Set title text color
       }
     }
   };
@@ -658,10 +710,10 @@ const Dashboard = ({ onLogout }) => {
           dashboardStats.totalDoctorCentres // Added data for Doctor Centres
         ],
         backgroundColor: [
-          'rgba(54, 162, 235, 0.8)', // Patients (Blue)
-          'rgba(255, 99, 132, 0.8)', // Doctors (Red)
+          'rgb(64, 249, 255)', // Patients (Blue)
+          'rgba(99, 234, 255, 0.8)', // Doctors (Red)
           'rgba(75, 192, 192, 0.8)', // Assistants (Green)
-          'rgba(255, 205, 86, 0.8)' // Doctor Centres (Yellow) - New color
+          'rgba(7, 166, 161, 0.8)' // Doctor Centres (Yellow) - New color
         ]
       }
     ]
@@ -673,10 +725,14 @@ const Dashboard = ({ onLogout }) => {
     plugins: {
       legend: {
         position: 'bottom',
+        labels: {
+          color: chartTextColor, // Set legend text color
+        },
       },
       title: {
         display: true,
         text: t('dashboard.admin.usersChartTitle'),
+        color: chartTextColor, // Set title text color
       }
     }
   };
@@ -700,10 +756,14 @@ const Dashboard = ({ onLogout }) => {
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          color: chartTextColor, // Set legend text color
+        },
       },
       title: {
         display: true,
         text: t('dashboard.admin.charts.consultationsEvolution.title'),
+        color: chartTextColor, // Set title text color
       },
     },
     scales: {
@@ -711,19 +771,29 @@ const Dashboard = ({ onLogout }) => {
         title: {
           display: true,
           text: t('dashboard.charts.monthAxisLabel'),
+          color: chartTextColor, // Set x-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set x-axis tick color
         },
         grid: {
           display: true,
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
       y: {
         title: {
           display: true,
           text: t('dashboard.charts.countAxisLabel'),
+          color: chartTextColor, // Set y-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set y-axis tick color
         },
         beginAtZero: true,
         grid: {
           display: true,
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
     },
@@ -736,8 +806,8 @@ const Dashboard = ({ onLogout }) => {
       {
         label: t('dashboard.admin.charts.examsEvolution.label'),
         data: adminMonthlyExams.map(stat => stat.count),
-        backgroundColor: 'rgba(153, 102, 255, 0.6)', // Purple
-        borderColor: 'rgba(153, 102, 255, 1)',
+        backgroundColor: 'rgb(64, 249, 255)', // Purple
+        borderColor: 'rgb(64, 249, 255)',
         borderWidth: 1,
       },
     ],
@@ -748,10 +818,14 @@ const Dashboard = ({ onLogout }) => {
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          color: chartTextColor, // Set legend text color
+        },
       },
       title: {
         display: true,
         text: t('dashboard.admin.charts.examsEvolution.title'),
+        color: chartTextColor, // Set title text color
       },
     },
     scales: {
@@ -759,19 +833,29 @@ const Dashboard = ({ onLogout }) => {
         title: {
           display: true,
           text: t('dashboard.charts.monthAxisLabel'),
+          color: chartTextColor, // Set x-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set x-axis tick color
         },
         grid: {
           display: true,
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
       y: {
         title: {
           display: true,
           text: t('dashboard.charts.countAxisLabel'),
+          color: chartTextColor, // Set y-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set y-axis tick color
         },
         beginAtZero: true,
         grid: {
           display: true,
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
     },
@@ -784,8 +868,8 @@ const Dashboard = ({ onLogout }) => {
       {
         label: t('dashboard.admin.charts.patientsEvolution.label'),
         data: adminMonthlyPatients.map(stat => stat.count),
-        borderColor: 'rgba(255, 159, 64, 1)', // Orange
-        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+        borderColor: 'rgb(64, 249, 255)', // Orange
+        backgroundColor: 'rgb(64, 249, 255)',
         tension: 0.1,
       },
     ],
@@ -796,10 +880,14 @@ const Dashboard = ({ onLogout }) => {
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          color: chartTextColor, // Set legend text color
+        },
       },
       title: {
         display: true,
         text: t('dashboard.admin.charts.patientsEvolution.title'),
+        color: chartTextColor, // Set title text color
       },
     },
     scales: {
@@ -807,19 +895,29 @@ const Dashboard = ({ onLogout }) => {
         title: {
           display: true,
           text: t('dashboard.charts.monthAxisLabel'),
+          color: chartTextColor, // Set x-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set x-axis tick color
         },
         grid: {
           display: true,
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)', // Grid line color
         },
       },
       y: {
         title: {
           display: true,
           text: t('dashboard.charts.countAxisLabel'),
+          color: chartTextColor, // Set y-axis title color
+        },
+        ticks: {
+          color: chartTextColor, // Set y-axis tick color
         },
         beginAtZero: true,
         grid: {
           display: true,
+          color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' // Grid line color
         },
       },
     },
@@ -839,12 +937,13 @@ const Dashboard = ({ onLogout }) => {
         <a href="/manage-cabinets">{t('nav.manageCabinets')}</a> {/* Link for Admin Cabinets */}
         <a href="/add-centre">{t('nav.addExamCentre')}</a> {/* Link for Admin Centres */}
         <a href="/manage-centres">{t('nav.manageExamCentres')}</a> {/* Link for Admin Centres */}
-        <a href="/admin/manage-report-templates">{t('nav.manageReportTemplates')}</a> {/* Added Manage Report Templates Link */}
-        <a href="/UserManagement">{t('nav.changeRole')}</a>
 
         <a href="/users">{t('nav.doctorsManagement')}</a>
+         <a href="/UserManagement">{t('nav.changeRole')}</a>
+
          {/*<a href="/bloque">{t('nav.deactivateAccounts')}</a>*/}
-        <a href="/activation">{t('nav.activationManagement')}</a> {/* Added Activation Link */}
+     { /*  <a href="/activation">{t('nav.activationManagement')}</a> {/* Added Activation Link */}
+             <a href="/admin/manage-report-templates">{t('nav.manageReportTemplates')}</a> {/* Added Manage Report Templates Link */}
         <a href={`/edit-user/${id}`}>{t('nav.editMyAccount')}</a>
         <a href="/change-password">{t('nav.changePassword')}</a>
         <a href="/Logout">{t('nav.logout')}</a>
@@ -973,6 +1072,10 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
 
         <div className="app-header-actions">
           <div className="app-header-actions-buttons">
+            {/* Theme Toggle Button */}
+            <button className="icon-button large" onClick={toggleTheme} title={theme === 'light' ? t('dashboard.tooltips.switchToDarkMode') : t('dashboard.tooltips.switchToLightMode')}>
+              <i className={theme === 'light' ? "ph-moon" : "ph-sun"}></i> {/* Icon changes based on theme */}
+            </button>
             <button className="icon-button large"><i className="ph-magnifying-glass"></i></button>
             <button className="icon-button large"><i className="ph-bell"></i></button>
             {/* Add sidebar toggle button */}
@@ -1471,7 +1574,7 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
                   ) : (
                     <div>{t('dashboard.charts.noDataAvailable')}</div>
                   )}
-                  <p className="chart-description">{t('dashboard.admin.charts.consultationsEvolution.description')}</p>
+                  <p className="chart-description">{t('')}</p>
                 </div>
 
                 {/* Admin Exams Evolution Chart */}
@@ -1484,7 +1587,7 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
                   ) : (
                     <div>{t('dashboard.charts.noDataAvailable')}</div>
                   )}
-                  <p className="chart-description">{t('dashboard.admin.charts.examsEvolution.description')}</p>
+                  <p className="chart-description">{t('')}</p>
                 </div>
 
                 {/* Admin Patients Evolution Chart */}
@@ -1497,7 +1600,7 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
                   ) : (
                     <div>{t('dashboard.charts.noDataAvailable')}</div>
                   )}
-                  <p className="chart-description">{t('dashboard.admin.charts.patientsEvolution.description')}</p>
+                  <p className="chart-description">{t('')}</p>
                 </div>
                 {/* Users Distribution Pie Chart */}
                 {usersDistributionData && usersDistributionData.datasets && usersDistributionData.datasets[0] && usersDistributionData.datasets[0].data.some(count => count > 0) && (
@@ -1519,7 +1622,7 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
                   <div className="chart-container">
                     <h4>{t('dashboard.charts.consultationsEvolution.title')}</h4>
                     <Line data={doctorConsultationsEvolutionData} options={doctorConsultationsEvolutionOptions} />
-                    <p className="chart-description">{t('dashboard.charts.consultationsEvolution.description')}</p>
+                    <p className="chart-description">{t('')}</p>
                   </div>
                 )}
 
@@ -1548,7 +1651,7 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
                         <option key={month.value} value={month.value}>{month.label}</option>
                       ))}
                     </select>
-
+<br></br>
                     <label htmlFor="year-select" style={{ marginLeft: '10px' }}>{t('dashboard.selectYear')}:</label>
                     <select
                       id="year-select"
@@ -1575,7 +1678,7 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
                   <div className="chart-container">
                     <h4>{t('dashboard.charts.patientsEvolution.title')}</h4>
                     <Line data={doctorPatientsEvolutionData} options={doctorPatientsEvolutionOptions} />
-                    <p className="chart-description">{t('dashboard.charts.patientsEvolution.description')}</p>
+                    <p className="chart-description">{t('')}</p>
                   </div>
                 )}
               </div>
@@ -1618,7 +1721,7 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
                   ) : (
                     <div>{t('dashboard.charts.noDataAvailable')}</div>
                   )}
-                  <p className="chart-description">{t('dashboard.doctorCentre.charts.reportTypes.description')}</p>
+                  <p className="chart-description">{t('')}</p>
                 </div>
                 )}
               </div>

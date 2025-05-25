@@ -4,6 +4,8 @@ import AuthContext from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { clearUserData, getToken, isTokenExpired } from '../../utils/auth'; // Import auth utils
+import ReactQuill from 'react-quill'; // Import ReactQuill
+import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 import './ManageReportTemplates.css'; // Optional CSS
 
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
@@ -141,11 +143,16 @@ const ManageReportTemplates = () => {
     };
 
     const handleFormInputChange = (event) => {
-    const { name, value } = event.target;
-    setCurrentTemplate(prev => ({ ...prev, [name]: value }));
-};
+        const { name, value } = event.target;
+        setCurrentTemplate(prev => ({ ...prev, [name]: value }));
+    };
 
-const handleSaveTemplate = async (event) => {
+    // Handler for ReactQuill content changes
+    const handleContenuChange = (html) => {
+        setCurrentTemplate(prev => ({ ...prev, contenuModele: html }));
+    };
+
+    const handleSaveTemplate = async (event) => {
         event.preventDefault();
         setIsSaving(true);
         setFormError('');
@@ -267,14 +274,12 @@ const handleSaveTemplate = async (event) => {
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="contenuModele" className="form-label required">{t('manageReportTemplates.form.content')}</label>
-                                <textarea
-                                    className="form-control"
-                                    id="contenuModele"
-                                    name="contenuModele"
+                                <ReactQuill
+                                    theme="snow"
                                     value={currentTemplate.contenuModele}
-                                    onChange={handleFormInputChange}
-                                    rows="5" // Optional: adjust number of rows
-                                    required
+                                    onChange={handleContenuChange} // Use the new handler
+                                    modules={quillModules} // Use the defined modules
+                                    className="quill-editor-custom" // Optional custom class for styling
                                 />
                             </div>
                             {/* The duplicate previewImageFile div was removed in a previous step, this comment is just for tracking */}
@@ -334,6 +339,20 @@ const handleSaveTemplate = async (event) => {
             {/* <AddEditTemplateModal show={showAddModal || showEditModal} handleClose={() => ...} template={currentTemplate} refreshTemplates={fetchTemplates} /> */}
         </div>
     );
+};
+
+// Define Quill modules (can be customized)
+const quillModules = {
+    toolbar: [
+        [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
+        [{size: []}],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+        ['link'],
+        ['clean'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'align': [] }],
+    ],
 };
 
 export default ManageReportTemplates;

@@ -450,7 +450,7 @@ const MedicalExaminationForm = () => {
                         <option value="Analyse sanguine">{t('medicalExaminationForm.examTypes.bloodTest')}</option> {/* Use translation key */}
                         <option value="Scanner">{t('medicalExaminationForm.examTypes.scanner')}</option> {/* Use translation key */}
                         <option value="Echographie">{t('medicalExaminationForm.examTypes.ultrasound')}</option> {/* Use translation key */}
-                        {/* Add other common exam types */}
+                        {/* Add other common exam types 
                         <option value="Autre">{t('medicalExaminationForm.examTypes.other')}</option> {/* Use translation key */}
                     </select>
                      {examenType === 'Autre' && (
@@ -492,7 +492,7 @@ const MedicalExaminationForm = () => {
                         theme="snow"
                         value={recommandation}
                         onChange={setRecommandation} // Pass the setter function directly
-                        style={{ backgroundColor: 'white', minHeight: '100px' }} // Adjust height as needed
+                        style={{ minHeight: '100px' }} // Adjust height as needed
                     />
                 </div>
 

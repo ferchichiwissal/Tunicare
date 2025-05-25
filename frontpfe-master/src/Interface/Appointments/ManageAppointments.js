@@ -125,7 +125,7 @@ const ManageAppointments = () => {
         firstName: '',
         lastName: '',
         apptDateTime: '', // Renamed from apptDate, default to empty
-        apptType: 'Nouvelle consultation', // Keep internal state value as is, translate options in JSX
+        apptType: '', // Changed initial state to empty string
     });
 
     // Extract cabinetId and userRole from userData state
@@ -627,6 +627,7 @@ const ManageAppointments = () => {
                                                 required
                                             >
                                                 {/* Keep internal value, translate the display text */}
+                                                <option value="">{t('addAppointment.typeOptionSelect', 'Sélectionner le type de rendez-vous...')}</option>
                                                 <option value="Nouvelle consultation">{t('manageAppointments.addForm.typeOptions.newConsultation')}</option>
                                                 <option value="Séance de contrôle">{t('manageAppointments.addForm.typeOptions.followUp')}</option>
                                             </select>

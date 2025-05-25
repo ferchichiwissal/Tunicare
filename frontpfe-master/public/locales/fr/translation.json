@@ -150,7 +150,12 @@
           "examsPerMonth": {
             "label": "Examens par mois",
             "title": "Évolution des examens/mois"
-          }
+,
+  "myConsultationsPage.buttons.downloadPrescription": "Télécharger l'ordonnance",
+  "myConsultationsPage.buttons.downloadCertificate": "Télécharger le certificat",
+  "myConsultationsPage.tooltips.prescriptionNotAvailable": "Ordonnance non disponible",
+  "myConsultationsPage.tooltips.certificateNotAvailable": "Certificat non disponible"
+}
         }
       }
     },
@@ -449,7 +454,7 @@
       "sessionInvalid": "Session invalide. Veuillez vous reconnecter.",
       "invalidRole": "Rôle utilisateur invalide. Impossible de continuer.",
       "adminAddSuccess": "Utilisateur ajouté avec succès avec les privilèges d'administrateur !",
-      "patientAddSuccess": "Patient ajouté avec succès !",
+      "patientAddSuccess": "✅Patient ajouté avec succès !",
       "permissionDeniedSubmit": "Permission refusée ou session expirée."
     },
     "errors": {
@@ -768,7 +773,7 @@
     },
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce modèle ?",
     "success": {
-      "addSuccess": "Modèle ajouté avec succès !",
+      "addSuccess": "✅Modèle ajouté avec succès !",
       "updateSuccess": "Modèle mis à jour avec succès !",
       "deleteSuccess": "Modèle supprimé avec succès."
     },
@@ -995,10 +1000,10 @@
     },
     "buttons": {
       "adding": "Ajout...",
-      "addCabinet": "Ajouter le Cabinet"
+      "addCabinet": "✅Ajouter le Cabinet"
     },
     "alerts": {
-      "success": "Cabinet ajouté avec succès !",
+      "success": "✅Cabinet ajouté avec succès !",
       "authRequired": "Authentification requise.",
       "permissionDenied": "Permission refusée. Seuls les administrateurs peuvent ajouter des cabinets.",
       "conflict": "Un cabinet avec ce nom/adresse existe peut-être déjà.",
@@ -1087,8 +1092,8 @@
       "qrCode": "QR Code"
     },
     "buttons": {
-      "edit": "Modifier",
-      "delete": "Supprimer",
+      "edit": "Modifier✏️",
+      "delete": "Supprimer🗑️",
       "showQr": "Afficher QR",
       "close": "Fermer",
       "print": "Imprimer"
@@ -1109,8 +1114,8 @@
       "searchPlaceholder": "Rechercher par nom..."
     },
     "buttons": {
-      "addAppointment": "Ajouter un Rendez-vous",
-      "cancelAdd": "Annuler l'ajout",
+      "addAppointment": "✅Ajouter un Rendez-vous",
+      "cancelAdd": "❌Annuler l'ajout",
       "accept": "Accepter",
       "refusePropose": "Refuser/Proposer",
       "startConsultation": "Commencer Consultation"
@@ -1138,7 +1143,7 @@
       "annulé": "Annulé"
     },
     "addForm": {
-      "title": "Ajouter un Nouveau Rendez-vous (Interne)",
+      "title": "Ajouter un Nouveau Rendez-vous ",
       "firstNameLabel": "Prénom du Patient",
       "lastNameLabel": "Nom du Patient",
       "dateTimeLabel": "Date et Heure",
@@ -1196,6 +1201,7 @@
     "rescheduleButton": "Reprogrammer Rendez-vous",
     "pastDateError": "La date sélectionnée ne peut pas être dans le passé.",
     "pastTimeError": "L'heure sélectionnée doit être ultérieure à l'heure actuelle pour aujourd'hui.",
+    "typeOptionSelect": "Sélectionner le type de rendez-vous...",
     "alerts": {
       "sessionExpired": "Session expirée. Veuillez vous reconnecter."
     }
@@ -1264,7 +1270,7 @@
       "other": "Autre (préciser)"
     },
     "buttons": {
-      "save": "🔘 Enregistrer",
+      "save": "📥 Enregistrer",
       "update": "🔄 Mettre à jour",
       "print": "🖨️ Imprimer"
     },
@@ -1368,7 +1374,7 @@
     "button": {
       "saving": "Sauvegarde...",
       "update": "🔵 METTRE À JOUR",
-      "save": "🔵 ENREGISTRER",
+      "save": "📥 ENREGISTRER",
       "print": "🖨️ IMPRIMER",
       "exam": "🔬 EXAM"
     },
@@ -1445,9 +1451,9 @@
       "noConsultations": "Vous n'avez aucune consultation enregistrée."
     },
     "buttons": {
-      "download": "Télécharger Ordonnance",
-      "downloadedCertificate": "Télécharger Certificat",
-      "hideConsultation": "Ne plus afficher"
+      "download": "Télécharger ⬇️",
+      "downloadedCertificate": "Télécharger ⬇️",
+      "hideConsultation": "Masquer👁️‍🗨️"
     },
     "checking": "Vérification..."
   },
@@ -1474,7 +1480,7 @@
       "action": "Action"
     },
     "buttons": {
-      "download": "Télécharger"
+      "download": "Télécharger⬇️"
     },
     "common": {
       "unspecified": "Non spécifié"
@@ -1500,12 +1506,12 @@
     "statusPending": "En attente",
     "statusAccepted": "Accepté",
     "statusRefused": "Refusé",
-    "statusCancelled": "Annulé",
+    "statusCancelled": "❌Annulé",
     "statusCompleted": "Réalisé",
     "typeNewConsultation": "Nouvelle consultation",
     "typeControlSession": "Séance de contrôle",
-    "buttonCancel": "Annuler",
-    "buttonModify": "Modifier",
+    "buttonCancel": "❌Annuler",
+    "buttonModify": "Modifier✏️",  
     "proposedDateLabel": "Date proposée :",
     "buttonFixNew": "Planifier Nouveau",
     "modalTitleModify": "Modifier le Rendez-vous",
@@ -1690,11 +1696,11 @@
     "unknownError": "Une erreur inconnue est survenue.",
     "saving": "Enregistrement...",
       "saved": "Enregistré",
-      "save": "Enregistrer",
+      "save": "Enregistrer📥",
       "clearFilter": "Effacer Filtre",
     "backToDashboard": "Retour au Tableau de Bord",
-    "edit": "Modifier",
-    "delete": "Supprimer",
+    "edit": "Modifier✏️",
+    "delete": "Supprimer🗑️",
     "errors": {
       "unauthorized": "Accès non autorisé."
     }
@@ -1773,7 +1779,7 @@
       "blankDocument": "Document Vierge",
       "notSpecified": "Non spécifié",
       "backToTemplates": "Retour à la Sélection des Modèles",
-      "saveReportButton": "Enregistrer le Rapport",
+      "saveReportButton": "📥Enregistrer le Rapport",
       "updateReportButton": "Mettre à Jour le Rapport",
       "errors": {
         "cannotUpdateCompleted": "Impossible de mettre à jour un rapport terminé.",
@@ -1851,9 +1857,9 @@
     "unauthorized": "Vous n'êtes pas autorisé à voir cette page.",
     "saving": "Sauvegarde...",
     "save": "Sauvegarder",
-    "cancel": "Annuler",
-    "edit": "Modifier",
-    "delete": "Supprimer"
+    "cancel": "Annuler❌",
+    "edit": "Modifier✏️",
+    "delete": "Supprimer🗑️"
   },
   "manageReportTemplates": {
     "loading": "Chargement des modèles de rapport",
@@ -1870,10 +1876,10 @@
     "success": {
       "deleteSuccess": "Modèle supprimé avec succès !",
       "updateSuccess": "Modèle mis à jour avec succès !",
-      "addSuccess": "Modèle ajouté avec succès !"
+      "addSuccess": "✅Modèle ajouté avec succès !"
     },
     "buttons": {
-      "addTemplate": "Ajouter un Modèle"
+      "addTemplate": "✅Ajouter un Modèle"
     },
     "noTemplates": "Aucun modèle trouvé.",
     "tableHeaders": {
@@ -1976,9 +1982,9 @@
       "noConsultations": "Aucune consultation trouvée."
     },
     "buttons": {
-      "download": "Télécharger",
-      "downloadedCertificate": "Téléchargé",
-      "hideConsultation": "Masquer"
+      "download": "Télécharger⬇️",
+      "downloadedCertificate": "Télécharger⬇️",
+      "hideConsultation": "Masquer👁️‍🗨️"
     },
     "checking": "Vérification..."
     },
@@ -2009,9 +2015,9 @@
       "action": "Action"
     },
     "buttons": {
-      "downloadRequest": "Télécharger Demande",
-      "downloadResult": "Télécharger Résultat",
-      "hide": "Masquer"
+      "downloadRequest": "Télécharger Demande⬇️",
+      "downloadResult": "Télécharger Résultat⬇️",
+      "hide": "Masquer👁️‍🗨️"
     },
     "tooltips": {
       "downloadNotReady": "Le résultat n'est pas encore disponible pour téléchargement."
@@ -2052,8 +2058,8 @@
       "noConsultations": "Aucune consultation trouvée."
     },
     "buttons": {
-      "viewDetails": "Voir Détails",
-      "hideConsultation": "Masquer"
+      "viewDetails": "Voir Détails📄",  
+      "hideConsultation": "Masquer👁️‍🗨️"
     }
   },
  
@@ -2091,9 +2097,9 @@
       "noConsultations": "Aucune consultation trouvée."
     },
     "buttons": {
-      "download": "Télécharger",
-      "downloadedCertificate": "Téléchargé",
-      "hideConsultation": "Masquer"
+      "download": "Télécharger⬇️",
+      "downloadedCertificate": "Télécharger⬇️",
+      "hideConsultation": "Masquer👁️‍🗨️"
     },
     "checking": "Vérification..."
     
@@ -2125,9 +2131,9 @@
       "action": "Action"
     },
     "buttons": {
-      "downloadRequest": "Télécharger Demande",
-      "downloadResult": "Télécharger Résultat",
-      "hide": "Masquer"
+      "downloadRequest": "Télécharger Demande⬇️",
+      "downloadResult": "Télécharger Résultat⬇️",
+      "hide": "Masquer👁️‍🗨️"
     },
     "tooltips": {
       "downloadNotReady": "Le résultat n'est pas encore disponible pour téléchargement."
@@ -2161,8 +2167,8 @@
       "noConsultations": "Aucune consultation trouvée."
     },
     "buttons": {
-      "viewDetails": "Voir Détails",
-      "hideConsultation": "Masquer"
+      "viewDetails": "Voir Détails📄",
+      "hideConsultation": "Masquer👁️‍🗨️"
     }
   },
   "doctorExaminationsDashboard": {
@@ -2272,7 +2278,7 @@
       "actions": "Actions"
     },
     "buttons": {
-      "prescribeReport": "Prescrire Rapport",
+      "prescribeReport": "Prescrire Rapport📄",
       "viewReport": "Voir Rapport"
     }
   },
@@ -2340,8 +2346,8 @@
       "action": "Action"
     },
     "buttons": {
-      "viewResult": "Voir Résultat",
-      "hideExam": "Masquer"
+      "viewResult": "Voir Résultat📄",
+      "hideExam": "Masquer👁️‍🗨️"
     },
     "tooltips": {
       "hideExam": "Ne plus afficher cet examen dans cette liste"
@@ -2365,10 +2371,10 @@
   "uploadSignaturePage.uploadButton": "Télécharger la Signature",
 
 
- "common.edit": "Modifier",
-  "common.delete": "Supprimer",
-  "common.save": "Enregistrer",
-  "common.cancel": "Annuler",
+ "common.edit": "Modifier✏️",
+  "common.delete": "Supprimer🗑️",
+  "common.save": "Enregistrer📥",
+  "common.cancel": "Annuler❌",
 
 
 
@@ -2579,9 +2585,9 @@
       "actions": "Actions"
     },
     "buttons": {
-      "changeToDoctor": "Promouvoir en Médecin",
-      "changeToAssistant": "Promouvoir en Assistant",
-      "convertToAdmin": "Convertir en Admin"
+      "changeToDoctor": "🔁Promouvoir en Médecin",
+      "changeToAssistant": "🔁Promouvoir en Assistant",
+      "convertToAdmin": "🔁Convertir en Admin"
     },
     "tooltips": {
       "selectCabinetFirst": "Veuillez d'abord sélectionner un cabinet",
@@ -2626,5 +2632,9 @@
 
 
 
-
+,
+  "myConsultationsPage.buttons.downloadPrescription": "Télécharger l'ordonnance",
+  "myConsultationsPage.buttons.downloadCertificate": "Télécharger le certificat",
+  "myConsultationsPage.tooltips.prescriptionNotAvailable": "Ordonnance non disponible",
+  "myConsultationsPage.tooltips.certificateNotAvailable": "Certificat non disponible"
 }

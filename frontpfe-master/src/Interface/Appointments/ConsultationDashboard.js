@@ -179,15 +179,17 @@ const ConsultationDashboard = () => {
             {error && <div className="alert alert-danger" role="alert">{t('consultationDashboard.errorPrefix')}: {error}</div>}
 
             {/* Search Bar - Use Bootstrap margin bottom, remove max-width */}
-            <div className="mb-3">
-                <input
-                    type="text"
-                    className="form-control"
-                    placeholder={t('consultationDashboard.searchPlaceholder')}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
+            <div className="consultation-dashboard-table-container"> {/* Added wrapper div */}
+                <div className="mb-3">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder={t('consultationDashboard.searchPlaceholder')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+            </div> {/* Closed wrapper div */}
 
             {/* Consultations List/Table - Add responsive wrapper, hover effect, and custom class */}
             <div className="table-responsive consultation-dashboard-table-container">

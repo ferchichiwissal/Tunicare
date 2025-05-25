@@ -85,6 +85,30 @@
     line-height: 1.6;
 }
 
+/* Styles pour les boutons Enregistrer et Imprimer */
+.prescribe-report-page .btn-primary,
+.prescribe-report-page .btn-info {
+    background-color: var(--primary-color, #00c6a9); /* Vert d'eau */
+    border-color: var(--primary-color, #00c6a9); /* Bordure vert d'eau */
+    color: var(--white, #ffffff); /* Texte blanc */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.prescribe-report-page .btn-primary:hover,
+.prescribe-report-page .btn-info:hover {
+    background-color: #00937d; /* Vert d'eau plus foncé au survol */
+    border-color: #00937d; /* Bordure vert d'eau plus foncé au survol */
+}
+
+.prescribe-report-page .btn-primary:disabled,
+.prescribe-report-page .btn-info:disabled {
+    background-color: #cccccc; /* Couleur grise pour les boutons désactivés */
+    border-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}
+
+
 /* --- Print Styles --- */
 @media print {
     body * {

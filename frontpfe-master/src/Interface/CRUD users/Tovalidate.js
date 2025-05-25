@@ -388,7 +388,7 @@ const CompteValide = () => {
 
   // Render the user table
   return (
-    <div>
+    <div className="tovalidate-container">
       <h2>{t('tovalidate.title')}</h2>
       <input
         type="text"

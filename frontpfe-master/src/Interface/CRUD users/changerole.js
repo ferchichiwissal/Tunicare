@@ -384,20 +384,7 @@ const UserManagement = () => {
                       {/* Admin View: Multiple Registrations */}
                       {user.registrations.length > 1 && (
                         <>
-                          <select
-                            id={`cabinet-select-${user.id}`}
-                            defaultValue=""
-                            onChange={(e) => handleTargetCabinetChange(user.id, e.target.value)}
-                            disabled={loading}
-                            style={{ marginRight: '10px' }}
-                          >
-                            <option value="" disabled>{t('changeRole.cabinetOptions.select')}</option>
-                            {user.registrations.map(reg => (
-                              <option key={reg.cabinetId} value={reg.cabinetId}>
-                                {reg.cabinetName || t('changeRole.cabinetOptions.cabinetId', { id: reg.cabinetId })}
-                              </option>
-                            ))}
-                          </select>
+                          {/* Sélecteur de cabinet supprimé */}
                           {/* Button replaces the role dropdown */}
                           <button
                             onClick={() => handleTransferPatient(user.id, 'DOCTOR', selectedTargetCabinets[user.id])}
