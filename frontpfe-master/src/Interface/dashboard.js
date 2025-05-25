@@ -1755,8 +1755,8 @@ else if (user.role === "ADMIN_CENTRE_EXAMEN") {
               </section>
             </>
           )}
-          {/* Conditionally render the Chatbot for DOCTOR role */}
-          {user.role === 'DOCTOR' && <Chatbot />}
+          {/* Conditionally render the Chatbot for DOCTOR and DOCTOR_CENTRE_EXAMEN roles */}
+          {(user.role === 'DOCTOR' || user.role === 'DOCTOR_CENTRE_EXAMEN') && <Chatbot />}
 
           {/* New Sidebar Toggle Button within Main Content */}
           <button

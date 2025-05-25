@@ -371,7 +371,7 @@ const MyAppointments = () => {
 
             {/* Modification Modal (Using Bootstrap Modal Structure) */}
             {showModifyModal && modifyTargetAppt && (
-                 <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}> {/* Simulate backdrop */}
+                 <div className={`modal fade show d-block ${theme === 'dark' ? 'dark-mode-modal' : ''}`} tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}> {/* Simulate backdrop */}
                      <div className="modal-dialog modal-dialog-centered" role="document"> {/* Center modal */}
                          <div className="modal-content">
                              <div className="modal-header">
@@ -389,25 +389,24 @@ const MyAppointments = () => {
                                          id="modifyDateTime"
                                          value={modifyDateTime}
                                          onChange={(e) => setModifyDateTime(e.target.value)}
-                                         required
-                                         className="form-control" // Already has Bootstrap class
-                                     />
-                                 </div>
-                                 <div className="mb-3">
-                                      <label htmlFor="modifyType" className="form-label">📄 {t('myAppointments.modalTypeLabel', 'Appointment Type:')}</label>
-                                      <select
-                                          id="modifyType"
-                                          value={modifyType} // Keep original value for selection state
-                                          onChange={(e) => setModifyType(e.target.value)} // Update state with original value
                                           required
-                                          className="form-select" // Use form-select for Bootstrap styling
-                                      >
-                                          {/* Use original backend values but display translated text */}
-                                          <option value="Nouvelle consultation">{t('myAppointments.typeNewConsultation', 'New Consultation')}</option>
-                                          <option value="Séance de contrôle">{t('myAppointments.typeControlSession', 'Follow-up Session')}</option>
-                                          {/* Add other types if they exist */}
-                                      </select>
+                                          className="form-control datetime-input-black" // Added custom class
+                                          // Removed inline style as we'll use CSS class
+                                      />
                                   </div>
+                                  <div className="mb-3">
+                                       <label htmlFor="modifyType" className="form-label">📄 {t('myAppointments.modalTypeLabel', 'Appointment Type:')}</label>
+                                       <select
+                                           id="modifyType"
+                                           value={modifyType}
+                                           onChange={(e) => setModifyType(e.target.value)}
+                                           required
+                                           className="form-select"
+                                       >
+                                           <option value="Nouvelle consultation">{t('myAppointments.typeNewConsultation', 'New Consultation')}</option>
+                                           <option value="Séance de contrôle">{t('myAppointments.typeControlSession', 'Follow-up Session')}</option>
+                                       </select>
+                                   </div>
                                  {/* Use Bootstrap alert for messages inside modal */}
                                  {actionMessage && (
                                      <div className={`alert mt-3 ${actionMessage.toLowerCase().includes('error') ? 'alert-danger' : 'alert-info'}`} role="alert">

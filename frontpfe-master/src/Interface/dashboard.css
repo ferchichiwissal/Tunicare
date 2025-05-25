@@ -458,16 +458,16 @@ body.dark-mode .chart-description {
 }
 
 /* Styles for Month/Year Selectors in Dark Mode */
+/* Removed potentially conflicting styles for select in dark mode */
 body.dark-mode .month-year-selector select {
-  color: #000000 !important; /* Black text color */
-  background-color: #ffffff !important; /* White background for the select box itself */
   border-color: var(--border-color); /* Darker border */
 }
 
-body.dark-mode .month-year-selector select option {
-    color: #000000 !important; /* Black text color for options */
-    background-color: #ffffff !important; /* White background for options */
-}
+/* Removed potentially conflicting styles for select options in dark mode */
+/* body.dark-mode .month-year-selector select option { */
+    /* color: #000000 !important; /* Black text color for options */ /* Removed potentially conflicting style */
+    /* background-color: #ffffff !important; /* White background for options */ /* Removed potentially conflicting style */
+/* } */
 
 
 /* Right Sidebar (User Info) */

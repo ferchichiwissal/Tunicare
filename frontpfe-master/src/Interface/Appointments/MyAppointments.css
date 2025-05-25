@@ -310,3 +310,76 @@ body.dark-mode .btn-outline-secondary {
   border-color: #00937d !important;
   color: var(--white) !important;
 }
+
+/* Dark mode styles for the modal */
+.dark-mode-modal .modal-content {
+    background-color: #212121; /* Dark background for modal content */
+    color: #e0e0e0; /* Light text color */
+    border-color: #3a3a3a; /* Darker border */
+}
+
+.dark-mode-modal .modal-header,
+.dark-mode-modal .modal-footer {
+    border-color: #3a3a3a; /* Darker border for header and footer */
+}
+
+.dark-mode-modal .modal-title {
+    color: #ffffff; /* White color for modal title */
+}
+
+.dark-mode-modal .form-label {
+    color: #e0e0e0; /* Light text for labels */
+}
+
+.dark-mode-modal .form-control,
+.dark-mode-modal .form-select {
+    background-color: #3a3f44; /* Darker input background */
+    color: #e0e0e0; /* Light input text */ /* Revert to original light text for other form controls */
+    border-color: #555; /* Darker border */
+}
+
+.dark-mode-modal input[type="datetime-local"].form-control {
+    color: #000000 !important; /* Set text color to black specifically for datetime-local input in dark mode */
+}
+
+/* Règle avec spécificité maximale pour le champ de date et heure en mode sombre */
+body.dark-mode .modal.show .modal-dialog .modal-content .modal-body input[type="datetime-local"].form-control {
+    color: #000000 !important; /* Force la couleur du texte en noir */
+}
+
+.dark-mode-modal .form-control::placeholder {
+    color: #cccccc !important; /* Lighter grey for placeholder text */
+}
+
+.dark-mode-modal .form-select {
+     /* Styles to neutralize potential conflicts */
+     background-image: none !important;
+     appearance: none !important;
+     -webkit-appearance: none !important;
+     -moz-appearance: none !important;
+     background-color: #212121 !important; /* Explicit dark background */
+     color: #e0e0e0 !important; /* Explicit light text */
+     border: 1px solid #555 !important; /* Explicit border */
+     box-shadow: none !important; /* Remove any box shadow */
+     outline: none !important; /* Remove outline */
+     text-shadow: none !important; /* Remove any text shadow */
+}
+
+.dark-mode-modal .form-select::before,
+.dark-mode-modal .form-select::after {
+    display: none !important; /* Hide any pseudo-elements */
+}
+
+/* Specific style for the datetime input field to ensure white text and match select appearance */
+.datetime-input-black {
+    color: #e0e0e0 !important; /* Set text color to white */
+    background-color: #212121 !important; /* Match select background */
+    border: 1px solid #555 !important; /* Match select border */
+    box-shadow: none !important; /* Remove any box shadow */
+    outline: none !important; /* Remove outline */
+}
+
+/* More specific rule for datetime input in dark mode modal */
+body.dark-mode .modal.show .modal-dialog .modal-content .modal-body input[type="datetime-local"].form-control.datetime-input-black {
+    color: #e0e0e0 !important; /* Force text color to white */
+}
