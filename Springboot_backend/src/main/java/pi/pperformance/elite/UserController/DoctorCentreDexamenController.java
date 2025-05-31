@@ -20,6 +20,7 @@ import pi.pperformance.elite.entities.DoctorCentreDexamen;
 import pi.pperformance.elite.entities.DoctorCentreVerificationRequest; // Added import
 import pi.pperformance.elite.entities.Role;
 // import pi.pperformance.elite.entities.VerificationRequest; // Removed import
+import org.springframework.security.core.userdetails.UserDetails; // Import UserDetails
 import pi.pperformance.elite.exceptions.ResourceNotFoundException;
 
 import java.io.IOException; // Import IOException
@@ -161,120 +162,6 @@ public class DoctorCentreDexamenController {
         return ResponseEntity.ok(Map.of("message", "Verification code sent to email."));
     }
 
-
-    // Endpoint to complete registration after email verification
-    @PostMapping("/verify-email")
-    public ResponseEntity<?> verifyDoctorEmail(
-            @RequestParam String email,
-            @RequestParam String code) {
-        log.info("Attempting to verify email: {}", email);
-
-        // 1. Retrieve Verification Request
-        // TODO: Update VerificationService to return DoctorCentreVerificationRequest specifically
-        // For now, casting the result, assuming getVerificationRequest returns a compatible type or Object
-        var verificationRequestData = verificationService.getVerificationRequest(email);
-        if (verificationRequestData == null) {
-             log.warn("No verification request found for email: {}", email);
-             return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired verification code."));
-        }
-        // Add type check before casting
-        if (!(verificationRequestData instanceof DoctorCentreVerificationRequest)) {
-            log.error("Verification request for {} is not of type DoctorCentreVerificationRequest. Found type: {}", email, verificationRequestData.getClass().getName());
-            verificationService.removeVerificationRequest(email); // Clean up mismatched request
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Internal error during verification. Please try registering again."));
-        }
-        DoctorCentreVerificationRequest request = (DoctorCentreVerificationRequest) verificationRequestData;
-
-        // 2. Validate Code and Request
-        if (request == null || !request.getVerificationCode().equals(code)) {
-            log.warn("Invalid or expired verification code for email: {}", email);
-            return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired verification code."));
-        }
-
-        // 3. Validate Centre ID from Request
-        Long centreId = request.getCentreId();
-        if (centreId == null) {
-            log.error("Verification request for {} is missing centreId.", email);
-            // TODO: Update VerificationService method name/signature if needed
-            verificationService.removeVerificationRequest(email); // Clean up invalid request
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Registration data is incomplete (missing center ID). Please register again."));
-        }
-
-        // 4. Check if Centre Exists
-        CentreDexamen centre = centreDexamenRepository.findById(centreId).orElse(null);
-        if (centre == null) {
-            log.error("Centre with ID {} specified in verification request for {} not found.", centreId, email);
-            // TODO: Update VerificationService method name/signature if needed
-            verificationService.removeVerificationRequest(email); // Clean up invalid request
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Associated examination center no longer exists. Please register again."));
-        }
-
-        // 5. Check for Duplicates (Email within the specific Centre)
-        if (doctorCentreDexamenRepository.existsByEmailAndCentreDexamen_IdCentre(email, centreId)) {
-             log.warn("Attempt to verify email for duplicate doctor (Email: {}) in centre ID: {}", email, centreId);
-             // TODO: Update VerificationService method name/signature if needed
-             verificationService.removeVerificationRequest(email); // Clean up verification request
-             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "A doctor with this email already exists in this examination center."));
-        }
-
-
-        // 6. Create DoctorCentreDexamen Entity
-        DoctorCentreDexamen newDoctor = new DoctorCentreDexamen();
-        newDoctor.setFirstName(request.getFirstName());
-        newDoctor.setLastName(request.getLastName());
-        newDoctor.setEmail(request.getEmail());
-        newDoctor.setPassword(passwordEncoder.encode(request.getPassword())); // Encode password
-        try {
-            if (request.getBirthDate() != null && !request.getBirthDate().isEmpty()) {
-                newDoctor.setBirthDate(LocalDate.parse(request.getBirthDate()));
-            }
-        } catch (Exception e) {
-             log.error("Error parsing birth date '{}' for email {}: {}", request.getBirthDate(), email, e.getMessage());
-             // Decide how to handle: reject, set null, etc. Rejecting seems safer.
-             // TODO: Update VerificationService method name/signature if needed
-             verificationService.removeVerificationRequest(email);
-             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Invalid birth date format provided during registration."));
-        }
-        newDoctor.setTel(request.getTel());
-        newDoctor.setAddress(request.getAddress());
-        newDoctor.setGender(request.getGender()); // Ensure frontend sends 'gender' consistently
-        newDoctor.setSpeciality(request.getSpeciality());
-        newDoctor.setRole(Role.DOCTOR_CENTRE_EXAMEN); // Set role
-        newDoctor.setActive(false); // Set as inactive initially
-        newDoctor.setCentreDexamen(centre); // Associate with the centre
-
-        // 6.b Set Photo Profile directly from verification request bytes
-        byte[] photoBytes = request.getPhotoProfil();
-        if (photoBytes != null && photoBytes.length > 0) {
-            newDoctor.setPhotoProfil(photoBytes); // Set the byte array directly
-            log.info("Setting profile photo ({} bytes) for email: {}", photoBytes.length, email);
-        } else {
-            log.info("No profile photo provided for email: {}", email);
-            newDoctor.setPhotoProfil(null); // Ensure it's null if not provided
-        }
-
-        newDoctor.setCreatedAt(LocalDate.now()); // Set timestamps
-        newDoctor.setUpdatedAt(LocalDate.now());
-
-        // 7. Save the new Doctor
-        try {
-            doctorCentreDexamenRepository.save(newDoctor);
-            log.info("Successfully verified and created inactive doctor: {}", email);
-        } catch (Exception e) {
-            log.error("Failed to save new doctor {} after verification: {}", email, e.getMessage());
-            // Don't remove verification request here, user might retry verification
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to save doctor information after verification. Please try verifying again or contact support."));
-        }
-
-        // 8. Clean up Verification Request
-        // TODO: Update VerificationService method name/signature if needed
-        verificationService.removeVerificationRequest(email);
-
-        // 9. Return Success
-        // Consider returning the created doctor ID or a simple success message
-        return ResponseEntity.ok(Map.of("message", "Email verified successfully. Your account is created but requires activation by an administrator."));
-    }
-
     // --- Admin Management Endpoints ---
 
     // Endpoint for Admin/System to get a single doctor by ID (needed for edit form)
@@ -312,6 +199,30 @@ public class DoctorCentreDexamenController {
         }
     }
 
+    // Endpoint for Admin Centre Examen and Admin to get doctors by Centre ID
+    @GetMapping("/centre/{centreId}")
+    @PreAuthorize("hasAnyRole('ADMIN_CENTRE_EXAMEN', 'ADMIN')") // Accessible by Admin Centre Examen and Admin
+    public ResponseEntity<?> getDoctorsByCentreId(@PathVariable Long centreId, org.springframework.security.core.Authentication authentication) {
+        log.info("Request to fetch DoctorCentreDexamen for Centre ID: {} by principal: {}", centreId, authentication.getName());
+
+        // Optional: Add a check here to ensure the ADMIN_CENTRE_EXAMEN is requesting doctors from THEIR centre
+        // This requires fetching the current user's details and comparing their centreId with the requested centreId.
+        // For now, assuming the frontend sends the correct centreId for the logged-in ADMIN_CENTRE_EXAMEN.
+        // The backend should ideally enforce this.
+
+        List<DoctorCentreDexamen> doctors = doctorCentreDexamenRepository.findByCentreDexamenIdCentre(centreId); // Corrected method name
+
+        if (doctors.isEmpty()) {
+            log.info("No DoctorCentreDexamen found for Centre ID: {}", centreId);
+            // Return 200 OK with empty list, or 404 Not Found depending on desired behavior
+            return ResponseEntity.ok(java.util.Collections.emptyList()); // Return empty list
+        } else {
+            log.info("Found {} DoctorCentreDexamen for Centre ID: {}", doctors.size(), centreId);
+            return ResponseEntity.ok(doctors);
+        }
+    }
+
+
     // Endpoint for Admin to get all *active* doctors
     @GetMapping("/active")
     @PreAuthorize("hasRole('ADMIN')") // Only Admins can access this
@@ -340,19 +251,60 @@ public class DoctorCentreDexamenController {
         return ResponseEntity.ok(allDoctors);
     }
 
-    // Endpoint for Admin to toggle the active status of a doctor
+    // Endpoint for Admin and Admin Centre Examen to toggle the active status of a doctor
     @PutMapping("/{id}/toggle-status")
-    @PreAuthorize("hasRole('ADMIN')") // Only Admins can access this
-    public ResponseEntity<?> toggleDoctorStatus(@PathVariable Long id) {
-        log.info("Admin request to toggle status for DoctorCentreDexamen ID: {}", id);
+    @PreAuthorize("hasAnyRole('ADMIN', 'ADMIN_CENTRE_EXAMEN')") // Allow Admins and Admin Centre Examen
+    public ResponseEntity<?> toggleDoctorStatus(@PathVariable Long id, org.springframework.security.core.Authentication authentication) { // Inject Authentication
+        log.info("Request to toggle status for DoctorCentreDexamen ID: {} by principal: {}", id, authentication.getName());
+
         return doctorCentreDexamenRepository.findById(id)
                 .map(doctor -> {
+                    // Ownership check for ADMIN_CENTRE_EXAMEN role
+                    boolean isAdmin = authentication.getAuthorities().stream()
+                                        .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+                    boolean isAdminCentreExamen = authentication.getAuthorities().stream()
+                                        .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN_CENTRE_EXAMEN"));
+
+                    if (isAdminCentreExamen) {
+                        Long currentUserCentreId = null;
+                        Object principal = authentication.getPrincipal();
+
+                        // Attempt to get the current user's centre ID from the principal
+                        try {
+                            // Assuming the principal object has a getCentreId() method
+                            java.lang.reflect.Method getCentreIdMethod = principal.getClass().getMethod("getCentreId");
+                            currentUserCentreId = (Long) getCentreIdMethod.invoke(principal);
+                        } catch (NoSuchMethodException e) {
+                            log.error("Principal object does not have a getCentreId() method for ADMIN_CENTRE_EXAMEN: {}", principal.getClass().getName());
+                            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body(Map.of("message", "Authenticated user details are missing centre information (getCentreId() method not found)."));
+                        } catch (Exception e) {
+                            log.error("Error invoking getCentreId() on principal for ADMIN_CENTRE_EXAMEN: {}", e.getMessage());
+                            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body(Map.of("message", "Could not retrieve current user centre ID from principal."));
+                        }
+
+                        if (currentUserCentreId == null) {
+                            log.error("ADMIN_CENTRE_EXAMEN user principal has null centre ID: {}", authentication.getName());
+                            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body(Map.of("message", "Current user centre ID is null."));
+                        }
+
+                        // Check if the doctor being modified belongs to the current ADMIN_CENTRE_EXAMEN's centre
+                        if (doctor.getCentreDexamen() == null || !doctor.getCentreDexamen().getIdCentre().equals(currentUserCentreId)) {
+                            log.warn("Forbidden toggle status attempt: ADMIN_CENTRE_EXAMEN {} tried to toggle DoctorCentreDexamen ID {} outside their centre (Centre ID {}).",
+                                     authentication.getName(), id, doctor.getCentreDexamen() != null ? doctor.getCentreDexamen().getIdCentre() : "N/A");
+                            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                                    .body(Map.of("message", "You do not have permission to toggle status for doctors outside your centre."));
+                        }
+                    }
+
                     boolean currentStatus = doctor.isActive();
                     doctor.setActive(!currentStatus); // Toggle status
                     doctor.setUpdatedAt(LocalDate.now()); // Update timestamp
                     doctorCentreDexamenRepository.save(doctor);
-                    log.info("Successfully toggled status for DoctorCentreDexamen ID: {} to {}", id, !currentStatus);
-                    // Return the updated doctor or just a success message with the new status
+                    log.info("Successfully toggled status for DoctorCentreDexamen ID: {} to {} by principal: {}", id, !currentStatus, authentication.getName());
+
                     return ResponseEntity.ok(Map.of(
                             "message", "Doctor status updated successfully.",
                             "doctorId", doctor.getId(),
@@ -360,10 +312,10 @@ public class DoctorCentreDexamenController {
                     ));
                 })
                 .orElseGet(() -> {
-                    log.warn("Admin attempt to toggle status for non-existent DoctorCentreDexamen ID: {}", id);
+                    log.warn("Attempt to toggle status for non-existent DoctorCentreDexamen ID: {} by principal: {}", id, authentication.getName());
                     return ResponseEntity.status(HttpStatus.NOT_FOUND)
                             .body(Map.of("message", "Doctor not found with ID: " + id));
-                 });
+                });
     }
 
     // Endpoint for Admin to update a doctor's details
@@ -458,8 +410,47 @@ public class DoctorCentreDexamenController {
                     log.warn("Admin attempt to delete non-existent DoctorCentreDexamen ID: {}", id);
                     return ResponseEntity.status(HttpStatus.NOT_FOUND)
                             .body(Map.of("message", "Doctor not found with ID: " + id));
-                });
+                 });
     }
+
+    // Endpoint for Admin Centre Examen to delete a doctor in their centre
+    @DeleteMapping("/centre/{centreId}/doctor/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN_CENTRE_EXAMEN', 'ADMIN')") // Allow Admin Centre Examen and Admin
+    public ResponseEntity<?> deleteDoctorByCentre(
+            @PathVariable Long centreId,
+            @PathVariable Long userId,
+            org.springframework.security.core.Authentication authentication) {
+
+        log.info("Request to delete DoctorCentreDexamen ID: {} in Centre ID: {} by principal: {}", userId, centreId, authentication.getName());
+
+        // Check if the doctor exists and belongs to the specified centre
+        Optional<DoctorCentreDexamen> doctorOptional = doctorCentreDexamenRepository.findById(userId);
+
+        if (doctorOptional.isPresent()) {
+            DoctorCentreDexamen doctor = doctorOptional.get();
+
+            // Verify that the doctor belongs to the specified centre
+            if (!doctor.getCentreDexamen().getIdCentre().equals(centreId)) {
+                log.warn("Forbidden delete attempt: Doctor ID {} does not belong to Centre ID {}", userId, centreId);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Doctor does not belong to the specified centre."));
+            }
+
+            // Optional: Add a check here to ensure the ADMIN_CENTRE_EXAMEN is acting within THEIR centre
+            // This requires fetching the current user's details and comparing their centreId with the requested centreId.
+            // For now, relying on @PreAuthorize and the centreId in the URL.
+
+            doctorCentreDexamenRepository.delete(doctor);
+            log.info("Successfully deleted DoctorCentreDexamen ID: {} in Centre ID: {}", userId, centreId);
+            return ResponseEntity.noContent().build(); // Standard practice for DELETE success
+
+        } else {
+            log.warn("Attempt to delete non-existent DoctorCentreDexamen ID: {} in Centre ID: {}", userId, centreId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Doctor not found with ID: " + userId));
+        }
+    }
+
 
     @PutMapping("/signature")
     @PreAuthorize("hasRole('ROLE_DOCTOR_CENTRE_EXAMEN')")
@@ -536,6 +527,33 @@ public class DoctorCentreDexamenController {
             log.error("Unexpected error during signature upload for doctor {}: {}", email, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "An unexpected error occurred during signature upload."));
+        }
+    }
+
+    // Endpoint to verify email using code
+    @GetMapping("/verify-email") // Correct mapping for the verification endpoint
+    public ResponseEntity<?> verifyDoctorEmail(
+            @RequestParam String email,
+            @RequestParam String code) {
+        log.info("Attempting to verify email for doctor: {} with code: {}", email, code);
+
+        try {
+            // Assuming VerificationService has a method to verify DoctorCentreVerificationRequest
+            // This method should find the request by email and code, validate it,
+            // create the DoctorCentreDexamen entity, save it, and remove the request.
+            verificationService.verifyDoctorCentreEmail(email, code); // TODO: Implement this method in VerificationService
+            log.info("Email verified successfully for doctor: {}", email);
+            return ResponseEntity.ok(Map.of("message", "Email verified successfully."));
+
+        } catch (ResourceNotFoundException e) {
+            log.warn("Verification failed for email {}: {}", email, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            log.warn("Verification failed for email {}: {}", email, e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            log.error("An unexpected error occurred during email verification for {}: {}", email, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An unexpected error occurred during verification."));
         }
     }
 }

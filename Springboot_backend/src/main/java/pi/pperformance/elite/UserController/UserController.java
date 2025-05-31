@@ -426,7 +426,7 @@ public class UserController {
     
     
 
-    @PostMapping("/verifyEmail")
+    @RequestMapping(value = "/verifyEmail", method = {org.springframework.web.bind.annotation.RequestMethod.GET, org.springframework.web.bind.annotation.RequestMethod.POST})
     public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String code) {
         // Stricter email format validation (gmail or yahoo)
         if (email == null || !email.matches("^[\\w-\\.]+@(gmail\\.com|yahoo\\.com)$")) {

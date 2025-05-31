@@ -20,6 +20,8 @@ import pi.pperformance.elite.dto.AppointmentDistributionDTO; // Import the new D
 import pi.pperformance.elite.dto.MonthlyStatDTO; // Import MonthlyStatDTO
 import pi.pperformance.elite.dto.MonthlyReportStatsDTO; // Import MonthlyReportStatsDTO
 import pi.pperformance.elite.dto.ReportTypeStatsDTO; // Import ReportTypeStatsDTO
+import pi.pperformance.elite.dto.AdminCentreStatisticsDTO; // Import AdminCentreStatisticsDTO
+import pi.pperformance.elite.dto.AdminCentreTileStatsDTO; // Ensure import is present
 import pi.pperformance.elite.entities.*;
 import pi.pperformance.elite.enums.RendezVousStatus;
 
@@ -471,10 +473,13 @@ public class StatisticsService implements IStatisticsService {
         long examsThisMonth = medicalExaminationRepository.countByCreatedAtBetween(startOfMonth, endOfMonth);
         long medicalReportsGeneratedThisMonth = medicalExaminationRepository.countByResultatIsNotNullAndResultatNotAndUpdatedAtBetween("", startOfMonth, endOfMonth);
 
+        // Fetch the total count of AdminCentreExamen users
+        long totalAdminCentreCount = getTotalAdminCentreCount();
+
         return new AdminGlobalStatisticsDTO(
             totalUsers, totalPatients, totalDoctors, totalAssistants, totalDoctorCentres,
-            totalCabinets, totalExamCentres, newUsersThisMonth,
-            appointmentsThisMonth, consultationsThisMonth, examsThisMonth, medicalReportsGeneratedThisMonth
+            totalCabinets, totalExamCentres, totalAdminCentreCount, // Added totalAdminCentreCount
+            newUsersThisMonth, appointmentsThisMonth, consultationsThisMonth, examsThisMonth, medicalReportsGeneratedThisMonth
         );
     }
 
@@ -683,5 +688,327 @@ public class StatisticsService implements IStatisticsService {
         LocalDate today = LocalDate.now();
         LocalDate twelveMonthsAgoDate = today.minusMonths(12).withDayOfMonth(1);
         return userCabinetRegistrationRepository.countGlobalActivePatientRegistrationsByMonth(twelveMonthsAgoDate); // Added parameter
+    }
+
+    @Override
+    public AdminCentreStatisticsDTO getAdminCentreDashboardStatistics(Long adminCentreId) {
+        if (adminCentreId == null) {
+            return new AdminCentreStatisticsDTO(0, 0, 0, 0);
+        }
+
+        User adminUser = userRepository.findById(adminCentreId).orElse(null);
+
+        if (adminUser == null || !(adminUser instanceof AdminCentreExamen)) {
+            System.err.println("AdminCentreExamen entity not found for user ID: " + adminCentreId);
+            return new AdminCentreStatisticsDTO(0, 0, 0, 0);
+        }
+
+        AdminCentreExamen adminCentre = (AdminCentreExamen) adminUser;
+
+        // Vérifier si l'administrateur est rattaché à un centre
+        CentreDexamen associatedCentre = adminCentre.getCentreDexamen();
+        if (associatedCentre == null || associatedCentre.getName() == null) {
+            System.err.println("AdminCentreExamen with ID " + adminCentreId + " is not associated with a CentreDexamen or centre name is null.");
+            return new AdminCentreStatisticsDTO(0, 0, 0, 0);
+        }
+
+        String centreName = associatedCentre.getName();
+        Long centreId = associatedCentre.getIdCentre(); // Corrected method name
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfToday = today.atStartOfDay();
+        LocalDateTime endOfToday = today.plusDays(1).atStartOfDay();
+        Date startDateToday = Date.from(startOfToday.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDateToday = Date.from(endOfToday.atZone(ZoneId.systemDefault()).toInstant());
+
+        // 1. Nombre d'examens réalisés aujourd'hui dans le centre
+        // Assuming "Terminé" is the status for completed exams and updatedAt is the completion date
+        long examsCompletedToday = medicalExaminationRepository.countByCentreNameAndEtatAndUpdatedAtBetween(centreName, "Terminé", startDateToday, endDateToday);
+
+        // 2. Nombre d'examens en attente dans le centre
+        // Assuming "EN_ATTENTE" is the status for pending exams
+        long pendingExams = medicalExaminationRepository.countByCentreNameAndEtat(centreName, "EN_ATTENTE");
+
+        // 3. Nombre total de rapports générés (dans le mois en cours) dans le centre
+        // Reports are generated when resultat is not null/empty and exam status is "Terminé"
+        // We need to count exams in this centre with a result generated this month
+        LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
+        LocalDateTime startOfMonthDateTime = startOfMonth.atStartOfDay();
+        LocalDateTime endOfMonthDateTime = startOfMonth.plusMonths(1).atStartOfDay();
+
+        long totalReportsGeneratedThisMonth = medicalExaminationRepository.countByCentreNameAndEtatAndResultatIsNotNullAndResultatNotAndUpdatedAtBetween(
+            centreName, "Terminé", "", startOfMonthDateTime, endOfMonthDateTime
+        );
+
+
+        // 4. Nombre total des doctor_centre_examen dans le centre
+        // Assuming DoctorCentreDexamen entity has a link to CentreDexamen
+        long totalDoctorCentresInCentre = doctorCentreDexamenRepository.countByCentreDexamen_IdCentre(associatedCentre.getIdCentre()); // Corrected method call
+
+
+        return new AdminCentreStatisticsDTO(
+            examsCompletedToday,
+            pendingExams,
+            totalReportsGeneratedThisMonth,
+            totalDoctorCentresInCentre
+        );
+    }
+
+    @Override
+    public List<CenterDoctorStatDTO> getAdminCentreExamStatsByDoctor(Long adminCentreId, Integer year, Integer month) {
+        // 1. Récupérer l'entité AdminCentreExamen
+        User adminUser = userRepository.findById(adminCentreId).orElse(null);
+
+        if (adminUser == null || !(adminUser instanceof AdminCentreExamen)) {
+            System.err.println("AdminCentreExamen entity not found for user ID: " + adminCentreId);
+            return new ArrayList<>();
+        }
+
+        AdminCentreExamen adminCentre = (AdminCentreExamen) adminUser;
+
+        // 2. Vérifier si l'administrateur est rattaché à un centre
+        CentreDexamen associatedCentre = adminCentre.getCentreDexamen();
+        if (associatedCentre == null || associatedCentre.getName() == null) {
+            System.err.println("AdminCentreExamen with ID " + adminCentreId + " is not associated with a CentreDexamen or centre name is null.");
+            return new ArrayList<>();
+        }
+
+        String centreName = associatedCentre.getName();
+
+        // 3. Récupérer les examens terminés pour ce centre, filtrés par date
+        List<MedicalExamination> completedExaminations = medicalExaminationRepository.findCompletedByCentreNameAndDate(centreName, year, month);
+
+        System.out.println("DEBUG: Found " + completedExaminations.size() + " completed examinations for centre " + centreName + " in " + (month != null ? month + "/" : "") + (year != null ? year : "any year"));
+
+        // 4. Regrouper par médecin prescripteur et compter
+        Map<String, Map<String, Long>> statsByDoctorAndCabinet = completedExaminations.stream()
+            .filter(exam -> exam.getDoctor() != null) // S'assurer qu'il y a un médecin prescripteur
+            .collect(Collectors.groupingBy(
+                exam -> exam.getDoctor().getFirstName() + " " + exam.getDoctor().getLastName(), // Clé: Nom du médecin
+                Collectors.groupingBy(
+                    exam -> exam.getDoctor().getCabinet() != null ? exam.getDoctor().getCabinet().getName() : "N/A", // Clé interne: Nom du cabinet ou "N/A"
+                    Collectors.counting() // Valeur: Nombre d'examens
+                )
+            ));
+
+        // 5. Mapper les résultats à une liste de CenterDoctorStatDTO
+        List<CenterDoctorStatDTO> result = new ArrayList<>();
+        statsByDoctorAndCabinet.forEach((doctorName, cabinetMap) -> {
+            cabinetMap.forEach((cabinetName, count) -> {
+                result.add(new CenterDoctorStatDTO(doctorName, cabinetName.equals("N/A") ? null : cabinetName, count));
+            });
+        });
+
+        // Optionnel: Trier les résultats
+        result.sort(Comparator.comparing(CenterDoctorStatDTO::getPrescribingDoctorName)
+                               .thenComparing(CenterDoctorStatDTO::getPrescribingDoctorCabinetName, Comparator.nullsLast(String::compareTo)));
+
+        return result;
+    }
+
+    @Override
+    public List<CenterDoctorStatDTO> getAdminCentreExamStatsByDoctorCentre(Long adminCentreId, Integer year, Integer month) {
+        // 1. Récupérer l'entité AdminCentreExamen
+        User adminUser = userRepository.findById(adminCentreId).orElse(null);
+
+        if (adminUser == null || !(adminUser instanceof AdminCentreExamen)) {
+            System.err.println("AdminCentreExamen entity not found for user ID: " + adminCentreId);
+            return new ArrayList<>();
+        }
+
+        AdminCentreExamen adminCentre = (AdminCentreExamen) adminUser;
+
+        // 2. Vérifier si l'administrateur est rattaché à un centre
+        CentreDexamen associatedCentre = adminCentre.getCentreDexamen();
+        if (associatedCentre == null || associatedCentre.getName() == null) {
+            System.err.println("AdminCentreExamen with ID " + adminCentreId + " is not associated with a CentreDexamen or centre name is null.");
+            return new ArrayList<>();
+        }
+
+        String centreName = associatedCentre.getName();
+
+        // 3. Récupérer les examens terminés pour ce centre, filtrés par date
+        List<MedicalExamination> completedExaminations = medicalExaminationRepository.findCompletedByCentreNameAndDate(centreName, year, month);
+
+        System.out.println("DEBUG: Found " + completedExaminations.size() + " completed examinations for centre " + centreName + " in " + (month != null ? month + "/" : "") + (year != null ? year : "any year"));
+
+        // 4. Regrouper par doctor_centre_examen et compter
+        Map<String, Long> statsByDoctorCentre = completedExaminations.stream()
+            .filter(exam -> exam.getDoctorCentreDexamen() != null) // S'assurer qu'il y a un doctor_centre_examen
+            .collect(Collectors.groupingBy(
+                exam -> exam.getDoctorCentreDexamen().getFirstName() + " " + exam.getDoctorCentreDexamen().getLastName(), // Clé: Nom du doctor_centre_examen
+                Collectors.counting() // Valeur: Nombre d'examens
+            ));
+
+        // 5. Mapper les résultats à une liste de CenterDoctorStatDTO
+        // On réutilise CenterDoctorStatDTO, en mettant le nom du doctor_centre_examen dans prescribingDoctorName
+        List<CenterDoctorStatDTO> result = new ArrayList<>();
+        statsByDoctorCentre.forEach((doctorCentreName, count) -> {
+            result.add(new CenterDoctorStatDTO(doctorCentreName, null, count)); // cabinetName est null car non pertinent ici
+        });
+
+        // Optionnel: Trier les résultats
+        result.sort(Comparator.comparing(CenterDoctorStatDTO::getPrescribingDoctorName));
+
+        return result;
+    }
+
+
+    @Override
+    public List<ReportTypeStatsDTO> getAdminCentreExamStatsByType(Long adminCentreId, Integer year, Integer month) {
+        // 1. Récupérer l'entité AdminCentreExamen
+        User adminUser = userRepository.findById(adminCentreId).orElse(null);
+
+        if (adminUser == null || !(adminUser instanceof AdminCentreExamen)) {
+            System.err.println("AdminCentreExamen entity not found for user ID: " + adminCentreId);
+            return new ArrayList<>();
+        }
+
+        AdminCentreExamen adminCentre = (AdminCentreExamen) adminUser;
+
+        // 2. Vérifier si l'administrateur est rattaché à un centre
+        CentreDexamen associatedCentre = adminCentre.getCentreDexamen();
+        if (associatedCentre == null || associatedCentre.getName() == null) {
+            System.err.println("AdminCentreExamen with ID " + adminCentreId + " is not associated with a CentreDexamen or centre name is null.");
+            return new ArrayList<>();
+        }
+
+        String centreName = associatedCentre.getName();
+
+        // 3. Récupérer les examens terminés pour ce centre, filtrés par date
+        List<MedicalExamination> completedExaminations = medicalExaminationRepository.findCompletedByCentreNameAndDate(centreName, year, month);
+
+        System.out.println("DEBUG: Found " + completedExaminations.size() + " completed examinations for centre " + centreName + " in " + (month != null ? month + "/" : "") + (year != null ? year : "any year"));
+
+        // 4. Regrouper par doctor_centre_examen et par type d'examen, puis compter
+        Map<String, Map<String, Long>> statsByDoctorCentreAndExamType = completedExaminations.stream()
+            .filter(exam -> exam.getDoctorCentreDexamen() != null && exam.getAct() != null && !exam.getAct().isEmpty()) // S'assurer qu'il y a un doctor_centre_examen et un type d'examen (act)
+            .collect(Collectors.groupingBy(
+                exam -> exam.getDoctorCentreDexamen().getFirstName() + " " + exam.getDoctorCentreDexamen().getLastName(), // Clé externe: Nom du doctor_centre_examen
+                Collectors.groupingBy(
+                    MedicalExamination::getAct, // Clé interne: Type d'examen (act)
+                    Collectors.counting() // Valeur: Nombre d'examens de ce type par ce doctor_centre_examen
+                )
+            ));
+
+        // 5. Mapper les résultats à une liste de ReportTypeStatsDTO (en adaptant le DTO si nécessaire, ou en créant un nouveau)
+        // Comme précédemment, ReportTypeStatsDTO n'est pas idéal, mais je vais l'adapter en concaténant.
+        List<ReportTypeStatsDTO> result = new ArrayList<>();
+        statsByDoctorCentreAndExamType.forEach((doctorCentreName, examTypeMap) -> {
+            examTypeMap.forEach((examType, count) -> {
+                // Format: "Nom du DoctorCentreExamen - Type d'Examen"
+                result.add(new ReportTypeStatsDTO(doctorCentreName + " - " + examType, count));
+            });
+        });
+
+        // Optionnel: Trier les résultats
+        // Assurez-vous que ReportTypeStatsDTO a une méthode getType() ou utilisez une autre approche de tri
+        // Si ReportTypeStatsDTO a un champ 'type' et un constructeur ReportTypeStatsDTO(String type, Long count)
+        // alors Comparator.comparing(ReportTypeStatsDTO::getType) devrait fonctionner.
+        // Je vais supposer que ReportTypeStatsDTO a bien un getter getType().
+        result.sort(Comparator.comparing(ReportTypeStatsDTO::getReportType)); // Correction ici
+
+        return result;
+    }
+
+    @Override
+    public List<ReportTypeStatsDTO> getAdminCentreExamDistributionByType(Long adminCentreId, Integer year, Integer month) {
+        // 1. Récupérer l'entité AdminCentreExamen
+        User adminUser = userRepository.findById(adminCentreId).orElse(null);
+
+        if (adminUser == null || !(adminUser instanceof AdminCentreExamen)) {
+            System.err.println("AdminCentreExamen entity not found for user ID: " + adminCentreId);
+            return new ArrayList<>();
+        }
+
+        AdminCentreExamen adminCentre = (AdminCentreExamen) adminUser;
+
+        // 2. Vérifier si l'administrateur est rattaché à un centre
+        CentreDexamen associatedCentre = adminCentre.getCentreDexamen();
+        if (associatedCentre == null || associatedCentre.getName() == null) {
+            System.err.println("AdminCentreExamen with ID " + adminCentreId + " is not associated with a CentreDexamen or centre name is null.");
+            return new ArrayList<>();
+        }
+
+        String centreName = associatedCentre.getName();
+
+        // 3. Récupérer les examens terminés pour ce centre, filtrés par date
+        List<MedicalExamination> completedExaminations = medicalExaminationRepository.findCompletedByCentreNameAndDate(centreName, year, month);
+
+        System.out.println("DEBUG: Found " + completedExaminations.size() + " completed examinations for centre " + centreName + " in " + (month != null ? month + "/" : "") + (year != null ? year : "any year"));
+
+        // 4. Regrouper par type d'examen (act) et compter
+        Map<String, Long> statsByExamType = completedExaminations.stream()
+            .filter(exam -> exam.getAct() != null && !exam.getAct().isEmpty()) // S'assurer qu'il y a un type d'examen (act)
+            .collect(Collectors.groupingBy(
+                MedicalExamination::getAct, // Clé: Type d'examen (act)
+                Collectors.counting() // Valeur: Nombre total d'examens de ce type dans le centre
+            ));
+
+        // 5. Mapper les résultats à une liste de ReportTypeStatsDTO
+        List<ReportTypeStatsDTO> result = new ArrayList<>();
+        statsByExamType.forEach((examType, count) -> {
+            result.add(new ReportTypeStatsDTO(examType, count));
+        });
+
+        // Optionnel: Trier les résultats
+        // Assurez-vous que ReportTypeStatsDTO a une méthode getType() ou utilisez une autre approche de tri
+        // Je vais supposer que ReportTypeStatsDTO a bien un getter getType().
+        result.sort(Comparator.comparing(ReportTypeStatsDTO::getReportType)); // Correction ici
+
+        return result;
+    }
+
+
+    @Override
+    public AdminCentreTileStatsDTO getAdminCentreTileStats(Long centreId) {
+        if (centreId == null) {
+            return new AdminCentreTileStatsDTO(0L, 0L, 0L, 0L);
+        }
+
+        CentreDexamen associatedCentre = centreDexamenRepository.findById(centreId).orElse(null);
+
+        if (associatedCentre == null || associatedCentre.getName() == null) {
+            System.err.println("CentreDexamen with ID " + centreId + " not found or centre name is null.");
+            return new AdminCentreTileStatsDTO(0L, 0L, 0L, 0L);
+        }
+
+        String centreName = associatedCentre.getName();
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfToday = today.atStartOfDay();
+        LocalDateTime endOfToday = today.plusDays(1).atStartOfDay();
+        Date startDateToday = Date.from(startOfToday.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDateToday = Date.from(endOfToday.atZone(ZoneId.systemDefault()).toInstant());
+
+        // Nombre d'examens réalisés aujourd'hui dans le centre
+        long dailyExaminationsCount = medicalExaminationRepository.countByCentreNameAndEtatAndUpdatedAtBetween(centreName, "Terminé", startDateToday, endDateToday);
+
+        // Nombre d'examens en attente dans le centre
+        long pendingExaminationsCount = medicalExaminationRepository.countByCentreNameAndEtat(centreName, "EN_ATTENTE");
+
+        // Nombre total de rapports générés (dans le mois en cours) dans le centre
+        LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
+        LocalDateTime startOfMonthDateTime = startOfMonth.atStartOfDay();
+        LocalDateTime endOfMonthDateTime = startOfMonth.plusMonths(1).atStartOfDay();
+
+        long monthlyReportsCount = medicalExaminationRepository.countByCentreNameAndEtatAndResultatIsNotNullAndResultatNotAndUpdatedAtBetween(
+            centreName, "Terminé", "", startOfMonthDateTime, endOfMonthDateTime
+        );
+
+        // Nombre total des doctor_centre_examen dans le centre
+        long totalDoctorsCount = doctorCentreDexamenRepository.countByCentreDexamen_IdCentre(associatedCentre.getIdCentre()); // Corrected method call
+
+        return new AdminCentreTileStatsDTO(
+            dailyExaminationsCount,
+            pendingExaminationsCount,
+            monthlyReportsCount,
+            totalDoctorsCount
+        );
+    }
+
+    @Override
+    public Long getTotalAdminCentreCount() {
+        return userRepository.countByRole(Role.ADMIN_CENTRE_EXAMEN);
     }
 }

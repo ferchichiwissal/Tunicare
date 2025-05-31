@@ -23,4 +23,7 @@ public interface DoctorCentreDexamenRepository extends JpaRepository<DoctorCentr
     List<DoctorCentreDexamen> findByIsActive(boolean isActive);
 
     // Add other custom query methods if needed
+
+    // Nouvelle méthode pour compter le nombre de DoctorCentreDexamen par CentreDexamen
+    long countByCentreDexamen_IdCentre(Long centreId);
 }

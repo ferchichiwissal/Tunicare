@@ -237,12 +237,48 @@ const MyConsultationsPage = () => {
         }
     };
 
-    // Keep handleDownload function but use translation for errors
-    const handleDownload = async (consultationId) => {
+    // --- Prescription Handlers ---
+    const handlePreviewPrescription = async (consultationId) => {
         const userData = getUserData();
         if (!userData || !userData.accessToken) {
-            setError(t('myConsultationsPage.errors.authErrorDownload')); // Use translation
-            performLogout(); // Logout if no token
+            setError(t('myConsultationsPage.errors.authErrorDownload'));
+            performLogout();
+            return;
+        }
+
+        try {
+            const response = await axios.get(`${API_URL}/api/ordonnances/consultation/${consultationId}/download`, {
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken}`
+                },
+                responseType: 'blob'
+            });
+
+            if (response.data && response.data instanceof Blob && response.data.type === 'application/pdf') {
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                // Open in a new tab for preview
+                window.open(url, '_blank');
+                // No need to revokeObjectURL immediately for new tab
+            } else {
+                 setError(t('myConsultationsPage.errors.downloadInvalidResponse'));
+            }
+
+        } catch (err) {
+            console.error("Error fetching prescription for preview:", err);
+            if (err.response?.status === 404) {
+                setError(t('myConsultationsPage.errors.prescriptionNotFound'));
+            } else {
+                setError(err.response?.data?.message || t('myConsultationsPage.errors.downloadFailedFallback'));
+            }
+        }
+    };
+
+    const handleDownloadPrescription = async (consultationId) => {
+        const userData = getUserData();
+        if (!userData || !userData.accessToken) {
+            setError(t('myConsultationsPage.errors.authErrorDownload'));
+            performLogout();
             return;
         }
 
@@ -265,20 +301,67 @@ const MyConsultationsPage = () => {
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
             } else {
-                 setError(t('myConsultationsPage.errors.downloadInvalidResponse')); // Use translation
+                 setError(t('myConsultationsPage.errors.downloadInvalidResponse'));
             }
 
         } catch (err) {
             console.error("Error downloading prescription:", err);
             if (err.response?.status === 404) {
-                setError(t('myConsultationsPage.errors.prescriptionNotFound')); // Use translation
+                setError(t('myConsultationsPage.errors.prescriptionNotFound'));
             } else {
-                setError(err.response?.data?.message || t('myConsultationsPage.errors.downloadFailedFallback')); // Use translation
+                setError(err.response?.data?.message || t('myConsultationsPage.errors.downloadFailedFallback'));
             }
         }
     };
- 
-    // --- Download Certificate Handler ---
+
+    // --- Certificate Handlers ---
+    const handlePreviewCertificate = async (consultationId) => {
+        const userData = getUserData();
+        if (!userData || !userData.accessToken) {
+            setError(t('myConsultationsPage.errors.authErrorDownload'));
+            performLogout();
+            return;
+        }
+        // Clear previous errors before attempting download
+        setError('');
+
+        try {
+            // Use the correct endpoint defined in CertificateController
+            const response = await axios.get(`${API_URL}/api/certificates/download/consultation/${consultationId}`, {
+                headers: {
+                    'Authorization': `Bearer ${userData.accessToken}`
+                },
+                responseType: 'blob' // Assuming backend sends PDF blob
+            });
+
+            // Handle PDF or HTML response for preview
+            if (response.data && response.data instanceof Blob && (response.data.type === 'application/pdf' || response.data.type.includes('html'))) {
+                const blob = new Blob([response.data], { type: response.data.type }); // Use actual type
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank');
+            } else {
+                 console.warn("Received unexpected response type for certificate preview:", response.headers['content-type']);
+                 setError(t('myConsultationsPage.errors.downloadInvalidResponse')); // Indicate preview failed
+            }
+
+        } catch (err) {
+            console.error("Error fetching certificate for preview:", err);
+             if (err.response?.status === 404) {
+                setError(t('myConsultationsPage.errors.certificateNotFound'));
+            } else if (err.response && err.response.data instanceof Blob) {
+                 try {
+                     const errorText = await err.response.data.text();
+                     const errorJson = JSON.parse(errorText);
+                     setError(errorJson.message || t('myConsultationsPage.errors.downloadFailedFallback'));
+                 } catch (parseError) {
+                     setError(t('myConsultationsPage.errors.downloadFailedFallback'));
+                 }
+             } else {
+                 setError(err.response?.data?.message || err.message || t('myConsultationsPage.errors.downloadFailedFallback'));
+             }
+        }
+    };
+
     const handleDownloadCertificate = async (consultationId) => {
         const userData = getUserData();
         if (!userData || !userData.accessToken) {
@@ -297,8 +380,8 @@ const MyConsultationsPage = () => {
                 },
                 responseType: 'blob' // Assuming backend sends PDF blob
             });
- 
-            // Assuming PDF response for now
+
+            // Only handle PDF response for download
             if (response.data && response.data instanceof Blob && response.data.type === 'application/pdf') {
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
@@ -318,16 +401,10 @@ const MyConsultationsPage = () => {
                 link.click();
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
-            } else if (response.data && response.data instanceof Blob && response.data.type.includes('html')) {
-                 // Handle HTML response - open in new tab
-                 const htmlBlob = new Blob([response.data], { type: 'text/html' });
-                 const url = window.URL.createObjectURL(htmlBlob);
-                 window.open(url, '_blank');
-                 // No revoke needed immediately for new tab
             } else {
-                 // Handle cases where response is not a blob or not the expected type
+                 // If not PDF, indicate download failed or is not possible
                  console.warn("Received unexpected response type for certificate download:", response.headers['content-type']);
-                 setError(t('myConsultationsPage.errors.downloadInvalidResponse'));
+                 setError(t('myConsultationsPage.errors.downloadInvalidResponse')); // Or a more specific message
             }
 
         } catch (err) {
@@ -421,38 +498,55 @@ const MyConsultationsPage = () => {
                                     {/* Use translation for default type */}
                                     <td>{consult.type || t('myConsultationsPage.table.defaultType')}</td>
                                     <td className="actions-cell"> {/* Combined Actions Cell */}
-                                        {prescriptionStatusMap[consult.idConsultation] === 'loading' ? ( // Check prescription loading state
-                                             <span className="text-muted small me-2">{t('myConsultationsPage.checking', 'Vérification...')}</span> // Added me-2
+                                        {/* Prescription Buttons */}
+                                        {prescriptionStatusMap[consult.idConsultation] === 'loading' ? (
+                                             <span className="text-muted small me-2">{t('myConsultationsPage.checking', 'Vérification...')}</span>
                                         ) : (
-                                            <button
-                                                className="btn btn-primary btn-sm me-2" // Change to btn-primary for teal color, added me-2
-                                                onClick={() => handleDownload(consult.idConsultation)}
-                                                disabled={prescriptionStatusMap[consult.idConsultation] !== 'exists'} // Disable if not 'exists'
-                                                title={prescriptionStatusMap[consult.idConsultation] !== 'exists' ? t('myConsultationsPage.tooltips.prescriptionNotAvailable', 'Ordonnance non disponible') : t('myConsultationsPage.buttons.download')} // Add tooltip
-                                            >
-                                                {t('myConsultationsPage.buttons.downloadPrescription')} {/* Use translation key */}
-                                            </button>
-                                            )}
-                                            {certificateStatusMap[consult.idConsultation] === 'loading' ? (
-                                                <span className="text-muted small me-2">{t('myConsultationsPage.checking')}</span> // Use translation key
-                                            ) : (
-                                                 <button
-                                                    className="btn btn-primary btn-sm me-2" // Changed to primary for teal color, added me-2
+                                            <> {/* Use fragment to group buttons */}
+                                                <button
+                                                    className="btn btn-primary btn-sm me-2" // Change to primary for teal color
+                                                    onClick={() => handlePreviewPrescription(consult.idConsultation)}
+                                                    disabled={prescriptionStatusMap[consult.idConsultation] !== 'exists'}
+                                                    title={prescriptionStatusMap[consult.idConsultation] !== 'exists' ? t('myConsultationsPage.tooltips.prescriptionNotAvailable', 'Ordonnance non disponible') : t('myConsultationsPage.buttons.viewPrescriptionTooltip')} // Use translation key
+                                                >
+                                                    {t('myConsultationsPage.buttons.viewPrescription')} {/* Use translation key */}
+                                                </button>
+                                                <button
+                                                    className="btn btn-primary btn-sm me-2" // Use primary for download
+                                                    onClick={() => handleDownloadPrescription(consult.idConsultation)}
+                                                    disabled={prescriptionStatusMap[consult.idConsultation] !== 'exists'}
+                                                    title={prescriptionStatusMap[consult.idConsultation] !== 'exists' ? t('myConsultationsPage.tooltips.prescriptionNotAvailable', 'Ordonnance non disponible') : t('myConsultationsPage.buttons.downloadPrescriptionTooltip')} // Use translation key
+                                                >
+                                                    {t('myConsultationsPage.buttons.downloadPrescription')} {/* Use translation key */}
+                                                </button>
+                                            </>
+                                        )}
+
+                                        {/* Certificate Buttons */}
+                                        {certificateStatusMap[consult.idConsultation] === 'loading' ? (
+                                            <span className="text-muted small me-2">{t('myConsultationsPage.checking')}</span>
+                                        ) : (
+                                            <> {/* Use fragment to group buttons */}
+                                                <button
+                                                    className="btn btn-primary btn-sm me-2" // Change to primary for teal color
+                                                    onClick={() => handlePreviewCertificate(consult.idConsultation)}
+                                                    disabled={certificateStatusMap[consult.idConsultation] !== 'exists'}
+                                                    title={certificateStatusMap[consult.idConsultation] !== 'exists' ? t('myConsultationsPage.tooltips.certificateNotAvailable') : t('myConsultationsPage.buttons.viewCertificateTooltip')} // Use translation key
+                                                >
+                                                    {t('myConsultationsPage.buttons.viewCertificate')} {/* Use translation key */}
+                                                </button>
+                                                <button
+                                                    className="btn btn-primary btn-sm me-2" // Use primary for download
                                                     onClick={() => handleDownloadCertificate(consult.idConsultation)}
-                                                    disabled={certificateStatusMap[consult.idConsultation] !== 'exists'} // Disable if not 'exists'
-                                                    title={certificateStatusMap[consult.idConsultation] !== 'exists' ? t('myConsultationsPage.tooltips.certificateNotAvailable') : t('myConsultationsPage.buttons.downloadedCertificate')} // Use translation keys
+                                                    disabled={certificateStatusMap[consult.idConsultation] !== 'exists'}
+                                                    title={certificateStatusMap[consult.idConsultation] !== 'exists' ? t('myConsultationsPage.tooltips.certificateNotAvailable') : t('myConsultationsPage.buttons.downloadCertificateTooltip')} // Use translation key
                                                 >
                                                     {t('myConsultationsPage.buttons.downloadCertificate')} {/* Use translation key */}
                                                 </button>
-                                            )}
-                                            <button
-                                                className="btn btn-primary btn-sm" // Removed ms-2, will be handled by me-2 on previous buttons
-                                                onClick={() => handleHideConsultation(consult.idConsultation)}
-                                            >
-                                                {t('myConsultationsPage.buttons.hideConsultation')} {/* Use translation key */}
-                                            </button>
-                                        </td>
-                                    </tr>
+                                            </>
+                                        )}
+                                    </td>
+                                </tr>
                                 ))
                             ) : (
                                 <tr>
@@ -470,3 +564,4 @@ const MyConsultationsPage = () => {
     };
     
     export default MyConsultationsPage;
+

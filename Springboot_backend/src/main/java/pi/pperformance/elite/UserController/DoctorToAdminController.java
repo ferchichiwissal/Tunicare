@@ -59,8 +59,11 @@ public class DoctorToAdminController {
             // Sauvegarder le nouvel admin
             userRepository.save(admin);
 
-            log.info("Docteur ID {} converti en admin centre examen", doctorId);
-            return ResponseEntity.ok("Conversion en admin centre examen réussie");
+            // Supprimer l'ancien docteur centre examen
+            userRepository.delete(doctor);
+
+            log.info("Docteur ID {} converti en admin centre examen et ancien compte supprimé", doctorId);
+            return ResponseEntity.ok("Conversion en admin centre examen réussie et ancien compte supprimé");
 
         } catch (Exception e) {
             log.error("Erreur lors de la conversion du docteur en admin: {}", e.getMessage());

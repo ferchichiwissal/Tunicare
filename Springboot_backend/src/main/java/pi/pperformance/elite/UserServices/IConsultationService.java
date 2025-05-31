@@ -86,5 +86,8 @@ public interface IConsultationService {
      */
     void setConsultationVisibilityForDoctor(Long consultationId, Long doctorId, boolean isHidden);
 
+    // New method to delete consultations by patient ID
+    void deleteConsultationsByPatientId(Long patientId);
+
     // Add other methods as needed
 }

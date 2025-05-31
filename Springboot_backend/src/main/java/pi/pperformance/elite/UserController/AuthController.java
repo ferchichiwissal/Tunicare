@@ -24,14 +24,15 @@ import pi.pperformance.elite.UserServices.UserServiceInterface;
 import pi.pperformance.elite.entities.*;
 import pi.pperformance.elite.UserRepository.CabinetDrRepository;
 import pi.pperformance.elite.UserRepository.UserCabinetRegistrationRepository;
+import pi.pperformance.elite.UserRepository.CentreDexamenRepository; // Import CentreDexamenRepository
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 import pi.pperformance.elite.entities.UserCabinetRegistration;
-import java.time.LocalDate; // Add import for LocalDate
-import java.time.Period;   // Add import for Period
-import java.util.Base64;   // Add import for Base64
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/auth")
@@ -45,6 +46,8 @@ public class AuthController {
     private final EmailService emailService;
     private final CabinetDrRepository cabinetDrRepository;
     private final UserCabinetRegistrationRepository userCabinetRegistrationRepository;
+    private final CentreDexamenRepository centreDexamenRepository; // Inject CentreDexamenRepository
+
 
     @Autowired
     public AuthController(
@@ -53,7 +56,8 @@ public class AuthController {
             PasswordEncoder passwordEncoder,
             EmailService emailService,
             CabinetDrRepository cabinetDrRepository,
-            UserCabinetRegistrationRepository userCabinetRegistrationRepository
+            UserCabinetRegistrationRepository userCabinetRegistrationRepository,
+            CentreDexamenRepository centreDexamenRepository // Inject CentreDexamenRepository
     ) {
         this.jwtUtil = jwtUtil;
         this.userServices = userServices;
@@ -61,6 +65,7 @@ public class AuthController {
         this.emailService = emailService;
         this.cabinetDrRepository = cabinetDrRepository;
         this.userCabinetRegistrationRepository = userCabinetRegistrationRepository;
+        this.centreDexamenRepository = centreDexamenRepository; // Assign injected repository
     }
     // --- End Dependency Injection ---
 
@@ -71,7 +76,7 @@ public class AuthController {
         String email = (String) loginRequest.get("email");
         String password = (String) loginRequest.get("password");
         Object cabinetIdObj = loginRequest.get("cabinetId");
-        Long parsedRequestedCabinetId = null; // Use a different name for the parsed value
+        Long parsedRequestedCabinetId = null;
 
         // Parse requestedCabinetId if provided
         if (cabinetIdObj != null) {
@@ -106,11 +111,14 @@ public class AuthController {
         }
         log.info("Password verified for user {}", email);
 
-        // 3. Handle Role-Specific Logic & Cabinet Selection (Simplified - No active check here)
+        // 3. Handle Role-Specific Logic & Cabinet/Centre Association
         Long cabinetIdForToken = null;
+        Long centreIdForToken = null; // Initialize centreIdForToken
 
         if (baseUser.getRole() == Role.ADMIN) {
+            // Global ADMIN has no associated cabinet or centre
             cabinetIdForToken = null;
+            centreIdForToken = null;
             log.info("Admin login successful for {}", email);
 
         } else if (baseUser instanceof Doctor || baseUser instanceof Assistant) {
@@ -137,7 +145,38 @@ public class AuthController {
                 log.warn("Login failed: Doctor/Assistant {} requested cabinet {} but belongs to {}", email, finalRequestedCabinetId, cabinetIdForToken);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Access denied for the selected cabinet."));
             }
+            // Doctor/Assistant are associated with a Cabinet, not a CentreDexamen directly in this context
+            centreIdForToken = null; // Ensure centreId is null for these roles
+
             log.info("Doctor/Assistant login successful for {} in cabinet {}", email, cabinetIdForToken);
+
+        } else if (baseUser instanceof AdminCentreExamen) {
+            AdminCentreExamen adminCentre = (AdminCentreExamen) baseUser;
+
+            // Check if active
+            if (!adminCentre.isActive()) {
+                log.warn("Login failed: AdminCentreExamen {} account is inactive.", email);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Your account is currently inactive. Please contact support."));
+            }
+
+            // Get the associated CentreDexamen and its ID
+            CentreDexamen centre = adminCentre.getCentreDexamen();
+            if (centre == null || centre.getIdCentre() == null) {
+                log.error("Login failed: AdminCentreExamen {} has no assigned centre or centre has no ID.", email);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Account not associated with a valid examination centre."));
+            }
+            centreIdForToken = centre.getIdCentre(); // Store centre ID here
+            cabinetIdForToken = null; // AdminCentreExamen is associated with a Centre, not a Cabinet
+
+            // Optional: Check against requestedCabinetId if AdminCentreExamen can also select centres (unlikely)
+            // if (finalRequestedCabinetId != null && !finalRequestedCabinetId.equals(cabinetIdForToken)) { // Note: This comparison is now against centreIdForToken
+            //     log.warn("Login failed: AdminCentreExamen {} requested centre {} but belongs to {}", email, finalRequestedCabinetId, centreIdForToken);
+            //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Access denied for the selected centre.")); // Or appropriate message
+            // }
+
+            log.info("AdminCentreExamen login successful for {} in centre {}", email, centreIdForToken);
+            // Add a log here to check centreIdForToken before token generation
+            log.info("Before token generation for AdminCentreExamen {}: centreIdForToken = {}", email, centreIdForToken);
 
         } else if (baseUser instanceof Patient) {
             Patient patient = (Patient) baseUser;
@@ -151,7 +190,7 @@ public class AuthController {
             if (finalRequestedCabinetId != null) {
                 // Check if registration exists for the requested cabinet (active or inactive)
                 Optional<UserCabinetRegistration> targetReg = allRegistrations.stream()
-                        .filter(reg -> reg.getCabinet().getIdSite().equals(finalRequestedCabinetId)) // Use final variable
+                        .filter(reg -> reg.getCabinet().getIdSite().equals(finalRequestedCabinetId))
                         .findFirst();
 
                 if (targetReg.isPresent()) {
@@ -200,6 +239,9 @@ public class AuthController {
                              ));
                  }
             }
+            // Patient is associated with a Cabinet, not a CentreDexamen
+            centreIdForToken = null; // Ensure centreId is null for this role
+
         } else if (baseUser instanceof DoctorCentreDexamen) {
             DoctorCentreDexamen doctorCentre = (DoctorCentreDexamen) baseUser;
 
@@ -211,19 +253,20 @@ public class AuthController {
 
             // Get the associated CentreDexamen and its ID
             CentreDexamen centre = doctorCentre.getCentreDexamen();
-            if (centre == null || centre.getIdCentre() == null) { // Use the correct getter getIdCentre()
+            if (centre == null || centre.getIdCentre() == null) {
                 log.error("Login failed: DoctorCentreDexamen {} has no assigned centre or centre has no ID.", email);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Account not associated with a valid examination centre."));
             }
-            cabinetIdForToken = centre.getIdCentre(); // Store centre ID here using the correct getter
+            centreIdForToken = centre.getIdCentre(); // Store centre ID here
+            cabinetIdForToken = null; // DoctorCentreDexamen is associated with a Centre, not a Cabinet
 
-            // Optional: Check against requestedCabinetId if DoctorCentreDexamen can also select cabinets (unlikely based on request)
-            // if (finalRequestedCabinetId != null && !finalRequestedCabinetId.equals(cabinetIdForToken)) {
-            //     log.warn("Login failed: DoctorCentreDexamen {} requested centre {} but belongs to {}", email, finalRequestedCabinetId, cabinetIdForToken);
+            // Optional: Check against requestedCabinetId if DoctorCentreDexamen can also select centres (unlikely based on request)
+            // if (finalRequestedCabinetId != null && !finalRequestedCabinetId.equals(cabinetIdForToken)) { // Note: This comparison is now against centreIdForToken
+            //     log.warn("Login failed: DoctorCentreDexamen {} requested centre {} but belongs to {}", email, finalRequestedCabinetId, centreIdForToken);
             //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Access denied for the selected centre.")); // Or appropriate message
             // }
 
-            log.info("DoctorCentreDexamen login successful for {} in centre {}", email, cabinetIdForToken);
+            log.info("DoctorCentreDexamen login successful for {} in centre {}", email, centreIdForToken);
 
         } else {
              log.error("Login failed: Unhandled user type for email {}", email);
@@ -233,15 +276,7 @@ public class AuthController {
         // 4. Generate Tokens and Respond
         Collection<GrantedAuthority> authorities = List.of(() -> "ROLE_" + baseUser.getRole().name());
 
-        // Determine centreId for the token if the user is DOCTOR_CENTRE_EXAMEN
-        Long centreIdForToken = null;
-        if (baseUser instanceof DoctorCentreDexamen) {
-            CentreDexamen centre = ((DoctorCentreDexamen) baseUser).getCentreDexamen();
-            if (centre != null) {
-                centreIdForToken = centre.getIdCentre();
-            }
-        }
-
+        // Pass the determined cabinetIdForToken and centreIdForToken to generateToken
         final String accessToken = jwtUtil.generateToken(baseUser.getEmail(), authorities, cabinetIdForToken, centreIdForToken);
         final String refreshToken = jwtUtil.generateRefreshToken(baseUser.getEmail(), authorities, cabinetIdForToken, centreIdForToken);
 
@@ -257,7 +292,9 @@ public class AuthController {
         userInfo.put("firstName", baseUser.getFirstName());
         userInfo.put("lastName", baseUser.getLastName());
         userInfo.put("role", baseUser.getRole());
-        userInfo.put("cabinetId", cabinetIdForToken);
+        userInfo.put("cabinetId", cabinetIdForToken); // This will be null for centre roles
+        userInfo.put("centreId", centreIdForToken); // Include centreId in user info
+
 
         // --- Add requested fields ---
         userInfo.put("birthDate", baseUser.getBirthDate() != null ? baseUser.getBirthDate().toString() : null); // Format as ISO string
@@ -265,8 +302,8 @@ public class AuthController {
         userInfo.put("address", baseUser.getAddress()); // User's own address
         userInfo.put("tel", baseUser.getTel()); // User's own tel
 
-        // Add active cabinet details if a cabinetIdForToken was determined
-        if (cabinetIdForToken != null && !(baseUser instanceof Admin)) { // Admins don't have an active cabinet in this context
+        // Add active cabinet details if a cabinetIdForToken was determined (for Doctor/Assistant/Patient)
+        if (cabinetIdForToken != null) { // Check if cabinetIdForToken is not null
             Optional<CabinetDr> activeCabinetOpt = cabinetDrRepository.findById(cabinetIdForToken);
             if (activeCabinetOpt.isPresent()) {
                 CabinetDr activeCabinet = activeCabinetOpt.get();
@@ -283,8 +320,31 @@ public class AuthController {
                 userInfo.put("activeCabinet", null); // Indicate cabinet details couldn't be found
             }
         } else {
-             userInfo.put("activeCabinet", null); // No active cabinet applicable (e.g., Admin) or determined
+             userInfo.put("activeCabinet", null); // No active cabinet applicable or determined
         }
+
+        // Add active centre details if a centreIdForToken was determined (for AdminCentreExamen/DoctorCentreDexamen)
+         if (centreIdForToken != null) { // Check if centreIdForToken is not null
+             // Assuming you have a CentreDexamenRepository
+             // Need to inject CentreDexamenRepository
+             Optional<CentreDexamen> activeCentreOpt = centreDexamenRepository.findById(centreIdForToken);
+             if (activeCentreOpt.isPresent()) {
+                 CentreDexamen activeCentre = activeCentreOpt.get();
+                 Map<String, Object> activeCentreInfo = new HashMap<>();
+                 activeCentreInfo.put("id", activeCentre.getIdCentre());
+                 activeCentreInfo.put("name", activeCentre.getName());
+                 activeCentreInfo.put("address", activeCentre.getAdress()); // Use getAdress()
+                 activeCentreInfo.put("tel", activeCentre.getTel());
+                 // Add other centre details if needed
+                 userInfo.put("activeCentre", activeCentreInfo);
+                 log.info("Included active centre details for centreId: {}", centreIdForToken);
+             } else {
+                 log.warn("Could not find details for active centreId: {}", centreIdForToken);
+                 userInfo.put("activeCentre", null);
+             }
+         } else {
+             userInfo.put("activeCentreId", null); // No active centre applicable or determined
+         }
 
 
         // Handle photoProfil (convert byte[] to Base64 string)

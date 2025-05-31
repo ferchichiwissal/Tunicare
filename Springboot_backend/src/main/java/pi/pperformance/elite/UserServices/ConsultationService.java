@@ -233,4 +233,11 @@ public class ConsultationService implements IConsultationService {
         consultation.setHiddenForDoctor(isHidden);
         consultationRepository.save(consultation);
     }
+
+    @Override
+    @Transactional // Ensure atomicity for deletion
+    public void deleteConsultationsByPatientId(Long patientId) {
+        // Use the repository method to delete consultations by patient ID
+        consultationRepository.deleteByPatient_Id(patientId);
+    }
 }

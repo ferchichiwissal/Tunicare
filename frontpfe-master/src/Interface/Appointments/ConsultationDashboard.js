@@ -222,12 +222,6 @@ const ConsultationDashboard = () => {
                                              >
                                                  {t('consultationDashboard.buttons.viewDetails')}
                                              </button>
-                                             <button
-                                              className="btn btn-sm btn-primary ms-2" // Changed to btn-primary and added margin for spacing
-                                              onClick={() => handleHideConsultation(consultationId)} // Use defined consultationId
-                                          >
-                                              {t('consultationDashboard.buttons.hideConsultation')}
-                                          </button>
                                        </td>
                                    )}
                                </tr>

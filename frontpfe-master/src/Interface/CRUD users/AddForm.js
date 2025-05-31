@@ -36,6 +36,7 @@ function AddForm() { // Renamed component for clarity
   const [passwordStrength, setPasswordStrength] = useState("");
   const [userRole, setUserRole] = useState(null);
   const [loggedInUserCabinetId, setLoggedInUserCabinetId] = useState(null);
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
   // --- Logout Function ---
   const performLogout = useCallback(() => {
@@ -383,15 +384,25 @@ function AddForm() { // Renamed component for clarity
           <div className="row g-3 mb-3">
             <div className="col-md-6">
               <label htmlFor="add-password" className="form-label">{t('addForm.labels.password')}</label>
-              <input
-                type="password"
-                id="add-password"
-                name="password"
-                 value={formData.password}
-                 onChange={handleChange}
-                 className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-               />
-              <div className="invalid-feedback">{errors.password}</div>
+              {/* Add a container for the input and icon */}
+              <div className="input-group">
+                <input
+                  type={showPassword ? 'text' : 'password'} // Toggle type based on state
+                  id="add-password"
+                  name="password"
+                   value={formData.password}
+                   onChange={handleChange}
+                   className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                 />
+                 <button
+                    type="button"
+                    className="btn btn-outline-secondary" // Use Bootstrap button styling
+                    onClick={() => setShowPassword(!showPassword)} // Toggle state on click
+                 >
+                    <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i> {/* Toggle icon */}
+                 </button>
+                <div className="invalid-feedback">{errors.password}</div>
+              </div>
               {passwordStrength && (
                 <div className={`form-text password-strength ${passwordStrength.toLowerCase()}`}>
                   {t('addForm.passwordStrength.label')}: {passwordStrength}
@@ -400,17 +411,27 @@ function AddForm() { // Renamed component for clarity
             </div>
             <div className="col-md-6">
               <label htmlFor="add-confirmPassword" className="form-label">{t('addForm.labels.confirmPassword')}</label>
-              <input
-                type="password"
-                id="add-confirmPassword"
-                name="confirmPassword"
-                 value={formData.confirmPassword}
-                 onChange={handleChange}
-                 className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
-                 // Required only if password has value
-                 required={!!formData.password}
-              />
-              <div className="invalid-feedback">{errors.confirmPassword}</div>
+              {/* Add a container for the input and icon */}
+              <div className="input-group">
+                <input
+                  type={showPassword ? 'text' : 'password'} // Toggle type based on state
+                  id="add-confirmPassword"
+                  name="confirmPassword"
+                   value={formData.confirmPassword}
+                   onChange={handleChange}
+                   className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                   // Required only if password has value
+                   required={!!formData.password}
+                />
+                 <button
+                    type="button"
+                    className="btn btn-outline-secondary" // Use Bootstrap button styling
+                    onClick={() => setShowPassword(!showPassword)} // Toggle state on click
+                 >
+                    <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i> {/* Toggle icon */}
+                 </button>
+                <div className="invalid-feedback">{errors.confirmPassword}</div>
+              </div>
             </div>
           </div>
 

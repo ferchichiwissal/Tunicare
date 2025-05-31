@@ -16,4 +16,7 @@ public interface IModeleCompteRenduService {
     void deleteModele(Long id);
 
     ModeleCompteRendu updateModele(Long id, ModeleCompteRendu updatedModele, MultipartFile previewImageFile);
+
+    // New method to get only the preview image data by ID
+    Optional<ModeleCompteRendu> getModelePreviewImageById(Long id);
 }

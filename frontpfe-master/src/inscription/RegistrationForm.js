@@ -20,6 +20,8 @@ function RegistrationForm() {
   const recaptchaRef = useRef(null);
   const { theme, toggleTheme } = useContext(ThemeContext); // Get theme context
 
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -357,16 +359,26 @@ function RegistrationForm() {
               <div className="row g-3 mb-3">
                 <div className="col-md-6">
                   <label htmlFor="reg-password" className="form-label required">{t('registration.passwordLabel')}</label>
-                  <input
-                    type="password"
-                    id="reg-password"
-                    name="password"
-                    value={formData.password}
-                     onChange={handleChange}
-                      className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                      required
-                    />
-                   <div className="invalid-feedback">{errors.password}</div>
+                  {/* Add a container for the input and icon */}
+                  <div className="input-group">
+                    <input
+                      type={showPassword ? 'text' : 'password'} // Toggle type based on state
+                      id="reg-password"
+                      name="password"
+                      value={formData.password}
+                       onChange={handleChange}
+                        className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                        required
+                      />
+                      <button
+                          type="button"
+                          className="btn btn-outline-secondary" // Use Bootstrap button styling
+                          onClick={() => setShowPassword(!showPassword)} // Toggle state on click
+                      >
+                          <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i> {/* Toggle icon */}
+                      </button>
+                     <div className="invalid-feedback">{errors.password}</div>
+                   </div>
                    {passwordStrength && (
                      <div className={`form-text password-strength-indicator ${passwordStrength.toLowerCase()}`}>
                        {t('registration.passwordStrengthLabel', {
@@ -377,17 +389,27 @@ function RegistrationForm() {
                 </div>
                 <div className="col-md-6">
                   <label htmlFor="reg-confirmPassword" className="form-label required">{t('registration.confirmPasswordLabel')}</label>
-                  <input
-                    type="password"
-                    id="reg-confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                     onChange={handleChange}
-                      className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
-                      required
-                    />
+                  {/* Add a container for the input and icon */}
+                  <div className="input-group">
+                    <input
+                      type={showPassword ? 'text' : 'password'} // Toggle type based on state
+                      id="reg-confirmPassword"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                       onChange={handleChange}
+                        className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                        required
+                      />
+                      <button
+                          type="button"
+                          className="btn btn-outline-secondary" // Use Bootstrap button styling
+                          onClick={() => setShowPassword(!showPassword)} // Toggle state on click
+                      >
+                          <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i> {/* Toggle icon */}
+                      </button>
                    <div className="invalid-feedback">{errors.confirmPassword}</div>
                  </div>
+               </div>
                </div>
 
                {/* Row 7: ReCAPTCHA */}

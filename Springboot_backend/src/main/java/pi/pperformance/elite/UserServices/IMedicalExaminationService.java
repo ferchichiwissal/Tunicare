@@ -157,4 +157,22 @@ public interface IMedicalExaminationService {
      * @throws SecurityException if the patient is not authorized.
      */
     void setExaminationVisibilityForPatient(Long examId, Long patientId, boolean isHidden);
+
+    /**
+     * Deletes medical examinations associated with a specific doctor.
+     * @param doctorId The ID of the doctor.
+     */
+    void deleteExaminationsByDoctorId(Long doctorId);
+
+    /**
+     * Deletes medical examinations associated with a specific doctor centre examen.
+     * @param doctorCentreDexamenId The ID of the doctor centre examen.
+     */
+    void deleteExaminationsByDoctorCentreDexamenId(Long doctorCentreDexamenId);
+
+    /**
+     * Deletes medical examinations associated with a specific patient.
+     * @param patientId The ID of the patient.
+     */
+    void deleteExaminationsByPatientId(Long patientId);
 }

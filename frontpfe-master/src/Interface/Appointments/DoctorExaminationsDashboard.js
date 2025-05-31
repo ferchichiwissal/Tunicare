@@ -230,13 +230,6 @@ const DoctorExaminationsDashboard = () => {
                                                     >
                                                         {t('doctorExaminationsDashboard.buttons.viewResult')} 📄
                                                     </button>
-                                                    <button
-                                                        onClick={() => handleHideExam(exam.idExam)}
-                                                        className="btn btn-outline-secondary btn-sm"
-                                                        title={t('doctorExaminationsDashboard.tooltips.hideExam')}
-                                                    >
-                                                        {t('doctorExaminationsDashboard.buttons.hideExam')} 👁️‍🗨️
-                                                    </button>
                                                 </>
                                             )}
                                         </div>

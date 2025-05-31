@@ -243,6 +243,13 @@ body.dark-mode .app-body-main-content {
   display: inline-block; /* Keep border only under text */
 }
 
+/* Style for underlined titles */
+.underlined-title {
+  border-bottom: 2px solid var(--primary-color); /* Green underline */
+  padding-bottom: 5px; /* Space between text and underline */
+  display: inline-block; /* Ensure underline only spans the text */
+}
+
 body.dark-mode .service-section h2 {
   color: var(--text-color);
   border-bottom-color: var(--primary-color);
@@ -372,7 +379,7 @@ body.dark-mode .tile a:hover {
 /* Doctor Charts Grid Layout */
 .doctor-charts-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Fixed 2-column grid */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
   gap: 25px; /* Space between charts */
   margin-top: 40px;
 }
@@ -380,10 +387,25 @@ body.dark-mode .tile a:hover {
 /* Admin Charts Grid Layout */
 .admin-charts-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Fixed 2-column grid */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
   gap: 25px; /* Space between charts */
   margin-top: 40px;
 }
+
+/* Doctor Centre Charts Grid Layout */
+.admin-centre-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+  gap: 25px; /* Space between charts */
+  margin-top: 40px;
+}
+
+/* Style for the double-size chart container */
+.admin-centre-charts-grid .double-size-chart {
+  grid-column: span 2; /* Make it span two columns */
+  height: 600px; /* Increase height slightly to accommodate text */
+}
+
 
 /* Charts Section */
 .charts-section {
@@ -458,16 +480,24 @@ body.dark-mode .chart-description {
 }
 
 /* Styles for Month/Year Selectors in Dark Mode */
-/* Removed potentially conflicting styles for select in dark mode */
 body.dark-mode .month-year-selector select {
+  color: var(--text-color) !important; /* White text */
+  background-color: var(--light-background) !important; /* Dark background */
   border-color: var(--border-color); /* Darker border */
 }
 
-/* Removed potentially conflicting styles for select options in dark mode */
-/* body.dark-mode .month-year-selector select option { */
-    /* color: #000000 !important; /* Black text color for options */ /* Removed potentially conflicting style */
-    /* background-color: #ffffff !important; /* White background for options */ /* Removed potentially conflicting style */
-/* } */
+body.dark-mode .month-year-selector select option {
+    color: var(--text-color) !important; /* White text */
+    background-color: var(--light-background) !important; /* Dark background */
+}
+
+body.dark-mode .month-year-selector select option:hover,
+body.dark-mode .month-year-selector select option:checked {
+    background-color: #555 !important; /* Grey highlight */
+    color: var(--text-color) !important; /* White text */
+}
+
+
 
 
 /* Right Sidebar (User Info) */

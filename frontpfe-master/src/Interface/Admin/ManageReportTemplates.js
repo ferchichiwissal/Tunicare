@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react'; // Added useCallback
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import apiClient from '../../utils/apiClient';
 import AuthContext from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { clearUserData, getToken, isTokenExpired } from '../../utils/auth'; // Import auth utils
-import ReactQuill from 'react-quill'; // Import ReactQuill
-import 'react-quill/dist/quill.snow.css'; // Import Quill styles
-import './ManageReportTemplates.css'; // Optional CSS
+import { useNavigate } from 'react-router-dom';
+import { clearUserData, getToken, isTokenExpired } from '../../utils/auth';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import './ManageReportTemplates.css';
 
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
@@ -15,21 +15,27 @@ const ManageReportTemplates = () => {
     const { user } = useContext(AuthContext);
     const [templates, setTemplates] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false); // For form saving state
+    const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState('');
-    const [formError, setFormError] = useState(''); // Error specific to the form
-    const navigate = useNavigate(); // Initialize useNavigate
+    const [formError, setFormError] = useState('');
+    const navigate = useNavigate();
 
     // State for Add/Edit Form
-    const [showForm, setShowForm] = useState(false); // Initialize to false to show button and table by default
+    const [showForm, setShowForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [currentTemplate, setCurrentTemplate] = useState({ id: null, nomModele: '', typeModele: '', contenuModele: '' });
-    const [previewImageFile, setPreviewImageFile] = useState(null); // For storing the selected image file
+    const [previewImageFile, setPreviewImageFile] = useState(null);
+
+    // Determine if the user has permission to manage (add/edit/delete) templates
+    const canManageTemplates = user?.role === 'ADMIN_CENTRE_EXAMEN';
+    // Determine if the user can view templates (all authorized roles)
+    const canViewTemplates = user?.role === 'ADMIN_CENTRE_EXAMEN' || user?.role === 'DOCTOR_CENTRE_EXAMEN';
+
 
     // --- Logout Function ---
     const performLogout = useCallback(() => {
         clearUserData();
-        alert(t('manageReportTemplates.alerts.sessionExpired')); // Add translation key
+        alert(t('manageReportTemplates.alerts.sessionExpired'));
         navigate("/sign-in");
     }, [navigate, t]);
 
@@ -79,6 +85,7 @@ const ManageReportTemplates = () => {
         setIsLoading(true);
         setError('');
         try {
+            // The backend now handles filtering by centre based on the authenticated user
             const response = await apiClient.get('/api/modeles-compte-rendu');
             setTemplates(response.data || []);
         } catch (err) {
@@ -89,15 +96,15 @@ const ManageReportTemplates = () => {
         }
     };
 
-    // Fetch templates on component mount
+    // Fetch templates on component mount if user is authorized to view
     useEffect(() => {
-        if (user?.role === 'ADMIN') {
+        if (canViewTemplates) {
             fetchTemplates();
         } else {
             setError(t('common.errors.unauthorized'));
             setIsLoading(false);
         }
-    }, [user, t]);
+    }, [user, t, canViewTemplates]); // Added canViewTemplates to dependency array
 
     const handleDelete = async (id) => {
         if (!window.confirm(t('manageReportTemplates.confirmDelete'))) {
@@ -117,15 +124,15 @@ const ManageReportTemplates = () => {
 
     const handleOpenAddForm = () => {
         setCurrentTemplate({ id: null, nomModele: '', typeModele: '', contenuModele: '' });
-        setPreviewImageFile(null); // Reset file
+        setPreviewImageFile(null);
         setIsEditing(false);
         setShowForm(true);
         setFormError('');
     };
 
     const handleOpenEditForm = (template) => {
-        setCurrentTemplate({ ...template }); // Copy template data
-        setPreviewImageFile(null); // Reset file input, existing image URL should be handled by display if needed
+        setCurrentTemplate({ ...template });
+        setPreviewImageFile(null);
         setIsEditing(true);
         setShowForm(true);
         setFormError('');
@@ -133,8 +140,8 @@ const ManageReportTemplates = () => {
 
     const handleCloseForm = () => {
         setShowForm(false);
-        setCurrentTemplate({ id: null, nomModele: '', typeModele: '', contenuModele: '' }); // Reset form
-        setPreviewImageFile(null); // Reset file
+        setCurrentTemplate({ id: null, nomModele: '', typeModele: '', contenuModele: '' });
+        setPreviewImageFile(null);
         setFormError('');
     };
 
@@ -156,7 +163,7 @@ const ManageReportTemplates = () => {
         event.preventDefault();
         setIsSaving(true);
         setFormError('');
-        setError(''); // Clear main error too
+        setError('');
 
         const formData = new FormData();
         formData.append('nomModele', currentTemplate.nomModele);
@@ -168,16 +175,12 @@ const ManageReportTemplates = () => {
 
         try {
             if (isEditing) {
-                // Update existing template
-                // Note: For PUT with FormData, some backends might expect POST or specific handling for file updates.
-                // This assumes the backend handles PUT with FormData for updates including optional new file.
                 await apiClient.put(`/api/modeles-compte-rendu/${currentTemplate.id}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
             } else {
-                // Create new template
                 await apiClient.post('/api/modeles-compte-rendu', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -186,7 +189,7 @@ const ManageReportTemplates = () => {
             }
             alert(isEditing ? t('manageReportTemplates.success.updateSuccess') : t('manageReportTemplates.success.addSuccess'));
             handleCloseForm();
-            fetchTemplates(); // Refresh the list
+            fetchTemplates();
         } catch (err) {
             console.error("Failed to save template:", err);
             setFormError(err.response?.data?.message || (isEditing ? t('manageReportTemplates.errors.updateFailed') : t('manageReportTemplates.errors.addFailed')));
@@ -200,26 +203,31 @@ const ManageReportTemplates = () => {
         return <div className="container mt-5"><p>{t('manageReportTemplates.loading')}</p></div>;
     }
 
-    if (error && templates.length === 0) { // Show error prominently if loading failed
+    // Show error if user cannot view templates
+    if (!canViewTemplates) {
+         return <div className="container mt-5 alert alert-danger">{t('common.errors.unauthorized')}</div>;
+    }
+
+    // Show error if fetching failed AND there are no templates to display
+    if (error && templates.length === 0) {
         return <div className="container mt-5 alert alert-danger">{error}</div>;
     }
 
-    // Ensure only Admin can see this page content
-    if (user?.role !== 'ADMIN') {
-         return <div className="container mt-5 alert alert-danger">{t('common.errors.unauthorized')}</div>;
-    }
 
     return (
         <div className="manage-report-templates-container container mt-5">
             <h2>{t('manageReportTemplates.title')}</h2>
             {error && <div className="alert alert-danger mt-3">{error}</div>}
 
-            {/* Add Template Button */}
-            <div className="add-template-button-container">
-                <button className="btn btn-primary mb-3 add-template-button" onClick={handleOpenAddForm}>
-                    {t('manageReportTemplates.buttons.addTemplate')}
-                </button>
-            </div>
+            {/* Add Template Button - Only visible if user can manage templates */}
+            {canManageTemplates && (
+                <div className="add-template-button-container">
+                    <button className="btn btn-primary mb-3 add-template-button" onClick={handleOpenAddForm}>
+                        {t('manageReportTemplates.buttons.addTemplate')}
+                    </button>
+                </div>
+            )}
+
 
             {/* Add/Edit Form Section (Conditional Rendering) */}
             {showForm ? (
@@ -263,7 +271,7 @@ const ManageReportTemplates = () => {
                                     id="previewImageFile"
                                     name="previewImageFile"
                                     onChange={handleFileChange}
-                                    accept="image/*" // Accept only image files
+                                    accept="image/*"
                                 />
                                 {isEditing && currentTemplate.previewImageUrl && !previewImageFile && (
                                     <div className="mt-2">
@@ -277,12 +285,11 @@ const ManageReportTemplates = () => {
                                 <ReactQuill
                                     theme="snow"
                                     value={currentTemplate.contenuModele}
-                                    onChange={handleContenuChange} // Use the new handler
-                                    modules={quillModules} // Use the defined modules
-                                    className="quill-editor-custom" // Optional custom class for styling
+                                    onChange={handleContenuChange}
+                                    modules={quillModules}
+                                    className="quill-editor-custom"
                                 />
                             </div>
-                            {/* The duplicate previewImageFile div was removed in a previous step, this comment is just for tracking */}
                             <button type="submit" className="btn btn-success me-2" disabled={isSaving}>
                                 {isSaving ? t('common.saving') : t('common.save')}
                             </button>
@@ -293,7 +300,7 @@ const ManageReportTemplates = () => {
                     </div>
                 </div>
             ) : (
-                // If showForm is false, display the "Add Template" button and the templates list
+                // If showForm is false, display the "Add Template" button (if authorized) and the templates list
                 <>
                     {/* Templates List */}
                     {templates.length === 0 && !isLoading ? (
@@ -305,7 +312,7 @@ const ManageReportTemplates = () => {
                                     <tr>
                                         <th>{t('manageReportTemplates.tableHeaders.name')}</th>
                                         <th>{t('manageReportTemplates.tableHeaders.type')}</th>
-                                        <th>{t('manageReportTemplates.tableHeaders.actions')}</th>
+                                        {canManageTemplates && <th>{t('manageReportTemplates.tableHeaders.actions')}</th>} {/* Show actions header only if user can manage */}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -313,20 +320,22 @@ const ManageReportTemplates = () => {
                                         <tr key={template.id}>
                                             <td>{template.nomModele}</td>
                                             <td>{template.typeModele || '-'}</td>
-                                            <td>
-                                                <button
-                                                    className="btn btn-sm btn-warning me-2"
-                                                    onClick={() => handleOpenEditForm(template)}
-                                                >
-                                                    {t('common.edit')}
-                                                </button>
-                                                <button
-                                                    className="btn btn-sm btn-danger"
-                                                    onClick={() => handleDelete(template.id)}
-                                                >
-                                                    {t('common.delete')}
-                                                </button>
-                                            </td>
+                                            {canManageTemplates && ( // Show action buttons only if user can manage
+                                                <td>
+                                                    <button
+                                                        className="btn btn-sm btn-warning me-2"
+                                                        onClick={() => handleOpenEditForm(template)}
+                                                    >
+                                                        {t('common.edit')}
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-danger"
+                                                        onClick={() => handleDelete(template.id)}
+                                                    >
+                                                        {t('common.delete')}
+                                                    </button>
+                                                </td>
+                                            )}
                                         </tr>
                                     ))}
                                 </tbody>
@@ -335,8 +344,6 @@ const ManageReportTemplates = () => {
                     )}
                 </>
             )}
-            {/* TODO: Add Modals/Forms for Add/Edit */}
-            {/* <AddEditTemplateModal show={showAddModal || showEditModal} handleClose={() => ...} template={currentTemplate} refreshTemplates={fetchTemplates} /> */}
         </div>
     );
 };

@@ -27,7 +27,8 @@ import ChangePassword from './Interface/ChangePassword'; // Import ChangePasswor
 import ProtectedLayout from './utils/ProtectedLayout'; // Assuming ProtectedLayout exists
 import { ThemeProvider } from './utils/ThemeContext'; // Import ThemeProvider
 import { AuthProvider } from './context/AuthContext'; // Import AuthProvider
-import Activation from './Interface/CRUD users/Activation'; // Import the new Activation component
+import Activation from './Interface/CRUD users/Activation'; // Import the original Activation component
+import CentreDoctorActivation from './Interface/CRUD users/CentreDoctorActivation'; // Import the new CentreDoctorActivation component
 
 // Import CentreDexamen components
 import CentreDexamenList from './Interface/CRUD_Centres/CentreDexamenList';
@@ -55,7 +56,9 @@ import UploadDoctorCentreSignaturePage from './Interface/Appointments/UploadDoct
 import ArchivedExaminationsPage from './Interface/Appointments/ArchivedExaminationsPage'; // Import Archived Examinations Page
 import DoctorStatistics from './Interface/Statistics/DoctorStatistics'; // Import DoctorStatistics
 import CenterStatistics from './Interface/Statistics/CenterStatistics'; // Import CenterStatistics
- 
+import AdminCentreStatistics from './Interface/Statistics/AdminCentreStatistics'; // Import AdminCentreStatistics
+import EditAdminCentreForm from './Interface/CRUD users/EditAdminCentreForm'; // Import the new form
+
 const onLogout = () => {
   // Clear tokens from localStorage and sessionStorage
   localStorage.removeItem("accessToken");
@@ -85,17 +88,28 @@ function App() {
           <Route path="/" element={<Template />} />
 
           {/* Protected routes - Layout applied within ProtectedLayout */}
-          <Route path='/dashboard' element={<ProtectedLayout><Layout><Dashboard onLogout={onLogout}/></Layout></ProtectedLayout>} />
+          {/* Dashboard route - explicitly list all allowed roles */}
+          <Route path='/dashboard' element={
+            <ProtectedLayout requiredRole={["ROLE_ADMIN", "ROLE_DOCTOR", "ROLE_PATIENT", "ROLE_ASSISTANT", "ROLE_DOCTOR_CENTRE_EXAMEN", "ROLE_ADMIN_CENTRE_EXAMEN"]}>
+              <Layout><Dashboard onLogout={onLogout}/></Layout>
+            </ProtectedLayout>
+          } />
           <Route path="/add" element={<ProtectedLayout><Layout><AddForm/></Layout></ProtectedLayout>} />
           <Route path="/bloque" element={<ProtectedLayout><Layout><ComptenotValide/></Layout></ProtectedLayout>}/>
           <Route path="/Tovalidate" element={<ProtectedLayout><Layout><CompteValide onLogout={onLogout} /></Layout></ProtectedLayout>}/>
           <Route path="/UserManagement" element={<ProtectedLayout><Layout><UserManagement onLogout={onLogout} /></Layout></ProtectedLayout>}/>
           <Route path="/users" element={<ProtectedLayout><Layout><UserList /></Layout></ProtectedLayout>} />
           <Route path="/edit-user/:id" element={<ProtectedLayout><Layout><EditUserForm /></Layout></ProtectedLayout>}/>
-          {/* Route for editing a DoctorCentreDexamen, protected for Admin */}
+          {/* Route for editing a DoctorCentreDexamen, protected for Admin and Admin Centre Examen */}
           <Route path="/edit-doctor-centre/:id" element={
-            <ProtectedLayout requiredRole={["ROLE_ADMIN", "ROLE_DOCTOR_CENTRE_EXAMEN"]}> {/* Corrected role string */}
+            <ProtectedLayout requiredRole={["ROLE_ADMIN", "ROLE_DOCTOR_CENTRE_EXAMEN", "ROLE_ADMIN_CENTRE_EXAMEN"]}> {/* Added ROLE_ADMIN_CENTRE_EXAMEN */}
               <Layout><EditDoctorCentreForm /></Layout>
+            </ProtectedLayout>
+          } />
+           {/* Route for editing an AdminCentreExamen, protected for Admin */}
+          <Route path="/edit-admin-centre/:id" element={
+            <ProtectedLayout requiredRole="ROLE_ADMIN">
+              <Layout><EditAdminCentreForm /></Layout>
             </ProtectedLayout>
           } />
           <Route path="/add-cabinet" element={
@@ -133,9 +147,16 @@ function App() {
               <Layout><EditCentreDexamenForm /></Layout>
             </ProtectedLayout>
           } />
-          <Route path="/activation" element={
+          {/* Route for Admin to manage ALL inactive doctors */}
+          <Route path="/admin/activation" element={
             <ProtectedLayout requiredRole="ROLE_ADMIN">
               <Layout><Activation /></Layout>
+            </ProtectedLayout>
+          } />
+          {/* Route for Admin Centre Examen to manage doctors in their centre */}
+          <Route path="/centre/doctor-activation" element={
+            <ProtectedLayout requiredRole="ROLE_ADMIN_CENTRE_EXAMEN">
+              <Layout><CentreDoctorActivation /></Layout>
             </ProtectedLayout>
           } />
           <Route path="/consultation/:appointmentId" element={
@@ -219,7 +240,7 @@ function App() {
           } />
           {/* Route for Admin to manage report templates */}
           <Route path="/admin/manage-report-templates" element={
-            <ProtectedLayout requiredRole="ROLE_ADMIN">
+            <ProtectedLayout requiredRole={["ROLE_ADMIN", "ROLE_ADMIN_CENTRE_EXAMEN"]}>
               <Layout><ManageReportTemplates /></Layout>
             </ProtectedLayout>
           } />
@@ -251,6 +272,12 @@ function App() {
           <Route path="/center-statistics" element={
             <ProtectedLayout requiredRole="ROLE_DOCTOR_CENTRE_EXAMEN">
               <Layout><CenterStatistics /></Layout>
+            </ProtectedLayout>
+          } />
+          {/* Route for Admin Centre Statistics */}
+          <Route path="/admin-centre-statistics" element={
+            <ProtectedLayout requiredRole="ROLE_ADMIN_CENTRE_EXAMEN">
+              <Layout><AdminCentreStatistics /></Layout>
             </ProtectedLayout>
           } />
 

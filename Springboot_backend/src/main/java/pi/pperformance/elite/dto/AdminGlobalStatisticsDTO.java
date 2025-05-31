@@ -8,6 +8,7 @@ public class AdminGlobalStatisticsDTO {
     private long totalDoctorCentres;
     private long totalCabinets;
     private long totalExamCentres;
+    private long totalAdminCentreCount; // Added field
     // private long newUsersThisWeek; // Supprimé
     private long newUsersThisMonth;
     // private long appointmentsToday; // Supprimé
@@ -27,6 +28,7 @@ public class AdminGlobalStatisticsDTO {
 
     public AdminGlobalStatisticsDTO(long totalUsers, long totalPatients, long totalDoctors, long totalAssistants,
                                   long totalDoctorCentres, long totalCabinets, long totalExamCentres,
+                                  long totalAdminCentreCount, // Added parameter
                                   long newUsersThisMonth, long appointmentsThisMonth,
                                   long consultationsThisMonth, long examsThisMonth, long medicalReportsGeneratedThisMonth) {
         this.totalUsers = totalUsers;
@@ -36,6 +38,7 @@ public class AdminGlobalStatisticsDTO {
         this.totalDoctorCentres = totalDoctorCentres;
         this.totalCabinets = totalCabinets;
         this.totalExamCentres = totalExamCentres;
+        this.totalAdminCentreCount = totalAdminCentreCount; // Set the new field
         this.newUsersThisMonth = newUsersThisMonth;
         this.appointmentsThisMonth = appointmentsThisMonth;
         this.consultationsThisMonth = consultationsThisMonth;
@@ -98,6 +101,14 @@ public class AdminGlobalStatisticsDTO {
 
     public void setTotalExamCentres(long totalExamCentres) {
         this.totalExamCentres = totalExamCentres;
+    }
+
+    public long getTotalAdminCentreCount() { // Added getter
+        return totalAdminCentreCount;
+    }
+
+    public void setTotalAdminCentreCount(long totalAdminCentreCount) { // Added setter
+        this.totalAdminCentreCount = totalAdminCentreCount;
     }
 
     // public long getNewUsersThisWeek() {

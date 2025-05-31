@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +14,7 @@ import pi.pperformance.elite.dto.CenterDoctorStatDTO;
 import pi.pperformance.elite.dto.DoctorStatisticsDTO; // Ajout DTO
 import pi.pperformance.elite.dto.PatientStatisticsDTO; // Ajout DTO
 import pi.pperformance.elite.dto.DoctorCentreStatisticsDTO; // Ajout DTO
+import pi.pperformance.elite.dto.AdminCentreStatisticsDTO;
 import pi.pperformance.elite.dto.AdminGlobalStatisticsDTO; // Ajout DTO
 import pi.pperformance.elite.dto.AssistantStatisticsDTO; // Ajout DTO
 import pi.pperformance.elite.dto.MonthlyStatDTO; // Ajout DTO
@@ -48,7 +50,7 @@ public class StatisticsController {
     }
 
     @GetMapping("/center/exams-by-doctor")
-    @PreAuthorize("hasRole('DOCTOR_CENTRE_EXAMEN')")
+    @PreAuthorize("hasAnyRole('DOCTOR_CENTRE_EXAMEN', 'ADMIN_CENTRE_EXAMEN')")
     public ResponseEntity<List<CenterDoctorStatDTO>> getCenterExamStatsByDoctor(
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Integer month) {
@@ -388,5 +390,88 @@ public class StatisticsController {
     public ResponseEntity<List<MonthlyStatDTO>> getGlobalPatientsPerMonthStats() {
         List<MonthlyStatDTO> stats = statisticsService.getGlobalPatientsPerMonth();
         return ResponseEntity.ok(stats);
+    }
+    @GetMapping("/admin-centre/exams-by-doctor")
+    @PreAuthorize("hasRole('ADMIN_CENTRE_EXAMEN')")
+    public ResponseEntity<List<CenterDoctorStatDTO>> getAdminCentreExamStatsByDoctor(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long adminCentreId = userDetails.getId();
+
+        List<CenterDoctorStatDTO> stats = statisticsService.getAdminCentreExamStatsByDoctor(adminCentreId, year, month);
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour les statistiques des examens par doctor_centre_examen pour l'administrateur de centre d'examen
+    @GetMapping("/admin-centre/exams-by-doctor-centre")
+    @PreAuthorize("hasRole('ADMIN_CENTRE_EXAMEN')")
+    public ResponseEntity<List<CenterDoctorStatDTO>> getAdminCentreExamStatsByDoctorCentre(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long adminCentreId = userDetails.getId();
+
+        List<CenterDoctorStatDTO> stats = statisticsService.getAdminCentreExamStatsByDoctorCentre(adminCentreId, year, month);
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour les statistiques des examens par type par doctor_centre_examen pour l'administrateur de centre d'examen
+    @GetMapping("/admin-centre/exams-by-type-by-doctor-centre")
+    @PreAuthorize("hasRole('ADMIN_CENTRE_EXAMEN')")
+    public ResponseEntity<List<ReportTypeStatsDTO>> getAdminCentreExamStatsByType(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long adminCentreId = userDetails.getId();
+
+        List<ReportTypeStatsDTO> stats = statisticsService.getAdminCentreExamStatsByType(adminCentreId, year, month);
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour la répartition des examens par type pour l'administrateur de centre d'examen
+    @GetMapping("/admin-centre/exam-distribution-by-type")
+    @PreAuthorize("hasRole('ADMIN_CENTRE_EXAMEN')")
+    public ResponseEntity<List<ReportTypeStatsDTO>> getAdminCentreExamDistributionByType(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long adminCentreId = userDetails.getId();
+
+        List<ReportTypeStatsDTO> stats = statisticsService.getAdminCentreExamDistributionByType(adminCentreId, year, month);
+        return ResponseEntity.ok(stats);
+    }
+
+
+    // Endpoint pour les statistiques du tableau de bord de l'administrateur de centre d'examen
+    @GetMapping("/dashboard/admin-centre")
+    @PreAuthorize("hasRole('ADMIN_CENTRE_EXAMEN')")
+    public ResponseEntity<AdminCentreStatisticsDTO> getAdminCentreDashboardStats() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long adminCentreId = userDetails.getId();
+
+        AdminCentreStatisticsDTO stats = statisticsService.getAdminCentreDashboardStatistics(adminCentreId);
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour les statistiques des tuiles de l'administrateur de centre d'examen
+    @GetMapping("/admincentre/tiles/{centreId}")
+    @PreAuthorize("hasRole('ADMIN_CENTRE_EXAMEN')")
+    public ResponseEntity<pi.pperformance.elite.dto.AdminCentreTileStatsDTO> getAdminCentreTileStats(@PathVariable Long centreId) {
+        pi.pperformance.elite.dto.AdminCentreTileStatsDTO stats = statisticsService.getAdminCentreTileStats(centreId);
+        return ResponseEntity.ok(stats);
+    }
+
+    // Endpoint pour le nombre total d'administrateurs de centre d'examen
+    @GetMapping("/admin/total-admin-centres")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Long> getTotalAdminCentreCount() {
+        Long count = statisticsService.getTotalAdminCentreCount();
+        return ResponseEntity.ok(count);
     }
 }

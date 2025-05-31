@@ -24,17 +24,24 @@ This allows it to be injected into other classes where needed.*/
 public class JwtUtils {
     /* Generate a strong secret key for HS256
      * It’s a method to mix the secret key with the data inside the token to create a secure signature. This signature is then used to ensure the token hasn’t been changed by anyone else.*/
-    private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256); // Ensure a strong dynamic 256-bit key
+    // Revert to the static final key generation
+    private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    
+    // Remove the @Value injection and getSigningKey method
+
     // Extract a claim from the token
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    public Claims extractAllClaims(String token) { // Changed from private to public
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody(); // Revert to older parser syntax
+    public Claims extractAllClaims(String token) {
+        // Use the static SECRET_KEY for parsing
+        return Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
      // Retrieve email from JWT token
      public String extractEmail(String token) {
@@ -65,7 +72,7 @@ public class JwtUtils {
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours validity
-                .signWith(SECRET_KEY)
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS256) // Use the static key
                 .compact();
     }
 
@@ -88,7 +95,7 @@ public class JwtUtils {
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7 days validity
-                .signWith(SECRET_KEY)
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS256) // Use the static key
                 .compact();
     }
 
@@ -141,10 +148,11 @@ public class JwtUtils {
 
     // Get roles from the token
     public List<Role> getRolesFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+        Claims claims = Jwts.parserBuilder() // Use the new parser builder
+                .setSigningKey(SECRET_KEY) // Use the static key
+                .build()
                 .parseClaimsJws(token)
-                .getBody(); // Revert to older parser syntax
+                .getBody();
 
         List<String> roleNames = claims.get("roles", List.class); // Extract roles as strings
         return roleNames.stream()

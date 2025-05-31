@@ -169,13 +169,6 @@ const ArchivedExaminationsPage = () => {
                                         <Link to={`/examination-result/${exam.idExam}`} className="btn btn-primary btn-sm me-2">
                                             {t('archivedExaminationsPage.buttons.viewResult')}
                                         </Link>
-                                        <button
-                                            onClick={() => handleHideExam(exam.idExam)}
-                                            className="btn btn-primary btn-sm"
-                                            title={t('archivedExaminationsPage.tooltips.hideExam')}
-                                        >
-                                            {t('archivedExaminationsPage.buttons.hideExam')}
-                                        </button>
                                     </td>
                                 </tr>
                             ))}

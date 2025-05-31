@@ -68,7 +68,7 @@ public class MedicalExamination implements Serializable {
     private List<FichierAttacheRapport> fichiersAttaches = new ArrayList<>();
 
     // Add relationship to DoctorCentreDexamen who might fill the result
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Added cascade
     @JoinColumn(name = "doctor_centre_id")
     private DoctorCentreDexamen doctorCentreDexamen;
 

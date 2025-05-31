@@ -15,7 +15,7 @@ const UserTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentUserDetails, setCurrentUserDetails] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [viewType, setViewType] = useState('doctors'); // 'doctors' or 'doctorCentres'
+  const [viewType, setViewType] = useState('doctors'); // 'doctors', 'doctorCentres', or 'adminCentres'
 
   // --- Logout Function ---
   const performLogout = useCallback(() => { // Wrap in useCallback
@@ -69,12 +69,21 @@ const UserTable = () => {
     };
   }, [performLogout]); // Use performLogout dependency
 
-  // --- Get Current User Details ---
+  // --- Get Current User Details and Set Initial View ---
   useEffect(() => {
     const details = getUserData(); // Use the correct function getUserData()
-    // const details = userDetails; // If using Context
     setCurrentUserDetails(details);
     console.log("Current User Details:", details);
+
+    // Set initial view based on user role
+    if (details?.roles?.includes("ROLE_ADMIN_CENTRE_EXAMEN")) {
+        setViewType('doctorCentres');
+        console.log("User is Admin Centre Examen, setting viewType to 'doctorCentres'");
+    } else {
+        setViewType('doctors'); // Default view for other roles
+        console.log("User is not Admin Centre Examen, setting viewType to 'doctors'");
+    }
+
   }, []); // Run once on mount
 
   // --- Fetch Users Function (Refactored for View Type) ---
@@ -95,8 +104,8 @@ const UserTable = () => {
 
     let apiUrl = "";
     const isAdmin = roles.includes("ROLE_ADMIN");
-    // Note: Only Admin can currently see the 'doctorCentres' view based on requirements
-    // Other roles (Doctor, Assistant) will only see their relevant 'doctors' view.
+    const isAdminCentreExamen = roles.includes("ROLE_ADMIN_CENTRE_EXAMEN");
+    const userCentreId = currentUserDetails?.centreId; // Assuming centreId is available in userDetails
 
     if (viewType === 'doctors') {
         const isDoctor = roles.includes("ROLE_DOCTOR");
@@ -113,8 +122,25 @@ const UserTable = () => {
           setLoading(false);
           return;
         }
-    } else if (viewType === 'doctorCentres' && isAdmin) {
-        apiUrl = "http://localhost:6952/api/doctor-centre-examen/all"; // Admin gets ALL doctor centres (active and inactive)
+    } else if (viewType === 'doctorCentres') {
+        if (isAdmin) {
+            apiUrl = "http://localhost:6952/api/doctor-centre-examen/all"; // Admin gets ALL doctor centres
+        } else if (isAdminCentreExamen && userCentreId) {
+            apiUrl = `http://localhost:6952/api/doctor-centre-examen/centre/${userCentreId}`; // Admin Centre gets doctor centres for their centre
+        } else {
+            console.error(`Unsupported viewType '${viewType}' or insufficient permissions/missing centreId for roles: ${roles}, centreId: ${userCentreId}`);
+            setLoading(false);
+            return;
+        }
+    } else if (viewType === 'adminCentres') {
+        if (isAdmin) {
+            // Use the new endpoint for fetching all Admin Centres
+            apiUrl = "http://localhost:6952/api/admin-centre-examen/all";
+        } else {
+            console.error(`Unsupported viewType '${viewType}' or insufficient permissions for roles: ${roles}`);
+            setLoading(false);
+            return;
+        }
     } else {
         console.error(`Unsupported viewType '${viewType}' or insufficient permissions for roles: ${roles}`);
         setLoading(false);
@@ -132,16 +158,22 @@ const UserTable = () => {
 
       const currentUserId = currentUserDetails?.user?.id;
       let filteredData = response.data;
-      if (currentUserId != null) { // Check for null/undefined
-        // Filter out the current logged-in user
+      // Only filter out the current user if the view is 'doctors'
+      if (viewType === 'doctors' && currentUserId != null) { // Check for null/undefined
         filteredData = response.data.filter(user => user.id !== currentUserId);
-        console.log(`[fetchUsers] Filtered data (removed self ID ${currentUserId}):`, filteredData);
+        console.log(`[fetchUsers] Filtered data (removed self ID ${currentUserId}) for 'doctors' view:`, filteredData);
+      } else if (viewType === 'doctorCentres') {
+         console.log(`[fetchUsers] No self-filtering for 'doctorCentres' view.`);
+         // Filter for active doctorCentres
+         filteredData = response.data.filter(user => user.active === true);
+         console.log(`[fetchUsers] Filtered data (only active) for 'doctorCentres' view:`, filteredData);
       } else {
         console.warn("[fetchUsers] Could not filter self from user list because current user ID is missing.");
       }
+
       // Add a simple 'isActive' field for display purposes based on backend data
       // Map data, ensuring 'active' field is used for displayStatus
-      const usersWithStatus = filteredData.map(u => ({
+      const usersWithStatus = filteredData.map(u => ({ // Use filteredData here
           ...u,
           // Use the 'active' field directly if it exists, otherwise default (e.g., true for simplicity)
           // DoctorCentreDexamen should have 'active' field from backend.
@@ -210,7 +242,9 @@ const UserTable = () => {
     console.log(`[deleteUser] Context: Target User ID=${userIdToDelete}, Actor Roles=${roles}, Actor Cabinet ID=${cabinetId}, Actor User ID=${currentUserId}`); // Log context
 
     const isAdmin = roles.includes("ROLE_ADMIN");
+    const isAdminCentreExamen = roles.includes("ROLE_ADMIN_CENTRE_EXAMEN");
     const isDoctorOrAssistant = roles.includes("ROLE_DOCTOR") || roles.includes("ROLE_ASSISTANT");
+    const userCentreId = currentUserDetails?.centreId; // Assuming centreId is available
 
     // **Enhanced Check:** Doctor/Assistant must have a cabinetId for certain actions
     if (viewType === 'doctors' && isDoctorOrAssistant && !cabinetId) {
@@ -228,25 +262,57 @@ const UserTable = () => {
     let confirmationMessage = "";
     let successMessageKey = "";
 
+    // Determine the base confirmation message based on the user's role being deleted
+    let baseConfirmationKey = 'userManagement.confirmations.deleteGeneric'; // Default
+    if (userRoleToDelete === 'PATIENT') {
+        baseConfirmationKey = 'userManagement.confirmations.deletePatientCascade';
+    } else if (userRoleToDelete === 'DOCTOR') {
+        baseConfirmationKey = 'userManagement.confirmations.deleteDoctorCascade';
+    } else if (userRoleToDelete === 'DOCTOR_CENTRE_EXAMEN') {
+        baseConfirmationKey = 'userManagement.confirmations.deleteDoctorCentreCascade';
+    }
+
+    // Construct the specific delete URL and confirmation message
     if (viewType === 'doctors') {
         if (isAdmin) {
           deleteUrl = `http://localhost:6952/Users/delete/${userIdToDelete}`;
-          confirmationMessage = t('userManagement.confirmations.deleteAdmin', { userId: userIdToDelete });
+          confirmationMessage = t(baseConfirmationKey, { userId: userIdToDelete, role: userRoleToDelete.toLowerCase() });
           successMessageKey = 'userManagement.alerts.deleteSuccess.admin';
         } else if (isDoctorOrAssistant && cabinetId) {
           // This deletes the registration from the cabinet
           deleteUrl = `http://localhost:6952/Users/cabinet/${cabinetId}/user/${userIdToDelete}`;
-          confirmationMessage = t('userManagement.confirmations.deleteDoctorAssistant', { userId: userIdToDelete, cabinetId });
+          // For Patient deletion by D/A, use the specific cascade message
+          confirmationMessage = t(baseConfirmationKey, { userId: userIdToDelete, cabinetId, role: userRoleToDelete.toLowerCase() });
           successMessageKey = 'userManagement.alerts.deleteSuccess.doctorAssistant';
         } else {
           alert(t('userManagement.alerts.deleteFailed.permissionOrMissingCabinet'));
           return;
         }
-    } else if (viewType === 'doctorCentres' && isAdmin) {
-        // Deleting a DoctorCentreDexamen directly
-        deleteUrl = `http://localhost:6952/api/doctor-centre-examen/${userIdToDelete}`;
-        confirmationMessage = t('userManagement.confirmations.deleteDoctorCentre', { userId: userIdToDelete }); // Add new translation key
-        successMessageKey = 'userManagement.alerts.deleteSuccess.doctorCentre'; // Add new translation key
+    } else if (viewType === 'doctorCentres') {
+        if (isAdmin) {
+            // Admin deleting any DoctorCentreDexamen
+            deleteUrl = `http://localhost:6952/api/doctor-centre-examen/${userIdToDelete}`; // Corrected URL
+            confirmationMessage = t(baseConfirmationKey, { userId: userIdToDelete, role: userRoleToDelete.toLowerCase() }); // Use base key for Admin
+            successMessageKey = 'userManagement.alerts.deleteSuccess.doctorCentre';
+        } else if (isAdminCentreExamen && userCentreId) {
+            // Admin Centre deleting a DoctorCentreDexamen from their centre
+            deleteUrl = `http://localhost:6952/api/doctor-centre-examen/centre/${userCentreId}/doctor/${userIdToDelete}`; // Corrected URL
+            confirmationMessage = t('userManagement.confirmations.deleteDoctorCentreAdminCentreCascade', { userId: userIdToDelete, centreId: userCentreId, role: userRoleToDelete.toLowerCase() }); // Keep this specific key
+            successMessageKey = 'userManagement.alerts.deleteSuccess.doctorCentreAdminCentre';
+        } else {
+             alert(t('userManagement.alerts.deleteFailed.invalidViewOrPermission')); // Generic error for invalid state
+             return;
+        }
+    } else if (viewType === 'adminCentres') {
+         if (isAdmin) {
+            // Admin deleting an AdminCentreExamen
+            deleteUrl = `http://localhost:6952/api/admin-centre-examen/${userIdToDelete}`;
+            confirmationMessage = t('userManagement.confirmations.deleteAdminCentre', { userId: userIdToDelete }); // Add new translation key
+            successMessageKey = 'userManagement.alerts.deleteSuccess.adminCentre'; // Add new translation key
+         } else {
+             alert(t('userManagement.alerts.deleteFailed.invalidViewOrPermission')); // Generic error for invalid state
+             return;
+         }
     } else {
         alert(t('userManagement.alerts.deleteFailed.invalidViewOrPermission')); // Generic error for invalid state
         return;
@@ -267,14 +333,26 @@ const UserTable = () => {
         })
         .catch((error) => {
           console.error(`Error during delete operation for view ${viewType}:`, error);
-          if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            alert(t('userManagement.alerts.deleteFailed.auth'));
-            performLogout();
-          } else if (error.response && error.response.status === 404) {
-             alert(t('userManagement.alerts.deleteFailed.notFound'));
+          if (error.response) {
+            const status = error.response.status;
+            const message = error.response.data?.message || "An error occurred.";
+             if (status === 401 || status === 403) {
+              alert(t('userManagement.alerts.deleteFailed.authWithMessage', { message }));
+              performLogout();
+            } else if (status === 404) {
+             alert(t('userManagement.alerts.deleteFailed.notFoundWithMessage', { message }));
+            } else if (status === 400) {
+             alert(t('userManagement.alerts.deleteFailed.badRequestWithMessage', { message }));
+            }
+            else {
+              alert(t('userManagement.alerts.deleteFailed.genericWithMessage', { message }));
+            }
           } else {
-            alert(t('userManagement.alerts.deleteFailed.generic'));
+            alert(t('userManagement.alerts.deleteFailed.networkError', { role: userRoleToDelete })); // Use target role in message
           }
+        })
+        .finally(() => {
+            setLoading(false); // Stop loading
         });
     }
   };
@@ -303,6 +381,9 @@ const UserTable = () => {
     let confirmationMessageKey = ""; // Key for translation
     let successMessageKey = ""; // Key for translation
 
+    const isAdminCentreExamen = actorRoles.includes("ROLE_ADMIN_CENTRE_EXAMEN");
+    const userCentreId = currentUserDetails?.centreId; // Assuming centreId is available
+
     if (viewType === 'doctors') {
         // Logic for toggling status of regular Doctors/Assistants/Patients
         if (targetUserRole === 'PATIENT') {
@@ -322,16 +403,37 @@ const UserTable = () => {
         } else {
             alert(t('userManagement.alerts.toggleFailed.invalidRole', { role: targetUserRole })); return;
         }
-    } else if (viewType === 'doctorCentres' && actorRoles.includes("ROLE_ADMIN")) {
-        // Logic for toggling status of DoctorCentreDexamen
-        toggleUrl = `http://localhost:6952/api/doctor-centre-examen/${targetUserId}/toggle-status`;
-        confirmationMessageKey = currentStatus ? 'userManagement.confirmations.deactivateDoctorCentre' : 'userManagement.confirmations.activateDoctorCentre'; // Add new keys
-        successMessageKey = 'userManagement.alerts.toggleSuccessDoctorCentre'; // Add new key
+    } else if (viewType === 'doctorCentres') {
+        if (actorRoles.includes("ROLE_ADMIN")) {
+            // Admin toggling any DoctorCentreDexamen
+            toggleUrl = `http://localhost:6952/api/doctor-centre-examen/${targetUserId}/toggle-status`;
+            confirmationMessageKey = currentStatus ? 'userManagement.confirmations.deactivateDoctorCentre' : 'userManagement.confirmations.activateDoctorCentre';
+            successMessageKey = 'userManagement.alerts.toggleSuccessDoctorCentre';
+        } else if (isAdminCentreExamen && userCentreId) {
+            // Admin Centre toggling a DoctorCentreDexamen from their centre
+            // Use the correct endpoint: PUT /api/doctor-centre-examen/{id}/toggle-status
+            toggleUrl = `http://localhost:6952/api/doctor-centre-examen/${targetUserId}/toggle-status`;
+            confirmationMessageKey = currentStatus ? 'userManagement.confirmations.deactivateDoctorCentreAdminCentre' : 'userManagement.confirmations.activateDoctorCentreAdminCentre'; // Add new translation keys
+            successMessageKey = 'userManagement.alerts.toggleSuccessDoctorCentreAdminCentre'; // Add new translation key
+        } else {
+             alert(t('userManagement.alerts.toggleFailed.invalidViewOrPermission')); // Generic error for invalid state
+             return;
+        }
+    } else if (viewType === 'adminCentres') {
+        if (actorRoles.includes("ROLE_ADMIN")) {
+            // Admin toggling an AdminCentreExamen
+            toggleUrl = `http://localhost:6952/api/admin-centre-examen/${targetUserId}/toggle-status`;
+            confirmationMessageKey = currentStatus ? 'userManagement.confirmations.deactivateAdminCentre' : 'userManagement.confirmations.activateAdminCentre'; // Add new translation keys
+            successMessageKey = 'userManagement.alerts.toggleSuccessAdminCentre'; // Add new translation key
+        } else {
+             alert(t('userManagement.alerts.toggleFailed.invalidViewOrPermission')); // Generic error for invalid state
+             return;
+        }
     } else {
         alert(t('userManagement.alerts.toggleFailed.invalidViewOrPermission')); return;
     }
 
-    const confirmationText = t(confirmationMessageKey, { userId: targetUserId, role: targetUserRole.toLowerCase(), cabinetId: actorCabinetId });
+    const confirmationText = t(confirmationMessageKey, { userId: targetUserId, role: targetUserRole.toLowerCase(), cabinetId: actorCabinetId, centreId: userCentreId }); // Added centreId to translation params
 
     if (window.confirm(confirmationText)) {
       setLoading(true);
@@ -380,6 +482,9 @@ const UserTable = () => {
     } else if (viewType === 'doctorCentres') {
         // Navigate to a new edit form for doctor centres (to be created)
         navigate(`/edit-doctor-centre/${id}`); // Define this route later
+    } else if (viewType === 'adminCentres') {
+        // Navigate to the generic user edit form for admin centres
+        navigate(`/edit-user/${id}`);
     } else {
         console.error("Cannot edit: Unknown view type", viewType);
     }
@@ -401,35 +506,35 @@ const UserTable = () => {
     <div>
       <h2 className="users-list-title">{t('userManagement.title')}</h2>
 
-      {/* Radio Buttons for Admins */}
+      {/* Radio buttons for view selection (only for Admin) */}
       {isAdmin && (
         <div className="mb-3">
           <div className="form-check form-check-inline">
             <input
               className="form-check-input"
               type="radio"
-              name="viewTypeRadio"
+              name="viewTypeOptions"
               id="viewDoctors"
               value="doctors"
               checked={viewType === 'doctors'}
               onChange={() => setViewType('doctors')}
             />
             <label className="form-check-label" htmlFor="viewDoctors">
-              {t('userManagement.viewOptions.doctors')} {/* Add translation */}
+              {t('userManagement.viewOptions.doctors')}
             </label>
           </div>
           <div className="form-check form-check-inline">
             <input
               className="form-check-input"
               type="radio"
-              name="viewTypeRadio"
-              id="viewDoctorCentres"
-              value="doctorCentres"
-              checked={viewType === 'doctorCentres'}
-              onChange={() => setViewType('doctorCentres')}
+              name="viewTypeOptions"
+              id="viewAdminCentres"
+              value="adminCentres"
+              checked={viewType === 'adminCentres'}
+              onChange={() => setViewType('adminCentres')}
             />
-            <label className="form-check-label" htmlFor="viewDoctorCentres">
-              {t('userManagement.viewOptions.doctorCentres')} {/* Add translation */}
+            <label className="form-check-label" htmlFor="viewAdminCentres">
+              {t('userManagement.viewOptions.adminCentres')}
             </label>
           </div>
         </div>
@@ -454,6 +559,8 @@ const UserTable = () => {
             <th>{t('userManagement.tableHeaders.role')}</th>
             {/* Conditionally show Speciality for Doctor Centres */}
             {viewType === 'doctorCentres' && <th>{t('userManagement.tableHeaders.speciality')}</th>}
+            {/* Conditionally show Centre Name for Admin Centres */}
+            {viewType === 'adminCentres' && null}
             <th>{t('userManagement.tableHeaders.actions')}</th>
           </tr>
         </thead>
@@ -461,13 +568,15 @@ const UserTable = () => {
           {!loading && filteredUsers.length === 0 ? (
             <tr>
               {/* Adjust colspan based on visible columns */}
-              <td colSpan={viewType === 'doctorCentres' ? 7 : 6}>{t('userManagement.noUsersFound')}</td>
+              <td colSpan={viewType === 'doctorCentres' ? 7 : (viewType === 'adminCentres' ? 6 : 6)}>{t('userManagement.noUsersFound')}</td>
             </tr>
           ) : (
             filteredUsers.map((user) => {
               // Log speciality specifically for doctorCentres view for debugging
               if (viewType === 'doctorCentres') {
                 console.log(`Rendering Doctor Centre ID: ${user.id}, Speciality:`, user.speciality);
+              } else if (viewType === 'adminCentres') {
+                 console.log(`Rendering Admin Centre ID: ${user.id}, Centre ID:`, user.centreId); // Log centreId instead of centreName
               }
               return (
               <tr key={user.id}>
@@ -477,6 +586,8 @@ const UserTable = () => {
                 <td>{user.role}</td>
                 {/* Conditionally render Speciality */}
                 {viewType === 'doctorCentres' && <td>{user.speciality ? user.speciality : 'N/A'}</td>}
+                 {/* Conditionally render Centre Name for Admin Centres */}
+                {viewType === 'adminCentres' && null}
                 <td>
                   <div className="action-buttons-container">
                     <button onClick={() => handleEditClick(user)} className="btn btn-sm btn-custom-teal me-1 btn-edit-custom" disabled={loading} style={{ backgroundColor: '#00c6a9', borderColor: '#00c6a9', color: '#ffffff', minWidth: '120px', textAlign: 'center' }}>{t('userManagement.buttons.edit')} ✏️</button>

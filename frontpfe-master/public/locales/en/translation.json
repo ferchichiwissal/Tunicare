@@ -71,7 +71,7 @@
     "confirmation": "Confirmation",
     "doctorsManagement": "Doctors Management",
     "deactivateAccounts": "Deactivate Accounts",
-    "changeRole": "Change Role",
+    "changeRole": "Change Roles",
     "addCabinet": "Add Cabinet",
     "manageCabinets": "Manage Cabinets & QR Codes",
     "manageExamCentres": "Manage Exam Centres",
@@ -80,7 +80,7 @@
     "editMyAccount": "Edit My Account",
     "changePassword": "Change Password",
     "logout": "Logout",
-    "userManagement": "User Management",
+    "userManagement": "Users Management",
     "consultationDashboard": "Consultation Dashboard",
     "manageAppointments": "Manage Appointments",
     "cabinetSettings": "Cabinet Settings",
@@ -94,7 +94,9 @@
     "statistics": "Statistics",
     "centreExaminationsDashboard": "Centre Examinations Dashboard",
     "archivedExaminations": "Archived Examinations",
-    "manageMySignature": "Manage My Signature"
+    "manageMySignature": "Manage My Signature",
+    "doctorActivation": "Doctor Activation",
+    "centreStatistics": "Centre Statistics"
   },
 
 
@@ -137,13 +139,20 @@
       "examsPerformedToday": "Exams Performed Today",
       "pendingExams": "Pending Exams",
       "charts": {
+        "examStatsByDoctor": {
+          "title": "Completed Examinations by Prescribing Doctor",
+          "label": "Number of Examinations",
+          "doctorLabel": "Prescribing Doctor",
+          "description": "Statistics of completed examinations by prescribing doctor in the centre."
+        },
         "monthlyReports": {
           "label": "Monthly Reports",
           "title": "Monthly Reports Evolution",
-          "description": ""
+          "description": "Evolution of the number of reports generated per month in the centre."
         },
         "reportTypes": {
-          "title": "Reports Distribution by Type"
+          "title": "Reports Distribution by Type",
+          "description": "Distribution of reports by type in the centre."
         }
       }
     },
@@ -207,7 +216,7 @@
         "label": "Number of Patients",
         "title": "Patients Evolution"
       },
-      "visualReportsTitle": "Visual Reports Statistics",
+      "visualReportsTitle": "Visual Statistics",
       "performanceTitle": "Performance Statistics for {{firstName}} {{lastName}}"
     },
     "tooltips": {
@@ -1577,7 +1586,7 @@
       "actions": "Actions"
     },
     "buttons": {
-      "prescribeReport": "Prescribe Report📄",
+      "prescribeReport": "generate the report📄",
       "printReport": "Print Report"
     },
     "errors": {
@@ -2029,7 +2038,7 @@
       "actions": "Actions"
     },
     "buttons": {
-      "prescribeReport": "Prescribe Report📄",
+      "prescribeReport": "generate the report📄",
       "viewReport": "View Report"
     }
   },
@@ -2379,5 +2388,140 @@
   "myConsultationsPage.buttons.downloadPrescription": "Download Prescription",
   "myConsultationsPage.buttons.downloadCertificate": "Download Certificate",
   "myConsultationsPage.tooltips.prescriptionNotAvailable": "Prescription not available",
-  "myConsultationsPage.tooltips.certificateNotAvailable": "Certificate not available"
-}
+  "myConsultationsPage.tooltips.certificateNotAvailable": "Certificate not available",
+
+
+
+ "activation.alerts.missingCentreInfo": "Your centre information is missing. Cannot load data.",
+  "activation.alerts.deleteFailed.missingCentreInfo": "Cannot delete: Your centre information is missing.",
+  "activation.alerts.toggleFailed.missingCentreInfo": "Cannot toggle status: Your centre information is missing.",
+  "activation.confirmations.activateDoctor": "Are you sure you want to activate this doctor?",
+  "activation.buttons.activateTooltip": "Activate this doctor",
+  "activation.buttons.cancelTooltip": "Delete this doctor registration",
+
+"admin_centre_statistics.loading_statistics": "Loading statistics...",
+  "admin_centre_statistics.error": "Error:",
+  "admin_centre_statistics.admin_centre_exam_stats_title": "Statistics of Completed Examinations by Prescribing Doctor",
+  "admin_centre_statistics.year": "Year:",
+  "admin_centre_statistics.month": "Month:",
+  "admin_centre_statistics.all_months": "All months",
+  "admin_centre_statistics.prescribing_doctor": "Prescribing Doctor",
+  "admin_centre_statistics.cabinet_name": "Cabinet Name",
+  "admin_centre_statistics.number_of_exams": "Number of Examinations",
+  "admin_centre_statistics.no_exam_stats_found": "No examination statistics found for this center with the selected filters.",
+  "admin_centre_statistics.authentication_token_missing": "Authentication token missing.",
+  "admin_centre_statistics.error_loading_statistics": "Error loading statistics.",
+
+
+"activation": {
+    "alerts": {
+      "sessionExpired": "Your session has expired. Please log in again.",
+      "missingCentreInfo": "Missing centre information for the administrator. Redirecting to dashboard.",
+      "fetchFailed": {
+        "authWithMessage": "Failed to load doctors: {{message}}. Authentication or authorization issue.",
+        "genericWithMessage": "Failed to load doctors: {{message}}.",
+        "generic": "Failed to load doctors."
+      },
+      "sessionInvalid": "Invalid session. Please log in again.",
+      "deleteFailed": {
+        "missingCentreInfo": "Missing centre information. Cannot delete doctor.",
+        "authWithMessage": "Failed to delete doctor: {{message}}. Authentication or authorization issue.",
+        "notFoundWithMessage": "Failed to delete doctor: {{message}}. Doctor not found.",
+        "genericWithMessage": "Failed to delete doctor: {{message}}.",
+        "generic": "Failed to delete doctor."
+      },
+      "deleteSuccess": "Doctor request deleted successfully.",
+      "toggleFailed": {
+        "missingCentreInfo": "Missing centre information. Cannot toggle doctor status.",
+        "authWithMessage": "Failed to toggle doctor status: {{message}}. Authentication or authorization issue.",
+        "notFoundWithMessage": "Failed to toggle doctor status: {{message}}. Doctor not found.",
+        "genericWithMessage": "Failed to toggle doctor status: {{message}}.",
+        "generic": "Failed to toggle doctor status."
+      },
+      "toggleSuccess": "Doctor status updated successfully: {{status}}."
+    },
+    "confirmations": {
+      "deleteDoctor": "Are you sure you want to cancel the activation request for doctor with ID {{doctorId}}?",
+      "activateDoctor": "Are you sure you want to activate doctor ?"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "title": "Centre Doctor Activation",
+    "searchPlaceholder": "Search by first name, last name, or email...",
+    "loading": "Loading...",
+    "tableHeaders": {
+      "id": "ID",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "speciality": "Speciality",
+      "centre": "Centre",
+      "actions": "Actions"
+    },
+    "noDoctorsFound": "No doctors pending activation found.",
+    "unknownCentre": "Unknown Centre",
+    "buttons": {
+      "activateTooltip": "Activate this doctor",
+      "activate": "Activate",
+      "cancelTooltip": "Cancel activation request",
+      "cancel": "Cancel"
+    }
+  },
+
+"dashboard.adminCentre.totalReportsGeneratedMonth":"total reports (current month)",
+"dashboard.adminCentre.pendingExams":"Pending exams",
+"dashboard.adminCentre.examsPerformedToday":"Tests carried out today",
+"dashboard.adminCentre.totalDoctorCentres":"Total center doctors",
+
+
+"dashboard.adminCentre.charts.visualStatisticsTitle": "Visual Statistics",
+  "dashboard.adminCentre.charts.examsByDoctorCentre.title": "Number of Exams by Centre Doctor",
+  "dashboard.adminCentre.charts.examsByDoctorCentre.label": "Number of Exams",
+  "dashboard.adminCentre.charts.doctorCentreAxisLabel": "Centre Doctor",
+  "dashboard.adminCentre.charts.examsByTypeByDoctorCentre.title": "Number of Exams by Type and by Centre Doctor",
+  "dashboard.adminCentre.charts.examsByTypeByDoctorCentre.label": "Number of Exams",
+  "dashboard.adminCentre.charts.doctorCentreExamTypeAxisLabel": "Centre Doctor - Exam Type",
+  "dashboard.adminCentre.charts.examDistributionByType.title": "Exam Distribution by Type",
+  "dashboard.charts.countAxisLabel": "Count",
+  "dashboard.charts.monthAxisLabel": "Month",
+  "dashboard.selectMonth": "Select Month",
+  "dashboard.selectYear": "Select Year",
+  "dashboard.charts.noDataAvailable": "No data available for this period",
+  "dashboard.charts.reportTypeUnknown": "Unknown Type",
+"dashboard.admin.totalAdminCentres":"Total center administrators",
+"dashboard.admin.adminCentres":"Centre Administrators",
+
+"myConsultationsPage.buttons.viewPrescription": "View Prescription",
+  "myConsultationsPage.buttons.viewPrescriptionTooltip": "View the prescription",
+  "myConsultationsPage.buttons.viewCertificate": "View Certificate",
+  "myConsultationsPage.buttons.viewCertificateTooltip": "View the certificate",
+  "myExaminationsPage.buttons.viewRequest": "View Request",
+     "myExaminationsPage.buttons.viewResult": "View Result",
+     "userManagement.confirmations.deletePatientCascade": "Are you sure you want to delete the patient ? This action will also delete all consultations and medical examinations associated with this patient.",
+  "userManagement.confirmations.deleteDoctorCascade": "Are you sure you want to delete the doctor with ? This action will also delete all consultations and medical examinations created by this doctor.",
+  "userManagement.confirmations.deleteDoctorCentreCascade": "Are you sure you want to delete the examination center doctor ? This action will also delete all medical examinations performed by this center doctor.",
+  "userManagement.confirmations.deleteDoctorCentreAdmin": "Are you sure you want to delete the examination center doctor ? This action will also delete all medical examinations performed by this center doctor.",
+  "userManagement.confirmations.deleteDoctorCentreAdminCentreCascade": "Are you sure you want to delete the examination center doctor ? This action will also delete all medical examinations performed by this center doctor.",
+  "userManagement.confirmations.deleteGeneric": "Are you sure you want to delete the user with ID  (role: {{role}})?",
+
+
+
+  "userManagement.tableHeaders.centreName": "Centre Name",
+  "userManagement.viewOptions.adminCentres": "Show Exam Centre Administrators",
+  "userManagement.confirmations.deleteAdminCentre": "Are you sure you want to permanently delete this Exam Centre Administrator?",
+  "userManagement.alerts.deleteSuccess.adminCentre": "Exam Centre Administrator deleted successfully.",
+  "userManagement.confirmations.deleteDoctorCentreAdminCentreCascade": "Are you sure you want to delete the examination center doctor ? This action will also delete all medical examinations performed by this center doctor.",
+  "userManagement.alerts.deleteSuccess.doctorCentreAdminCentre": "Exam Centre Doctor removed from this centre successfully.",
+  "userManagement.confirmations.deactivateDoctorCentreAdminCentre": "Are you sure you want to deactivate this Exam Centre Doctor in your centre ({{centreId}})?",
+  "userManagement.confirmations.activateDoctorCentreAdminCentre": "Are you sure you want to activate this Exam Centre Doctor in your centre ({{centreId}})?",
+  "userManagement.alerts.toggleSuccessDoctorCentreAdminCentre": "Exam Centre Doctor status successfully toggled. New status: {{status}}.",
+  "userManagement.confirmations.deactivateAdminCentre": "Are you sure you want to deactivate this Exam Centre Administrator?",
+  "userManagement.confirmations.activateAdminCentre": "Are you sure you want to activate this Exam Centre Administrator?",
+  "userManagement.alerts.toggleSuccessAdminCentre": "Exam Centre Administrator status successfully toggled. New status: {{status}}."
+
+    }
+  
+  
+

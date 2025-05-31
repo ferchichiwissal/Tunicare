@@ -72,6 +72,12 @@ public class UserServiceImplmnt implements UserServiceInterface {
     @Autowired // Inject the new repository
     private UserCabinetRegistrationRepository userCabinetRegistrationRepository;
 
+    @Autowired // Inject ConsultationService
+    private IConsultationService consultationService;
+
+    @Autowired // Inject MedicalExaminationService
+    private IMedicalExaminationService medicalExaminationService;
+
     // --- Authorization Helper Methods ---
 
     private User getCurrentAuthenticatedUser() {
@@ -371,7 +377,21 @@ public class UserServiceImplmnt implements UserServiceInterface {
         if (actor.getRole() == Role.ADMIN) {
             // Admin deletes the user entirely
             log.info("ADMIN {} deleting user {} (ID: {}) entirely.", actor.getEmail(), targetUser.getEmail(), targetUserId);
-            UsrRepo.delete(targetUser); // Cascade should handle registrations if configured
+
+            // Before deleting the user, delete associated entities based on their role
+            if (targetUser.getRole() == Role.DOCTOR) {
+                log.info("Deleting associated medical examinations for Doctor ID: {}", targetUserId);
+                medicalExaminationService.deleteExaminationsByDoctorId(targetUserId);
+            } else if (targetUser.getRole() == Role.PATIENT) {
+                 log.info("Deleting associated consultations and medical examinations for Patient ID: {}", targetUserId);
+                 consultationService.deleteConsultationsByPatientId(targetUserId);
+                 medicalExaminationService.deleteExaminationsByPatientId(targetUserId);
+            } else if (targetUser.getRole() == Role.DOCTOR_CENTRE_EXAMEN) {
+                 log.info("Deleting associated medical examinations for DoctorCentreExamen ID: {}", targetUserId);
+                 medicalExaminationService.deleteExaminationsByDoctorCentreDexamenId(targetUserId);
+            }
+
+            UsrRepo.delete(targetUser); // Delete the User record
         } else if (actor.getRole() == Role.DOCTOR || actor.getRole() == Role.ASSISTANT) {
             // Doctor/Assistant can only 'remove' a patient from their specific cabinet
             if (targetUser instanceof Patient) {
@@ -1306,15 +1326,17 @@ private Patient addPatient(Patient patient, Long targetCabinetId, boolean passwo
             // Check if the Patient has any remaining registrations
             List<UserCabinetRegistration> remainingRegistrations = userCabinetRegistrationRepository.findByUserId(targetUserId);
             if (remainingRegistrations.isEmpty()) {
-                log.info("Patient {} (ID: {}) has no remaining registrations. Deleting User record.", targetUser.getEmail(), targetUserId);
+                log.info("Patient {} (ID: {}) has no remaining registrations. Deleting associated consultations, medical examinations, and User record.", targetUser.getEmail(), targetUserId);
+                // Delete associated consultations before deleting the user
+                consultationService.deleteConsultationsByPatientId(targetUserId);
+                // Delete associated medical examinations before deleting the user
+                medicalExaminationService.deleteExaminationsByPatientId(targetUserId); // Call the new method
                 UsrRepo.delete(targetUser); // Delete the User record
             } else {
                 log.info("Patient {} (ID: {}) still has {} other registrations. User record not deleted.", targetUser.getEmail(), targetUserId, remainingRegistrations.size());
             }
 
         } else if (targetUser.getRole() == Role.ASSISTANT) {
-            // Permission check already verified the actor (Doctor/Assistant) is in the same cabinet as the target Assistant.
-            // Assistants are deleted directly when action is initiated by Doctor/Assistant in the same cabinet.
             // Permission check already verified the actor (Doctor/Assistant) is in the same cabinet as the target Assistant.
             // Assistants are deleted directly when action is initiated by Doctor/Assistant in the same cabinet.
             log.info("User {} deleting Assistant {} (ID: {}) directly.",

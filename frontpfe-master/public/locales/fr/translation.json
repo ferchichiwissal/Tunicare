@@ -1,4 +1,3 @@
-
 {
   "welcome": "Bienvenue",
   "call": "Appel : 1234567890",
@@ -68,7 +67,7 @@
     "confirmation": "Confirmation",
     "doctorsManagement": "Gestion des médecins",
     "deactivateAccounts": "Désactiver les comptes",
-    "changeRole": "Changer le rôle",
+    "changeRole": "Changer les Rôles",
     "addCabinet": "Ajouter un cabinet",
     "manageCabinets": "Gérer les cabinets & QR Codes",
     "manageExamCentres": "Gérer les centres d'examen",
@@ -91,7 +90,8 @@
     "centreExaminationsDashboard": "Tableau de Bord Centre Examens",
     "archivedExaminations": "Archive des Examens",
     "manageMySignature": "Gérer ma Signature",
-    "statistics": "Statistiques"
+    "statistics": "Statistiques",
+    "centreStatistics": "Statistiques du Centre"
   },
   "dashboard": {
     "title": "Tableau de bord de {{firstName}} {{lastName}}",
@@ -205,7 +205,16 @@
       "pendingExams": "Examens en Attente",
       "upcomingExamsTitle": "Examens à Venir Aujourd'hui",
       "examsPerformedTodayCount": "Examens réalisés aujourd'hui",
-      "pendingExamsCount": "Examens en attente"
+      "pendingExamsCount": "Examens en attente",
+      "charts": {
+        "monthlyReports": {
+          "title": "Rapports Mensuels",
+          "label": "Rapports Mensuels"
+        },
+        "reportTypes": {
+          "title": "Types de Rapport"
+        }
+      }
     },
     "admin": {
       "totalUsers": "Total Utilisateurs",
@@ -253,23 +262,6 @@
         "refused": "Refusés"
       }
     }
-    },
-    "doctorCentre": {
-      "examsPerformedToday": "Examens Aujourd'hui",
-      "averageProcessingTime": "Délai Traitement Moyen",
-      "pendingExams": "Examens en Attente",
-      "upcomingExamsTitle": "Examens à Venir Aujourd'hui",
-      "examsPerformedTodayCount": "Examens réalisés aujourd'hui",
-      "pendingExamsCount": "Examens en attente",
-      "charts": {
-        "monthlyReports": {
-          "title": "Rapports Mensuels",
-          "label": "Rapports Mensuels"
-        },
-        "reportTypes": {
-          "title": "Types de Rapport"
-        }
-      }
     },
     "assistant": {
       "appointmentsToday": "Rendez-vous Aujourd'hui",
@@ -341,7 +333,28 @@
         "realized": "Réalisés",
         "refused": "Refusés"
       },
-      "visualReportsTitle": "Statistiques Visuelles des Rapports"
+      "visualReportsTitle": "Statistiques Visuelles"
+    },
+    "adminCentre": {
+      "examsPerformedToday": "Examens réalisés aujourd'hui",
+      "pendingExams": "Examens en attente",
+      "totalReports": "Total rapports générés",
+      "totalDoctorCentres": "Total médecins de centre",
+      "statisticsTitle": "Statistiques du Centre d'Examen",
+      "charts": {
+        "monthlyReports": {
+          "title": "Statistiques mensuelles des rapports",
+          "label": "Nombre de rapports"
+        },
+        "reportTypes": {
+          "title": "Statistiques des rapports par type"
+        },
+        "examsByDoctor": {
+          "title": "Statistiques des examens par médecin",
+          "label": "Nombre d'examens",
+          "doctorAxisLabel": "Médecin"
+        }
+      }
     }
   },
   "editUserForm": {
@@ -734,6 +747,9 @@
     "confirmations": {
       "deleteDoctor": "Êtes-vous sûr de vouloir supprimer définitivement l'inscription de ce médecin ?",
       "activateDoctor": "Êtes-vous sûr de vouloir activer ce médecin ?"
+    },
+    "alerts": {
+      "missingCentreInfo": "Vos informations de centre sont manquantes. Impossible de charger les données."
     }
   },
 
@@ -1275,7 +1291,7 @@
       "print": "🖨️ Imprimer"
     },
     "status": {
-      "saving": "Enregistrement en cours...",
+      "saving": "Sauvegarde en cours...",
       "saveSuccess": "Demande d'examen enregistrée avec succès !",
       "updating": "Mise à jour en cours...",
       "updateSuccess": "Demande d'examen mise à jour avec succès !"
@@ -1437,7 +1453,7 @@
       "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
       "confirmHide": "Êtes-vous sûr de vouloir masquer cette consultation ? Elle ne sera plus visible dans cette liste.",
       "hideSuccess": "Consultation masquée avec succès.",
-      "hideError": "Échec du masquage de la consultation."
+      "hideError": "Erreur lors du masquage de la consultation."
     },
     "table": {
       "date": "Date",
@@ -2022,122 +2038,6 @@
     "tooltips": {
       "downloadNotReady": "Le résultat n'est pas encore disponible pour téléchargement."
     },
-    "noExaminations": "Aucun examen trouvé."
-  },
-  "common": {
-    "notAvailable": "N/A",
-    "invalidDate": "Date invalide",
-    "loading": "Chargement..."
-  },
-
-
-  "consultationDashboard": {
-    "alerts": {
-      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
-      "confirmHide": "Êtes-vous sûr de vouloir masquer cette consultation ?",
-      "hideSuccess": "Consultation masquée avec succès.",
-      "hideError": "Erreur lors du masquage de la consultation."
-    },
-    "errors": {
-      "missingDoctorId": "L'ID du médecin est manquant.",
-      "fetchFailedFallback": "Échec de la récupération des consultations.",
-      "hideFailedFallback": "Échec du masquage de la consultation."
-    },
-    "loading": "Chargement...",
-    "title": "Tableau de bord des consultations",
-    "errorPrefix": "Erreur",
-    "searchPlaceholder": "Rechercher par nom de patient...",
-    "table": {
-      "patient": "Patient",
-      "date": "Date",
-      "type": "Type",
-      "actions": "Actions",
-      "notAvailable": "N/A",
-      "invalidDate": "Date invalide",
-      "defaultType": "Consultation",
-      "noConsultations": "Aucune consultation trouvée."
-    },
-    "buttons": {
-      "viewDetails": "Voir Détails📄",  
-      "hideConsultation": "Masquer👁️‍🗨️"
-    }
-  },
- 
-  "myConsultationsPage": {
-    "alerts": {
-      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
-      "confirmHide": "Êtes-vous sûr de vouloir masquer cette consultation ?",
-      "hideSuccess": "Consultation masquée avec succès.",
-      "hideError": "Erreur lors du masquage de la consultation."
-    },
-    "errors": {
-      "unidentifiedUser": "Utilisateur non identifié.",
-      "cabinetContextNotFound": "Contexte du cabinet introuvable.",
-      "fetchFailedFallback": "Échec de la récupération des consultations.",
-      "authError": "Erreur d'authentification. Veuillez vous reconnecter.",
-      "authErrorDownload": "Erreur d'authentification. Impossible de télécharger.",
-      "downloadInvalidResponse": "Réponse invalide reçue pour le téléchargement.",
-      "prescriptionNotFound": "Ordonnance introuvable.",
-      "downloadFailedFallback": "Échec du téléchargement du fichier.",
-      "certificateNotFound": "Certificat introuvable.",
-      "hideFailedFallback": "Échec du masquage de la consultation."
-    },
-    "loading": "Chargement...",
-    "title": "Mes Consultations",
-    "errorPrefix": "Erreur",
-    "table": {
-      "date": "Date",
-      "type": "Type",
-      "prescription": "Ordonnance",
-      "certificate": "Certificat",
-      "actions": "Actions",
-      "notAvailable": "N/A",
-      "invalidDate": "Date invalide",
-      "defaultType": "Consultation",
-      "noConsultations": "Aucune consultation trouvée."
-    },
-    "buttons": {
-      "download": "Télécharger⬇️",
-      "downloadedCertificate": "Télécharger⬇️",
-      "hideConsultation": "Masquer👁️‍🗨️"
-    },
-    "checking": "Vérification..."
-    
-  },
-  "myExaminationsPage": {
-    "alerts": {
-      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
-      "confirmHide": "Êtes-vous sûr de vouloir masquer cet examen ? Cette action est irréversible depuis cette interface."
-    },
-    "errors": {
-      "authMissing": "Jeton d'authentification manquant. Veuillez vous reconnecter.",
-      "downloadFailed": "Échec du téléchargement du fichier pour l'examen ID {{examId}}.",
-      "hideFailed": "Échec du masquage de l'examen ID {{examId}}.",
-      "unidentifiedUser": "Utilisateur non identifié.",
-      "cabinetContextNotFound": "Contexte du cabinet introuvable.",
-      "authMissingLogin": "Jeton d'authentification manquant. Veuillez vous connecter.",
-      "fetchFailedFallback": "Échec de la récupération des examens."
-    },
-    "common": {
-      "unspecified": "Non spécifié"
-    },
-    "loading": "Chargement...",
-    "title": "Mes Examens",
-    "errorPrefix": "Erreur :",
-    "table": {
-      "dateRequested": "Date de la demande",
-      "type": "Type",
-      "centre": "Centre",
-      "action": "Action"
-    },
-    "buttons": {
-      "downloadRequest": "Télécharger Demande⬇️",
-      "downloadResult": "Télécharger Résultat⬇️",
-      "hide": "Masquer👁️‍🗨️"
-    },
-    "tooltips": {
-      "downloadNotReady": "Le résultat n'est pas encore disponible pour téléchargement."
-    },
     "noExaminationsFound": "Aucun examen trouvé pour le statut sélectionné."
   },
   "consultationDashboard": {
@@ -2278,7 +2178,7 @@
       "actions": "Actions"
     },
     "buttons": {
-      "prescribeReport": "Prescrire Rapport📄",
+      "prescribeReport": "Générer le Rapport📄",
       "viewReport": "Voir Rapport"
     }
   },
@@ -2453,9 +2353,9 @@
   "medicalExaminationForm.placeholders.select": "Sélectionner...",
   "medicalExaminationForm.examTypes.irm": "IRM",
   "medicalExaminationForm.examTypes.radio": "Radio",
-  "medicalExaminationForm.examTypes.bloodTest": "Analyse sanguine",
+  "medicalExaminationForm.examTypes.analysesanguine": "Analyse sanguine",
   "medicalExaminationForm.examTypes.scanner": "Scanner",
-  "medicalExaminationForm.examTypes.ultrasound": "Échographie",
+  "medicalExaminationForm.examTypes.echographie": "Échographie",
   "medicalExaminationForm.examTypes.other": "Autre",
   "medicalExaminationForm.placeholders.specifyExamType": "Spécifier le type d'examen",
   "medicalExaminationForm.labels.centre": "Centre d'examen",
@@ -2636,5 +2536,145 @@
   "myConsultationsPage.buttons.downloadPrescription": "Télécharger l'ordonnance",
   "myConsultationsPage.buttons.downloadCertificate": "Télécharger le certificat",
   "myConsultationsPage.tooltips.prescriptionNotAvailable": "Ordonnance non disponible",
-  "myConsultationsPage.tooltips.certificateNotAvailable": "Certificat non disponible"
+  "myConsultationsPage.tooltips.certificateNotAvailable": "Certificat non disponible",
+
+
+"activation.alerts.deleteFailed.missingCentreInfo": "Impossible de supprimer : Vos informations de centre sont manquantes.",
+  "activation.alerts.toggleFailed.missingCentreInfo": "Impossible de changer le statut : Vos informations de centre sont manquantes.",
+  "activation.buttons.activateTooltip": "Activer ce médecin",
+  "activation.buttons.cancelTooltip": "Supprimer l'inscription de ce médecin",
+
+
+
+"admin_centre_statistics.loading_statistics": "Chargement des statistiques...",
+  "admin_centre_statistics.error": "Erreur :",
+  "admin_centre_statistics.admin_centre_exam_stats_title": "Statistiques des Examens Terminés par Médecin Prescripteur",
+  "admin_centre_statistics.year": "Année :",
+  "admin_centre_statistics.month": "Mois :",
+  "admin_centre_statistics.all_months": "Tous les mois",
+  "admin_centre_statistics.prescribing_doctor": "Médecin Prescripteur",
+  "admin_centre_statistics.cabinet_name": "Nom du Cabinet",
+  "admin_centre_statistics.number_of_exams": "Nombre d'Examens",
+  "admin_centre_statistics.no_exam_stats_found": "Aucune statistique d'examen trouvée pour ce centre avec les filtres sélectionnés.",
+  "admin_centre_statistics.authentication_token_missing": "Token d'authentification manquant.",
+  "admin_centre_statistics.error_loading_statistics": "Erreur lors du chargement des statistiques.",
+
+
+      "activation": {
+    "alerts": {
+      "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+      "missingCentreInfo": "Informations sur le centre manquantes pour l'administrateur. Redirection vers le tableau de bord.",
+      "fetchFailed": {
+        "authWithMessage": "Échec du chargement des médecins : {{message}}. Problème d'authentification ou d'autorisation.",
+        "genericWithMessage": "Échec du chargement des médecins : {{message}}.",
+        "generic": "Échec du chargement des médecins."
+      },
+      "sessionInvalid": "Session invalide. Veuillez vous reconnecter.",
+      "deleteFailed": {
+        "missingCentreInfo": "Informations sur le centre manquantes. Impossible de supprimer le médecin.",
+        "authWithMessage": "Échec de la suppression du médecin : {{message}}. Problème d'authentification ou d'autorisation.",
+        "notFoundWithMessage": "Échec de la suppression du médecin : {{message}}. Médecin introuvable.",
+        "genericWithMessage": "Échec de la suppression du médecin : {{message}}.",
+        "generic": "Échec de la suppression du médecin."
+      },
+      "deleteSuccess": "Demande de médecin supprimée avec succès.",
+      "toggleFailed": {
+        "missingCentreInfo": "Informations sur le centre manquantes. Impossible de changer le statut du médecin.",
+        "authWithMessage": "Échec du changement de statut du médecin : {{message}}. Problème d'authentification ou d'autorisation.",
+        "notFoundWithMessage": "Échec du changement de statut du médecin : {{message}}. Médecin introuvable.",
+        "genericWithMessage": "Échec du changement de statut du médecin : {{message}}.",
+        "generic": "Échec du changement de statut du médecin."
+      },
+      "toggleSuccess": "Statut du médecin mis à jour avec succès : {{status}}."
+    },
+    "confirmations": {
+      "deleteDoctor": "Êtes-vous sûr de vouloir annuler la demande d'activation pour le médecin avec l'ID {{doctorId}} ?",
+      "activateDoctor": "Êtes-vous sûr de vouloir activer le médecin  ?"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "title": "Activation des médecins du centre",
+    "searchPlaceholder": "Rechercher par nom, prénom ou email...",
+    "loading": "Chargement...",
+    "tableHeaders": {
+      "id": "ID",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "speciality": "Spécialité",
+      "centre": "Centre",
+      "actions": "Actions"
+    },
+    "noDoctorsFound": "Aucun médecin en attente d'activation trouvé.",
+    "unknownCentre": "Centre inconnu",
+    "buttons": {
+      "activateTooltip": "Activer ce médecin",
+      "activate": "Activer",
+      "cancelTooltip": "Annuler la demande d'activation",
+      "cancel": "Annuler"
+    }
+  },
+
+    "dashboard.adminCentre.totalReportsGeneratedMonth":"total des rapports (mois en cours)",
+
+    "dashboard.adminCentre.statisticsTitle": "Statistiques du Centre d'Examen",
+    "dashboard.adminCentre.charts.monthlyReports.title": "Statistiques mensuelles des rapports",
+    "dashboard.adminCentre.charts.monthlyReports.label": "Nombre de rapports",
+    "dashboard.adminCentre.charts.monthlyReports.description": "Évolution du nombre de rapports générés par mois au cours des 12 derniers mois.",
+    "dashboard.adminCentre.charts.reportTypes.title": "Statistiques des rapports par type",
+    "dashboard.adminCentre.charts.reportTypes.description": "Distribution des rapports générés par type d'examen.",
+    "dashboard.adminCentre.charts.examsByDoctor.title": "Statistiques des examens par médecin",
+    "dashboard.adminCentre.charts.examsByDoctor.label": "Nombre d'examens",
+    "dashboard.adminCentre.charts.examsByDoctor.doctorLabel": "Médecin",
+    "dashboard.adminCentre.charts.examsByDoctor.description": "Nombre d'examens terminés par médecin prescripteur.",
+
+
+
+ "dashboard.adminCentre.charts.visualStatisticsTitle": "Statistiques Visuelles",
+  "dashboard.adminCentre.charts.examsByDoctorCentre.title": "Nombre d'examens par médecin du centre",
+  "dashboard.adminCentre.charts.examsByDoctorCentre.label": "Nombre d'examens",
+  "dashboard.adminCentre.charts.doctorCentreAxisLabel": "Médecin du Centre",
+  "dashboard.adminCentre.charts.examsByTypeByDoctorCentre.title": "Nombre d'examens par type et par médecin du centre",
+  "dashboard.adminCentre.charts.examsByTypeByDoctorCentre.label": "Nombre d'examens",
+  "dashboard.adminCentre.charts.doctorCentreExamTypeAxisLabel": "Médecin du Centre - Type d'examen",
+  "dashboard.adminCentre.charts.examDistributionByType.title": "Répartition des examens par type",
+  "dashboard.charts.countAxisLabel": "Nombre",
+  "dashboard.charts.monthAxisLabel": "Mois",
+  "dashboard.selectMonth": "Sélectionner le mois",
+  "dashboard.selectYear": "Sélectionner l'année",
+  "dashboard.charts.noDataAvailable": "Aucune donnée disponible pour cette période",
+  "dashboard.charts.reportTypeUnknown": "Type inconnu",
+"dashboard.admin.totalAdminCentres":"Total des administrateurs des centres",
+"dashboard.admin.adminCentres":"Administrateurs des centres",
+
+"myConsultationsPage.buttons.viewPrescription": "Visualiser Ordonnance",
+  "myConsultationsPage.buttons.viewPrescriptionTooltip": "Visualiser l'ordonnance",
+  "myConsultationsPage.buttons.viewCertificate": "Visualiser Certificat",
+  "myConsultationsPage.buttons.viewCertificateTooltip": "Visualiser le certificat",
+
+"myExaminationsPage.buttons.viewRequest": "Afficher la demande",
+     "myExaminationsPage.buttons.viewResult": "Afficher le résultat",
+     "userManagement.confirmations.deletePatientCascade": "Êtes-vous sûr de vouloir supprimer le patient ? Cette action supprimera également toutes les consultations et examens médicaux associés à ce patient.",
+  "userManagement.confirmations.deleteDoctorCascade": "Êtes-vous sûr de vouloir supprimer  {{role}}? Cette action supprimera également toutes les consultations et examens médicaux créés par ce docteur.",
+  "userManagement.confirmations.deleteDoctorCentreCascade": "Êtes-vous sûr de vouloir supprimer le docteur de centre d'examen  ? Cette action supprimera également tous les examens médicaux réalisés par ce docteur de centre.",
+  "userManagement.confirmations.deleteDoctorCentreAdmin": "Êtes-vous sûr de vouloir supprimer le docteur de centre d'examen ? Cette action supprimera également tous les examens médicaux réalisés par ce docteur de centre.",
+  "userManagement.confirmations.deleteDoctorCentreAdminCentreCascade": "Êtes-vous sûr de vouloir supprimer le docteur de centre d'examen ? Cette action supprimera également tous les examens médicaux réalisés par ce docteur de centre.",
+    "userManagement.confirmations.deleteGeneric": "Êtes-vous sûr de vouloir supprimer l'utilisateur avec le (rôle : {{role}}) ?",
+
+
+    "userManagement.tableHeaders.centreName": "Nom du Centre",
+  "userManagement.viewOptions.adminCentres": "Afficher Administrateurs Centre Examen",
+  "userManagement.confirmations.deleteAdminCentre": "Êtes-vous sûr de vouloir supprimer définitivement cet Administrateur de Centre d'Examen ?",
+  "userManagement.alerts.deleteSuccess.adminCentre": "Administrateur de Centre d'Examen supprimé avec succès.",
+  "userManagement.confirmations.deleteDoctorCentreAdminCentreCascade": "Êtes-vous sûr de vouloir supprimer le docteur de centre d'examen ? Cette action supprimera également tous les examens médicaux réalisés par ce docteur de centre.",
+  "userManagement.alerts.deleteSuccess.doctorCentreAdminCentre": "Médecin du Centre d'Examen supprimé de ce centre avec succès.",
+  "userManagement.confirmations.deactivateDoctorCentreAdminCentre": "Êtes-vous sûr de vouloir désactiver ce Médecin du Centre d'Examen dans votre centre ({{centreId}}) ?",
+  "userManagement.confirmations.activateDoctorCentreAdminCentre": "Êtes-vous sûr de vouloir activer ce Médecin du Centre d'Examen dans votre centre ({{centreId}}) ?",
+  "userManagement.alerts.toggleSuccessDoctorCentreAdminCentre": "Statut du Médecin du Centre d'Examen basculé avec succès. Nouveau statut : {{status}}.",
+  "userManagement.confirmations.deactivateAdminCentre": "Êtes-vous sûr de vouloir désactiver cet Administrateur de Centre d'Examen ?",
+  "userManagement.confirmations.activateAdminCentre": "Êtes-vous sûr de vouloir activer cet Administrateur de Centre d'Examen ?",
+  "userManagement.alerts.toggleSuccessAdminCentre": "Statut de l'Administrateur de Centre d'Examen basculé avec succès. Nouveau statut : {{status}}."
+
 }

@@ -11,6 +11,8 @@ import pi.pperformance.elite.dto.MonthlyStatDTO; // Ajout de l'import
 import pi.pperformance.elite.dto.AppointmentDistributionDTO; // Import the new DTO
 import pi.pperformance.elite.dto.MonthlyReportStatsDTO; // Import MonthlyReportStatsDTO
 import pi.pperformance.elite.dto.ReportTypeStatsDTO; // Import ReportTypeStatsDTO
+import pi.pperformance.elite.dto.AdminCentreStatisticsDTO; // Import AdminCentreStatisticsDTO
+import pi.pperformance.elite.dto.AdminCentreTileStatsDTO; // Import AdminCentreTileStatsDTO
 
 import java.util.List;
 
@@ -44,4 +46,19 @@ public interface IStatisticsService {
     // Nouvelles méthodes pour les statistiques de rapports du docteur de centre d'examen
     List<MonthlyReportStatsDTO> getDoctorCentreReportsPerMonth(Long doctorCentreId, Long centreId);
     List<ReportTypeStatsDTO> getDoctorCentreReportsByType(Long doctorCentreId, Long centreId);
+    List<CenterDoctorStatDTO> getAdminCentreExamStatsByDoctor(Long adminCentreId, Integer year, Integer month);
+
+    // Nouvelles méthodes pour les graphiques de l'administrateur de centre d'examen
+    List<CenterDoctorStatDTO> getAdminCentreExamStatsByDoctorCentre(Long adminCentreId, Integer year, Integer month); // Nouvelle méthode
+    List<ReportTypeStatsDTO> getAdminCentreExamStatsByType(Long adminCentreId, Integer year, Integer month);
+    List<ReportTypeStatsDTO> getAdminCentreExamDistributionByType(Long adminCentreId, Integer year, Integer month);
+
+    // Nouvelle méthode pour les statistiques de l'administrateur de centre d'examen
+    AdminCentreStatisticsDTO getAdminCentreDashboardStatistics(Long adminCentreId);
+
+    // Nouvelle méthode pour les statistiques des tuiles de l'administrateur de centre d'examen
+    AdminCentreTileStatsDTO getAdminCentreTileStats(Long centreId);
+
+    // Nouvelle méthode pour le nombre total d'administrateurs de centre d'examen
+    Long getTotalAdminCentreCount();
 }

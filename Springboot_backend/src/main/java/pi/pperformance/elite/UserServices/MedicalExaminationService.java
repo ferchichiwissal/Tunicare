@@ -750,4 +750,32 @@ public class MedicalExaminationService implements IMedicalExaminationService {
         medicalExaminationRepository.save(exam);
         log.info("Successfully set hidden={} for examination {} for patient {}", isHidden, examId, patientId);
     }
+
+    @Override
+    @Transactional // Ensure atomicity for deletion
+    public void deleteExaminationsByPatientId(Long patientId) {
+        log.info("Attempting to delete medical examinations for patient ID: {}", patientId);
+        // Use the repository method to delete examinations by patient ID
+        // This assumes MedicalExaminationRepository has a method like deleteByRendezVous_Patient_Id
+        medicalExaminationRepository.deleteByRendezVous_Patient_Id(patientId);
+        log.info("Successfully deleted medical examinations for patient ID: {}", patientId);
+    }
+
+    @Override
+    @Transactional // Ensure atomicity for deletion
+    public void deleteExaminationsByDoctorId(Long doctorId) {
+        log.info("Attempting to delete medical examinations for doctor ID: {}", doctorId);
+        // Use the repository method to delete examinations by doctor ID
+        medicalExaminationRepository.deleteByDoctor_Id(doctorId);
+        log.info("Successfully deleted medical examinations for doctor ID: {}", doctorId);
+    }
+
+    @Override
+    @Transactional // Ensure atomicity for deletion
+    public void deleteExaminationsByDoctorCentreDexamenId(Long doctorCentreDexamenId) {
+        log.info("Attempting to delete medical examinations for doctor centre examen ID: {}", doctorCentreDexamenId);
+        // Use the repository method to delete examinations by doctor centre examen ID
+        medicalExaminationRepository.deleteByDoctorCentreDexamen_Id(doctorCentreDexamenId);
+        log.info("Successfully deleted medical examinations for doctor centre examen ID: {}", doctorCentreDexamenId);
+    }
 }

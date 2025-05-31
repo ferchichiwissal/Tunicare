@@ -79,4 +79,7 @@ public interface ConsultationRepository extends JpaRepository<Consultation, Long
           "GROUP BY YEAR(c.dateConsultation), MONTH(c.dateConsultation) " +
           "ORDER BY YEAR(c.dateConsultation) DESC, MONTH(c.dateConsultation) DESC")
    List<MonthlyStatDTO> countGlobalConsultationsByMonth(@Param("startDate") Date startDate);
+
+   // Add method to delete consultations by patient ID
+   void deleteByPatient_Id(Long patientId);
 }

@@ -113,6 +113,9 @@ public interface MedicalExaminationRepository extends JpaRepository<MedicalExami
 
     long countByCentreNameAndEtatAndUpdatedAtBetween(String centreName, String etat, java.util.Date startDate, java.util.Date endDate);
 
+    // Nouvelle méthode pour compter les rapports générés dans un centre pour une période donnée
+    long countByCentreNameAndEtatAndResultatIsNotNullAndResultatNotAndUpdatedAtBetween(String centreName, String etat, String resultatExclu, LocalDateTime startOfMonth, LocalDateTime endOfMonth);
+
     List<MedicalExamination> findByCentreNameAndEtatAndRendezVous_ApptDateTimeBetweenOrderByRendezVous_ApptDateTimeAsc(String centreName, String etat, LocalDateTime startOfDay, LocalDateTime endOfDay);
 
     // Nouvelles méthodes pour les statistiques de rapports du docteur de centre d'examen
@@ -160,4 +163,23 @@ public interface MedicalExaminationRepository extends JpaRepository<MedicalExami
 
 
     // Add other custom query methods if needed later
+    @Query("SELECT me FROM MedicalExamination me WHERE me.centreName = :centreName AND me.etat = 'Terminé' " +
+           "AND (:year IS NULL OR YEAR(me.updatedAt) = :year) " +
+           "AND (:month IS NULL OR MONTH(me.updatedAt) = :month)")
+    List<MedicalExamination> findCompletedByCentreNameAndDate(@Param("centreName") String centreName,
+                                                              @Param("year") Integer year,
+                                                              @Param("month") Integer month);
+
+    // Add method to delete medical examinations by doctor ID
+    void deleteByDoctor_Id(Long doctorId);
+
+    // Add method to delete medical examinations by doctor centre examen ID
+    void deleteByDoctorCentreDexamen_Id(Long doctorCentreDexamenId);
+
+    /**
+     * Deletes medical examinations associated with a specific patient.
+     * This method assumes the relationship MedicalExamination -> RendezVous -> Patient.
+     * @param patientId The ID of the patient.
+     */
+    void deleteByRendezVous_Patient_Id(Long patientId);
 }

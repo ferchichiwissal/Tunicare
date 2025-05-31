@@ -23,6 +23,8 @@ const RegisterDoctorCentreForm = () => {
     const recaptchaRef = useRef(null);
     const { theme, toggleTheme } = useContext(ThemeContext); // Get theme context
 
+    const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -71,12 +73,31 @@ const RegisterDoctorCentreForm = () => {
     // Handle file input change
     const handleFileChange = (e) => {
         const file = e.target.files[0];
+        const MAX_FILE_SIZE = 1024 * 1024; // 1MB in bytes
+
         if (file) {
-            setFormData(prevState => ({ ...prevState, photoProfil: file }));
-            // Clear potential previous file error
-            if (errors.photoProfil) {
-                setErrors(prevErrors => ({ ...prevErrors, photoProfil: null }));
+            if (file.size > MAX_FILE_SIZE) {
+                // Set an error if the file is too large
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    photoProfil: t('validation.photoTooLarge', { maxSize: '1MB' }) // Add translation key
+                }));
+                setFormData(prevState => ({ ...prevState, photoProfil: null })); // Clear the file from state
+            } else {
+                // File is valid size, update state
+                setFormData(prevState => ({ ...prevState, photoProfil: file }));
+                // Clear potential previous file error
+                if (errors.photoProfil) {
+                    setErrors(prevErrors => ({ ...prevErrors, photoProfil: null }));
+                }
             }
+        } else {
+             // If file input is cleared
+             setFormData(prevState => ({ ...prevState, photoProfil: null }));
+             // Clear potential previous file error
+             if (errors.photoProfil) {
+                 setErrors(prevErrors => ({ ...prevErrors, photoProfil: null }));
+             }
         }
     };
 
@@ -104,7 +125,7 @@ const RegisterDoctorCentreForm = () => {
             newErrors.tel = t('validation.phoneDigitsOnly');
         }
         if (!formData.gender) newErrors.gender = t('validation.genderRequired');
-        if (!formData.speciality) newErrors.speciality = t('validation.specialityRequired'); // Add speciality validation
+        // Remove speciality validation
         // Optional: Add validation for file type/size if needed
         // if (formData.photoProfil && !['image/jpeg', 'image/png'].includes(formData.photoProfil.type)) {
         //     newErrors.photoProfil = t('validation.photoInvalidType');
@@ -225,7 +246,7 @@ const RegisterDoctorCentreForm = () => {
         setErrors({}); // Clear previous verification errors
         try {
             // Use apiClient
-            const response = await apiClient.post(
+            const response = await apiClient.get( // Changed from post to get
               `/api/doctor-centre-examen/verify-email?email=${encodeURIComponent(formData.email)}&code=${verificationCode}`
             );
             // Assuming backend returns 200 OK on success
@@ -338,9 +359,9 @@ const RegisterDoctorCentreForm = () => {
                                 <div className="invalid-feedback">{errors.gender}</div>
                             </div>
                             <div className="col-md-6">
-                                <label htmlFor="reg-speciality" className="form-label required">{t('registration.specialityLabel')}</label> {/* Add translation key */}
-                                <input type="text" id="reg-speciality" name="speciality" value={formData.speciality} onChange={handleChange} className={`form-control ${errors.speciality ? 'is-invalid' : ''}`} required />
-                                <div className="invalid-feedback">{errors.speciality}</div>
+                                <label htmlFor="reg-speciality" className="form-label">{t('registration.specialityLabel')}</label> {/* Add translation key */}
+                                <input type="text" id="reg-speciality" name="speciality" value={formData.speciality} onChange={handleChange} className={`form-control ${errors.speciality ? 'is-invalid' : ''}`} />
+                                {/* No feedback needed for optional field */}
                             </div>
                         </div>
 
@@ -358,8 +379,26 @@ const RegisterDoctorCentreForm = () => {
                         <div className="row g-3 mb-3">
                             <div className="col-md-6">
                                 <label htmlFor="reg-password" className="form-label required">{t('registration.passwordLabel')}</label>
-                                <input type="password" id="reg-password" name="password" value={formData.password} onChange={handleChange} className={`form-control ${errors.password ? 'is-invalid' : ''}`} required />
-                                <div className="invalid-feedback">{errors.password}</div>
+                                {/* Add a container for the input and icon */}
+                                <div className="input-group">
+                                    <input
+                                        type={showPassword ? 'text' : 'password'} // Toggle type based on state
+                                        id="reg-password"
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary" // Use Bootstrap button styling
+                                        onClick={() => setShowPassword(!showPassword)} // Toggle state on click
+                                    >
+                                        <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i> {/* Toggle icon */}
+                                    </button>
+                                    <div className="invalid-feedback">{errors.password}</div>
+                                </div>
                                 {passwordStrength && (
                                     <div className={`form-text password-strength-indicator ${passwordStrength.toLowerCase()}`}>
                                       {t('registration.passwordStrengthLabel', {
@@ -370,8 +409,26 @@ const RegisterDoctorCentreForm = () => {
                             </div>
                             <div className="col-md-6">
                                 <label htmlFor="reg-confirmPassword" className="form-label required">{t('registration.confirmPasswordLabel')}</label>
-                                <input type="password" id="reg-confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`} required />
-                                <div className="invalid-feedback">{errors.confirmPassword}</div>
+                                {/* Add a container for the input and icon */}
+                                <div className="input-group">
+                                    <input
+                                        type={showPassword ? 'text' : 'password'} // Toggle type based on state
+                                        id="reg-confirmPassword"
+                                        name="confirmPassword"
+                                        value={formData.confirmPassword}
+                                        onChange={handleChange}
+                                        className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary" // Use Bootstrap button styling
+                                        onClick={() => setShowPassword(!showPassword)} // Toggle state on click
+                                    >
+                                        <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i> {/* Toggle icon */}
+                                    </button>
+                                    <div className="invalid-feedback">{errors.confirmPassword}</div>
+                                </div>
                             </div>
                         </div>
 

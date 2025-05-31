@@ -83,6 +83,28 @@
   box-sizing: border-box;
 }
 
+/* Style for the input group containing password field and toggle button */
+.input-group {
+  display: flex;
+  align-items: center; /* Vertically align items */
+  width: 100%; /* Ensure it takes full width of its container */
+}
+
+/* Adjust input within the input group to take available space */
+.input-group .form-control {
+  flex-grow: 1; /* Allow input to grow and take available space */
+  /* Ensure no extra padding/margin is pushing the button away */
+  margin-right: -1px; /* Collapse border with button */
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Style the button within the input group */
+.input-group .btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
 /* Add styles for select to match input */
 select.form-select {
   padding: 12px 15px;

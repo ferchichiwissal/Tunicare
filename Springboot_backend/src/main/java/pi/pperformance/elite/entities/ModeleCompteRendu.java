@@ -3,32 +3,34 @@ package pi.pperformance.elite.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "modele_compte_rendu") // Explicit table name as requested
+@Table(name = "modele_compte_rendu")
 public class ModeleCompteRendu {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String nomModele; // e.g., "IRM Cérébrale Standard", "Radio Thorax", "Scanner Abdominal"
+    @Column(nullable = false)
+    private String nomModele;
 
-    @Column(nullable = true) // Or false if type is mandatory
-    private String typeModele; // e.g., "IRM", "Scanner", "Echographie"
+    @Lob // Use @Lob for large text content
+    @Column(nullable = false, columnDefinition = "LONGTEXT") // Explicitly define column type for large text
+    private String contenuModele;
 
-    @Lob
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String contenuModele; // The actual template content (HTML or plain text)
+    private String typeModele; // e.g., "General", "Cardiologie", etc.
 
-    @Lob
-    @Column(name = "preview_image", columnDefinition="LONGBLOB", nullable = true) // Use LONGBLOB for potentially larger images
-    private byte[] previewImage; // Store image data directly
+    @Lob // Use @Lob for binary data like images
+    @Column(columnDefinition = "LONGBLOB") // Or appropriate type for your DB (e.g., BYTEA for PostgreSQL)
+    private byte[] previewImage;
 
-    // Default constructor
-    public ModeleCompteRendu() {
-    }
+    private String previewImageType; // Store MIME type of the image
+
+    @ManyToOne
+    @JoinColumn(name = "centre_dexamen_id") // Foreign key column name
+    private CentreDexamen centreDexamen;
 
     // Getters and Setters
+
     public Long getId() {
         return id;
     }
@@ -67,5 +69,21 @@ public class ModeleCompteRendu {
 
     public void setPreviewImage(byte[] previewImage) {
         this.previewImage = previewImage;
+    }
+
+    public String getPreviewImageType() {
+        return previewImageType;
+    }
+
+    public void setPreviewImageType(String previewImageType) {
+        this.previewImageType = previewImageType;
+    }
+
+    public CentreDexamen getCentreDexamen() {
+        return centreDexamen;
+    }
+
+    public void setCentreDexamen(CentreDexamen centreDexamen) {
+        this.centreDexamen = centreDexamen;
     }
 }

@@ -35,6 +35,11 @@ public class DoctorCentreDexamen extends User implements Serializable {
     @JoinColumn(name = "id_centre") // Foreign key column
     private CentreDexamen centreDexamen;
 
+    // Relationship: DoctorCentreDexamen 'réaliser' MedicalExamination (1 to * - Owning Side)
+    @OneToMany(mappedBy = "doctorCentreDexamen", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<MedicalExamination> medicalExaminations;
+
+
     // Constructor to set the role specifically for this entity
     public DoctorCentreDexamen(String firstName, String lastName, String email, String password, LocalDate birthDate, String tel, String address, String speciality, CentreDexamen centreDexamen) {
         super(firstName, lastName, email, password, birthDate, tel, address); // Call User constructor
@@ -50,6 +55,10 @@ public class DoctorCentreDexamen extends User implements Serializable {
     // Getters for fields specific to this class
     public String getSpeciality() {
         return speciality;
+    }
+
+    public Set<MedicalExamination> getMedicalExaminations() {
+        return medicalExaminations;
     }
 
     public boolean isActive() { // Getter for boolean often uses 'is' prefix

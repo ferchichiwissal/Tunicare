@@ -17,6 +17,7 @@ const MyExaminationsPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [downloading, setDownloading] = useState(null); // Track which exam is downloading
+    const [previewing, setPreviewing] = useState(null); // Track which exam is previewing // Added state for previewing
     const [hidingExamId, setHidingExamId] = useState(null); // Track which exam is being hidden
     const navigate = useNavigate(); // Initialize useNavigate
 
@@ -69,8 +70,66 @@ const MyExaminationsPage = () => {
         };
     }, [performLogout]);
 
+    // Function to handle the preview click for examination request PDF // Added preview function
+    const handlePreviewRequest = async (examId) => {
+        setPreviewing(`request_${examId}`); // Set previewing state
+        setError('');
 
-    // Function to handle the download click for examination request PDF
+        console.log(`Attempting to preview examination request PDF for ID: ${examId}`);
+
+        const token = getToken();
+        if (!token) {
+            setError(t('myExaminationsPage.errors.authMissing'));
+            setPreviewing(null); // Clear previewing state
+            performLogout();
+            return;
+        }
+
+        try {
+            const previewResponse = await axios.get(`${API_URL}/api/medical-examinations/${examId}/download`, {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: 'blob',
+            });
+
+            if (previewResponse.data && previewResponse.data instanceof Blob && previewResponse.data.type === 'application/pdf') {
+                const blob = new Blob([previewResponse.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank'); // Open in a new tab
+            } else {
+                 console.warn("Received unexpected response type for request preview:", previewResponse.headers['content-type']);
+                 setError(t('myExaminationsPage.errors.previewInvalidResponse', 'Réponse invalide pour la prévisualisation de la demande.')); // Indicate preview failed
+            }
+
+        } catch (err) {
+            console.error("Error fetching examination request PDF for preview:", err);
+            let errorMessage = t('myExaminationsPage.errors.previewFailed', { examId: examId, defaultValue: 'Échec de la prévisualisation de la demande d\'examen.' });
+            if (err.response) {
+                try {
+                    const errorBlob = err.response.data;
+                    // Attempt to read error message from blob if it's not 404
+                    if (errorBlob instanceof Blob) {
+                        const errorText = await errorBlob.text();
+                        try {
+                            const errorJson = JSON.parse(errorText);
+                            errorMessage = errorJson.message || errorText || errorMessage;
+                        } catch (parseError) {
+                            errorMessage = errorText || errorMessage;
+                        }
+                    } else {
+                         errorMessage = err.response.data?.message || err.response.statusText || errorMessage;
+                    }
+                } catch (parseError) {
+                    console.error("Could not parse error response for request preview:", parseError);
+                }
+            }
+            setError(errorMessage);
+        } finally {
+            setPreviewing(null); // Clear previewing state
+        }
+    };
+
+
+    // Function to handle the download click for examination request PDF // Keep download function
     const handleDownloadRequest = async (examId) => {
         setDownloading(`request_${examId}`);
         setError('');
@@ -114,12 +173,68 @@ const MyExaminationsPage = () => {
                 }
             }
             setError(errorMessage);
-        } finally {
-            setDownloading(null);
         }
     };
 
-    // Function to handle the download click for examination result PDF
+    // Function to handle the preview click for examination result PDF // Added preview function
+    const handlePreviewResult = async (examId) => {
+        setPreviewing(`result_${examId}`); // Set previewing state
+        setError('');
+
+        console.log(`Attempting to preview examination result PDF for ID: ${examId}`);
+
+        const token = getToken();
+        if (!token) {
+            setError(t('myExaminationsPage.errors.authMissing'));
+            setPreviewing(null); // Clear previewing state
+            performLogout();
+            return;
+        }
+
+        try {
+            const previewResponse = await axios.get(`${API_URL}/api/medical-examinations/${examId}/report/download-pdf`, {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: 'blob',
+            });
+
+            if (previewResponse.data && previewResponse.data instanceof Blob && previewResponse.data.type === 'application/pdf') {
+                const blob = new Blob([previewResponse.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank'); // Open in a new tab
+            } else {
+                 console.warn("Received unexpected response type for result preview:", previewResponse.headers['content-type']);
+                 setError(t('myExaminationsPage.errors.previewInvalidResponse', 'Réponse invalide pour la prévisualisation du résultat.')); // Indicate preview failed
+            }
+
+        } catch (err) {
+            console.error("Error fetching examination result PDF for preview:", err);
+            let errorMessage = t('myExaminationsPage.errors.previewFailed', { examId: examId, defaultValue: 'Échec de la prévisualisation du résultat d\'examen.' });
+            if (err.response) {
+                try {
+                    const errorBlob = err.response.data;
+                    // Attempt to read error message from blob if it's not 404
+                    if (errorBlob instanceof Blob) {
+                        const errorText = await errorBlob.text();
+                        try {
+                            const errorJson = JSON.parse(errorText);
+                            errorMessage = errorJson.message || errorText || errorMessage;
+                        } catch (parseError) {
+                            errorMessage = errorText || errorMessage;
+                        }
+                    } else {
+                         errorMessage = err.response.data?.message || err.response.statusText || errorMessage;
+                    }
+                } catch (parseError) {
+                    console.error("Could not parse error response for result preview:", parseError);
+                }
+            }
+            setError(errorMessage);
+        } finally {
+            setPreviewing(null); // Clear previewing state
+        }
+    };
+
+    // Function to handle the download click for examination result PDF // Keep download function
     const handleDownloadResult = async (examId) => {
         setDownloading(`result_${examId}`);
         setError('');
@@ -356,32 +471,42 @@ const MyExaminationsPage = () => {
                                 <td>{exam.act || t('common.notAvailable')}</td> {/* Use translation key */}
                                 <td>{displayCentre(exam)}</td> {/* Needs logic based on backend */}
                                 {/* <td>{exam.resultat || t('common.notAvailable')}</td> {/* Suppressed Result Cell */}
-                                <td className="actions-cell">
+                                <td className="actions-cell"> {/* Use actions-cell class for consistent styling */}
+                                    {/* Preview Request Button */}
+                                    <button
+                                        className="btn btn-primary btn-sm me-2" // Bootstrap classes for margin
+                                        onClick={() => handlePreviewRequest(exam.idExam)}
+                                        disabled={previewing === `request_${exam.idExam}`} // Disable while previewing
+                                        title={t('myExaminationsPage.buttons.viewRequestTooltip', 'Visualiser la demande')} // Add tooltip translation key
+                                    >
+                                        {previewing === `request_${exam.idExam}` ? t('loading') : t('myExaminationsPage.buttons.viewRequest', 'Visualiser Demande')} {/* Add button text translation key */}
+                                    </button>
+                                    {/* Download Request Button */}
                                     <button
                                         className="btn btn-primary btn-sm me-2" // Bootstrap classes for margin
                                         onClick={() => handleDownloadRequest(exam.idExam)}
-                                        disabled={downloading === `request_${exam.idExam}`}
-                                        title={t('myExaminationsPage.buttons.downloadRequest', 'Télécharger Demande')}
+                                        disabled={downloading === `request_${exam.idIdExam}`} // Disable while downloading
+                                        title={t('myExaminationsPage.buttons.downloadRequestTooltip', 'Télécharger la demande')} // Add tooltip translation key
                                     >
-                                        {downloading === `request_${exam.idExam}` ? t('loading') : t('myExaminationsPage.buttons.downloadRequest', 'Télécharger Demande')}
+                                        {downloading === `request_${exam.idExam}` ? t('loading') : t('myExaminationsPage.buttons.downloadRequest', 'Télécharger Demande')} {/* Add button text translation key */}
                                     </button>
+                                    {/* Preview Result Button */}
+                                    <button
+                                        className="btn btn-primary btn-sm me-2" // Bootstrap classes for margin
+                                        onClick={() => handlePreviewResult(exam.idExam)}
+                                        disabled={previewing === `result_${exam.idExam}` || exam.etat !== 'terminé'} // Disable while previewing or if not finished
+                                        title={exam.etat !== 'terminé' ? t('myExaminationsPage.tooltips.resultNotAvailable', 'Le résultat n\'est pas encore disponible.') : t('myExaminationsPage.buttons.viewResultTooltip', 'Visualiser le résultat')} // Add tooltip translation key
+                                    >
+                                        {previewing === `result_${exam.idExam}` ? t('loading') : t('myExaminationsPage.buttons.viewResult', 'Visualiser Résultat')} {/* Add button text translation key */}
+                                    </button>
+                                    {/* Download Result Button */}
                                     <button
                                         className="btn btn-primary btn-sm"
                                         onClick={() => handleDownloadResult(exam.idExam)}
-                                        disabled={downloading === `result_${exam.idExam}` || exam.etat !== 'terminé'}
-                                        title={exam.etat !== 'terminé' ? t('myExaminationsPage.tooltips.downloadNotReady', 'Le résultat n\'est pas encore disponible pour téléchargement.') : t('myExaminationsPage.buttons.downloadResult', 'Télécharger Résultat')}
+                                        disabled={downloading === `result_${exam.idExam}` || exam.etat !== 'terminé'} // Disable while downloading or if not finished
+                                        title={exam.etat !== 'terminé' ? t('myExaminationsPage.tooltips.downloadNotReady', 'Le résultat n\'est pas encore disponible pour téléchargement.') : t('myExaminationsPage.buttons.downloadResultTooltip', 'Télécharger le résultat')} // Add tooltip translation key
                                     >
-                                        {downloading === `result_${exam.idExam}` ? t('loading') : t('myExaminationsPage.buttons.downloadResult', 'Télécharger Résultat')}
-                                    </button>
-                                    {/* --- Hide Button --- */}
-                                    <button
-                                        className="btn btn-primary btn-sm ms-2" // Added margin-start
-                                        onClick={() => handleHideExamination(exam.idExam)}
-                                        disabled={hidingExamId === exam.idExam}
-                                        title={t('myExaminationsPage.buttons.hide', 'Ne plus afficher')}
-                                    >
-                                        {/* Replace icon with text */}
-                                        {hidingExamId === exam.idExam ? t('loading') : t('myExaminationsPage.buttons.hide', 'Masquer')}
+                                        {downloading === `result_${exam.idExam}` ? t('loading') : t('myExaminationsPage.buttons.downloadResult', 'Télécharger Résultat')} {/* Add button text translation key */}
                                     </button>
                                 </td>
                             </tr>
@@ -397,4 +522,3 @@ const MyExaminationsPage = () => {
 };
 
 export default MyExaminationsPage;
-
